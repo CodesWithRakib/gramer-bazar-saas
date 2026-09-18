@@ -22,6 +22,7 @@ import { ReviewsModule } from './reviews/reviews.module.js';
 import { OrdersModule } from './orders/orders.module.js';
 import { ProductRequestsModule } from './product-requests/product-requests.module.js';
 import { SellerPortalModule } from './seller-portal/seller-portal.module.js';
+import { DeliveriesModule } from './deliveries/deliveries.module.js';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { SellerPortalModule } from './seller-portal/seller-portal.module.js';
     PublicModule,
     ProductRequestsModule,
     SellerPortalModule,
+    DeliveriesModule,
   ],
   controllers: [AppController],
   providers: [

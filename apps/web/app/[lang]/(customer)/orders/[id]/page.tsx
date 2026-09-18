@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useGetOrderByIdQuery, useCancelOrderMutation } from '@/features/orders/ordersApi';
+import { useGetCustomerDeliveryQuery } from '@/features/deliveries/deliveriesApi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,7 @@ export default function OrderDetailsPage({ params: { lang, id } }: { params: { l
   const dispatch = useDispatch();
   
   const { data: order, isLoading, isError } = useGetOrderByIdQuery(id);
+  const { data: delivery } = useGetCustomerDeliveryQuery(id);
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
 
   if (isLoading) {
@@ -211,6 +213,26 @@ export default function OrderDetailsPage({ params: { lang, id } }: { params: { l
               )}
             </CardContent>
           </Card>
+
+          {delivery && delivery.rider && (
+            <Card className="border-primary bg-primary/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-primary" />
+                  {isBn ? 'আপনার রাইডার' : 'Your Rider'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <p className="font-semibold text-base">{delivery.rider.firstName} {delivery.rider.lastName}</p>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="font-medium">{delivery.rider.phone}</span>
+                  <a href={`tel:${delivery.rider.phone}`} className="text-primary hover:underline">
+                    {isBn ? 'কল করুন' : 'Call'}
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
