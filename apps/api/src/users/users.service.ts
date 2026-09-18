@@ -15,15 +15,15 @@ export class UsersService {
   ) {}
 
   async findByPhone(phone: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { phone } });
+    return this.userRepository.findOne({ where: { phone }, relations: ['roles'] });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { email } });
+    return this.userRepository.findOne({ where: { email }, relations: ['roles'] });
   }
 
   async findById(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ where: { id }, relations: ['roles'] });
     if (!user) {
       throw new NotFoundException('User not found');
     }

@@ -116,7 +116,8 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     const refreshTokenHash = await bcrypt.hash(refreshToken, salt);
 
-    await this.usersService.update(user.id, {
+    // update() internally calls findById which loads relations: ['roles']
+    const updatedUser = await this.usersService.update(user.id, {
       refreshTokenHash,
       lastLoginAt: new Date(),
     });
@@ -125,12 +126,12 @@ export class AuthService {
       accessToken,
       refreshToken,
       user: {
-        id: user.id,
-        phone: user.phone,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        roles: user.roles?.map((r) => r.name) || [],
+        id: updatedUser.id,
+        phone: updatedUser.phone,
+        email: updatedUser.email,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        roles: updatedUser.roles?.map((r) => r.name) || [],
       },
     };
   }

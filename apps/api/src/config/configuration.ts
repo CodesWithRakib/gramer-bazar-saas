@@ -10,6 +10,10 @@ export default () => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
   },
   cors: {
-    origins: process.env.CORS_ORIGINS?.split(',') || ['*'],
+    origins: (process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
   },
 });
