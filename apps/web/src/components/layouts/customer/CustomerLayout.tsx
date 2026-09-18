@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export function CustomerLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,8 +10,9 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
           <span className="font-bold text-lg text-primary">Gramer Bazar</span>
           <div className="flex-1" />
           <nav className="flex items-center space-x-4">
-            <span className="text-sm font-medium">Cart</span>
-            <span className="text-sm font-medium">Profile</span>
+            <Link href="/en/wishlist" className="text-sm font-medium hover:text-primary transition-colors">Wishlist</Link>
+            <Link href="/en/reviews" className="text-sm font-medium hover:text-primary transition-colors">Reviews</Link>
+            <Link href="/en/orders" className="text-sm font-medium hover:text-primary transition-colors">Orders</Link>
           </nav>
         </div>
       </header>

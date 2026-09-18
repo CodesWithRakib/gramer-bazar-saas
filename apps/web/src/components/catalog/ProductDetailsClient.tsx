@@ -2,13 +2,17 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Store, ShieldCheck, Truck, Star } from 'lucide-react';
+import { ArrowLeft, Store, ShieldCheck, Truck, Star, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { ProductGrid } from '@/components/catalog/ProductGrid';
-import { SellerProduct, useGetRelatedProductsQuery, useGetProductReviewsQuery } from '@/features/catalog/catalogApi';
-import { useDispatch } from 'react-redux';
+import { SellerProduct, useGetRelatedProductsQuery } from '@/features/catalog/catalogApi';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
+import { useGetUserWishlistQuery, useAddProductToWishlistMutation, useRemoveProductFromWishlistMutation } from '@/features/wishlists/wishlistsApi';
+import { useGetProductReviewsQuery, useAddReviewMutation } from '@/features/reviews/reviewsApi';
+import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
 
 export function ProductDetailsClient({ 
   products, 
@@ -52,7 +56,52 @@ export function ProductDetailsClient({
   const isOutOfStock = stock <= 0;
 
   const { data: relatedProducts } = useGetRelatedProductsQuery(product.productVariant.product.slug);
-  const { data: reviewsResponse } = useGetProductReviewsQuery(product.productVariant.product.id);
+  const { data: reviewsResponse, refetch: refetchReviews } = useGetProductReviewsQuery({ productId: product.productVariant.product.id });
+  
+  // Auth state
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
+
+  // Wishlist hooks
+  const { data: wishlist } = useGetUserWishlistQuery(undefined, { skip: !isAuthenticated });
+  const [addToWishlist, { isLoading: isAddingWishlist }] = useAddProductToWishlistMutation();
+  const [removeFromWishlist, { isLoading: isRemovingWishlist }] = useRemoveProductFromWishlistMutation();
+
+  const isWishlisted = wishlist?.some(item => item.productId === product.productVariant.product.id);
+
+  const toggleWishlist = async () => {
+    if (!isAuthenticated) {
+      toast.error(isBn ? 'দয়া করে লগইন করুন' : 'Please login first');
+      return;
+    }
+    try {
+      if (isWishlisted) {
+        await removeFromWishlist(product.productVariant.product.id).unwrap();
+        toast.success(isBn ? 'উইশলিস্ট থেকে সরানো হয়েছে' : 'Removed from wishlist');
+      } else {
+        await addToWishlist(product.productVariant.product.id).unwrap();
+        toast.success(isBn ? 'উইশলিস্টে যোগ করা হয়েছে' : 'Added to wishlist');
+      }
+    } catch (error) {
+      toast.error(isBn ? 'একটি ত্রুটি হয়েছে' : 'An error occurred');
+    }
+  };
+
+  // Review state
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [addReview, { isLoading: isAddingReview }] = useAddReviewMutation();
+
+  const handleReviewSubmit = async () => {
+    if (!isAuthenticated) return;
+    try {
+      await addReview({ productId: product.productVariant.product.id, rating, comment }).unwrap();
+      toast.success(isBn ? 'রিভিউ জমা দেওয়া হয়েছে' : 'Review submitted successfully');
+      setComment('');
+      refetchReviews();
+    } catch (error: any) {
+      toast.error(error?.data?.message || (isBn ? 'রিভিউ জমা দিতে সমস্যা হয়েছে' : 'Failed to submit review'));
+    }
+  };
 
   const handleAddToCart = () => {
     dispatch(addToCart({
@@ -101,7 +150,18 @@ export function ProductDetailsClient({
             </Link>
           </div>
           
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{name}</h1>
+          <div className="flex justify-between items-start mb-4 gap-4">
+            <h1 className="text-3xl md:text-4xl font-bold">{name}</h1>
+            <Button
+              variant="outline"
+              size="icon"
+              className={`rounded-full shrink-0 ${isWishlisted ? 'text-red-500 border-red-200 bg-red-50' : 'text-muted-foreground'}`}
+              onClick={toggleWishlist}
+              disabled={isAddingWishlist || isRemovingWishlist}
+            >
+              <Heart className={`h-6 w-6 ${isWishlisted ? 'fill-current' : ''}`} />
+            </Button>
+          </div>
           
           <div className="flex items-center gap-4 mb-6 pb-6 border-b">
             {discountPrice ? (
@@ -214,6 +274,37 @@ export function ProductDetailsClient({
       {/* Reviews Section */}
       <div className="mt-12 bg-card p-6 md:p-8 rounded-2xl border shadow-sm">
         <h2 className="text-2xl font-bold mb-6">{isBn ? 'গ্রাহকদের মতামত' : 'Customer Reviews'}</h2>
+        
+        {isAuthenticated && (
+          <div className="mb-8 p-4 border rounded-xl bg-muted/30">
+            <h3 className="font-semibold mb-4">{isBn ? 'মতামত লিখুন' : 'Write a Review'}</h3>
+            <div className="flex gap-2 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button 
+                  key={star} 
+                  type="button" 
+                  onClick={() => setRating(star)}
+                  className="focus:outline-none"
+                >
+                  <Star className={`w-6 h-6 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'}`} />
+                </button>
+              ))}
+            </div>
+            <Textarea 
+              placeholder={isBn ? 'আপনার অভিজ্ঞতা শেয়ার করুন...' : 'Share your experience...'}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="mb-4 bg-background"
+            />
+            <Button onClick={handleReviewSubmit} disabled={isAddingReview}>
+              {isAddingReview ? (isBn ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...') : (isBn ? 'জমা দিন' : 'Submit Review')}
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              {isBn ? 'বিঃদ্রঃ শুধুমাত্র যারা পণ্যটি কিনেছেন তারাই রিভিউ দিতে পারবেন।' : 'Note: Only customers who have purchased this product can leave a review.'}
+            </p>
+          </div>
+        )}
+
         {reviewsResponse && reviewsResponse.data && reviewsResponse.data.length > 0 ? (
           <div className="space-y-6">
             {reviewsResponse.data.map(review => (
