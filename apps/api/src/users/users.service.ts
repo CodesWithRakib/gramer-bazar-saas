@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity.js';
+import { RoleEntity } from '../roles/entities/role.entity.js';
 import { UserStatus } from './enums/user-status.enum.js';
 
 @Injectable()
@@ -9,6 +10,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
   ) {}
 
   async findByPhone(phone: string): Promise<User | null> {
@@ -27,8 +30,17 @@ export class UsersService {
     return user;
   }
 
-  async create(userData: Partial<User>): Promise<User> {
-    const user = this.userRepository.create(userData);
+  async create(userData: Partial<User> & { roleNames?: string[] }): Promise<User> {
+    const { roleNames, ...rest } = userData;
+    const user = this.userRepository.create(rest);
+    
+    if (roleNames && roleNames.length > 0) {
+      const roles = await this.roleRepository.createQueryBuilder('role')
+        .where('role.name IN (:...roleNames)', { roleNames })
+        .getMany();
+      user.roles = roles;
+    }
+
     return this.userRepository.save(user);
   }
 

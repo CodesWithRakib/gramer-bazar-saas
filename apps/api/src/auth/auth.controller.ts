@@ -5,6 +5,7 @@ import { AuthService } from './auth.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { LoginDto } from './dto/login.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
 import { RefreshDto } from './dto/refresh.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 
@@ -31,9 +32,17 @@ export class AuthController {
     return this.authService.verifyOtp(verifyOtpDto.phone, verifyOtpDto.otp);
   }
 
+  @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @ApiOperation({ summary: 'Register a new staff member (Admin/Seller/Rider)' })
+  @ApiResponse({ status: 201, description: 'Registered successfully' })
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.registerStaff(registerDto);
+  }
+
   @Post('login')
   @Throttle({ default: { limit: 5, ttl: 60000 } })
-  @ApiOperation({ summary: 'Login with password (for admin/seller)' })
+  @ApiOperation({ summary: 'Login with password (for admin/seller/rider)' })
   @ApiResponse({ status: 200, description: 'Logged in successfully' })
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {

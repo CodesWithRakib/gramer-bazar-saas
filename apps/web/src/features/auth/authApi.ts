@@ -16,6 +16,20 @@ export interface AuthResponse {
   user: UserProfile;
 }
 
+export interface LoginRequest {
+  emailOrPhone: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  phone: string;
+  email?: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     sendOtp: builder.mutation<{ success: boolean; message?: string }, SendOtpRequest>({
@@ -32,6 +46,20 @@ export const authApi = api.injectEndpoints({
         body,
       }),
     }),
+    loginWithPassword: builder.mutation<AuthResponse, LoginRequest>({
+      query: (body) => ({
+        url: '/auth/login',
+        method: 'POST',
+        body,
+      }),
+    }),
+    registerStaff: builder.mutation<AuthResponse, RegisterRequest>({
+      query: (body) => ({
+        url: '/auth/register',
+        method: 'POST',
+        body,
+      }),
+    }),
     getProfile: builder.query<UserProfile, void>({
       query: () => '/auth/me',
       providesTags: ['User'],
@@ -42,6 +70,8 @@ export const authApi = api.injectEndpoints({
 export const {
   useSendOtpMutation,
   useVerifyOtpMutation,
+  useLoginWithPasswordMutation,
+  useRegisterStaffMutation,
   useGetProfileQuery,
   useLazyGetProfileQuery,
 } = authApi;

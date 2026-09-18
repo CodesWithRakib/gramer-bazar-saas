@@ -1,5 +1,5 @@
 {
-  "extends": "@gramer-bazar/tsconfig/nestjs.json",
+  "extends": "../../packages/tsconfig/nestjs.json",
   "compilerOptions": {
     "outDir": "./dist",
     "strictPropertyInitialization": false,

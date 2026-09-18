@@ -160,16 +160,38 @@ export function Header({ lang }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href={`/${lang}/profile`} className="cursor-pointer">
-                      {isBn ? "আমার প্রোফাইল" : "My Profile"}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={`/${lang}/orders`} className="cursor-pointer">
-                      {isBn ? "আমার অর্ডার" : "My Orders"}
-                    </Link>
-                  </DropdownMenuItem>
+                  {user?.roles?.includes('ADMIN') ? (
+                    <DropdownMenuItem asChild>
+                      <Link href={`/${lang}/admin`} className="cursor-pointer font-medium text-primary">
+                        {isBn ? "অ্যাডমিন প্যানেল" : "Admin Dashboard"}
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : user?.roles?.includes('SELLER') ? (
+                    <DropdownMenuItem asChild>
+                      <Link href={`/${lang}/seller`} className="cursor-pointer font-medium text-primary">
+                        {isBn ? "সেলার পোর্টাল" : "Seller Portal"}
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : user?.roles?.includes('RIDER') ? (
+                    <DropdownMenuItem asChild>
+                      <Link href={`/${lang}/rider`} className="cursor-pointer font-medium text-primary">
+                        {isBn ? "রাইডার অ্যাপ" : "Rider App"}
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/${lang}/profile`} className="cursor-pointer">
+                          {isBn ? "আমার প্রোফাইল" : "My Profile"}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/${lang}/orders`} className="cursor-pointer">
+                          {isBn ? "আমার অর্ডার" : "My Orders"}
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onSelect={(e) => {

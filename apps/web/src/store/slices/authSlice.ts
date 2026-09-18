@@ -6,7 +6,7 @@ export interface UserProfile {
   email?: string;
   firstName?: string;
   lastName?: string;
-  roles?: { id: string; name: string }[];
+  roles?: string[];
 }
 
 export interface AuthState {

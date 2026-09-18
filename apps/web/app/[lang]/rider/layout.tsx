@@ -32,14 +32,14 @@ export default function RiderLayout({
       router.push(`/${lang}`);
       return;
     }
-    const isRider = user?.roles?.some((r) => r.name === 'RIDER');
+    const isRider = user?.roles?.some((r) => r === 'RIDER');
     if (user && !isRider) {
       toast.error(isBn ? 'এই পেজটি দেখার অনুমতি নেই' : 'Unauthorized access');
       router.push(`/${lang}`);
     }
   }, [isAuthenticated, user, router, lang, isBn]);
 
-  if (!isAuthenticated || !user?.roles?.some((r) => r.name === 'RIDER')) {
+  if (!isAuthenticated || !user?.roles?.some((r) => r === 'RIDER')) {
     return null;
   }
 

@@ -72,6 +72,33 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
+  async registerStaff(registerDto: any) {
+    // Check if user already exists
+    let user = await this.usersService.findByPhone(registerDto.phone);
+    if (!user && registerDto.email) {
+      user = await this.usersService.findByEmail(registerDto.email);
+    }
+    if (user) {
+      throw new BadRequestException('User with this phone or email already exists');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(registerDto.password, salt);
+
+    user = await this.usersService.create({
+      phone: registerDto.phone,
+      email: registerDto.email,
+      firstName: registerDto.firstName,
+      lastName: registerDto.lastName,
+      passwordHash,
+      isPhoneVerified: false,
+      status: UserStatus.ACTIVE, // Assuming they are active upon registration for MVP
+      roleNames: [registerDto.role],
+    });
+
+    return this.generateTokens(user);
+  }
+
   private async generateTokens(user: User) {
     const payload = { sub: user.id, phone: user.phone };
 

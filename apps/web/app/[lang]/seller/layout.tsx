@@ -31,14 +31,14 @@ export default function SellerLayout({
       router.push(`/${lang}`);
       return;
     }
-    const isSeller = user?.roles?.some((r) => r.name === 'SELLER');
+    const isSeller = user?.roles?.some((r) => r === 'SELLER');
     if (user && !isSeller) {
       toast.error(isBn ? 'এই পেজটি দেখার অনুমতি নেই' : 'Unauthorized access');
       router.push(`/${lang}`);
     }
   }, [isAuthenticated, user, router, lang, isBn]);
 
-  if (!isAuthenticated || !user?.roles?.some((r) => r.name === 'SELLER')) {
+  if (!isAuthenticated || !user?.roles?.some((r) => r === 'SELLER')) {
     return null;
   }
 

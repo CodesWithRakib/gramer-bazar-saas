@@ -148,6 +148,16 @@ export function LoginModal({ lang }: { lang: string }) {
               </div>
             </form>
           )}
+
+          <div className="mt-8 text-center border-t pt-4">
+            <a 
+              href={`/${lang}/login`} 
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              onClick={handleClose}
+            >
+              {isBn ? 'অ্যাডমিন/সেলার লগইন' : 'Admin / Seller Login'}
+            </a>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -46,7 +46,13 @@ export default function ProfilePage({ params: { lang } }: { params: { lang: stri
             </div>
             <div>
               <p className="font-semibold text-lg">{user.firstName} {user.lastName}</p>
-              <p className="text-muted-foreground capitalize">{user.roles?.[0]?.name?.toLowerCase()}</p>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {user.roles?.map((role) => (
+                  <span key={role} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full capitalize">
+                    {role}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
           
