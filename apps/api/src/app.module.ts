@@ -14,6 +14,9 @@ import { RolesModule } from './roles/roles.module.js';
 import { PermissionsModule } from './permissions/permissions.module.js';
 import { LocationsModule } from './locations/locations.module.js';
 import { AddressesModule } from './addresses/addresses.module.js';
+import { CatalogModule } from './catalog/catalog.module.js';
+import { ShopsModule } from './shops/shops.module.js';
+import { InventoryModule } from './inventory/inventory.module.js';
 
 @Module({
   imports: [
@@ -44,6 +47,9 @@ import { AddressesModule } from './addresses/addresses.module.js';
     AuthModule,
     LocationsModule,
     AddressesModule,
+    CatalogModule,
+    ShopsModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [
