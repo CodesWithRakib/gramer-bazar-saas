@@ -4,6 +4,8 @@ import "../globals.css";
 import { getDirection, type Locale } from "@/config/i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { ReduxProvider } from "@/store/provider";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -41,7 +43,11 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <ReduxProvider>
-          {children}
+          <Header lang={lang} />
+          <main className="flex-grow flex flex-col">
+            {children}
+          </main>
+          <Footer lang={lang} />
         </ReduxProvider>
         <Toaster />
       </body>

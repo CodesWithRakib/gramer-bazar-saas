@@ -15,7 +15,7 @@ export class Category {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'parent_id', nullable: true })
+  @Column({ name: 'parent_id', type: 'uuid', nullable: true })
   parentId: string | null;
 
   @ManyToOne(() => Category, (category) => category.children, {
@@ -37,7 +37,7 @@ export class Category {
   @Column({ unique: true })
   slug: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   icon: string | null;
 
   @Column({ name: 'is_regulated', default: false })

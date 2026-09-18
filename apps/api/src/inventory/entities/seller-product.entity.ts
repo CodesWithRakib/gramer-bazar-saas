@@ -44,7 +44,7 @@ export class SellerProduct {
   })
   discountPrice: number | null;
 
-  @Column({ name: 'seller_sku', nullable: true })
+  @Column({ name: 'seller_sku', type: 'varchar', nullable: true })
   sellerSku: string | null;
 
   @Column({ name: 'is_regulated_approved', default: false })

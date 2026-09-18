@@ -20,7 +20,7 @@ export class Brand {
   @Column({ unique: true })
   slug: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   logo: string | null;
 
   @Column({ name: 'is_active', default: true })

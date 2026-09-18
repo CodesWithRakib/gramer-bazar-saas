@@ -28,43 +28,43 @@ export class Address {
   @Column({ name: 'contact_phone', length: 20 })
   contactPhone: string;
 
-  @Column({ name: 'country_id', nullable: true })
-  countryId: string;
+  @Column({ name: 'country_id', type: 'uuid', nullable: true })
+  countryId: string | null;
 
   @ManyToOne(() => Country)
   @JoinColumn({ name: 'country_id' })
   country: Relation<Country>;
 
-  @Column({ name: 'division_id', nullable: true })
-  divisionId: string;
+  @Column({ name: 'division_id', type: 'uuid', nullable: true })
+  divisionId: string | null;
 
   @ManyToOne(() => Division)
   @JoinColumn({ name: 'division_id' })
   division: Relation<Division>;
 
-  @Column({ name: 'district_id', nullable: true })
-  districtId: string;
+  @Column({ name: 'district_id', type: 'uuid', nullable: true })
+  districtId: string | null;
 
   @ManyToOne(() => District)
   @JoinColumn({ name: 'district_id' })
   district: Relation<District>;
 
-  @Column({ name: 'upazila_id', nullable: true })
-  upazilaId: string;
+  @Column({ name: 'upazila_id', type: 'uuid', nullable: true })
+  upazilaId: string | null;
 
   @ManyToOne(() => Upazila)
   @JoinColumn({ name: 'upazila_id' })
   upazila: Relation<Upazila>;
 
-  @Column({ name: 'union_id', nullable: true })
-  unionId: string;
+  @Column({ name: 'union_id', type: 'uuid', nullable: true })
+  unionId: string | null;
 
   @ManyToOne(() => Union)
   @JoinColumn({ name: 'union_id' })
   union: Relation<Union>;
 
-  @Column({ name: 'area_id', nullable: true })
-  areaId: string;
+  @Column({ name: 'area_id', type: 'uuid', nullable: true })
+  areaId: string | null;
 
   @ManyToOne(() => Area)
   @JoinColumn({ name: 'area_id' })

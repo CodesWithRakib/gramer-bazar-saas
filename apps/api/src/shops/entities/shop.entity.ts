@@ -34,10 +34,10 @@ export class Shop {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   logo: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   banner: string | null;
 
   @Column({ name: 'is_verified', default: false })

@@ -17,6 +17,7 @@ import { AddressesModule } from './addresses/addresses.module.js';
 import { CatalogModule } from './catalog/catalog.module.js';
 import { ShopsModule } from './shops/shops.module.js';
 import { InventoryModule } from './inventory/inventory.module.js';
+import { PublicModule } from './public/public.module.js';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { InventoryModule } from './inventory/inventory.module.js';
     CatalogModule,
     ShopsModule,
     InventoryModule,
+    PublicModule,
   ],
   controllers: [AppController],
   providers: [

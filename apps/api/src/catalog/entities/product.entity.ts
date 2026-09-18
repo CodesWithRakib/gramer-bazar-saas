@@ -26,7 +26,7 @@ export class Product {
   @JoinColumn({ name: 'category_id' })
   category: Relation<Category>;
 
-  @Column({ name: 'brand_id', nullable: true })
+  @Column({ name: 'brand_id', type: 'uuid', nullable: true })
   brandId: string | null;
 
   @ManyToOne(() => Brand, { onDelete: 'SET NULL', nullable: true })
