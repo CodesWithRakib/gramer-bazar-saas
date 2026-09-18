@@ -6,7 +6,9 @@
     "dev": "pnpm --parallel -r run dev",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "test:e2e:api": "pnpm -C apps/api run test:e2e",
+    "test:e2e:web": "pnpm -C apps/e2e exec playwright test"
   },
   "dependencies": {
     "jimp": "^1.6.1",
