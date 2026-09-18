@@ -10,13 +10,13 @@ import {
   type Relation,
 } from 'typeorm';
 
-
 import {
   OrderStatus,
   PaymentMethod,
   PaymentStatus,
 } from '../enums/order-status.enum.js';
 import { OrderItem } from './order-item.entity.js';
+import { OrderStatusHistory } from './order-status-history.entity.js';
 import { User } from '../../users/entities/user.entity.js';
 import { Address } from '../../addresses/entities/address.entity.js';
 
@@ -78,6 +78,9 @@ export class Order {
 
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   items: Relation<OrderItem[]>;
+
+  @OneToMany(() => OrderStatusHistory, (history) => history.order, { cascade: true })
+  statusHistory: Relation<OrderStatusHistory[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -8,6 +8,7 @@ import { DataSource, In } from 'typeorm';
 import { CheckoutDto } from './dto/checkout.dto.js';
 import { Order } from './entities/order.entity.js';
 import { OrderItem } from './entities/order-item.entity.js';
+import { OrderStatusHistory } from './entities/order-status-history.entity.js';
 
 import { OrderStatus, PaymentStatus } from './enums/order-status.enum.js';
 import { Address } from '../addresses/entities/address.entity.js';
@@ -99,11 +100,102 @@ export class OrdersService {
       order.paymentStatus = PaymentStatus.PENDING;
       order.items = orderItems;
 
-      // 6. Save all within transaction
+      // 6. Create Status History
+      const statusHistory = new OrderStatusHistory();
+      statusHistory.status = OrderStatus.PENDING;
+      statusHistory.remark = 'Order placed successfully';
+      
+      order.statusHistory = [statusHistory];
+
+      // 7. Save all within transaction
       await manager.save(Inventory, inventoryUpdates);
       const savedOrder = await manager.save(Order, order);
 
       return savedOrder;
+    });
+  }
+
+  async findCustomerOrders(userId: string) {
+    return this.dataSource.getRepository(Order).find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findCustomerOrderById(userId: string, orderId: string) {
+    const order = await this.dataSource.getRepository(Order).findOne({
+      where: { id: orderId, userId },
+      relations: [
+        'items', 
+        'items.sellerProduct', 
+        'items.sellerProduct.product',
+        'statusHistory', 
+        'address'
+      ],
+      order: {
+        statusHistory: {
+          createdAt: 'DESC',
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return order;
+  }
+
+  async cancelOrder(userId: string, orderId: string) {
+    return this.dataSource.transaction(async (manager) => {
+      // 1. Fetch Order with items and pessimistic write lock
+      const order = await manager.findOne(Order, {
+        where: { id: orderId, userId },
+        relations: ['items'],
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      // 2. Check if cancellation is allowed
+      if (order.status !== OrderStatus.PENDING && order.status !== OrderStatus.CONFIRMED) {
+        throw new BadRequestException(`Order cannot be cancelled because it is already ${order.status}`);
+      }
+
+      // 3. Restore inventory
+      const itemIds = order.items.map((i) => i.sellerProductId);
+      const dbProducts = await manager.find(SellerProduct, {
+        where: { id: In(itemIds) },
+        relations: ['inventory'],
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      const inventoryUpdates: Inventory[] = [];
+      for (const orderItem of order.items) {
+        const dbProduct = dbProducts.find((p) => p.id === orderItem.sellerProductId);
+        if (dbProduct && dbProduct.inventory) {
+          dbProduct.inventory.quantity += orderItem.quantity;
+          inventoryUpdates.push(dbProduct.inventory);
+        }
+      }
+
+      // 4. Update order status
+      order.status = OrderStatus.CANCELLED;
+
+      // 5. Create History Entry
+      const history = new OrderStatusHistory();
+      history.orderId = order.id;
+      history.status = OrderStatus.CANCELLED;
+      history.remark = 'Cancelled by customer';
+
+      // 6. Save updates
+      if (inventoryUpdates.length > 0) {
+        await manager.save(Inventory, inventoryUpdates);
+      }
+      await manager.save(OrderStatusHistory, history);
+      return manager.save(Order, order);
     });
   }
 }
