@@ -1,0 +1,57 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import configuration from './config/configuration.js';
+import { envValidationSchema } from './config/env.validation.js';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { AuthModule } from './auth/auth.module.js';
+import { UsersModule } from './users/users.module.js';
+import { OtpModule } from './otp/otp.module.js';
+import { RolesModule } from './roles/roles.module.js';
+import { PermissionsModule } from './permissions/permissions.module.js';
+import { LocationsModule } from './locations/locations.module.js';
+import { AddressesModule } from './addresses/addresses.module.js';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      validate: (env) => envValidationSchema.parse(env),
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('database.url'),
+        autoLoadEntities: true,
+        synchronize: true,
+        logging: configService.get<string>('NODE_ENV') === 'development',
+      }),
+      inject: [ConfigService],
+    }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 10,
+    }]),
+    RolesModule,
+    PermissionsModule,
+    UsersModule,
+    OtpModule,
+    AuthModule,
+    LocationsModule,
+    AddressesModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    {
+      provide: 'APP_GUARD',
+      useClass: ThrottlerGuard,
+    },
+  ],
+})
+export class AppModule {}

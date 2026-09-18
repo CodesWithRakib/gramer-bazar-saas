@@ -1,0 +1,12 @@
+{
+  "extends": "@gramer-bazar/tsconfig/nestjs.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

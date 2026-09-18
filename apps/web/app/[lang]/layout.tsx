@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_Bengali } from "next/font/google";
 import "../globals.css";
 import { getDirection, type Locale } from "@/config/i18n";
 import { Toaster } from "@/components/ui/sonner";
+import { ReduxProvider } from "@/store/provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,10 +36,13 @@ export default async function RootLayout({
     <html
       lang={lang}
       dir={dir}
+      suppressHydrationWarning
       className={`${inter.variable} ${notoSansBengali.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        {children}
+        <ReduxProvider>
+          {children}
+        </ReduxProvider>
         <Toaster />
       </body>
     </html>
