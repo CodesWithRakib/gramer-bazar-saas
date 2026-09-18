@@ -20,6 +20,7 @@ import { InventoryModule } from './inventory/inventory.module.js';
 import { PublicModule } from './public/public.module.js';
 import { ReviewsModule } from './reviews/reviews.module.js';
 import { OrdersModule } from './orders/orders.module.js';
+import { ProductRequestsModule } from './product-requests/product-requests.module.js';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { OrdersModule } from './orders/orders.module.js';
     ReviewsModule,
     OrdersModule,
     PublicModule,
+    ProductRequestsModule,
   ],
   controllers: [AppController],
   providers: [
