@@ -10,6 +10,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setLoginModalOpen, logout } from '@/store/slices/authSlice';
 import { setCartOpen } from '@/store/slices/cartSlice';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+
+import { useGetProfileQuery } from '@/features/auth/authApi';
+import { setUser } from '@/store/slices/authSlice';
 
 interface HeaderProps {
   lang: string;
@@ -20,12 +38,26 @@ export function Header({ lang }: HeaderProps) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
+  const [mounted, setMounted] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const isBn = lang === 'bn';
   
-  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user, token } = useSelector((state: RootState) => state.auth);
   const cartItemsCount = useSelector((state: RootState) => 
     state.cart.items.reduce((total, item) => total + item.quantity, 0)
   );
+
+  const { data: profile } = useGetProfileQuery(undefined, { skip: !isAuthenticated || !!user });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (profile && !user) {
+      dispatch(setUser(profile));
+    }
+  }, [profile, user, dispatch]);
 
   useEffect(() => {
     setSearchTerm(searchParams.get('q') || '');
@@ -88,10 +120,38 @@ export function Header({ lang }: HeaderProps) {
               )}
             </Button>
 
-            {isAuthenticated ? (
-              <Button variant="ghost" className="font-medium" onClick={() => dispatch(logout())}>
-                {user?.firstName || (isBn ? 'প্রোফাইল' : 'Profile')} (Logout)
-              </Button>
+            {!mounted ? (
+              <div className="w-20 h-9 bg-muted animate-pulse rounded-md ml-2" />
+            ) : isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="font-medium">
+                    {user?.firstName || profile?.firstName || (isBn ? 'প্রোফাইল' : 'Profile')}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${lang}/profile`} className="cursor-pointer">
+                      {isBn ? 'আমার প্রোফাইল' : 'My Profile'}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${lang}/orders`} className="cursor-pointer">
+                      {isBn ? 'আমার অর্ডার' : 'My Orders'}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsLogoutModalOpen(true);
+                    }}
+                    className="text-destructive cursor-pointer focus:text-destructive"
+                  >
+                    {isBn ? 'লগআউট' : 'Logout'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button onClick={() => dispatch(setLoginModalOpen(true))}>
                 {isBn ? 'লগইন' : 'Login'}
@@ -114,6 +174,32 @@ export function Header({ lang }: HeaderProps) {
           </Button>
         </form>
       </div>
+
+      <Dialog open={isLogoutModalOpen} onOpenChange={setIsLogoutModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isBn ? 'লগআউট নিশ্চিত করুন' : 'Confirm Logout'}</DialogTitle>
+            <DialogDescription>
+              {isBn ? 'আপনি কি নিশ্চিত যে আপনি লগআউট করতে চান?' : 'Are you sure you want to logout of your account?'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-end mt-4">
+            <Button variant="outline" onClick={() => setIsLogoutModalOpen(false)}>
+              {isBn ? 'বাতিল' : 'Cancel'}
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                dispatch(logout());
+                setIsLogoutModalOpen(false);
+                router.push(`/${lang}`);
+              }}
+            >
+              {isBn ? 'লগআউট' : 'Logout'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
