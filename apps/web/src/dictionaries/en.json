@@ -1,0 +1,9 @@
+{
+  "common": {
+    "welcome": "Welcome to Gramer Bazar",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "empty": "No data found"
+  }
+}
