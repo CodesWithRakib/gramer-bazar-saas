@@ -14,6 +14,9 @@ import { OrderStatus, PaymentStatus } from './enums/order-status.enum.js';
 import { Address } from '../addresses/entities/address.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
+import { Coupon } from '../coupons/entities/coupon.entity.js';
+import { CouponUsage } from '../coupons/entities/coupon-usage.entity.js';
+import { DiscountType } from '../coupons/enums/discount-type.enum.js';
 
 @Injectable()
 export class OrdersService {
@@ -82,9 +85,68 @@ export class OrdersService {
         inventoryUpdates.push(dbProduct.inventory);
       }
 
-      // 4. Calculate Delivery & Total (Flat 50 BDT for now, configurable later)
-      const deliveryFee = 50;
-      const discount = 0;
+      // 4. Calculate Delivery & Discount
+      const deliveryFee = 50; // Flat 50 BDT for now
+      let discount = 0;
+      let appliedCoupon: Coupon | null = null;
+      let couponUsage: CouponUsage | null = null;
+
+      if (checkoutDto.couponCode) {
+        appliedCoupon = await manager.findOne(Coupon, {
+          where: { code: checkoutDto.couponCode.toUpperCase() },
+          lock: { mode: 'pessimistic_write' },
+        });
+
+        if (!appliedCoupon) {
+          throw new BadRequestException('Invalid coupon code');
+        }
+        if (!appliedCoupon.isActive) {
+          throw new BadRequestException('This coupon is currently inactive');
+        }
+
+        const now = new Date();
+        if (appliedCoupon.startDate && new Date(appliedCoupon.startDate) > now) {
+          throw new BadRequestException('This coupon is not active yet');
+        }
+        if (appliedCoupon.endDate && new Date(appliedCoupon.endDate) < now) {
+          throw new BadRequestException('This coupon has expired');
+        }
+        if (appliedCoupon.usageLimit !== null && appliedCoupon.usedCount >= appliedCoupon.usageLimit) {
+          throw new BadRequestException('This coupon has reached its usage limit');
+        }
+        if (subtotal < (appliedCoupon.minOrderAmount || 0)) {
+          throw new BadRequestException(`Minimum order amount of ${appliedCoupon.minOrderAmount} BDT is required to use this coupon`);
+        }
+
+        const userUsageCount = await manager.count(CouponUsage, {
+          where: { couponId: appliedCoupon.id, userId },
+        });
+
+        if (userUsageCount >= appliedCoupon.customerUsageLimit) {
+          throw new BadRequestException('You have reached the maximum usage limit for this coupon');
+        }
+
+        if (appliedCoupon.discountType === DiscountType.FIXED) {
+          discount = Number(appliedCoupon.discountValue);
+        } else if (appliedCoupon.discountType === DiscountType.PERCENTAGE) {
+          discount = subtotal * (Number(appliedCoupon.discountValue) / 100);
+          if (appliedCoupon.maxDiscountAmount && discount > Number(appliedCoupon.maxDiscountAmount)) {
+            discount = Number(appliedCoupon.maxDiscountAmount);
+          }
+        }
+
+        if (discount > subtotal) {
+          discount = subtotal;
+        }
+
+        appliedCoupon.usedCount += 1;
+        
+        couponUsage = new CouponUsage();
+        couponUsage.couponId = appliedCoupon.id;
+        couponUsage.userId = userId;
+        couponUsage.discountAmount = discount;
+      }
+
       const total = subtotal + deliveryFee - discount;
 
       // 5. Create Order
@@ -110,6 +172,12 @@ export class OrdersService {
       // 7. Save all within transaction
       await manager.save(Inventory, inventoryUpdates);
       const savedOrder = await manager.save(Order, order);
+
+      if (couponUsage && appliedCoupon) {
+        couponUsage.orderId = savedOrder.id;
+        await manager.save(CouponUsage, couponUsage);
+        await manager.save(Coupon, appliedCoupon);
+      }
 
       return savedOrder;
     });

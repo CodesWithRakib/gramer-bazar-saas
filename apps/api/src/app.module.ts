@@ -27,6 +27,7 @@ import { WishlistsModule } from './wishlists/wishlists.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AnalyticsModule } from './analytics/analytics.module.js';
+import { CouponsModule } from './coupons/coupons.module.js';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { AnalyticsModule } from './analytics/analytics.module.js';
     WishlistsModule,
     NotificationsModule,
     AnalyticsModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [

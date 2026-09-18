@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsUUID, ValidateNested, ArrayMinSize, Min, IsNumber } from 'class-validator';
+import { IsArray, IsEnum, IsUUID, ValidateNested, ArrayMinSize, Min, IsNumber, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { PaymentMethod } from '../enums/order-status.enum.js';
@@ -29,4 +29,9 @@ export class CheckoutDto {
   @ValidateNested({ each: true })
   @Type(() => CheckoutItemDto)
   items: CheckoutItemDto[];
+
+  @ApiProperty({ description: 'Optional coupon code', required: false })
+  @IsString()
+  @IsOptional()
+  couponCode?: string;
 }
