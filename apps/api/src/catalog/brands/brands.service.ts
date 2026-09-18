@@ -17,8 +17,33 @@ export class BrandsService {
     return this.brandsRepository.save(brand);
   }
 
-  async findAll(): Promise<Brand[]> {
-    return this.brandsRepository.find();
+  async findAll(page?: number, limit?: number, search?: string) {
+    if (!page || !limit) {
+      // Legacy unpaginated behavior
+      return this.brandsRepository.find();
+    }
+
+    const query = this.brandsRepository.createQueryBuilder('brand')
+      .orderBy('brand.createdAt', 'DESC');
+
+    if (search) {
+      query.andWhere('brand.name ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<Brand> {

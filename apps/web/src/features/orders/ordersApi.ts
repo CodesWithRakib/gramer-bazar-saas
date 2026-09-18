@@ -60,6 +60,13 @@ export const ordersApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Order", id }, "Order"],
     }),
+    getAdminOrders: builder.query<{ data: Order[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+      query: (params) => ({
+        url: '/orders/admin/all',
+        params,
+      }),
+      providesTags: ["Order"],
+    }),
   }),
 });
 
@@ -67,4 +74,5 @@ export const {
   useGetOrdersQuery,
   useGetOrderByIdQuery,
   useCancelOrderMutation,
+  useGetAdminOrdersQuery,
 } = ordersApi;

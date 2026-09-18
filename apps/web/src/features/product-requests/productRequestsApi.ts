@@ -59,13 +59,15 @@ export const productRequestsApi = api.injectEndpoints({
     }),
 
     // Admin endpoints
-    getAdminProductRequests: builder.query<ProductRequest[], { status?: string; search?: string } | void>({
+    getAdminProductRequests: builder.query<{ data: ProductRequest[]; meta: any }, { status?: string; search?: string; page?: number; limit?: number } | void>({
       query: (params) => {
         let url = '/admin/product-requests';
         if (params) {
           const searchParams = new URLSearchParams();
           if (params.status) searchParams.set('status', params.status);
           if (params.search) searchParams.set('search', params.search);
+          if (params.page) searchParams.set('page', params.page.toString());
+          if (params.limit) searchParams.set('limit', params.limit.toString());
           if (searchParams.toString()) url += `?${searchParams.toString()}`;
         }
         return url;

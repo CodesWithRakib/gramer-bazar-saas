@@ -17,8 +17,36 @@ export class ProductsService {
     return this.productsRepository.save(product);
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productsRepository.find({ relations: ['category', 'brand', 'variants'] });
+  async findAll(page?: number, limit?: number, search?: string) {
+    if (!page || !limit) {
+      // Legacy unpaginated behavior
+      return this.productsRepository.find({ relations: ['category', 'brand', 'variants'] });
+    }
+
+    const query = this.productsRepository.createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.variants', 'variants')
+      .orderBy('product.createdAt', 'DESC');
+
+    if (search) {
+      query.andWhere('product.name ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<Product> {

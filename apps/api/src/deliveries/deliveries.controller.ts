@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { DeliveriesService } from './deliveries.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
@@ -20,8 +20,12 @@ export class DeliveriesController {
   @Get('admin')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Admin: Get all deliveries' })
-  getAllDeliveries() {
-    return this.deliveriesService.getAllDeliveries();
+  getAllDeliveries(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('search') search?: string,
+  ) {
+    return this.deliveriesService.getAllDeliveries(page, limit, search);
   }
 
   @Post('admin/assign')

@@ -85,11 +85,40 @@ export class ReviewsService {
     });
   }
 
-  async getAdminReviews() {
-    return this.reviewRepo.find({
-      relations: ['user', 'product'],
-      order: { createdAt: 'DESC' },
-    });
+  async getAdminReviews(page?: number, limit?: number, search?: string) {
+    if (!page || !limit) {
+      return this.reviewRepo.find({
+        relations: ['user', 'product'],
+        order: { createdAt: 'DESC' },
+      });
+    }
+
+    const query = this.reviewRepo.createQueryBuilder('review')
+      .leftJoinAndSelect('review.user', 'user')
+      .leftJoinAndSelect('review.product', 'product')
+      .orderBy('review.createdAt', 'DESC');
+
+    if (search) {
+      query.andWhere(
+        '(review.comment ILIKE :search OR user.firstName ILIKE :search OR product.nameEn ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async moderateReview(id: string, isApproved: boolean) {

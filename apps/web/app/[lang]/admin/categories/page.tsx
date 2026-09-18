@@ -1,61 +1,50 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminProductRequestsQuery } from '@/features/product-requests/productRequestsApi';
+import { useGetAdminCategoriesQuery } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
-export default function AdminProductRequestsPage() {
+export default function AdminCategoriesPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
-  const { data, isLoading } = useGetAdminProductRequestsQuery({ page, limit, search });
+  const { data, isLoading } = useGetAdminCategoriesQuery({ page, limit, search });
 
   const columns: ColumnDef<any>[] = [
     {
-      accessorKey: 'requestedProductName',
-      header: 'Requested Product',
+      accessorKey: 'nameEn',
+      header: 'Name (EN)',
     },
     {
-      accessorKey: 'user',
-      header: 'Customer',
+      accessorKey: 'nameBn',
+      header: 'Name (BN)',
+    },
+    {
+      accessorKey: 'slug',
+      header: 'Slug',
+    },
+    {
+      accessorKey: 'parent',
+      header: 'Parent',
       cell: ({ row }) => {
-        const user = row.getValue('user') as any;
-        return user ? `${user.firstName} ${user.lastName}` : '-';
+        const parent = row.getValue('parent') as any;
+        return parent ? parent.nameEn : '-';
       },
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => {
-        const status = row.getValue('status') as string;
-        let variant: any = 'default';
-        if (status === 'PENDING') variant = 'secondary';
-        else if (status === 'APPROVED' || status === 'FULFILLED') variant = 'default';
-        else if (status === 'REJECTED') variant = 'destructive';
-        
-        return <Badge variant={variant}>{status}</Badge>;
-      }
-    },
-    {
-      accessorKey: 'createdAt',
-      header: 'Requested On',
-      cell: ({ row }) => new Date(row.getValue('createdAt')).toLocaleDateString(),
     },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Product Requests</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
       </div>
       
       <div className="flex items-center space-x-2 max-w-sm">
         <Input 
-          placeholder="Search product requests..." 
+          placeholder="Search categories..." 
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);

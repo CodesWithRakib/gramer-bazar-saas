@@ -17,8 +17,35 @@ export class CategoriesService {
     return this.categoriesRepository.save(category);
   }
 
-  async findAll(): Promise<Category[]> {
-    return this.categoriesRepository.find({ relations: ['parent', 'children'] });
+  async findAll(page?: number, limit?: number, search?: string) {
+    if (!page || !limit) {
+      // Legacy unpaginated behavior
+      return this.categoriesRepository.find({ relations: ['parent', 'children'] });
+    }
+
+    const query = this.categoriesRepository.createQueryBuilder('category')
+      .leftJoinAndSelect('category.parent', 'parent')
+      .leftJoinAndSelect('category.children', 'children')
+      .orderBy('category.createdAt', 'DESC');
+
+    if (search) {
+      query.andWhere('category.name ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<Category> {

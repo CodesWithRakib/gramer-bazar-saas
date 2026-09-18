@@ -62,6 +62,27 @@ export const catalogApi = api.enhanceEndpoints({ addTagTypes: ['Catalog', 'Categ
       query: () => '/public/categories',
       providesTags: ['Category'],
     }),
+    getAdminCategories: builder.query<{ data: Category[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+      query: (params) => ({
+        url: '/categories',
+        params,
+      }),
+      providesTags: ['Category'],
+    }),
+    getAdminBrands: builder.query<{ data: any[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+      query: (params) => ({
+        url: '/brands',
+        params,
+      }),
+      providesTags: ['Catalog'],
+    }),
+    getAdminProducts: builder.query<{ data: any[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+      query: (params) => ({
+        url: '/products',
+        params,
+      }),
+      providesTags: ['Catalog'],
+    }),
     searchProducts: builder.query<SearchResponse, SearchParams>({
       query: (params) => {
         // Strip out undefined, null, or empty string values
@@ -102,6 +123,9 @@ export const catalogApi = api.enhanceEndpoints({ addTagTypes: ['Catalog', 'Categ
 
 export const {
   useGetPublicCategoriesQuery,
+  useGetAdminCategoriesQuery,
+  useGetAdminBrandsQuery,
+  useGetAdminProductsQuery,
   useSearchProductsQuery,
   useGetFeaturedProductsQuery,
   useGetProductDetailsQuery,

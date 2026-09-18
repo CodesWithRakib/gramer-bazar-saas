@@ -1,39 +1,31 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminDeliveriesQuery } from '@/features/deliveries/deliveriesApi';
+import { useGetAdminOrdersQuery } from '@/features/orders/ordersApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
-export default function AdminDeliveriesPage() {
+export default function AdminOrdersPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
-  const { data, isLoading } = useGetAdminDeliveriesQuery({ page, limit, search });
+  const { data, isLoading } = useGetAdminOrdersQuery({ page, limit, search });
 
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: 'id',
-      header: 'Delivery ID',
+      header: 'Order ID',
       cell: ({ row }) => <span className="font-mono">{String(row.getValue('id')).substring(0, 8)}...</span>
     },
     {
-      accessorKey: 'order',
-      header: 'Order',
+      accessorKey: 'user',
+      header: 'Customer',
       cell: ({ row }) => {
-        const order = row.getValue('order') as any;
-        return order ? <span className="font-mono">{String(order.id).substring(0, 8)}...</span> : '-';
-      },
-    },
-    {
-      accessorKey: 'rider',
-      header: 'Rider',
-      cell: ({ row }) => {
-        const rider = row.getValue('rider') as any;
-        return rider ? `${rider.firstName} ${rider.lastName}` : '-';
+        const user = row.getValue('user') as any;
+        return user ? `${user.firstName} ${user.lastName}` : '-';
       },
     },
     {
@@ -42,7 +34,7 @@ export default function AdminDeliveriesPage() {
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
         let variant: any = 'default';
-        if (status === 'UNASSIGNED') variant = 'secondary';
+        if (status === 'PENDING') variant = 'secondary';
         else if (status === 'DELIVERED') variant = 'default';
         else if (status === 'CANCELLED' || status === 'FAILED') variant = 'destructive';
         
@@ -50,8 +42,13 @@ export default function AdminDeliveriesPage() {
       }
     },
     {
+      accessorKey: 'total',
+      header: 'Total',
+      cell: ({ row }) => `৳${Number(row.getValue('total')).toFixed(2)}`
+    },
+    {
       accessorKey: 'createdAt',
-      header: 'Created At',
+      header: 'Placed On',
       cell: ({ row }) => new Date(row.getValue('createdAt')).toLocaleDateString(),
     },
   ];
@@ -59,12 +56,12 @@ export default function AdminDeliveriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Deliveries</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
       </div>
       
       <div className="flex items-center space-x-2 max-w-sm">
         <Input 
-          placeholder="Search delivery ID..." 
+          placeholder="Search order ID..." 
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);

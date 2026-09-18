@@ -29,11 +29,38 @@ export class DeliveriesService {
 
   // --- ADMIN ACTIONS ---
 
-  async getAllDeliveries() {
-    return this.deliveryRepository.find({
-      relations: ['order', 'rider', 'order.address'],
-      order: { createdAt: 'DESC' },
-    });
+  async getAllDeliveries(page?: number, limit?: number, search?: string) {
+    if (!page || !limit) {
+      return this.deliveryRepository.find({
+        relations: ['order', 'rider', 'order.address'],
+        order: { createdAt: 'DESC' },
+      });
+    }
+
+    const query = this.deliveryRepository.createQueryBuilder('delivery')
+      .leftJoinAndSelect('delivery.order', 'order')
+      .leftJoinAndSelect('delivery.rider', 'rider')
+      .leftJoinAndSelect('order.address', 'address')
+      .orderBy('delivery.createdAt', 'DESC');
+
+    if (search) {
+      query.andWhere('delivery.id::text ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async getRiders() {

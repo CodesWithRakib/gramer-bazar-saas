@@ -1,4 +1,7 @@
-import { Controller, Post, Body, UseGuards, Request, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Get, Param, Query } from '@nestjs/common';
+import { RolesGuard } from '../common/guards/roles.guard.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
+import { Role } from '../roles/enums/role.enum.js';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service.js';
 import { CheckoutDto } from './dto/checkout.dto.js';
@@ -15,6 +18,19 @@ export class OrdersController {
   @ApiOperation({ summary: 'Process checkout and create order' })
   async checkout(@Request() req: any, @Body() checkoutDto: CheckoutDto) {
     return this.ordersService.checkout(req.user.id, checkoutDto);
+  }
+
+  @Get('admin/all')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Get all orders (Admin only)' })
+  async getAllOrders(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('search') search?: string,
+  ) {
+    return this.ordersService.findAll(page, limit, search);
   }
 
   @Get()

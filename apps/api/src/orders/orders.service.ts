@@ -198,4 +198,35 @@ export class OrdersService {
       return manager.save(Order, order);
     });
   }
+
+  async findAll(page?: number, limit?: number, search?: string) {
+    const orderRepository = this.dataSource.getRepository(Order);
+    if (!page || !limit) {
+      return orderRepository.find({ relations: ['user', 'address'] });
+    }
+
+    const query = orderRepository.createQueryBuilder('order')
+      .leftJoinAndSelect('order.user', 'user')
+      .leftJoinAndSelect('order.address', 'address')
+      .orderBy('order.createdAt', 'DESC');
+
+    if (search) {
+      query.andWhere('order.id::text ILIKE :search', { search: `%${search}%` });
+    }
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }

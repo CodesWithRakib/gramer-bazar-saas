@@ -18,8 +18,11 @@ export const reviewsApi = api.injectEndpoints({
       query: () => '/reviews/user',
       providesTags: ['Review'],
     }),
-    getAdminReviews: builder.query<any[], void>({
-      query: () => '/reviews/admin',
+    getAdminReviews: builder.query<{ data: any[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+      query: (params) => ({
+        url: '/reviews/admin',
+        params,
+      }),
       providesTags: ['Review'],
     }),
     moderateReview: builder.mutation<any, { id: string, isApproved: boolean }>({

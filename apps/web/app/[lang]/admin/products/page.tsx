@@ -1,53 +1,46 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminDeliveriesQuery } from '@/features/deliveries/deliveriesApi';
+import { useGetAdminProductsQuery } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
-export default function AdminDeliveriesPage() {
+export default function AdminProductsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
-  const { data, isLoading } = useGetAdminDeliveriesQuery({ page, limit, search });
+  const { data, isLoading } = useGetAdminProductsQuery({ page, limit, search });
 
   const columns: ColumnDef<any>[] = [
     {
-      accessorKey: 'id',
-      header: 'Delivery ID',
-      cell: ({ row }) => <span className="font-mono">{String(row.getValue('id')).substring(0, 8)}...</span>
+      accessorKey: 'nameEn',
+      header: 'Name (EN)',
     },
     {
-      accessorKey: 'order',
-      header: 'Order',
+      accessorKey: 'category',
+      header: 'Category',
       cell: ({ row }) => {
-        const order = row.getValue('order') as any;
-        return order ? <span className="font-mono">{String(order.id).substring(0, 8)}...</span> : '-';
+        const category = row.getValue('category') as any;
+        return category ? category.nameEn : '-';
       },
     },
     {
-      accessorKey: 'rider',
-      header: 'Rider',
+      accessorKey: 'brand',
+      header: 'Brand',
       cell: ({ row }) => {
-        const rider = row.getValue('rider') as any;
-        return rider ? `${rider.firstName} ${rider.lastName}` : '-';
+        const brand = row.getValue('brand') as any;
+        return brand ? brand.nameEn : '-';
       },
     },
     {
-      accessorKey: 'status',
-      header: 'Status',
+      accessorKey: 'variants',
+      header: 'Variants',
       cell: ({ row }) => {
-        const status = row.getValue('status') as string;
-        let variant: any = 'default';
-        if (status === 'UNASSIGNED') variant = 'secondary';
-        else if (status === 'DELIVERED') variant = 'default';
-        else if (status === 'CANCELLED' || status === 'FAILED') variant = 'destructive';
-        
-        return <Badge variant={variant}>{status}</Badge>;
-      }
+        const variants = row.getValue('variants') as any[];
+        return variants?.length || 0;
+      },
     },
     {
       accessorKey: 'createdAt',
@@ -59,12 +52,12 @@ export default function AdminDeliveriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Deliveries</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Products (Global)</h1>
       </div>
       
       <div className="flex items-center space-x-2 max-w-sm">
         <Input 
-          placeholder="Search delivery ID..." 
+          placeholder="Search products..." 
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);

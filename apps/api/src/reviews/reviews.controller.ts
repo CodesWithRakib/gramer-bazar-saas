@@ -45,8 +45,12 @@ export class ReviewsController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Admin: Get all reviews for moderation' })
-  getAdminReviews() {
-    return this.reviewsService.getAdminReviews();
+  getAdminReviews(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('search') search?: string,
+  ) {
+    return this.reviewsService.getAdminReviews(page, limit, search);
   }
 
   @Patch('admin/:id/moderate')

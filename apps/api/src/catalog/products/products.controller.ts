@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from '../dto/create-product.dto.js';
@@ -24,8 +24,12 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all global products' })
-  findAll() {
-    return this.productsService.findAll();
+  findAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('search') search?: string,
+  ) {
+    return this.productsService.findAll(page, limit, search);
   }
 
   @Get(':id')

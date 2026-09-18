@@ -62,23 +62,48 @@ export class ProductRequestsService {
     return request;
   }
 
-  async findAllAdmin(status?: ProductRequestStatus, search?: string) {
+  async findAllAdmin(status?: ProductRequestStatus, search?: string, page?: number, limit?: number) {
+    if (!page || !limit) {
+      const query = this.requestRepository.createQueryBuilder('request')
+        .leftJoinAndSelect('request.user', 'user')
+        .orderBy('request.createdAt', 'DESC');
+  
+      if (status) query.andWhere('request.status = :status', { status });
+      if (search) {
+        query.andWhere(
+          '(request.requestedProductName ILIKE :search OR user.firstName ILIKE :search OR user.phone ILIKE :search)',
+          { search: `%${search}%` }
+        );
+      }
+      return query.getMany();
+    }
+
     const query = this.requestRepository.createQueryBuilder('request')
       .leftJoinAndSelect('request.user', 'user')
       .orderBy('request.createdAt', 'DESC');
 
-    if (status) {
-      query.andWhere('request.status = :status', { status });
-    }
-
+    if (status) query.andWhere('request.status = :status', { status });
     if (search) {
       query.andWhere(
-        '(request.requestedProductName ILIKE :search OR user.name ILIKE :search OR user.phone ILIKE :search)',
+        '(request.requestedProductName ILIKE :search OR user.firstName ILIKE :search OR user.phone ILIKE :search)',
         { search: `%${search}%` }
       );
     }
 
-    return query.getMany();
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOneAdmin(id: string) {

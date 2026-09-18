@@ -14,8 +14,11 @@ export enum DeliveryStatus {
 export const deliveriesApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // ADMIN ENDPOINTS
-    getAdminDeliveries: builder.query<any[], void>({
-      query: () => '/deliveries/admin',
+    getAdminDeliveries: builder.query<{ data: any[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+      query: (params) => ({
+        url: '/deliveries/admin',
+        params,
+      }),
       providesTags: ['Order'],
     }),
     getRiders: builder.query<any[], void>({

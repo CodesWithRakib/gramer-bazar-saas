@@ -50,8 +50,10 @@ export class ProductRequestsController {
   findAllAdmin(
     @Query('status') status?: ProductRequestStatus,
     @Query('search') search?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
-    return this.productRequestsService.findAllAdmin(status, search);
+    return this.productRequestsService.findAllAdmin(status, search, page, limit);
   }
 
   @Get('admin/product-requests/:id')
