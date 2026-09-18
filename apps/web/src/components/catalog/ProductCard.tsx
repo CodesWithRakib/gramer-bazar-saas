@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { SellerProduct } from '@/features/catalog/catalogApi';
@@ -19,11 +20,12 @@ export function ProductCard({ product, lang }: ProductCardProps) {
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
       <Link href={`/${lang}/products/${slug}`} className="block relative pt-[100%] overflow-hidden bg-muted">
-        {/* Using standard img instead of Next Image for simplicity with dynamic urls for now */}
-        <img 
+        <Image 
           src={image} 
           alt={name} 
-          className="absolute top-0 left-0 w-full h-full object-cover transition-transform hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          className="object-cover transition-transform hover:scale-105"
           loading="lazy"
         />
       </Link>

@@ -51,5 +51,40 @@ export default async function ProductDetailsPage({ params }: Props) {
   const { lang, slug } = await params;
   const products = await getProductData(slug);
 
-  return <ProductDetailsClient products={products} lang={lang} />;
+  if (!products || products.length === 0) {
+    return <div>Product not found</div>;
+  }
+
+  const product = products[0];
+  const isBn = lang === 'bn';
+  const name = isBn ? (product.productVariant.nameBn || product.productVariant.product.nameBn) : (product.productVariant.nameEn || product.productVariant.product.nameEn);
+  const description = isBn ? product.productVariant.product.descriptionBn : product.productVariant.product.descriptionEn;
+  const image = product.productVariant.images?.[0] || 'https://placehold.co/800x800?text=No+Image';
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: name,
+    image: image,
+    description: description,
+    sku: product.productVariant.sku,
+    offers: {
+      '@type': 'Offer',
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${lang}/products/${slug}`,
+      priceCurrency: 'BDT',
+      price: product.discountPrice ? Number(product.discountPrice) : Number(product.price),
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: product.inventory?.quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailsClient products={products} lang={lang} />
+    </>
+  );
 }

@@ -20,8 +20,26 @@ const notoSansBengali = Noto_Sans_Bengali({
 });
 
 export const metadata: Metadata = {
-  title: "Gramer Bazar",
-  description: "Your local hyper-marketplace",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  title: {
+    default: "Gramer Bazar | Rural Hyper-marketplace",
+    template: "%s | Gramer Bazar",
+  },
+  description: "Your local hyper-marketplace for authentic rural products and fresh groceries delivered to your door.",
+  openGraph: {
+    title: "Gramer Bazar",
+    description: "Your local hyper-marketplace for authentic rural products.",
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "bn_BD",
+    siteName: "Gramer Bazar",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gramer Bazar",
+    description: "Your local hyper-marketplace for authentic rural products.",
+  },
+  manifest: '/manifest.ts',
 };
 
 import { LoginModal } from "@/components/auth/LoginModal";
