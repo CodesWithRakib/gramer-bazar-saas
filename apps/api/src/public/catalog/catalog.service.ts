@@ -79,8 +79,6 @@ export class CatalogService {
   }
 
   async getProductDetails(slug: string) {
-    // Usually, you'd find by global product slug and include variants, OR find by seller product ID.
-    // Assuming product slug applies to the global product.
     const query = this.sellerProductRepo.createQueryBuilder('sp')
       .leftJoinAndSelect('sp.productVariant', 'pv')
       .leftJoinAndSelect('pv.product', 'p')
@@ -98,5 +96,35 @@ export class CatalogService {
     }
 
     return items;
+  }
+
+  async getRelatedProducts(slug: string, limit = 5) {
+    // First find the category of this product
+    const currentProduct = await this.sellerProductRepo.createQueryBuilder('sp')
+      .leftJoin('sp.productVariant', 'pv')
+      .leftJoin('pv.product', 'p')
+      .where('p.slug = :slug', { slug })
+      .select(['p.categoryId'])
+      .getRawOne();
+
+    if (!currentProduct) {
+      return [];
+    }
+
+    // Now find other seller products in the same category, excluding the same product slug
+    const query = this.sellerProductRepo.createQueryBuilder('sp')
+      .leftJoinAndSelect('sp.productVariant', 'pv')
+      .leftJoinAndSelect('pv.product', 'p')
+      .leftJoinAndSelect('p.category', 'cat')
+      .leftJoinAndSelect('p.brand', 'b')
+      .leftJoinAndSelect('sp.shop', 'shop')
+      .leftJoinAndSelect('sp.inventory', 'inv')
+      .where('sp.isActive = :isActive', { isActive: true })
+      .andWhere('p.categoryId = :categoryId', { categoryId: currentProduct.p_categoryId })
+      .andWhere('p.slug != :slug', { slug })
+      .orderBy('sp.createdAt', 'DESC')
+      .take(limit);
+
+    return await query.getMany();
   }
 }

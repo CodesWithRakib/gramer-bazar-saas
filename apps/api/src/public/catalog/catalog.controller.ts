@@ -25,4 +25,10 @@ export class CatalogController {
   getProductDetails(@Param('slug') slug: string) {
     return this.catalogService.getProductDetails(slug);
   }
+
+  @Get(':slug/related')
+  @ApiOperation({ summary: 'Get related products' })
+  getRelatedProducts(@Param('slug') slug: string, @Query('limit') limit?: string) {
+    return this.catalogService.getRelatedProducts(slug, limit ? parseInt(limit, 10) : 5);
+  }
 }

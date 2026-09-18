@@ -15,9 +15,8 @@ async function bootstrap() {
   app.use(helmet());
 
   // CORS
-  const corsOrigins = configService.get<string>('CORS_ORIGINS')?.split(',') || '*';
   app.enableCors({
-    origin: corsOrigins,
+    origin: true, // Reflects the incoming origin, valid for credentials: true
     credentials: true,
   });
 
@@ -50,6 +49,8 @@ async function bootstrap() {
   logger.log(`Resolved port from configService: ${port}`);
   await app.listen(port);
   logger.log(`Application is running on: http://localhost:${port}/api/v1`);
-  logger.log(`Swagger docs are available on: http://localhost:${port}/api/docs`);
+  logger.log(
+    `Swagger docs are available on: http://localhost:${port}/api/docs`,
+  );
 }
 void bootstrap();

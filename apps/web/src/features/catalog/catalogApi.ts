@@ -63,10 +63,16 @@ export const catalogApi = api.enhanceEndpoints({ addTagTypes: ['Catalog', 'Categ
       providesTags: ['Category'],
     }),
     searchProducts: builder.query<SearchResponse, SearchParams>({
-      query: (params) => ({
-        url: '/public/catalog/search',
-        params: params as Record<string, string | number>,
-      }),
+      query: (params) => {
+        // Strip out undefined, null, or empty string values
+        const cleanParams = Object.fromEntries(
+          Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+        );
+        return {
+          url: '/public/catalog/search',
+          params: cleanParams as Record<string, string | number>,
+        };
+      },
       providesTags: ['Catalog'],
     }),
     getFeaturedProducts: builder.query<SearchResponse, void>({
@@ -77,6 +83,20 @@ export const catalogApi = api.enhanceEndpoints({ addTagTypes: ['Catalog', 'Categ
       query: (slug) => `/public/catalog/${slug}`,
       providesTags: (result, error, slug) => [{ type: 'Catalog', id: slug }],
     }),
+    getRelatedProducts: builder.query<SellerProduct[], string>({
+      query: (slug) => `/public/catalog/${slug}/related`,
+      providesTags: (result, error, slug) => [{ type: 'Catalog', id: `related-${slug}` }],
+    }),
+    getProductReviews: builder.query<{ data: any[], meta: any }, string>({
+      query: (productId) => `/public/reviews/product/${productId}`,
+    }),
+    validateCart: builder.mutation<any, { items: { sellerProductId: string, quantity: number }[] }>({
+      query: (body) => ({
+        url: '/public/cart/validate',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -85,4 +105,7 @@ export const {
   useSearchProductsQuery,
   useGetFeaturedProductsQuery,
   useGetProductDetailsQuery,
+  useGetRelatedProductsQuery,
+  useGetProductReviewsQuery,
+  useValidateCartMutation,
 } = catalogApi;

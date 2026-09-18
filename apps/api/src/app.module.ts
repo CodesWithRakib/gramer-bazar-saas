@@ -18,6 +18,7 @@ import { CatalogModule } from './catalog/catalog.module.js';
 import { ShopsModule } from './shops/shops.module.js';
 import { InventoryModule } from './inventory/inventory.module.js';
 import { PublicModule } from './public/public.module.js';
+import { ReviewsModule } from './reviews/reviews.module.js';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { PublicModule } from './public/public.module.js';
     CatalogModule,
     ShopsModule,
     InventoryModule,
+    ReviewsModule,
     PublicModule,
   ],
   controllers: [AppController],
