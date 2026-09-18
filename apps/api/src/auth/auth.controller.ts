@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
@@ -13,6 +14,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('send-otp')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @ApiOperation({ summary: 'Send OTP to a phone number' })
   @ApiResponse({ status: 200, description: 'OTP sent successfully' })
   @HttpCode(HttpStatus.OK)
@@ -21,6 +23,7 @@ export class AuthController {
   }
 
   @Post('verify-otp')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Verify OTP and get tokens' })
   @ApiResponse({ status: 200, description: 'OTP verified successfully' })
   @HttpCode(HttpStatus.OK)
@@ -29,6 +32,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Login with password (for admin/seller)' })
   @ApiResponse({ status: 200, description: 'Logged in successfully' })
   @HttpCode(HttpStatus.OK)
@@ -37,26 +41,12 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshDto: RefreshDto) {
-    // In a real app, you might want to decode the refresh token to get the user ID
-    // or pass the user ID if you store it in the frontend.
-    // For simplicity, we decode it without verifying signature first, then verify in service.
-    // However, it's safer to have the service decode and verify.
-    // Here we'll pass the token to the service. Wait, the service expects userId.
-    // Let's decode it safely inside the service.
-    
-    // Quick and dirty way to extract user ID for the service:
-    const base64Payload = refreshDto.refreshToken.split('.')[1];
-    if (!base64Payload) {
-      throw new Error('Invalid token');
-    }
-    const payloadBuffer = Buffer.from(base64Payload, 'base64');
-    const payload = JSON.parse(payloadBuffer.toString());
-    
-    return this.authService.refreshTokens(payload.sub, refreshDto.refreshToken);
+    return this.authService.refreshTokens(refreshDto.refreshToken);
   }
 
   @Post('logout')

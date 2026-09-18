@@ -50,7 +50,7 @@ import { CouponsModule } from './coupons/coupons.module.js';
     EventEmitterModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000,
-      limit: 10,
+      limit: 120,
     }]),
     RolesModule,
     PermissionsModule,

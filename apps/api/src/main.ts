@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
 import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
@@ -15,8 +15,14 @@ async function bootstrap() {
   app.use(helmet());
 
   // CORS
+  const corsOrigins = configService.get<string>('CORS_ORIGINS');
+  let allowedOrigins: (string | RegExp)[] = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:4000'];
+  if (corsOrigins) {
+    allowedOrigins = corsOrigins.split(',').map(origin => origin.trim());
+  }
+  
   app.enableCors({
-    origin: true, // Reflects the incoming origin, valid for credentials: true
+    origin: allowedOrigins,
     credentials: true,
   });
 
@@ -34,6 +40,9 @@ async function bootstrap() {
 
   // Global Exception Filter
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Global Interceptors
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   // Swagger Setup
   const config = new DocumentBuilder()

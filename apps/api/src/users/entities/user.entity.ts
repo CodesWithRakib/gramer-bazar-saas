@@ -8,6 +8,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { UserStatus } from '../enums/user-status.enum.js';
 import { RoleEntity } from '../../roles/entities/role.entity.js';
 
@@ -23,6 +24,7 @@ export class User {
   email: string | null;
 
   @Column({ type: 'varchar', nullable: true })
+  @Exclude()
   passwordHash: string | null;
 
   @Column({ type: 'varchar', nullable: true })
@@ -41,6 +43,7 @@ export class User {
   isEmailVerified: boolean;
 
   @Column({ type: 'varchar', nullable: true })
+  @Exclude()
   refreshTokenHash: string | null;
 
   @Column({ type: 'timestamp', nullable: true })

@@ -108,7 +108,17 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
+  async refreshTokens(refreshToken: string) {
+    let payload;
+    try {
+      payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET', 'super-secret-refresh-key'),
+      });
+    } catch (e) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const userId = payload.sub;
     const user = await this.usersService.findById(userId);
     if (!user || !user.refreshTokenHash) {
       throw new UnauthorizedException('Access Denied');
