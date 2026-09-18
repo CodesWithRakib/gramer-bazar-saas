@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   description: "Your local hyper-marketplace",
 };
 
+import { LoginModal } from "@/components/auth/LoginModal";
+import { CartDrawer } from "@/components/cart/CartDrawer";
+
 export default async function RootLayout({
   children,
   params,
@@ -48,6 +51,8 @@ export default async function RootLayout({
             {children}
           </main>
           <Footer lang={lang} />
+          <LoginModal lang={lang} />
+          <CartDrawer lang={lang} />
         </ReduxProvider>
         <Toaster />
       </body>

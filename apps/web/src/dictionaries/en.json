@@ -5,5 +5,13 @@
     "error": "An error occurred",
     "retry": "Retry",
     "empty": "No data found"
+  },
+  "home": {
+    "heroSubtitle": "Shop for fresh groceries, local products, and daily essentials from the comfort of your home.",
+    "startShopping": "Start Shopping",
+    "viewCategories": "View Categories",
+    "productImage": "Product Image",
+    "localProduct": "Local Product",
+    "addToCart": "Add to Cart"
   }
 }

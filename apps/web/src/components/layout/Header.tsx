@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, Menu } from 'lucide-react';
+import { Search, MapPin, Menu, ShoppingCart } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { setLoginModalOpen, logout } from '@/store/slices/authSlice';
+import { setCartOpen } from '@/store/slices/cartSlice';
 
 interface HeaderProps {
   lang: string;
@@ -13,9 +17,15 @@ interface HeaderProps {
 
 export function Header({ lang }: HeaderProps) {
   const router = useRouter();
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const isBn = lang === 'bn';
+  
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const cartItemsCount = useSelector((state: RootState) => 
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
 
   useEffect(() => {
     setSearchTerm(searchParams.get('q') || '');
@@ -62,13 +72,31 @@ export function Header({ lang }: HeaderProps) {
               {isBn ? 'খানসামা, দিনাজপুর' : 'Khansama, Dinajpur'}
             </span>
           </Button>
-          <div className="flex gap-2 ml-2">
+          <div className="flex gap-2 ml-2 items-center">
             <Link href={lang === 'en' ? '/bn' : '/en'}>
               <Button variant="ghost" size="sm" className="font-semibold">
                 {lang === 'en' ? 'BN' : 'EN'}
               </Button>
             </Link>
-            <Button>{isBn ? 'লগইন' : 'Login'}</Button>
+            
+            <Button variant="ghost" size="icon" onClick={() => dispatch(setCartOpen(true))} className="relative">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
+            </Button>
+
+            {isAuthenticated ? (
+              <Button variant="ghost" className="font-medium" onClick={() => dispatch(logout())}>
+                {user?.firstName || (isBn ? 'প্রোফাইল' : 'Profile')} (Logout)
+              </Button>
+            ) : (
+              <Button onClick={() => dispatch(setLoginModalOpen(true))}>
+                {isBn ? 'লগইন' : 'Login'}
+              </Button>
+            )}
           </div>
         </div>
       </div>

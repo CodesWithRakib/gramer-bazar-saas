@@ -3,12 +3,14 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { api } from './api';
 import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
+import authReducer from './slices/authSlice';
 
 export const store = configureStore({
   reducer: {
     [api.reducerPath]: api.reducer,
     cart: cartReducer,
     wishlist: wishlistReducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),
