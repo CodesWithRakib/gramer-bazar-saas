@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { NotificationBell } from '@/components/ui/NotificationBell';
+
 export function SellerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-muted/40">
@@ -21,7 +23,10 @@ export function SellerLayout({ children }: { children: React.ReactNode }) {
         <header className="h-14 border-b bg-background flex items-center px-6">
           <span className="md:hidden font-bold">Seller Central</span>
           <div className="flex-1" />
-          <span className="text-sm font-medium">Store Owner</span>
+          <div className="flex items-center gap-4">
+            <NotificationBell lang="en" />
+            <span className="text-sm font-medium">Store Owner</span>
+          </div>
         </header>
         <main className="flex-1 p-6">
           {children}

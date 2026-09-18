@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { NotificationBell } from '@/components/ui/NotificationBell';
 
 export function CustomerLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
             <Link href="/en/wishlist" className="text-sm font-medium hover:text-primary transition-colors">Wishlist</Link>
             <Link href="/en/reviews" className="text-sm font-medium hover:text-primary transition-colors">Reviews</Link>
             <Link href="/en/orders" className="text-sm font-medium hover:text-primary transition-colors">Orders</Link>
+            <NotificationBell lang="en" />
           </nav>
         </div>
       </header>

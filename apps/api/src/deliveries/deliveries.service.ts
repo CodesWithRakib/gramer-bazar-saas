@@ -12,6 +12,8 @@ import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
 import { Role } from '../roles/enums/role.enum.js';
 
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
 @Injectable()
 export class DeliveriesService {
   constructor(
@@ -22,6 +24,7 @@ export class DeliveriesService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly dataSource: DataSource,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   // --- ADMIN ACTIONS ---
@@ -167,6 +170,13 @@ export class DeliveriesService {
           orderId: order.id,
           status: newOrderStatus,
           remark: `Updated via Delivery tracking: ${dto.status}`,
+        });
+
+        // Use event emitter to avoid blocking the transaction
+        this.eventEmitter.emit('order.status.changed', {
+          orderId: order.id,
+          customerId: order.userId,
+          status: newOrderStatus,
         });
       }
 

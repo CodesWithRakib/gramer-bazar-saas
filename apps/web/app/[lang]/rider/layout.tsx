@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { Bike, List, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
+import { NotificationBell } from '@/components/ui/NotificationBell';
 
 export default function RiderLayout({
   children,
@@ -49,6 +50,10 @@ export default function RiderLayout({
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/20">
+      <header className="sticky top-0 z-40 bg-background border-b flex items-center justify-between p-4">
+        <h1 className="font-bold text-lg text-primary">Rider App</h1>
+        <NotificationBell lang={lang} />
+      </header>
       <main className="flex-1 pb-16">
         <div className="container p-4 max-w-md mx-auto">
           {children}

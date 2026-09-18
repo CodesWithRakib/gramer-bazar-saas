@@ -7,12 +7,15 @@ import { CreateProductRequestDto } from './dto/create-product-request.dto.js';
 import { UpdateProductRequestStatusDto } from './dto/update-product-request-status.dto.js';
 import { ProductRequestStatus } from './enums/product-request-status.enum.js';
 
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
 @Injectable()
 export class ProductRequestsService {
   constructor(
     @InjectRepository(ProductRequest)
     private readonly requestRepository: Repository<ProductRequest>,
     private readonly dataSource: DataSource,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(userId: string, createDto: CreateProductRequestDto) {
@@ -125,7 +128,16 @@ export class ProductRequestsService {
       history.changedByUserId = adminId;
 
       await manager.save(ProductRequestHistory, history);
-      return manager.save(ProductRequest, request);
+      const savedRequest = await manager.save(ProductRequest, request);
+      
+      this.eventEmitter.emit('productRequest.status.changed', {
+        requestId: savedRequest.id,
+        customerId: savedRequest.userId,
+        status: updateDto.status,
+        productName: savedRequest.requestedProductName,
+      });
+
+      return savedRequest;
     });
   }
 }

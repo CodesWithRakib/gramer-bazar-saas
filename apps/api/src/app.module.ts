@@ -24,6 +24,8 @@ import { ProductRequestsModule } from './product-requests/product-requests.modul
 import { SellerPortalModule } from './seller-portal/seller-portal.module.js';
 import { DeliveriesModule } from './deliveries/deliveries.module.js';
 import { WishlistsModule } from './wishlists/wishlists.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { WishlistsModule } from './wishlists/wishlists.module.js';
       }),
       inject: [ConfigService],
     }),
+    EventEmitterModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 10,
@@ -64,6 +67,7 @@ import { WishlistsModule } from './wishlists/wishlists.module.js';
     SellerPortalModule,
     DeliveriesModule,
     WishlistsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [
