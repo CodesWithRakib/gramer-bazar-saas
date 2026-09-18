@@ -26,6 +26,7 @@ import { DeliveriesModule } from './deliveries/deliveries.module.js';
 import { WishlistsModule } from './wishlists/wishlists.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AnalyticsModule } from './analytics/analytics.module.js';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     DeliveriesModule,
     WishlistsModule,
     NotificationsModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [
