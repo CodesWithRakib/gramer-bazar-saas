@@ -46,6 +46,22 @@ export default function OrdersPage({ params: { lang } }: { params: { lang: strin
     }
   };
 
+  const getStatusText = (status: string) => {
+    if (!isBn) return status;
+    switch (status) {
+      case 'PENDING': return 'অপেক্ষমাণ';
+      case 'CONFIRMED': return 'নিশ্চিতকৃত';
+      case 'PROCESSING': return 'প্রক্রিয়াজাত হচ্ছে';
+      case 'READY_FOR_PICKUP': return 'পিকআপের জন্য প্রস্তুত';
+      case 'OUT_FOR_DELIVERY': return 'ডেলিভারির জন্য বের হয়েছে';
+      case 'DELIVERED': return 'ডেলিভারি সম্পন্ন';
+      case 'PICKED_UP': return 'পিকআপ সম্পন্ন';
+      case 'CANCELLED': return 'বাতিলকৃত';
+      case 'FAILED': return 'ব্যর্থ';
+      default: return status;
+    }
+  };
+
   return (
     <div className="container max-w-4xl py-8 space-y-6">
       <h1 className="text-3xl font-bold">{isBn ? 'আমার অর্ডারসমূহ' : 'My Orders'}</h1>
@@ -58,7 +74,7 @@ export default function OrdersPage({ params: { lang } }: { params: { lang: strin
                 {isBn ? 'অর্ডার আইডি:' : 'Order ID:'} {order.id.slice(0, 8).toUpperCase()}
               </CardTitle>
               <Badge className={getStatusColor(order.status)}>
-                {order.status}
+                {getStatusText(order.status)}
               </Badge>
             </CardHeader>
             <CardContent>

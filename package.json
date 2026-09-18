@@ -9,6 +9,7 @@
     "typecheck": "pnpm -r run typecheck"
   },
   "dependencies": {
+    "jimp": "^1.6.1",
     "tailwindcss-animate": "^1.0.7"
   }
 }

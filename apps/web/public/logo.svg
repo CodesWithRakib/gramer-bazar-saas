@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e" />
+      <stop offset="100%" stop-color="#15803d" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  
+  <!-- Handle -->
+  <path d="M176 210 v-50 a80 80 0 0 1 160 0 v50" fill="none" stroke="white" stroke-width="40" stroke-linecap="round" />
+  
+  <!-- Bag Body -->
+  <rect x="120" y="210" width="272" height="200" rx="32" fill="white" />
+  
+  <!-- Accent (Leaf / Drop) -->
+  <path d="M256 260 C290 260, 290 310, 256 310 C222 310, 222 260, 256 260 Z" fill="#facc15" />
+</svg>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -84,10 +85,13 @@ export function Header({ lang }: HeaderProps) {
             <Menu className="h-5 w-5" />
           </Button>
           <Link href={`/${lang}`} className="flex items-center">
-            <img
+            <Image
               src="/logo.jpg"
               alt={isBn ? "গ্রামের বাজার" : "Gramer Bazar"}
-              className="h-8 object-contain"
+              width={256}
+              height={80}
+              className="w-48 h-14 object-cover object-left mix-blend-multiply"
+              priority
             />
           </Link>
         </div>

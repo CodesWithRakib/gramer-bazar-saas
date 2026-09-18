@@ -45,6 +45,22 @@ export default function OrderDetailsPage({ params: { lang, id } }: { params: { l
     }
   };
 
+  const getStatusText = (status: string) => {
+    if (!isBn) return status;
+    switch (status) {
+      case 'PENDING': return 'অপেক্ষমাণ';
+      case 'CONFIRMED': return 'নিশ্চিতকৃত';
+      case 'PROCESSING': return 'প্রক্রিয়াজাত হচ্ছে';
+      case 'READY_FOR_PICKUP': return 'পিকআপের জন্য প্রস্তুত';
+      case 'OUT_FOR_DELIVERY': return 'ডেলিভারির জন্য বের হয়েছে';
+      case 'DELIVERED': return 'ডেলিভারি সম্পন্ন';
+      case 'PICKED_UP': return 'পিকআপ সম্পন্ন';
+      case 'CANCELLED': return 'বাতিলকৃত';
+      case 'FAILED': return 'ব্যর্থ';
+      default: return status;
+    }
+  };
+
   const handleCancel = async () => {
     if (window.confirm(isBn ? 'আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি বাতিল করতে চান?' : 'Are you sure you want to cancel this order?')) {
       try {
@@ -92,7 +108,7 @@ export default function OrderDetailsPage({ params: { lang, id } }: { params: { l
           <p className="text-sm text-muted-foreground">ID: {order.id}</p>
         </div>
         <Badge className={getStatusColor(order.status) + ' text-white hover:' + getStatusColor(order.status)}>
-          {order.status}
+          {getStatusText(order.status)}
         </Badge>
       </div>
 
@@ -116,7 +132,7 @@ export default function OrderDetailsPage({ params: { lang, id } }: { params: { l
                       )}
                     </div>
                     <div className="pb-4">
-                      <p className="font-semibold">{history.status}</p>
+                      <p className="font-semibold">{getStatusText(history.status)}</p>
                       <p className="text-sm text-muted-foreground">
                         {new Intl.DateTimeFormat(isBn ? 'bn-BD' : 'en-US', {
                           dateStyle: 'medium',
@@ -241,12 +257,12 @@ export default function OrderDetailsPage({ params: { lang, id } }: { params: { l
             <CardContent className="text-sm space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{isBn ? 'পদ্ধতি' : 'Method'}</span>
-                <span className="font-medium">{order.paymentMethod === 'COD' ? 'Cash on Delivery' : order.paymentMethod}</span>
+                <span className="font-medium">{order.paymentMethod === 'COD' ? (isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery') : order.paymentMethod}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{isBn ? 'অবস্থা' : 'Status'}</span>
                 <span className={`font-medium ${order.paymentStatus === 'PAID' ? 'text-green-600' : 'text-yellow-600'}`}>
-                  {order.paymentStatus}
+                  {order.paymentStatus === 'PAID' ? (isBn ? 'পরিশোধিত' : 'PAID') : (order.paymentStatus === 'PENDING' ? (isBn ? 'বকেয়া' : 'PENDING') : order.paymentStatus)}
                 </span>
               </div>
             </CardContent>
