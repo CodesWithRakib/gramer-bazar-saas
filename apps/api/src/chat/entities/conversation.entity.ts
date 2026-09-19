@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
-import { Message } from './message.entity.js';
+import type { Message } from './message.entity.js';
 
 @Entity('conversations')
 export class Conversation {
@@ -15,7 +15,7 @@ export class Conversation {
   })
   participants: User[];
 
-  @OneToMany(() => Message, (message) => message.conversation)
+  @OneToMany('Message', (message: Message) => message.conversation)
   messages: Message[];
 
   @CreateDateColumn()

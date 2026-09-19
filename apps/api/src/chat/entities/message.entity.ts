@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
-import { Conversation } from './conversation.entity.js';
+import type { Conversation } from './conversation.entity.js';
 
 @Entity('messages')
 export class Message {
@@ -17,7 +17,7 @@ export class Message {
   @Column({ name: 'sender_id' })
   senderId: string;
 
-  @ManyToOne(() => Conversation, (conversation) => conversation.messages, { onDelete: 'CASCADE' })
+  @ManyToOne('Conversation', (conversation: Conversation) => conversation.messages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'conversation_id' })
   conversation: Conversation;
 
