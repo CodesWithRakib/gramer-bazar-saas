@@ -30,6 +30,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <Link href="/en/admin/deliveries" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Deliveries</Link>
           <Link href="/en/admin/product-requests" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Product Requests</Link>
           <Link href="/en/admin/reviews" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Reviews</Link>
+          
+          <div className="pt-4 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">System</div>
+          <Link href="/en/admin/settings" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Settings</Link>
+          <Link href="/en/admin/audit-logs" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Audit Logs</Link>
         </nav>
       </aside>
 
