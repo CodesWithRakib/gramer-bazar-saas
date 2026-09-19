@@ -34,7 +34,7 @@ export async function generateMetadata(
   const isBn = lang === 'bn';
   const name = isBn ? (product.productVariant.nameBn || product.productVariant.product.nameBn) : (product.productVariant.nameEn || product.productVariant.product.nameEn);
   const description = isBn ? product.productVariant.product.descriptionBn : product.productVariant.product.descriptionEn;
-  const image = product.productVariant.images?.[0] || 'https://placehold.co/800x800?text=No+Image';
+  const image = product.productVariant.images?.[0] || '/placeholder.jpg';
 
   return {
     title: `${name} | Gramer Bazar`,
@@ -59,7 +59,7 @@ export default async function ProductDetailsPage({ params }: Props) {
   const isBn = lang === 'bn';
   const name = isBn ? (product.productVariant.nameBn || product.productVariant.product.nameBn) : (product.productVariant.nameEn || product.productVariant.product.nameEn);
   const description = isBn ? product.productVariant.product.descriptionBn : product.productVariant.product.descriptionEn;
-  const image = product.productVariant.images?.[0] || 'https://placehold.co/800x800?text=No+Image';
+  const image = product.productVariant.images?.[0] || '/placeholder.jpg';
 
   const jsonLd = {
     '@context': 'https://schema.org',

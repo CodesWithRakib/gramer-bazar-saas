@@ -4,17 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from '@/components/ui/NotificationBell';
-import { Home, Grid, ShoppingBag, User } from 'lucide-react';
-
-const MobileNavItem = ({ href, icon: Icon, label, pathname }: { href: string, icon: React.ElementType, label: string, pathname: string }) => {
-  const isActive = pathname === href || pathname === `/en${href}` || pathname === `/bn${href}`;
-  return (
-    <Link href={href} className="flex flex-col items-center justify-center w-full h-full hover:bg-muted/30 transition-colors">
-      <Icon className={`w-5 h-5 mb-1 ${isActive ? 'text-primary drop-shadow-sm' : 'text-muted-foreground'}`} />
-      <span className={`text-[10px] font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
-    </Link>
-  );
-};
+import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 
 export function CustomerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -49,15 +39,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      {/* Bottom Nav Placeholder (Mobile Only) */}
-      <nav className="md:hidden fixed bottom-0 z-50 w-full border-t bg-background/90 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] flex items-center justify-around h-16 pb-safe">
-        <MobileNavItem href="/" icon={Home} label="Home" pathname={pathname} />
-        <MobileNavItem href="/en/categories" icon={Grid} label="Categories" pathname={pathname} />
-        <MobileNavItem href="/en/cart" icon={ShoppingBag} label="Cart" pathname={pathname} />
-        <MobileNavItem href="/en/profile" icon={User} label="Account" pathname={pathname} />
-      </nav>
-      {/* Spacer for mobile nav */}
-      <div className="h-16 md:hidden pb-safe"></div>
+      <MobileBottomNav />
     </div>
   );
 }

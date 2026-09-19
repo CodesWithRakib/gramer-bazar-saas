@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { CustomImage } from '@/components/ui/CustomImage';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
 import { toast } from 'sonner';
@@ -18,7 +18,7 @@ interface ProductCardProps {
 export function ProductCard({ product, lang }: ProductCardProps) {
   const dispatch = useDispatch();
   const name = lang === 'bn' ? product.productVariant.nameBn || product.productVariant.product.nameBn : product.productVariant.nameEn || product.productVariant.product.nameEn;
-  const image = product.productVariant.images?.[0] || 'https://placehold.co/400x400?text=No+Image';
+  const image = product.productVariant.images?.[0] || '/placeholder.jpg';
   const price = Number(product.price);
   const discountPrice = product.discountPrice ? Number(product.discountPrice) : null;
   const slug = product.productVariant.product.slug;
@@ -40,13 +40,12 @@ export function ProductCard({ product, lang }: ProductCardProps) {
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group border-border bg-card">
       <Link href={`/${lang}/products/${slug}`} className="block relative pt-[100%] overflow-hidden bg-muted/20">
-        <Image 
+        <CustomImage 
           src={image} 
           alt={name} 
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           className="object-cover transition-transform duration-500 group-hover:scale-110"
-          loading="lazy"
         />
         {discountPrice && (
           <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-sm z-10 shadow-sm uppercase tracking-wider">

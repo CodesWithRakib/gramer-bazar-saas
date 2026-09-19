@@ -15,6 +15,7 @@ import { useGetProductReviewsQuery, useAddReviewMutation } from '@/features/revi
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CustomImage } from '@/components/ui/CustomImage';
 
 export function ProductDetailsClient({ 
   products, 
@@ -50,7 +51,7 @@ export function ProductDetailsClient({
   // In a real scenario with complex variants, you'd group by variant attributes.
   const product = products[selectedVariantIdx];
   const name = isBn ? product.productVariant.nameBn || product.productVariant.product.nameBn : product.productVariant.nameEn || product.productVariant.product.nameEn;
-  const images = product.productVariant.images?.length ? product.productVariant.images : ['https://placehold.co/800x800?text=No+Image'];
+  const images = product.productVariant.images?.length ? product.productVariant.images : ['/placeholder.jpg'];
   
   const [activeImage, setActiveImage] = useState(images[0]);
   
@@ -143,7 +144,14 @@ export function ProductDetailsClient({
         {/* Image Gallery */}
         <div className="flex flex-col gap-4">
           <div className="bg-muted rounded-xl overflow-hidden aspect-square flex items-center justify-center p-4 relative group">
-            <img src={activeImage} alt={name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-300 md:group-hover:scale-110" />
+            <CustomImage 
+              src={activeImage} 
+              alt={name} 
+              fill 
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-contain p-4 mix-blend-multiply transition-transform duration-300 md:group-hover:scale-110" 
+              priority
+            />
             {isOutOfStock && (
               <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
                 <span className="bg-destructive text-destructive-foreground font-bold px-6 py-2 rounded-full text-lg shadow-lg rotate-12">
@@ -158,9 +166,15 @@ export function ProductDetailsClient({
                 <button 
                   key={idx} 
                   onClick={() => setActiveImage(img)}
-                  className={`w-20 h-20 bg-muted rounded-lg flex-shrink-0 border-2 overflow-hidden snap-center transition-all ${activeImage === img ? 'border-primary ring-2 ring-primary/20 ring-offset-1' : 'border-transparent hover:border-primary/50'}`}
+                  className={`relative w-20 h-20 bg-muted rounded-lg flex-shrink-0 border-2 overflow-hidden snap-center transition-all ${activeImage === img ? 'border-primary ring-2 ring-primary/20 ring-offset-1' : 'border-transparent hover:border-primary/50'}`}
                 >
-                  <img src={img} className="w-full h-full object-cover mix-blend-multiply" alt={`Thumbnail ${idx + 1}`} />
+                  <CustomImage 
+                    src={img} 
+                    fill 
+                    sizes="80px"
+                    className="object-cover mix-blend-multiply" 
+                    alt={`Thumbnail ${idx + 1}`} 
+                  />
                 </button>
               ))}
             </div>

@@ -43,6 +43,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     alternateLocale: "bn_BD",
     siteName: "Gramer Bazar",
+    images: [
+      {
+        url: "/placeholder.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Gramer Bazar Preview",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

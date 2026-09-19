@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Trash2, ShoppingBag, Plus, Minus } from 'lucide-react';
+import { CustomImage } from '@/components/ui/CustomImage';
 
 export function CartDrawer({ lang }: { lang: string }) {
   const isBn = lang === 'bn';
@@ -56,8 +57,14 @@ export function CartDrawer({ lang }: { lang: string }) {
               <div className="space-y-6">
                 {items.map((item) => (
                   <div key={item.sellerProductId} className="flex gap-4 py-2 border-b last:border-0 border-muted/50">
-                    <div className="h-20 w-20 bg-muted/30 rounded-xl overflow-hidden flex-shrink-0 border p-1">
-                      <img src={item.image} alt={isBn ? item.nameBn : item.nameEn} className="h-full w-full object-contain mix-blend-multiply rounded-lg" />
+                    <div className="h-20 w-20 bg-muted/30 rounded-xl overflow-hidden flex-shrink-0 border p-1 relative">
+                      <CustomImage 
+                        src={item.image} 
+                        alt={isBn ? item.nameBn : item.nameEn} 
+                        fill
+                        sizes="80px"
+                        className="object-contain p-1 mix-blend-multiply rounded-lg" 
+                      />
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-1">
                       <div>
@@ -77,30 +84,30 @@ export function CartDrawer({ lang }: { lang: string }) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 rounded-md"
+                              className="h-9 w-9 rounded-md"
                               onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: Math.max(1, item.quantity - 1) }))}
                               disabled={item.quantity <= 1}
                             >
-                              <Minus className="h-3 w-3" />
+                              <Minus className="h-4 w-4" />
                             </Button>
                             <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 rounded-md"
+                              className="h-9 w-9 rounded-md"
                               onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: item.maxQuantity ? Math.min(item.maxQuantity, item.quantity + 1) : item.quantity + 1 }))}
                               disabled={item.maxQuantity ? item.quantity >= item.maxQuantity : false}
                             >
-                              <Plus className="h-3 w-3" />
+                              <Plus className="h-4 w-4" />
                             </Button>
                           </div>
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-9 w-9 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded-lg transition-colors"
+                            className="h-10 w-10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded-lg transition-colors"
                             onClick={() => dispatch(removeFromCart(item.sellerProductId))}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-5 w-5" />
                           </Button>
                         </div>
                       </div>
