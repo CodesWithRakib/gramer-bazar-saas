@@ -18,6 +18,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <Link href="/en/admin/users" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">All Users</Link>
           <Link href="/en/admin/sellers" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Sellers</Link>
           <Link href="/en/admin/riders" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Riders</Link>
+          <Link href="/en/admin/messages" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Messages</Link>
           
           <div className="pt-4 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Catalog</div>
           <Link href="/en/admin/categories" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground">Categories</Link>

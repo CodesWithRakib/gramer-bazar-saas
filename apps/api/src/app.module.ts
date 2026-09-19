@@ -28,6 +28,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AnalyticsModule } from './analytics/analytics.module.js';
 import { CouponsModule } from './coupons/coupons.module.js';
+import { ChatModule } from './chat/chat.module.js';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { CouponsModule } from './coupons/coupons.module.js';
     NotificationsModule,
     AnalyticsModule,
     CouponsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { NotificationBell } from '@/components/ui/NotificationBell';
+import Link from 'next/link';
 
 export function SellerLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,10 +12,11 @@ export function SellerLayout({ children }: { children: React.ReactNode }) {
           <span className="font-bold text-primary">Seller Central</span>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <div className="px-3 py-2 text-sm font-medium rounded-md bg-muted text-foreground">Overview</div>
-          <div className="px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground">My Products</div>
-          <div className="px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground">Orders</div>
-          <div className="px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground">Payouts</div>
+          <Link href="/en/seller" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-foreground">Overview</Link>
+          <Link href="/en/seller/products" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">My Products</Link>
+          <Link href="/en/seller/orders" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Orders</Link>
+          <Link href="/en/seller/messages" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Messages</Link>
+          <Link href="/en/seller/payouts" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Payouts</Link>
         </nav>
       </aside>
 

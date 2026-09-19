@@ -4,6 +4,7 @@ import "../globals.css";
 import { getDirection, type Locale } from "@/config/i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { ReduxProvider } from "@/store/provider";
+import { SocketProvider } from "@/providers/SocketProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
@@ -64,13 +65,15 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <ReduxProvider>
-          <Header lang={lang} />
-          <main className="flex-grow flex flex-col">
-            {children}
-          </main>
-          <Footer lang={lang} />
-          <LoginModal lang={lang} />
-          <CartDrawer lang={lang} />
+          <SocketProvider>
+            <Header lang={lang} />
+            <main className="flex-grow flex flex-col">
+              {children}
+            </main>
+            <Footer lang={lang} />
+            <LoginModal lang={lang} />
+            <CartDrawer lang={lang} />
+          </SocketProvider>
         </ReduxProvider>
         <Toaster />
       </body>
