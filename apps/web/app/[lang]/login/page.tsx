@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '@/store/slices/authSlice';
@@ -10,10 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 
-export default function StaffLoginPage({ params }: { params: { lang: string } }) {
+export default function StaffLoginPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
   const router = useRouter();
   const dispatch = useDispatch();
-  const isBn = params.lang === 'bn';
+  const isBn = lang === 'bn';
 
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -30,14 +31,14 @@ export default function StaffLoginPage({ params }: { params: { lang: string } })
       dispatch(setCredentials({ token: res.accessToken, user: res.user }));
       
       const roles = res.user.roles || [];
-      if (roles.includes('ADMIN')) {
-        router.push(`/${params.lang}/admin`);
+      if (roles.includes('ADMIN') || roles.includes('SUPER_ADMIN')) {
+        router.push(`/${lang}/admin`);
       } else if (roles.includes('SELLER')) {
-        router.push(`/${params.lang}/seller`);
+        router.push(`/${lang}/seller`);
       } else if (roles.includes('RIDER')) {
-        router.push(`/${params.lang}/rider`);
+        router.push(`/${lang}/rider`);
       } else {
-        router.push(`/${params.lang}/profile`);
+        router.push(`/${lang}/profile`);
       }
     } catch (err: any) {
       setErrorMsg(err.data?.message || (isBn ? 'লগইন ব্যর্থ হয়েছে' : 'Login failed'));
@@ -99,7 +100,7 @@ export default function StaffLoginPage({ params }: { params: { lang: string } })
           <span className="text-muted-foreground">
             {isBn ? 'অ্যাকাউন্ট নেই?' : "Don't have an account?"}{' '}
           </span>
-          <Link href={`/${params.lang}/register`} className="font-semibold text-primary hover:underline">
+          <Link href={`/${lang}/register`} className="font-semibold text-primary hover:underline">
             {isBn ? 'রেজিস্টার করুন' : 'Register here'}
           </Link>
         </div>

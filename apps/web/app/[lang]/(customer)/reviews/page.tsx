@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 
 import React from 'react';
 import { useGetUserReviewsQuery } from '@/features/reviews/reviewsApi';
@@ -6,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import Link from 'next/link';
 
-export default function MyReviewsPage({ params }: { params: { lang: string } }) {
-  const isBn = params.lang === 'bn';
+export default function MyReviewsPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
+  const isBn = lang === 'bn';
   const { data: reviews, isLoading } = useGetUserReviewsQuery();
 
   if (isLoading) return <div className="container mx-auto p-8">{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</div>;
@@ -28,7 +30,7 @@ export default function MyReviewsPage({ params }: { params: { lang: string } }) 
             <Card key={review.id}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex justify-between items-center">
-                  <Link href={`/${params.lang}/products/${review.product?.slug || ''}`} className="hover:underline text-primary">
+                  <Link href={`/${lang}/products/${review.product?.slug || ''}`} className="hover:underline text-primary">
                     {isBn ? review.product?.nameBn : review.product?.nameEn}
                   </Link>
                   <span className="text-sm font-normal text-muted-foreground">

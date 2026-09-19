@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -28,7 +29,8 @@ const shopSchema = z.object({
   phone: z.string().optional(),
 });
 
-export default function SellerProfilePage({ params: { lang } }: { params: { lang: string } }) {
+export default function SellerProfilePage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
   const isBn = lang === 'bn';
   const { data: shop, isLoading } = useGetSellerShopQuery();
   const [updateShop, { isLoading: isUpdating }] = useUpdateSellerShopMutation();

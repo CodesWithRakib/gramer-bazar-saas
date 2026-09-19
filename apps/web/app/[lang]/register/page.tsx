@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '@/store/slices/authSlice';
@@ -17,10 +17,11 @@ import {
 } from '@/components/ui/select';
 import Link from 'next/link';
 
-export default function StaffRegisterPage({ params }: { params: { lang: string } }) {
+export default function StaffRegisterPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
   const router = useRouter();
   const dispatch = useDispatch();
-  const isBn = params.lang === 'bn';
+  const isBn = lang === 'bn';
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -44,11 +45,11 @@ export default function StaffRegisterPage({ params }: { params: { lang: string }
       
       const roles = res.user.roles || [];
       if (roles.includes('SELLER')) {
-        router.push(`/${params.lang}/seller`);
+        router.push(`/${lang}/seller`);
       } else if (roles.includes('RIDER')) {
-        router.push(`/${params.lang}/rider`);
+        router.push(`/${lang}/rider`);
       } else {
-        router.push(`/${params.lang}/profile`);
+        router.push(`/${lang}/profile`);
       }
     } catch (err: any) {
       setErrorMsg(err.data?.message || (isBn ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে' : 'Registration failed'));
@@ -132,7 +133,7 @@ export default function StaffRegisterPage({ params }: { params: { lang: string }
           <span className="text-muted-foreground">
             {isBn ? 'ইতিমধ্যেই অ্যাকাউন্ট আছে?' : "Already have an account?"}{' '}
           </span>
-          <Link href={`/${params.lang}/login`} className="font-semibold text-primary hover:underline">
+          <Link href={`/${lang}/login`} className="font-semibold text-primary hover:underline">
             {isBn ? 'লগইন করুন' : 'Login here'}
           </Link>
         </div>

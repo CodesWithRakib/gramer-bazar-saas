@@ -9,8 +9,10 @@ import { Button } from '@/components/ui/button';
 import { User, Phone, LogOut } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
+import { use } from 'react';
 
-export default function ProfilePage({ params: { lang } }: { params: { lang: string } }) {
+export default function ProfilePage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
   const isBn = lang === 'bn';
   const router = useRouter();
   const dispatch = useDispatch();

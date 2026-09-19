@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 
 import React from 'react';
 import Link from 'next/link';
@@ -7,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-export default function OrdersPage({ params: { lang } }: { params: { lang: string } }) {
+export default function OrdersPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
   const isBn = lang === 'bn';
   const { data: orders, isLoading, isError } = useGetOrdersQuery();
 

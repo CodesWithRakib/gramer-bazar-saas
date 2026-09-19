@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 
 import React from 'react';
 import { useGetSellerDashboardQuery } from '@/features/seller-portal/sellerPortalApi';
@@ -6,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PackageX, ShoppingCart, DollarSign } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function SellerDashboardPage({ params: { lang } }: { params: { lang: string } }) {
+export default function SellerDashboardPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
   const isBn = lang === 'bn';
   const { data: metrics, isLoading, isError } = useGetSellerDashboardQuery();
 

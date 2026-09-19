@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { use } from 'react';
 import { useGetUserWishlistQuery, useRemoveProductFromWishlistMutation } from '@/features/wishlists/wishlistsApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,8 +8,9 @@ import { Trash2, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function WishlistPage({ params }: { params: { lang: string } }) {
-  const isBn = params.lang === 'bn';
+export default function WishlistPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
+  const isBn = lang === 'bn';
   const { data: wishlist, isLoading } = useGetUserWishlistQuery();
   const [remove] = useRemoveProductFromWishlistMutation();
 
@@ -34,7 +35,7 @@ export default function WishlistPage({ params }: { params: { lang: string } }) {
             {isBn ? 'আপনার উইশলিস্ট খালি।' : 'Your wishlist is empty.'}
             <div className="mt-4">
               <Button asChild variant="outline">
-                <Link href={`/${params.lang}`}>{isBn ? 'শপিং চালিয়ে যান' : 'Continue Shopping'}</Link>
+                <Link href={`/${lang}`}>{isBn ? 'শপিং চালিয়ে যান' : 'Continue Shopping'}</Link>
               </Button>
             </div>
           </CardContent>
@@ -45,7 +46,7 @@ export default function WishlistPage({ params }: { params: { lang: string } }) {
             <Card key={item.id} className="flex flex-col">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  <Link href={`/${params.lang}/products/${item.product.slug}`} className="hover:underline">
+                  <Link href={`/${lang}/products/${item.product.slug}`} className="hover:underline">
                     {isBn ? item.product.nameBn : item.product.nameEn}
                   </Link>
                 </CardTitle>
@@ -68,7 +69,7 @@ export default function WishlistPage({ params }: { params: { lang: string } }) {
                     disabled={!item.product.isAvailable}
                     asChild
                   >
-                    <Link href={`/${params.lang}/products/${item.product.slug}`}>
+                    <Link href={`/${lang}/products/${item.product.slug}`}>
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       {isBn ? 'পণ্যটি দেখুন' : 'View Product'}
                     </Link>

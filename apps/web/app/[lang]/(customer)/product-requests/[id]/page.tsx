@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 
 import React from 'react';
 import Link from 'next/link';
@@ -8,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, CheckCircle2, PackageSearch } from 'lucide-react';
 
-export default function ProductRequestDetailsPage({ params: { lang, id } }: { params: { lang: string, id: string } }) {
+export default function ProductRequestDetailsPage({ params }: { params: Promise<{ lang: string, id: string }> }) {
+  const { lang, id } = use(params);
   const isBn = lang === 'bn';
   const { data: request, isLoading, isError } = useGetCustomerProductRequestByIdQuery(id);
 

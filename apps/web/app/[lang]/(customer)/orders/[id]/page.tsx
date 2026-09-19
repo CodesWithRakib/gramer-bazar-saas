@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 
 import React from 'react';
 import Link from 'next/link';
@@ -13,7 +14,8 @@ import { useDispatch } from 'react-redux';
 import { setCartOpen, clearCart, addToCart } from '@/store/slices/cartSlice';
 import { toast } from 'sonner';
 
-export default function OrderDetailsPage({ params: { lang, id } }: { params: { lang: string, id: string } }) {
+export default function OrderDetailsPage({ params }: { params: Promise<{ lang: string, id: string }> }) {
+  const { lang, id } = use(params);
   const isBn = lang === 'bn';
   const router = useRouter();
   const dispatch = useDispatch();
