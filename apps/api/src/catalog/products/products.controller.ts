@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from '../dto/create-product.dto.js';
@@ -23,6 +24,8 @@ export class ProductsController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000) // 60 seconds
   @ApiOperation({ summary: 'Get all global products' })
   findAll(
     @Query('page') page?: number,
@@ -33,6 +36,8 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000)
   @ApiOperation({ summary: 'Get a global product by ID' })
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);

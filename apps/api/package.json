@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@gramer-bazar/types": "workspace:*",
+    "@nestjs/cache-manager": "^12.0.0",
     "@nestjs/common": "^12.0.1",
     "@nestjs/config": "^12.0.0",
     "@nestjs/core": "^12.0.1",
@@ -38,6 +39,8 @@
     "@nestjs/typeorm": "^12.0.1",
     "@nestjs/websockets": "^12.0.3",
     "bcryptjs": "^3.0.3",
+    "cache-manager": "^7.2.9",
+    "cache-manager-redis-yet": "^5.1.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv": "^17.4.2",

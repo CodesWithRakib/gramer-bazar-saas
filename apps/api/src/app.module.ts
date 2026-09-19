@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
@@ -48,6 +50,22 @@ import { SeederModule } from './seeder/seeder.module.js';
         synchronize: true,
         logging: configService.get<string>('NODE_ENV') === 'development',
       }),
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const env = configService.get<string>('NODE_ENV');
+        if (env === 'production') {
+          const store = await redisStore({
+            url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+            ttl: 60 * 1000, // 1 minute default TTL
+          });
+          return { store };
+        }
+        return { ttl: 60 * 1000 }; // In-memory fallback for dev
+      },
       inject: [ConfigService],
     }),
     EventEmitterModule.forRoot(),

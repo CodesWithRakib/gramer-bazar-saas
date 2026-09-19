@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Bengali } from "next/font/google";
 import "../globals.css";
 import { getDirection, type Locale } from "@/config/i18n";
@@ -20,8 +20,13 @@ const notoSansBengali = Noto_Sans_Bengali({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#22c55e",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  keywords: ["ecommerce", "rural", "grocery", "bangladesh", "gramer bazar"],
   title: {
     default: "Gramer Bazar | Rural Hyper-marketplace",
     template: "%s | Gramer Bazar",
@@ -45,6 +50,7 @@ export const metadata: Metadata = {
 
 import { LoginModal } from "@/components/auth/LoginModal";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { CSPostHogProvider } from "@/providers/PostHogProvider";
 
 export default async function RootLayout({
   children,
@@ -64,17 +70,19 @@ export default async function RootLayout({
       className={`${inter.variable} ${notoSansBengali.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <ReduxProvider>
-          <SocketProvider>
-            <Header lang={lang} />
-            <main className="flex-grow flex flex-col">
-              {children}
-            </main>
-            <Footer lang={lang} />
-            <LoginModal lang={lang} />
-            <CartDrawer lang={lang} />
-          </SocketProvider>
-        </ReduxProvider>
+        <CSPostHogProvider>
+          <ReduxProvider>
+            <SocketProvider>
+              <Header lang={lang} />
+              <main className="flex-grow flex flex-col">
+                {children}
+              </main>
+              <Footer lang={lang} />
+              <LoginModal lang={lang} />
+              <CartDrawer lang={lang} />
+            </SocketProvider>
+          </ReduxProvider>
+        </CSPostHogProvider>
         <Toaster />
       </body>
     </html>

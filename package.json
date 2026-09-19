@@ -13,5 +13,13 @@
   "dependencies": {
     "jimp": "^1.6.1",
     "tailwindcss-animate": "^1.0.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@sentry/node-cpu-profiler",
+      "@sentry/cli",
+      "core-js",
+      "@scarf/scarf"
+    ]
   }
 }

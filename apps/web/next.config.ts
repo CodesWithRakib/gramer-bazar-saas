@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import withSerwistInit from "@serwist/next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 const withSerwist = withSerwistInit({
   swSrc: "app/sw.ts",
@@ -12,15 +13,20 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'placehold.co',
+        protocol: "https",
+        hostname: "placehold.co",
       },
       {
-        protocol: 'https',
-        hostname: 'chaldn.com',
+        protocol: "https",
+        hostname: "chaldn.com",
       },
     ],
   },
 };
 
-export default withSerwist(nextConfig);
+export default withSentryConfig(withSerwist(nextConfig), {
+  org: "gramer-bazar",
+  project: "gramer-bazar-web",
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+});

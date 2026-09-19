@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SellerProductsService } from './seller-products.service.js';
 import { CreateSellerProductDto } from '../dto/create-seller-product.dto.js';
@@ -23,12 +24,16 @@ export class SellerProductsController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000)
   @ApiOperation({ summary: 'Get all seller products' })
   findAll() {
     return this.sellerProductsService.findAll();
   }
 
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000)
   @ApiOperation({ summary: 'Get a seller product by ID' })
   findOne(@Param('id') id: string) {
     return this.sellerProductsService.findOne(id);
