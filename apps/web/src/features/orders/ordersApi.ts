@@ -60,6 +60,14 @@ export const ordersApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Order", id }, "Order"],
     }),
+    checkoutOrder: builder.mutation<Order, { addressId: string, paymentMethod: string, items: { sellerProductId: string, quantity: number }[] }>({
+      query: (body) => ({
+        url: `/orders/checkout`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Order"],
+    }),
     getAdminOrders: builder.query<{ data: Order[]; meta: any }, { page?: number; limit?: number; search?: string }>({
       query: (params) => ({
         url: '/orders/admin/all',
@@ -74,5 +82,6 @@ export const {
   useGetOrdersQuery,
   useGetOrderByIdQuery,
   useCancelOrderMutation,
+  useCheckoutOrderMutation,
   useGetAdminOrdersQuery,
 } = ordersApi;

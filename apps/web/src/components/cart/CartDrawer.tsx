@@ -110,11 +110,18 @@ export function CartDrawer({ lang }: { lang: string }) {
               <p className="text-xs text-muted-foreground text-center">
                 {isBn ? 'ডেলিভারি চার্জ চেকআউটে হিসাব করা হবে' : 'Delivery fee calculated at checkout'}
               </p>
-              <Button className="w-full" size="lg" asChild onClick={() => dispatch(setCartOpen(false))}>
-                <Link href={`/${lang}/checkout`}>
-                  {isBn ? 'চেকআউট করুন' : 'Proceed to Checkout'}
-                </Link>
-              </Button>
+              <div className="flex w-full gap-2 mt-2">
+                <Button variant="outline" className="flex-1" asChild onClick={() => dispatch(setCartOpen(false))}>
+                  <Link href={`/${lang}/cart`}>
+                    {isBn ? 'কার্ট দেখুন' : 'View Cart'}
+                  </Link>
+                </Button>
+                <Button className="flex-1" size="lg" asChild onClick={() => dispatch(setCartOpen(false))}>
+                  <Link href={`/${lang}/checkout`}>
+                    {isBn ? 'চেকআউট' : 'Checkout'}
+                  </Link>
+                </Button>
+              </div>
             </SheetFooter>
           </>
         )}
