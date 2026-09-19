@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CustomImage } from '@/components/ui/CustomImage';
+import { StartChatButton } from '@/components/chat/StartChatButton';
 
 export function ProductDetailsClient({ 
   products, 
@@ -249,14 +250,24 @@ export function ProductDetailsClient({
               </div>
             </TabsContent>
             <TabsContent value="seller">
-              <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-xl border">
-                <div className="bg-primary/10 p-4 rounded-full">
-                  <Store className="h-8 w-8 text-primary" />
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-muted/30 p-4 rounded-xl border">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary/10 p-4 rounded-full">
+                    <Store className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg text-foreground">{isBn ? product.shop.nameBn : product.shop.nameEn}</h4>
+                    <p className="text-xs text-muted-foreground">{isBn ? 'ভেরিফাইড লোকাল সেলার' : 'Verified Local Seller'}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold text-lg text-foreground">{isBn ? product.shop.nameBn : product.shop.nameEn}</h4>
-                  <p className="text-xs text-muted-foreground">{isBn ? 'ভেরিফাইড লোকাল সেলার' : 'Verified Local Seller'}</p>
-                </div>
+                {isAuthenticated && (
+                  <StartChatButton 
+                    participantId={product.shop.userId} 
+                    lang={lang} 
+                    buttonText={isBn ? 'বিক্রেতাকে মেসেজ দিন' : 'Message Seller'} 
+                    redirectPath={`/${lang}/messages`}
+                  />
+                )}
               </div>
             </TabsContent>
           </Tabs>

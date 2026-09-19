@@ -5,9 +5,7 @@ import { getDirection, type Locale } from "@/config/i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { ReduxProvider } from "@/store/provider";
 import { SocketProvider } from "@/providers/SocketProvider";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { ClientLayoutWrapper } from "@/components/layout/ClientLayoutWrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -86,14 +84,11 @@ export default async function RootLayout({
         <CSPostHogProvider>
           <ReduxProvider>
             <SocketProvider>
-              <Header lang={lang} />
-              <main className="flex-grow flex flex-col pb-16 md:pb-0">
+              <ClientLayoutWrapper lang={lang}>
                 {children}
-              </main>
-              <Footer lang={lang} />
+              </ClientLayoutWrapper>
               <LoginModal lang={lang} />
               <CartDrawer lang={lang} />
-              <MobileBottomNav lang={lang} />
               <InstallPrompt lang={lang} />
             </SocketProvider>
           </ReduxProvider>

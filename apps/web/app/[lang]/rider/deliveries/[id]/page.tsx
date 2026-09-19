@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Phone, MapPin, Package, ArrowLeft, CheckCircle2, AlertTriangle, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { StartChatButton } from '@/components/chat/StartChatButton';
 
 export default function RiderDeliveryDetailsPage({
   params,
@@ -79,16 +80,28 @@ export default function RiderDeliveryDetailsPage({
             </div>
           </div>
           
-          <div className="flex items-center gap-3 pt-2">
-            <Phone className="h-5 w-5 text-muted-foreground" />
-            <div>
-              <p className="font-medium text-sm">{order.user?.phone}</p>
-              <a href={`tel:${order.user?.phone}`} className="text-sm text-primary underline">
-                {isBn ? 'কল করুন' : 'Call Customer'}
-              </a>
+            <div className="flex items-center gap-3 pt-2">
+              <Phone className="h-5 w-5 text-muted-foreground" />
+              <div className="flex-grow flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm">{order.user?.phone}</p>
+                  <a href={`tel:${order.user?.phone}`} className="text-sm text-primary underline">
+                    {isBn ? 'কল করুন' : 'Call Customer'}
+                  </a>
+                </div>
+                {order.user?.id && (
+                  <StartChatButton
+                    participantId={order.user.id}
+                    lang={lang}
+                    buttonText={isBn ? 'মেসেজ দিন' : 'Message'}
+                    redirectPath={`/${lang}/rider/messages`}
+                    size="sm"
+                    variant="outline"
+                  />
+                )}
+              </div>
             </div>
-          </div>
-        </CardContent>
+          </CardContent>
       </Card>
 
       <Card>

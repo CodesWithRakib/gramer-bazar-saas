@@ -92,6 +92,7 @@ export interface SellerProduct {
     id: string;
     nameEn: string;
     nameBn: string;
+    userId: string;
   };
   inventory: {
     quantity: number;

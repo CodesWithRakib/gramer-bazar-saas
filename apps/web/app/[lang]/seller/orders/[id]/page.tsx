@@ -5,6 +5,7 @@ import { useGetSellerOrderByIdQuery } from '@/features/seller-portal/sellerPorta
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StartChatButton } from '@/components/chat/StartChatButton';
 
 import { use } from 'react';
 
@@ -32,9 +33,23 @@ export default function SellerOrderDetailsPage({
             <CardTitle>{isBn ? 'গ্রাহকের তথ্য' : 'Customer Info'}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p><strong>{isBn ? 'নাম' : 'Name'}:</strong> {order.user?.firstName} {order.user?.lastName}</p>
-            <p><strong>{isBn ? 'ফোন' : 'Phone'}:</strong> {order.user?.phone}</p>
-            <p><strong>{isBn ? 'ঠিকানা' : 'Address'}:</strong> {order.address?.street}, {order.address?.city}</p>
+            <div className="flex flex-col gap-4">
+              <div>
+                <p><strong>{isBn ? 'নাম' : 'Name'}:</strong> {order.user?.firstName} {order.user?.lastName}</p>
+                <p><strong>{isBn ? 'ফোন' : 'Phone'}:</strong> {order.user?.phone}</p>
+                <p><strong>{isBn ? 'ঠিকানা' : 'Address'}:</strong> {order.address?.street}, {order.address?.city}</p>
+              </div>
+              {order.user?.id && (
+                <div className="pt-4 border-t">
+                  <StartChatButton 
+                    participantId={order.user.id} 
+                    lang={lang} 
+                    buttonText={isBn ? 'গ্রাহককে মেসেজ দিন' : 'Message Customer'} 
+                    redirectPath={`/${lang}/seller/messages`}
+                  />
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
