@@ -7,7 +7,7 @@ import { Order } from '../orders/entities/order.entity.js';
 import { OrderStatusHistory } from '../orders/entities/order-status-history.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { DeliveryStatus } from './enums/delivery-status.enum.js';
-import { OrderStatus } from '../orders/enums/order-status.enum.js';
+import { OrderStatus, PaymentStatus, PaymentMethod } from '../orders/enums/order-status.enum.js';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
 import { Role } from '../roles/enums/role.enum.js';
@@ -191,6 +191,12 @@ export class DeliveriesService {
 
       if (newOrderStatus && order.status !== newOrderStatus) {
         order.status = newOrderStatus;
+        
+        // Synchronize COD payment status
+        if (newOrderStatus === OrderStatus.DELIVERED && order.paymentMethod === PaymentMethod.COD) {
+          order.paymentStatus = PaymentStatus.PAID;
+        }
+
         await manager.save(Order, order);
         
         await manager.insert(OrderStatusHistory, {

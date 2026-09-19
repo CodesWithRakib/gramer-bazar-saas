@@ -73,15 +73,17 @@ export function CartDrawer({ lang }: { lang: string }) {
                         <div className="flex items-center gap-2">
                           <div className="flex items-center border rounded-md">
                             <button
-                              className="px-2 py-1 text-muted-foreground hover:bg-muted"
+                              className="px-2 py-1 text-muted-foreground hover:bg-muted disabled:opacity-50"
                               onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: Math.max(1, item.quantity - 1) }))}
+                              disabled={item.quantity <= 1}
                             >
                               -
                             </button>
                             <span className="w-8 text-center text-sm">{item.quantity}</span>
                             <button
-                              className="px-2 py-1 text-muted-foreground hover:bg-muted"
-                              onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: item.quantity + 1 }))}
+                              className="px-2 py-1 text-muted-foreground hover:bg-muted disabled:opacity-50"
+                              onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: item.maxQuantity ? Math.min(item.maxQuantity, item.quantity + 1) : item.quantity + 1 }))}
+                              disabled={item.maxQuantity ? item.quantity >= item.maxQuantity : false}
                             >
                               +
                             </button>

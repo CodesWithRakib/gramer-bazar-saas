@@ -3,13 +3,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface CartItem {
   sellerProductId: string;
   quantity: number;
+  maxQuantity?: number;
   // Local cache of product details for UI rendering without waiting for backend
   price: number;
   nameEn: string;
   nameBn: string;
   image: string;
-  sellerNameEn: string;
-  sellerNameBn: string;
+  sellerNameEn?: string;
+  sellerNameBn?: string;
 }
 
 export interface CartState {

@@ -2,12 +2,15 @@
 
 import React, { useState } from 'react';
 import { useGetAdminOrdersQuery, useUpdateAdminOrderStatusMutation } from '@/features/orders/ordersApi';
+import { useGetRidersQuery, useAssignDeliveryMutation } from '@/features/deliveries/deliveriesApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -16,8 +19,16 @@ export default function AdminOrdersPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
+  // Rider Assignment State
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
+  const [selectedRiderId, setSelectedRiderId] = useState<string>('');
+
   const { data, isLoading } = useGetAdminOrdersQuery({ page, limit, search });
   const [updateStatus] = useUpdateAdminOrderStatusMutation();
+  
+  const { data: ridersData } = useGetRidersQuery(undefined, { skip: !isAssignModalOpen });
+  const [assignDelivery, { isLoading: isAssigning }] = useAssignDeliveryMutation();
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
@@ -25,6 +36,20 @@ export default function AdminOrdersPage() {
       toast.success('Order status updated');
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to update order status');
+    }
+  };
+
+  const handleAssignRiderSubmit = async () => {
+    if (!assigningOrderId || !selectedRiderId) return;
+    
+    try {
+      await assignDelivery({ orderId: assigningOrderId, riderId: selectedRiderId }).unwrap();
+      toast.success('Rider assigned successfully');
+      setIsAssignModalOpen(false);
+      setAssigningOrderId(null);
+      setSelectedRiderId('');
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to assign rider');
     }
   };
 
@@ -82,6 +107,16 @@ export default function AdminOrdersPage() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => {
+                  setAssigningOrderId(order.id);
+                  setIsAssignModalOpen(true);
+                }}
+              >
+                Assign Rider
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-xs text-muted-foreground">Change Status</DropdownMenuLabel>
               {availableStatuses.map((status) => (
                 <DropdownMenuItem 
                   key={status}
@@ -132,6 +167,44 @@ export default function AdminOrdersPage() {
         }}
         isLoading={isLoading}
       />
+
+      <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Rider</DialogTitle>
+            <DialogDescription>
+              Select a rider to assign to order #{assigningOrderId?.substring(0, 8)}...
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select value={selectedRiderId} onValueChange={setSelectedRiderId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a rider" />
+              </SelectTrigger>
+              <SelectContent>
+                {ridersData && ridersData.length > 0 ? (
+                  ridersData.map((rider: any) => (
+                    <SelectItem key={rider.id} value={rider.id}>
+                      {rider.firstName} {rider.lastName} - {rider.phone}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="p-2 text-sm text-muted-foreground">No riders available</div>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAssignModalOpen(false)}>Cancel</Button>
+            <Button 
+              onClick={handleAssignRiderSubmit} 
+              disabled={!selectedRiderId || isAssigning}
+            >
+              {isAssigning ? 'Assigning...' : 'Assign'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

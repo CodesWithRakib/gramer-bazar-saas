@@ -14,7 +14,7 @@ export function CategoryCard({ category, lang }: CategoryCardProps) {
 
   return (
     <Link href={`/${lang}/categories/${category.slug}`}>
-      <Card className="hover:border-primary hover:shadow-sm transition-all group cursor-pointer text-center h-full">
+      <Card className="hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer text-center h-full bg-card/50 backdrop-blur-sm">
         <CardContent className="p-4 flex flex-col items-center justify-center gap-3">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
             <img src={icon} alt={name} className="w-10 h-10 object-contain" />

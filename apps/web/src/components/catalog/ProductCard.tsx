@@ -38,8 +38,8 @@ export function ProductCard({ product, lang }: ProductCardProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 group border-primary/10">
-      <Link href={`/${lang}/products/${slug}`} className="block relative pt-[100%] overflow-hidden bg-muted">
+    <Card className="h-full flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group border-border/50 bg-card/50 backdrop-blur-sm">
+      <Link href={`/${lang}/products/${slug}`} className="block relative pt-[100%] overflow-hidden bg-muted/30">
         <Image 
           src={image} 
           alt={name} 
