@@ -17,7 +17,8 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Process checkout and create order' })
   async checkout(@Request() req: any, @Body() checkoutDto: CheckoutDto) {
-    return this.ordersService.checkout(req.user.id, checkoutDto);
+    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:3000';
+    return this.ordersService.checkout(req.user.id, checkoutDto, originUrl);
   }
 
   @Get('admin/all')

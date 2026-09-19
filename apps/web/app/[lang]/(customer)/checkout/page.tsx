@@ -97,7 +97,11 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
 
       const res = await checkoutOrder(orderData).unwrap();
       dispatch(clearCart());
-      router.push(`/${lang}/orders/${res.id}?success=true`);
+      if (res.paymentUrl) {
+        window.location.href = res.paymentUrl;
+      } else {
+        router.push(`/${lang}/orders/${res.order.id}?success=true`);
+      }
     } catch (err: any) {
       setErrorMsg(err.data?.message || (isBn ? 'অর্ডার তৈরি করতে সমস্যা হয়েছে' : 'Failed to place order'));
     }
@@ -238,22 +242,24 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                   </Label>
                   {paymentMethod === 'CASH_ON_DELIVERY' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
                 </div>
-                <div className="relative opacity-50">
+                <div className="relative">
                   <input 
                     type="radio" 
                     name="paymentMethod" 
                     value="DIGITAL_PAYMENT" 
                     id="digital" 
                     className="peer sr-only" 
-                    disabled 
+                    checked={paymentMethod === 'DIGITAL_PAYMENT'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
                   />
                   <Label
                     htmlFor="digital"
-                    className="flex flex-col gap-1 p-4 border-2 rounded-lg cursor-not-allowed bg-muted/50"
+                    className="flex flex-col gap-1 p-4 border-2 rounded-lg cursor-pointer hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5"
                   >
                     <span className="font-semibold text-base">{isBn ? 'ডিজিটাল পেমেন্ট' : 'Digital Payment'}</span>
-                    <span className="text-sm text-muted-foreground">{isBn ? 'বিকাশ, নগদ, কার্ড (শীঘ্রই আসছে)' : 'bKash, Nagad, Cards (Coming Soon)'}</span>
+                    <span className="text-sm text-muted-foreground">{isBn ? 'বিকাশ, রকেট, কার্ড (SSLCommerz)' : 'bKash, Nagad, Cards (SSLCommerz)'}</span>
                   </Label>
+                  {paymentMethod === 'DIGITAL_PAYMENT' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
                 </div>
               </div>
             </CardContent>

@@ -9,8 +9,11 @@ import { CheckoutDto } from './dto/checkout.dto.js';
 import { Order } from './entities/order.entity.js';
 import { OrderItem } from './entities/order-item.entity.js';
 import { OrderStatusHistory } from './entities/order-status-history.entity.js';
+import { PaymentsService } from '../payments/payments.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
+import { User } from '../users/entities/user.entity.js';
 
-import { OrderStatus, PaymentStatus } from './enums/order-status.enum.js';
+import { OrderStatus, PaymentMethod, PaymentStatus } from './enums/order-status.enum.js';
 import { Address } from '../addresses/entities/address.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
@@ -20,9 +23,13 @@ import { DiscountType } from '../coupons/enums/discount-type.enum.js';
 
 @Injectable()
 export class OrdersService {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly dataSource: DataSource,
+    private paymentsService: PaymentsService,
+    private notificationsService: NotificationsService,
+  ) {}
 
-  async checkout(userId: string, checkoutDto: CheckoutDto) {
+  async checkout(userId: string, checkoutDto: CheckoutDto, originUrl: string) {
     return this.dataSource.transaction(async (manager) => {
       // 1. Validate Address
       const address = await manager.findOne(Address, {
@@ -179,7 +186,27 @@ export class OrdersService {
         await manager.save(Coupon, appliedCoupon);
       }
 
-      return savedOrder;
+      const user = await manager.findOne(User, { where: { id: userId } });
+      
+      let paymentUrl = null;
+      if (savedOrder.paymentMethod !== PaymentMethod.COD) {
+        paymentUrl = await this.paymentsService.initPayment(
+          savedOrder, 
+          { 
+            name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Customer', 
+            email: user?.email, 
+            phone: user?.phone, 
+            address: address.streetAddress 
+          }, 
+          originUrl
+        );
+      }
+
+      if (user?.email) {
+        await this.notificationsService.sendOrderConfirmationEmail(user.email, savedOrder);
+      }
+
+      return { order: savedOrder, paymentUrl };
     });
   }
 

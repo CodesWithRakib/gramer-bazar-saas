@@ -76,6 +76,9 @@ export class Order {
   })
   paymentStatus: PaymentStatus;
 
+  @Column({ name: 'transaction_id', type: 'varchar', nullable: true })
+  transactionId: string | null;
+
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   items: Relation<OrderItem[]>;
 
