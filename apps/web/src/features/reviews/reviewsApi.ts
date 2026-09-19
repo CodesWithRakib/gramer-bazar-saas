@@ -23,6 +23,7 @@ export interface Review {
   };
   rating: number;
   comment: string;
+  images?: string[];
   isApproved: boolean;
   createdAt: string;
   updatedAt: string;
@@ -34,7 +35,7 @@ export const reviewsApi = api.injectEndpoints({
       query: ({ productId, page = 1, limit = 10 }) => `/reviews/product/${productId}?page=${page}&limit=${limit}`,
       providesTags: (result, error, { productId }) => [{ type: 'Review', id: productId }],
     }),
-    addReview: builder.mutation<Review, { productId: string, rating: number, comment?: string }>({
+    addReview: builder.mutation<Review, { productId: string, rating: number, comment?: string, images?: string[] }>({
       query: (body) => ({
         url: '/reviews',
         method: 'POST',

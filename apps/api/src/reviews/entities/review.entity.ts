@@ -39,6 +39,9 @@ export class Review {
   @Column({ name: 'is_approved', default: true })
   isApproved: boolean;
 
+  @Column({ type: 'text', array: true, nullable: true })
+  images: string[] | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

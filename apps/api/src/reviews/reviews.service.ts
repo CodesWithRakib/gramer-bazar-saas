@@ -37,7 +37,7 @@ export class ReviewsService {
     };
   }
 
-  async addReview(userId: string, productId: string, rating: number, comment?: string) {
+  async addReview(userId: string, productId: string, rating: number, comment?: string, images?: string[]) {
     // 1. Duplicate check
     const existingReview = await this.reviewRepo.findOne({
       where: { userId, productId },
@@ -70,6 +70,7 @@ export class ReviewsService {
       productId,
       rating,
       comment,
+      images,
       isApproved: true,
     });
 

@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Star, User } from 'lucide-react';
 import { AddReviewModal } from './AddReviewModal';
 import { useRouter } from 'next/navigation';
+import { CustomImage } from '@/components/ui/CustomImage';
+import { X } from 'lucide-react';
 
 interface ProductReviewsProps {
   productId: string;
@@ -20,6 +22,7 @@ export function ProductReviews({ productId, isBn, lang }: ProductReviewsProps) {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   const { data, isLoading } = useGetProductReviewsQuery({ productId, page, limit: 5 });
 
@@ -93,6 +96,25 @@ export function ProductReviews({ productId, isBn, lang }: ProductReviewsProps) {
                       {review.comment}
                     </p>
                   )}
+                  {review.images && review.images.length > 0 && (
+                    <div className="flex gap-2 mt-3 overflow-x-auto pb-2 hide-scrollbar">
+                      {review.images.map((img, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setLightboxImage(img)}
+                          className="relative w-20 h-20 rounded-md overflow-hidden border bg-muted flex-shrink-0 hover:ring-2 ring-primary transition-all"
+                        >
+                          <CustomImage 
+                            src={img}
+                            alt={`Review photo ${idx + 1}`}
+                            fill
+                            sizes="80px"
+                            className="object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -125,6 +147,26 @@ export function ProductReviews({ productId, isBn, lang }: ProductReviewsProps) {
         productId={productId}
         isBn={isBn}
       />
+
+      {lightboxImage && (
+        <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setLightboxImage(null)}>
+          <button 
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 p-2 rounded-full backdrop-blur-md transition-colors"
+            onClick={(e) => { e.stopPropagation(); setLightboxImage(null); }}
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <div className="relative w-full max-w-4xl max-h-[85vh] aspect-square md:aspect-video flex items-center justify-center">
+            <CustomImage 
+              src={lightboxImage}
+              alt="Review photo enlarged"
+              fill
+              className="object-contain"
+              sizes="100vw"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -28,7 +28,7 @@ export class ReviewsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Customer: Add a review for a purchased product' })
   addReview(@Request() req: any, @Body() dto: CreateReviewDto) {
-    return this.reviewsService.addReview(req.user.id, dto.productId, dto.rating, dto.comment);
+    return this.reviewsService.addReview(req.user.id, dto.productId, dto.rating, dto.comment, dto.images);
   }
 
   @Get('user')
