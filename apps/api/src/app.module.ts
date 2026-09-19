@@ -30,6 +30,7 @@ import { AnalyticsModule } from './analytics/analytics.module.js';
 import { CouponsModule } from './coupons/coupons.module.js';
 import { ChatModule } from './chat/chat.module.js';
 import { PaymentsModule } from './payments/payments.module.js';
+import { SeederModule } from './seeder/seeder.module.js';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { PaymentsModule } from './payments/payments.module.js';
     CouponsModule,
     ChatModule,
     PaymentsModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [
