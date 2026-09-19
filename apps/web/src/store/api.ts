@@ -29,6 +29,11 @@ export const api = createApi({
     "Coupon",
     "Conversation",
     "Message",
+    "Shop",
+    "Banner",
+    "Wallet",
+    "WalletTransaction",
+    "Payout",
   ],
   endpoints: () => ({}),
 });

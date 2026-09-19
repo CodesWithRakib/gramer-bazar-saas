@@ -33,6 +33,9 @@ import { CouponsModule } from './coupons/coupons.module.js';
 import { ChatModule } from './chat/chat.module.js';
 import { PaymentsModule } from './payments/payments.module.js';
 import { SeederModule } from './seeder/seeder.module.js';
+import { BannersModule } from './banners/banners.module.js';
+import { WalletsModule } from './wallets/wallets.module.js';
+import { PayoutsModule } from './payouts/payouts.module.js';
 
 @Module({
   imports: [
@@ -96,6 +99,9 @@ import { SeederModule } from './seeder/seeder.module.js';
     ChatModule,
     PaymentsModule,
     SeederModule,
+    BannersModule,
+    WalletsModule,
+    PayoutsModule,
   ],
   controllers: [AppController],
   providers: [

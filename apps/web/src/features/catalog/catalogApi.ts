@@ -111,6 +111,7 @@ export interface SearchResponse {
 export interface SearchParams {
   q?: string;
   categoryId?: string;
+  sellerId?: string;
   minPrice?: number;
   maxPrice?: number;
   page?: number;
