@@ -13,6 +13,12 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { use } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
 
 export default function HomePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -32,24 +38,42 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
   return (
     <div className="flex flex-col gap-12 pb-12">
       {/* Hero Section */}
-      <section className="bg-primary/5 py-12 md:py-20 px-4">
+      <section className="bg-primary/5 py-12 md:py-20 px-4 overflow-hidden">
         <div className="container mx-auto text-center max-w-3xl">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground tracking-tight">
+          <motion.h1 
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground tracking-tight"
+          >
             {isBn ? 'আপনার প্রয়োজনীয় সবকিছু এখন এক ক্লিকে' : 'Everything You Need, Just a Click Away'}
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8">
+          </motion.h1>
+          <motion.p 
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-lg md:text-xl text-muted-foreground mb-8"
+          >
             {isBn 
               ? 'গ্রামের বাজার থেকে খাঁটি এবং ফ্রেশ পণ্য কিনুন সরাসরি স্থানীয় বিক্রেতাদের কাছ থেকে।' 
               : 'Buy authentic and fresh products directly from local sellers at Gramer Bazar.'}
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" asChild>
+          </motion.p>
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex flex-wrap justify-center gap-4"
+          >
+            <Button size="lg" className="rounded-full shadow-lg transition-transform hover:scale-105" asChild>
               <Link href={`/${lang}/categories`}>{isBn ? 'শপিং শুরু করুন' : 'Start Shopping'}</Link>
             </Button>
             <ProductRequestModal lang={lang} trigger={
-              <Button size="lg" variant="outline">{isBn ? 'পণ্য অনুরোধ' : 'Product Request'}</Button>
+              <Button size="lg" variant="outline" className="rounded-full transition-transform hover:scale-105">{isBn ? 'পণ্য অনুরোধ' : 'Product Request'}</Button>
             } />
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -71,7 +95,14 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
       </section>
 
       {/* Featured Products */}
-      <section className="container mx-auto px-4">
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={fadeUp}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto px-4"
+      >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">{isBn ? 'জনপ্রিয় পণ্য' : 'Featured Products'}</h2>
           <Link href={`/${lang}/search`} className="text-primary hover:underline flex items-center gap-1 text-sm font-medium">
@@ -79,26 +110,36 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
           </Link>
         </div>
         <ProductGrid products={featuredData?.data} isLoading={isLoadingFeatured} lang={lang} />
-      </section>
+      </motion.section>
 
       {/* Product Request Banner */}
-      <section className="container mx-auto px-4">
-        <div className="bg-primary text-primary-foreground rounded-2xl p-8 md:p-12 text-center shadow-lg">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            {isBn ? 'আপনার পছন্দের পণ্যটি খুঁজে পাচ্ছেন না?' : 'Cannot find your desired product?'}
-          </h2>
-          <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            {isBn 
-              ? 'আমাদের জানান আপনার কী প্রয়োজন, আমরা তা সরবরাহ করার সর্বোচ্চ চেষ্টা করব।' 
-              : 'Let us know what you need, and we will try our best to source it for you.'}
-          </p>
-          <ProductRequestModal lang={lang} trigger={
-            <Button size="lg" variant="secondary" className="font-semibold px-8">
-              {isBn ? 'আমাদের জানান' : 'Let Us Know'}
-            </Button>
-          } />
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={fadeUp}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto px-4"
+      >
+        <div className="bg-primary text-primary-foreground rounded-2xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary pointer-events-none" />
+          <div className="relative z-10">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              {isBn ? 'আপনার পছন্দের পণ্যটি খুঁজে পাচ্ছেন না?' : 'Cannot find your desired product?'}
+            </h2>
+            <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
+              {isBn 
+                ? 'আমাদের জানান আপনার কী প্রয়োজন, আমরা তা সরবরাহ করার সর্বোচ্চ চেষ্টা করব।' 
+                : 'Let us know what you need, and we will try our best to source it for you.'}
+            </p>
+            <ProductRequestModal lang={lang} trigger={
+              <Button size="lg" variant="secondary" className="font-semibold px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+                {isBn ? 'আমাদের জানান' : 'Let Us Know'}
+              </Button>
+            } />
+          </div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }

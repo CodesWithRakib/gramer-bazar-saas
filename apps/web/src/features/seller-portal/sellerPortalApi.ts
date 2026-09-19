@@ -58,7 +58,7 @@ export const sellerPortalApi = api.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    getSellerProducts: builder.query<SellerProductItem[], string | void>({
+    getSellerProducts: builder.query<any[], string | void>({
       query: (search) => {
         let url = '/seller-portal/products';
         if (search) {

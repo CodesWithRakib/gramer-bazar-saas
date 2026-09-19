@@ -23,6 +23,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { BoxSelect } from 'lucide-react';
 import { AddProductDialog, EditProductDialog } from './ProductDialogs';
 
 export default function SellerProductsPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -133,11 +135,15 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {isBn ? 'লোড হচ্ছে...' : 'Loading...'}
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-4 w-40 mb-2" /><Skeleton className="h-3 w-20" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-32 mb-2" /><Skeleton className="h-3 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-9 w-16" /></TableCell>
+                </TableRow>
+              ))
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -153,8 +159,12 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {isBn ? 'কোনো প্রোডাক্ট পাওয়া যায়নি' : 'No results.'}
+                <TableCell colSpan={columns.length} className="h-64 text-center">
+                  <div className="flex flex-col items-center justify-center text-muted-foreground">
+                    <BoxSelect className="h-12 w-12 mb-4 opacity-20" />
+                    <p className="text-lg font-medium">{isBn ? 'কোনো প্রোডাক্ট পাওয়া যায়নি' : 'No products found'}</p>
+                    <p className="text-sm mt-1">{isBn ? 'নতুন প্রোডাক্ট যোগ করতে উপরে "Add Product" বাটনে ক্লিক করুন' : 'Click "Add Product" above to create a new product.'}</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

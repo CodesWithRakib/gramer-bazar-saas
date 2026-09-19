@@ -1,8 +1,16 @@
 import { api } from "../../store/api";
 
+export interface SystemNotification {
+  id: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export const notificationsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getUserNotifications: builder.query<Notification[], void>({
+    getUserNotifications: builder.query<SystemNotification[], void>({
       query: () => "/notifications",
       providesTags: ["Notification"],
     }),
