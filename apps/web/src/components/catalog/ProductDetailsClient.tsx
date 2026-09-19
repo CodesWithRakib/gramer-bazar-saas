@@ -56,7 +56,7 @@ export function ProductDetailsClient({
   const isOutOfStock = stock <= 0;
 
   const { data: relatedProducts } = useGetRelatedProductsQuery(product.productVariant.product.slug);
-  const { data: reviewsResponse, refetch: refetchReviews } = useGetProductReviewsQuery({ productId: product.productVariant.product.id });
+  const { data: reviewsResponse, refetch: refetchReviews } = useGetProductReviewsQuery(product.productVariant.product.id);
   
   // Auth state
   const { isAuthenticated } = useSelector((state: any) => state.auth);
@@ -114,6 +114,7 @@ export function ProductDetailsClient({
       sellerNameEn: product.shop.nameEn,
       sellerNameBn: product.shop.nameBn,
     }));
+    toast.success(isBn ? 'কার্টে যোগ করা হয়েছে' : 'Added to cart');
   };
 
   return (

@@ -58,7 +58,7 @@ export default function SellerOrderDetailsPage({
             {order.items.map((item: any) => (
               <div key={item.id} className="py-4 flex justify-between">
                 <div>
-                  <p className="font-medium">{item.sellerProduct?.productVariant?.product?.name}</p>
+                  <p className="font-medium">{item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn}</p>
                   <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
                 <div className="font-bold">৳ {item.subtotal}</div>

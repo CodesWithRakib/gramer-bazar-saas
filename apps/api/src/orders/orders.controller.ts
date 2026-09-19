@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Get, Param, Query, Patch } from '@nestjs/common';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
@@ -32,6 +32,19 @@ export class OrdersController {
     @Query('search') search?: string,
   ) {
     return this.ordersService.findAll(page, limit, search);
+  }
+
+  @Patch('admin/:id/status')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Update order status (Admin only)' })
+  async updateAdminOrderStatus(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body('status') status: string
+  ) {
+    return this.ordersService.updateAdminOrderStatus(id, status, req.user.id);
   }
 
   @Get()

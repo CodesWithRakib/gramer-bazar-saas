@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { clearCart } from '@/store/slices/cartSlice';
-import { useGetAddressesQuery, useCreateAddressMutation } from '@/features/addresses/addressesApi';
+import { useGetAddressesQuery } from '@/features/addresses/addressApi';
+import { AddressForm } from '@/features/addresses/components/AddressForm';
 import { useCheckoutOrderMutation } from '@/features/orders/ordersApi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,25 +29,14 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   const total = subtotal + deliveryFee;
 
   const { data: addresses, isLoading: isAddressesLoading } = useGetAddressesQuery(undefined, { skip: !isAuthenticated });
-  const [createAddress, { isLoading: isCreatingAddress }] = useCreateAddressMutation();
   const [checkoutOrder, { isLoading: isCheckingOut }] = useCheckoutOrderMutation();
 
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<string>('CASH_ON_DELIVERY');
+  const [paymentMethod, setPaymentMethod] = useState<string>('COD');
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // New Address Form State
-  const [newAddress, setNewAddress] = useState({
-    title: 'Home',
-    streetAddress: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'Bangladesh',
-    contactName: '',
-    contactPhone: '',
-  });
+
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -67,16 +57,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
 
   if (!isAuthenticated || items.length === 0) return null;
 
-  const handleCreateAddress = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await createAddress(newAddress).unwrap();
-      setSelectedAddressId(res.id);
-      setShowAddressForm(false);
-    } catch (err: any) {
-      setErrorMsg(err.data?.message || 'Failed to create address');
-    }
-  };
+
 
   const handleCheckout = async () => {
     if (!selectedAddressId) {
@@ -151,7 +132,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                         >
                           <span className="font-semibold text-base">{address.title} {address.isDefault && <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full ml-2">Default</span>}</span>
                           <span className="text-sm">{address.contactName} ({address.contactPhone})</span>
-                          <span className="text-sm text-muted-foreground">{address.streetAddress}, {address.city}</span>
+                          <span className="text-sm text-muted-foreground">{address.streetAddress}</span>
                         </Label>
                         {selectedAddressId === address.id && (
                           <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />
@@ -169,45 +150,17 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                   )}
 
                   {showAddressForm && (
-                    <form onSubmit={handleCreateAddress} className="space-y-4 border p-4 rounded-lg bg-muted/20">
-                      <h4 className="font-semibold">{isBn ? 'নতুন ঠিকানা' : 'New Address'}</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>{isBn ? 'ঠিকানার নাম' : 'Address Title (e.g., Home)'}</Label>
-                          <Input required value={newAddress.title} onChange={e => setNewAddress({...newAddress, title: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>{isBn ? 'যোগাযোগের নাম' : 'Contact Name'}</Label>
-                          <Input required value={newAddress.contactName} onChange={e => setNewAddress({...newAddress, contactName: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>{isBn ? 'যোগাযোগের নম্বর' : 'Contact Phone'}</Label>
-                          <Input required value={newAddress.contactPhone} onChange={e => setNewAddress({...newAddress, contactPhone: e.target.value})} />
-                        </div>
-                        <div className="space-y-2 sm:col-span-2">
-                          <Label>{isBn ? 'রাস্তা / বিস্তারিত ঠিকানা' : 'Street Address'}</Label>
-                          <Input required value={newAddress.streetAddress} onChange={e => setNewAddress({...newAddress, streetAddress: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>{isBn ? 'শহর' : 'City'}</Label>
-                          <Input required value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>{isBn ? 'পোস্টাল কোড' : 'Postal Code'}</Label>
-                          <Input required value={newAddress.postalCode} onChange={e => setNewAddress({...newAddress, postalCode: e.target.value})} />
-                        </div>
-                      </div>
-                      <div className="flex gap-2 justify-end pt-2">
+                    <div className="border p-4 rounded-lg bg-card">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="font-semibold">{isBn ? 'নতুন ঠিকানা' : 'New Address'}</h4>
                         {addresses && addresses.length > 0 && (
-                          <Button type="button" variant="ghost" onClick={() => setShowAddressForm(false)}>
+                          <Button type="button" variant="ghost" size="sm" onClick={() => setShowAddressForm(false)}>
                             {isBn ? 'বাতিল' : 'Cancel'}
                           </Button>
                         )}
-                        <Button type="submit" disabled={isCreatingAddress}>
-                          {isCreatingAddress ? (isBn ? 'যোগ করা হচ্ছে...' : 'Saving...') : (isBn ? 'ঠিকানা সেভ করুন' : 'Save Address')}
-                        </Button>
                       </div>
-                    </form>
+                      <AddressForm onSuccess={() => setShowAddressForm(false)} />
+                    </div>
                   )}
                 </div>
               )}
@@ -227,10 +180,10 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                   <input 
                     type="radio" 
                     name="paymentMethod" 
-                    value="CASH_ON_DELIVERY" 
+                    value="COD" 
                     id="cod" 
                     className="peer sr-only" 
-                    checked={paymentMethod === 'CASH_ON_DELIVERY'}
+                    checked={paymentMethod === 'COD'}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
                   <Label
@@ -240,16 +193,16 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                     <span className="font-semibold text-base">{isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery'}</span>
                     <span className="text-sm text-muted-foreground">{isBn ? 'পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন' : 'Pay when you receive the product'}</span>
                   </Label>
-                  {paymentMethod === 'CASH_ON_DELIVERY' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
+                  {paymentMethod === 'COD' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
                 </div>
                 <div className="relative">
                   <input 
                     type="radio" 
                     name="paymentMethod" 
-                    value="DIGITAL_PAYMENT" 
+                    value="ONLINE" 
                     id="digital" 
                     className="peer sr-only" 
-                    checked={paymentMethod === 'DIGITAL_PAYMENT'}
+                    checked={paymentMethod === 'ONLINE'}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
                   <Label
@@ -259,7 +212,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                     <span className="font-semibold text-base">{isBn ? 'ডিজিটাল পেমেন্ট' : 'Digital Payment'}</span>
                     <span className="text-sm text-muted-foreground">{isBn ? 'বিকাশ, রকেট, কার্ড (SSLCommerz)' : 'bKash, Nagad, Cards (SSLCommerz)'}</span>
                   </Label>
-                  {paymentMethod === 'DIGITAL_PAYMENT' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
+                  {paymentMethod === 'ONLINE' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
                 </div>
               </div>
             </CardContent>

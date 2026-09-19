@@ -41,13 +41,22 @@ export class OrdersService {
         );
       }
 
-      // 2. Fetch SellerProducts & Inventory in bulk with Row Lock
+      // 2. Fetch SellerProducts
       const itemIds = checkoutDto.items.map((i) => i.sellerProductId);
       const dbProducts = await manager.find(SellerProduct, {
         where: { id: In(itemIds), isActive: true },
-        relations: ['inventory'],
-        lock: { mode: 'pessimistic_write' }, // Lock these rows to prevent race conditions during checkout
       });
+
+      // Fetch and lock Inventory rows separately to avoid Postgres 'FOR UPDATE on nullable side of outer join' error
+      const inventories = await manager.find(Inventory, {
+        where: { sellerProductId: In(itemIds) },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      // Attach inventory to products
+      for (const product of dbProducts) {
+        product.inventory = inventories.find((i) => i.sellerProductId === product.id) as any;
+      }
 
       if (dbProducts.length !== itemIds.length) {
         throw new BadRequestException('One or more products are unavailable.');
@@ -223,7 +232,8 @@ export class OrdersService {
       relations: [
         'items', 
         'items.sellerProduct', 
-        'items.sellerProduct.product',
+        'items.sellerProduct.productVariant',
+        'items.sellerProduct.productVariant.product',
         'statusHistory', 
         'address'
       ],
@@ -323,5 +333,44 @@ export class OrdersService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async updateAdminOrderStatus(orderId: string, status: string, adminId: string) {
+    return this.dataSource.transaction(async (manager) => {
+      const order = await manager.findOne(Order, {
+        where: { id: orderId },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      // Check if status is a valid OrderStatus
+      if (!Object.values(OrderStatus).includes(status as OrderStatus)) {
+        throw new BadRequestException('Invalid order status');
+      }
+
+      const newStatus = status as OrderStatus;
+      
+      if (order.status === newStatus) {
+        return order; // No change
+      }
+
+      order.status = newStatus;
+
+      // Also update paymentStatus to PAID if status is DELIVERED and payment method is COD
+      if (newStatus === OrderStatus.DELIVERED && order.paymentMethod === PaymentMethod.COD) {
+        order.paymentStatus = PaymentStatus.PAID;
+      }
+
+      const history = new OrderStatusHistory();
+      history.orderId = order.id;
+      history.status = newStatus;
+      history.remark = `Status updated by Admin (${adminId})`;
+
+      await manager.save(OrderStatusHistory, history);
+      return manager.save(Order, order);
+    });
   }
 }

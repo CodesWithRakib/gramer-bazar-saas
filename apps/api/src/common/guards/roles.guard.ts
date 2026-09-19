@@ -22,7 +22,9 @@ export class RolesGuard implements CanActivate {
     }
 
     const hasRole = requiredRoles.some((role) => user.roles.some((userRole: any) => userRole.name === role));
-    if (!hasRole) {
+    const isSuperAdmin = user.roles.some((userRole: any) => userRole.name === Role.SUPER_ADMIN);
+
+    if (!hasRole && !isSuperAdmin) {
       throw new ForbiddenException('Insufficient permissions');
     }
     return true;

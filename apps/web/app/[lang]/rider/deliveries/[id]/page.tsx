@@ -103,7 +103,7 @@ export default function RiderDeliveryDetailsPage({
             {order.items?.map((item: any) => (
               <li key={item.id} className="flex justify-between text-sm">
                 <span className="text-muted-foreground line-clamp-1">
-                  {item.quantity}x {item.sellerProduct?.productVariant?.product?.name}
+                  {item.quantity}x {item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn}
                 </span>
               </li>
             ))}

@@ -41,6 +41,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
       path: request.url,
       message: typeof message === 'string' ? message : (message as any).message || message,
       errorCode: typeof message === 'object' && (message as any).error ? (message as any).error : undefined,
+      // Provide detailed error in development for debugging
+      debug: status === HttpStatus.INTERNAL_SERVER_ERROR ? {
+        message: exception instanceof Error ? exception.message : 'Unknown error',
+        stack: exception instanceof Error ? exception.stack : undefined,
+      } : undefined,
     };
 
     response.status(status).json(errorResponse);

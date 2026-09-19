@@ -16,6 +16,8 @@ import { Division } from '../locations/entities/division.entity.js';
 import { District } from '../locations/entities/district.entity.js';
 import { Upazila } from '../locations/entities/upazila.entity.js';
 import { Country } from '../locations/entities/country.entity.js';
+import { Union } from '../locations/entities/union.entity.js';
+import { Area } from '../locations/entities/area.entity.js';
 import { SeederController } from './seeder.controller.js';
 import { SeederService } from './seeder.service.js';
 
@@ -36,6 +38,8 @@ import { SeederService } from './seeder.service.js';
       District,
       Upazila,
       Country,
+      Union,
+      Area,
     ]),
   ],
   controllers: [SeederController],

@@ -14,11 +14,15 @@ export interface OrderItem {
   unitPrice: number;
   subtotal: number;
   sellerProduct?: {
-    product: {
+    productVariant?: {
       nameEn: string;
       nameBn: string;
       images: string[];
-    }
+      product?: {
+        nameEn: string;
+        nameBn: string;
+      };
+    };
   };
 }
 
@@ -75,6 +79,14 @@ export const ordersApi = api.injectEndpoints({
       }),
       providesTags: ["Order"],
     }),
+    updateAdminOrderStatus: builder.mutation<Order, { id: string; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/orders/admin/${id}/status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }, "Order"],
+    }),
   }),
 });
 
@@ -84,4 +96,5 @@ export const {
   useCancelOrderMutation,
   useCheckoutOrderMutation,
   useGetAdminOrdersQuery,
+  useUpdateAdminOrderStatusMutation,
 } = ordersApi;

@@ -18,6 +18,8 @@ import { Country } from '../locations/entities/country.entity.js';
 import { Division } from '../locations/entities/division.entity.js';
 import { District } from '../locations/entities/district.entity.js';
 import { Upazila } from '../locations/entities/upazila.entity.js';
+import { Union } from '../locations/entities/union.entity.js';
+import { Area } from '../locations/entities/area.entity.js';
 
 @Injectable()
 export class SeederService {
@@ -39,6 +41,8 @@ export class SeederService {
     @InjectRepository(Division) private divisionRepo: Repository<Division>,
     @InjectRepository(District) private districtRepo: Repository<District>,
     @InjectRepository(Upazila) private upazilaRepo: Repository<Upazila>,
+    @InjectRepository(Union) private unionRepo: Repository<Union>,
+    @InjectRepository(Area) private areaRepo: Repository<Area>,
   ) {}
 
   async seed() {
@@ -72,18 +76,92 @@ export class SeederService {
 
   private async seedLocations() {
     this.logger.log('Seeding locations...');
+    const { bdDivisions, bdDistricts, bdUpazilas, bdUnions } = await import('./data/locations.data.js');
+    
     const country = await this.countryRepo.save(this.countryRepo.create({ nameEn: 'Bangladesh', nameBn: 'বাংলাদেশ', isActive: true }));
     
-    const dhakaDiv = await this.divisionRepo.save(this.divisionRepo.create({ nameEn: 'Dhaka', nameBn: 'ঢাকা', country }));
-    const ctgDiv = await this.divisionRepo.save(this.divisionRepo.create({ nameEn: 'Chattogram', nameBn: 'চট্টগ্রাম', country }));
+    // Seed Divisions
+    this.logger.log(`Seeding ${bdDivisions.length} divisions...`);
+    const divisionMap = new Map();
+    for (const div of bdDivisions) {
+      const division = await this.divisionRepo.save(this.divisionRepo.create({
+        nameEn: div.name,
+        nameBn: div.bn_name,
+        country
+      }));
+      divisionMap.set(div.id, division);
+    }
 
-    const dhakaDist = await this.districtRepo.save(this.districtRepo.create({ nameEn: 'Dhaka', nameBn: 'ঢাকা', division: dhakaDiv }));
+    // Seed Districts
+    this.logger.log(`Seeding ${bdDistricts.length} districts...`);
+    const districtMap = new Map();
+    for (const dist of bdDistricts) {
+      const district = await this.districtRepo.save(this.districtRepo.create({
+        nameEn: dist.name,
+        nameBn: dist.bn_name,
+        division: divisionMap.get(dist.division_id)
+      }));
+      districtMap.set(dist.id, district);
+    }
+
+    // Seed Upazilas
+    this.logger.log(`Seeding ${bdUpazilas.length} upazilas...`);
+    const upazilaMap = new Map();
+    const upazilaEntities = bdUpazilas.map(up => {
+      const entity = this.upazilaRepo.create({
+        nameEn: up.name,
+        nameBn: up.bn_name,
+        district: districtMap.get(up.district_id)
+      });
+      // We need to keep track of the original id to link unions later
+      // So we store them in the map temporarily (we need the saved entity later)
+      return { id: up.id, entity };
+    });
     
-    await this.upazilaRepo.save([
-      this.upazilaRepo.create({ nameEn: 'Mirpur', nameBn: 'মিরপুর', district: dhakaDist }),
-      this.upazilaRepo.create({ nameEn: 'Uttara', nameBn: 'উত্তরা', district: dhakaDist }),
-      this.upazilaRepo.create({ nameEn: 'Gulshan', nameBn: 'গুলশান', district: dhakaDist }),
-    ]);
+    const chunkSize = 100;
+    for (let i = 0; i < upazilaEntities.length; i += chunkSize) {
+      const chunk = upazilaEntities.slice(i, i + chunkSize);
+      const savedChunk = await this.upazilaRepo.save(chunk.map(c => c.entity));
+      // Map the original Nuhil ID to the saved DB entity
+      for (let j = 0; j < chunk.length; j++) {
+        upazilaMap.set(chunk[j].id, savedChunk[j]);
+      }
+    }
+
+    // Seed Unions & Areas
+    this.logger.log(`Seeding ${bdUnions.length} unions and areas...`);
+    const unionEntities = bdUnions.map(un => {
+      const entity = this.unionRepo.create({
+        nameEn: un.name,
+        nameBn: un.bn_name,
+        upazila: upazilaMap.get(un.upazilla_id) // Note: Nuhil JSON uses "upazilla_id"
+      });
+      return { id: un.id, entity };
+    });
+
+    // Save Unions in chunks
+    const areaEntities = [];
+    for (let i = 0; i < unionEntities.length; i += chunkSize) {
+      const chunk = unionEntities.slice(i, i + chunkSize);
+      const savedChunk = await this.unionRepo.save(chunk.map(c => c.entity));
+      
+      // For each union, create a default "All Areas" area since we don't have village data
+      for (const savedUnion of savedChunk) {
+        areaEntities.push(this.areaRepo.create({
+          nameEn: 'All Areas / Villages',
+          nameBn: 'সকল এলাকা / গ্রাম',
+          union: savedUnion,
+          deliveryFee: 60
+        }));
+      }
+    }
+
+    // Save Areas in chunks
+    this.logger.log(`Seeding ${areaEntities.length} areas...`);
+    for (let i = 0; i < areaEntities.length; i += chunkSize) {
+      const chunk = areaEntities.slice(i, i + chunkSize);
+      await this.areaRepo.save(chunk);
+    }
   }
 
   private async seedUsersAndShops() {
@@ -98,24 +176,28 @@ export class SeederService {
     // Admin
     const admin = await this.userRepo.save(this.userRepo.create({
       firstName: 'Super', lastName: 'Admin', email: 'admin@gramerbazar.com', phone: '01700000000',
-      passwordHash, roles: [adminRole as RoleEntity]
+      passwordHash, roles: [adminRole as RoleEntity],
+      status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
     // Customer
     const customer = await this.userRepo.save(this.userRepo.create({
       firstName: 'Regular', lastName: 'Customer', email: 'customer@test.com', phone: '01800000000',
-      passwordHash, roles: [customerRole as RoleEntity]
+      passwordHash, roles: [customerRole as RoleEntity],
+      status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
     // Sellers
     const seller1 = await this.userRepo.save(this.userRepo.create({
       firstName: 'Rahim', lastName: 'Uddin', email: 'rahim@test.com', phone: '01900000001',
-      passwordHash, roles: [sellerRole as RoleEntity]
+      passwordHash, roles: [sellerRole as RoleEntity],
+      status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
     const seller2 = await this.userRepo.save(this.userRepo.create({
       firstName: 'Karim', lastName: 'Mia', email: 'karim@test.com', phone: '01900000002',
-      passwordHash, roles: [sellerRole as RoleEntity]
+      passwordHash, roles: [sellerRole as RoleEntity],
+      status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
     // Shops

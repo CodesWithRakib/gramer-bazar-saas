@@ -84,9 +84,9 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
         sellerProductId: item.sellerProductId,
         quantity: item.quantity,
         price: item.unitPrice,
-        nameEn: item.sellerProduct?.product?.nameEn || 'Unknown Product',
-        nameBn: item.sellerProduct?.product?.nameBn || 'অজানা পণ্য',
-        image: item.sellerProduct?.product?.images?.[0] || '',
+        nameEn: item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn || 'Unknown Product',
+        nameBn: item.sellerProduct?.productVariant?.nameBn || item.sellerProduct?.productVariant?.product?.nameBn || 'অজানা পণ্য',
+        image: item.sellerProduct?.productVariant?.images?.[0] || '',
         sellerNameEn: 'Previous Seller', // Note: Need seller detail if strictly required
         sellerNameBn: 'পূর্ববর্তী বিক্রেতা'
       }));
@@ -164,8 +164,8 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
                       <div>
                         <p className="font-medium">
                           {isBn 
-                            ? item.sellerProduct?.product?.nameBn || `পণ্য আইডি: ${item.sellerProductId.slice(0, 8)}`
-                            : item.sellerProduct?.product?.nameEn || `Product ID: ${item.sellerProductId.slice(0, 8)}`
+                            ? item.sellerProduct?.productVariant?.nameBn || item.sellerProduct?.productVariant?.product?.nameBn || `পণ্য আইডি: ${item.sellerProductId.slice(0, 8)}`
+                            : item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn || `Product ID: ${item.sellerProductId.slice(0, 8)}`
                           }
                         </p>
                         <p className="text-sm text-muted-foreground">Qty: {item.quantity} × ৳{Number(item.unitPrice).toFixed(2)}</p>

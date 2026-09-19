@@ -1,11 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminOrdersQuery } from '@/features/orders/ordersApi';
+import { useGetAdminOrdersQuery, useUpdateAdminOrderStatusMutation } from '@/features/orders/ordersApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AdminOrdersPage() {
   const [page, setPage] = useState(1);
@@ -13,6 +17,16 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState('');
   
   const { data, isLoading } = useGetAdminOrdersQuery({ page, limit, search });
+  const [updateStatus] = useUpdateAdminOrderStatusMutation();
+
+  const handleStatusChange = async (id: string, status: string) => {
+    try {
+      await updateStatus({ id, status }).unwrap();
+      toast.success('Order status updated');
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to update order status');
+    }
+  };
 
   const columns: ColumnDef<any>[] = [
     {
@@ -50,6 +64,37 @@ export default function AdminOrdersPage() {
       accessorKey: 'createdAt',
       header: 'Placed On',
       cell: ({ row }) => new Date(row.getValue('createdAt')).toLocaleDateString(),
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => {
+        const order = row.original;
+        const availableStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'FAILED'];
+        
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {availableStatuses.map((status) => (
+                <DropdownMenuItem 
+                  key={status}
+                  onClick={() => handleStatusChange(order.id, status)}
+                  disabled={order.status === status}
+                >
+                  Mark as {status}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 

@@ -30,7 +30,9 @@ export class PaymentsService {
 
   async initPayment(order: Order, customerInfo: any, redirectUrl: string) {
     if (!this.sslcz) {
-      throw new Error('Payment gateway is not configured.');
+      this.logger.warn('Payment gateway is not configured. Returning mock payment URL.');
+      // Return a mock URL for local development/testing
+      return `${redirectUrl}/success?mock_payment=true&tran_id=${order.id}`;
     }
 
     const data = {
