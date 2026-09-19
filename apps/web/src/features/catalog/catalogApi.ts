@@ -83,6 +83,38 @@ export const catalogApi = api.enhanceEndpoints({ addTagTypes: ['Catalog', 'Categ
       }),
       providesTags: ['Catalog'],
     }),
+    createAdminCategory: builder.mutation<any, Partial<Category>>({
+      query: (body) => ({
+        url: '/categories',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Category'],
+    }),
+    updateAdminCategory: builder.mutation<any, { id: string; data: Partial<Category> }>({
+      query: ({ id, data }) => ({
+        url: `/categories/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Category'],
+    }),
+    createAdminBrand: builder.mutation<any, any>({
+      query: (body) => ({
+        url: '/brands',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Catalog'],
+    }),
+    updateAdminBrand: builder.mutation<any, { id: string; data: any }>({
+      query: ({ id, data }) => ({
+        url: `/brands/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Catalog'],
+    }),
     searchProducts: builder.query<SearchResponse, SearchParams>({
       query: (params) => {
         // Strip out undefined, null, or empty string values
@@ -132,4 +164,8 @@ export const {
   useGetRelatedProductsQuery,
   useGetProductReviewsQuery,
   useValidateCartMutation,
+  useCreateAdminCategoryMutation,
+  useUpdateAdminCategoryMutation,
+  useCreateAdminBrandMutation,
+  useUpdateAdminBrandMutation,
 } = catalogApi;

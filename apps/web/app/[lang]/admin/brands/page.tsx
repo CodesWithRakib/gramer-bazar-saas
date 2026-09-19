@@ -5,11 +5,14 @@ import { useGetAdminBrandsQuery } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { AddBrandDialog, EditBrandDialog } from './BrandDialogs';
 
 export default function AdminBrandsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
+  const [editingBrand, setEditingBrand] = useState<any>(null);
   
   const { data, isLoading } = useGetAdminBrandsQuery({ page, limit, search });
 
@@ -26,12 +29,22 @@ export default function AdminBrandsPage() {
       accessorKey: 'slug',
       header: 'Slug',
     },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => (
+        <Button variant="outline" size="sm" onClick={() => setEditingBrand(row.original)}>
+          Edit
+        </Button>
+      ),
+    },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Brands</h1>
+        <AddBrandDialog />
       </div>
       
       <div className="flex items-center space-x-2 max-w-sm">
@@ -62,6 +75,16 @@ export default function AdminBrandsPage() {
         }}
         isLoading={isLoading}
       />
+
+      {editingBrand && (
+        <EditBrandDialog
+          brand={editingBrand}
+          open={!!editingBrand}
+          onOpenChange={(o) => {
+            if (!o) setEditingBrand(null);
+          }}
+        />
+      )}
     </div>
   );
 }

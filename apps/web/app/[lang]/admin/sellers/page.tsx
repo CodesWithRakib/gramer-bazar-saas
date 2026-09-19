@@ -6,7 +6,8 @@ import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Role } from '@/features/users/usersApi';
+import { Button } from '@/components/ui/button';
+import { Role, useUpdateUserStatusMutation } from '@/features/users/usersApi';
 
 export default function AdminSellersPage() {
   const [page, setPage] = useState(1);
@@ -14,6 +15,7 @@ export default function AdminSellersPage() {
   const [search, setSearch] = useState('');
   
   const { data, isLoading } = useGetUsersQuery({ page, limit, search, role: Role.SELLER });
+  const [updateStatus] = useUpdateUserStatusMutation();
 
   const columns: ColumnDef<any>[] = [
     {
@@ -37,10 +39,24 @@ export default function AdminSellersPage() {
       header: 'Status',
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
+        const user = row.original;
+        
         return (
-          <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>
-            {status}
-          </Badge>
+          <div className="flex items-center space-x-2">
+            <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>
+              {status}
+            </Badge>
+            {status !== 'ACTIVE' && (
+              <Button size="sm" variant="outline" onClick={() => updateStatus({ id: user.id, status: 'ACTIVE' })}>
+                Approve
+              </Button>
+            )}
+            {status === 'ACTIVE' && (
+              <Button size="sm" variant="destructive" onClick={() => updateStatus({ id: user.id, status: 'SUSPENDED' })}>
+                Suspend
+              </Button>
+            )}
+          </div>
         );
       },
     },

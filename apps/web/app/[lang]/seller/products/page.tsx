@@ -23,11 +23,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { AddProductDialog, EditProductDialog } from './ProductDialogs';
 
 export default function SellerProductsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingProduct, setEditingProduct] = useState<any>(null);
   
   const { data: products, isLoading } = useGetSellerProductsQuery(searchTerm || undefined);
 
@@ -79,7 +81,7 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
       id: 'actions',
       header: isBn ? 'অ্যাকশন' : 'Actions',
       cell: ({ row }) => (
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={() => setEditingProduct(row.original)}>
           {isBn ? 'এডিট' : 'Edit'}
         </Button>
       ),
@@ -97,7 +99,7 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">{isBn ? 'আমার প্রোডাক্টসমূহ' : 'My Products'}</h1>
-        <Button>{isBn ? 'নতুন প্রোডাক্ট যোগ করুন' : 'Add New Product'}</Button>
+        <AddProductDialog isBn={isBn} />
       </div>
       
       <div className="flex items-center space-x-2">
@@ -178,6 +180,17 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
           {isBn ? 'পরবর্তী' : 'Next'}
         </Button>
       </div>
+      
+      {editingProduct && (
+        <EditProductDialog
+          isBn={isBn}
+          product={editingProduct}
+          open={!!editingProduct}
+          onOpenChange={(o) => {
+            if (!o) setEditingProduct(null);
+          }}
+        />
+      )}
     </div>
   );
 }

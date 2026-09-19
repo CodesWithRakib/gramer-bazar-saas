@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
@@ -27,5 +27,25 @@ export class UsersController {
     @Query('role') role?: Role,
   ) {
     return this.usersService.findAll(page, limit, search, role);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update user status (e.g., ACTIVE, INACTIVE, SUSPENDED)' })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+  ) {
+    return this.usersService.update(id, { status } as any);
+  }
+
+  @Patch(':id/roles')
+  @ApiOperation({ summary: 'Update user roles' })
+  async updateRoles(
+    @Param('id') id: string,
+    @Body('roles') roles: string[],
+  ) {
+    // For simplicity, we can fetch roles in service and assign. 
+    // This requires a new method in usersService. Let's add it.
+    return this.usersService.updateRoles(id, roles);
   }
 }

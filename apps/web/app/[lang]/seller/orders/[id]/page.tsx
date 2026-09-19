@@ -6,11 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import { use } from 'react';
+
 export default function SellerOrderDetailsPage({
-  params: { lang, id },
+  params,
 }: {
-  params: { lang: string; id: string };
+  params: Promise<{ lang: string; id: string }>;
 }) {
+  const resolvedParams = use(params);
+  const lang = resolvedParams.lang;
+  const id = resolvedParams.id;
   const isBn = lang === 'bn';
   const { data: order, isLoading, isError } = useGetSellerOrderByIdQuery(id);
 

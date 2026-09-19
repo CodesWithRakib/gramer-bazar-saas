@@ -81,4 +81,17 @@ export class UsersService {
       },
     };
   }
+
+  async updateRoles(id: string, roleNames: string[]): Promise<User> {
+    const user = await this.findById(id);
+    if (!roleNames || roleNames.length === 0) {
+      user.roles = [];
+    } else {
+      const roles = await this.roleRepository.createQueryBuilder('role')
+        .where('role.name IN (:...roleNames)', { roleNames })
+        .getMany();
+      user.roles = roles;
+    }
+    return this.userRepository.save(user);
+  }
 }
