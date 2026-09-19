@@ -34,9 +34,12 @@ export interface CheckoutRequest {
 }
 
 export interface CheckoutResponse {
-  id: string;
-  total: number;
-  // other fields
+  order: {
+    id: string;
+    total: number;
+    // other fields
+  };
+  paymentUrl: string | null;
 }
 
 export const checkoutApi = api.injectEndpoints({

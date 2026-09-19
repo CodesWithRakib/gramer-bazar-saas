@@ -92,7 +92,11 @@ export function CheckoutClient({ lang }: { lang: string }) {
       }).unwrap();
 
       dispatch(clearCart());
-      router.push(`/${lang}/checkout/success?orderId=${result.id}`);
+      if (result.paymentUrl) {
+        window.location.href = result.paymentUrl;
+      } else {
+        router.push(`/${lang}/checkout/success?orderId=${result.order.id}`);
+      }
     } catch (err: any) {
       setErrorMsg(err.data?.message || (isBn ? 'অর্ডার করতে সমস্যা হয়েছে' : 'Failed to place order'));
     }

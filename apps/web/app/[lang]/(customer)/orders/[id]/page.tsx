@@ -3,7 +3,7 @@ import { use } from 'react';
 
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useGetOrderByIdQuery, useCancelOrderMutation } from '@/features/orders/ordersApi';
 import { useGetCustomerDeliveryQuery } from '@/features/deliveries/deliveriesApi';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,9 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
   const { data: order, isLoading, isError } = useGetOrderByIdQuery(id);
   const { data: delivery } = useGetCustomerDeliveryQuery(id);
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
+
+  const searchParams = useSearchParams();
+  const isSuccess = searchParams.get('success') === 'true';
 
   if (isLoading) {
     return <div className="container py-8 text-center">{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</div>;
@@ -99,6 +102,13 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
 
   return (
     <div className="container max-w-4xl py-8 space-y-6">
+      {isSuccess && (
+        <div className="bg-primary/10 border border-primary/20 text-primary p-4 rounded-xl flex items-center justify-center gap-3 mb-6 animate-in slide-in-from-top-4 fade-in">
+          <CheckCircle2 className="h-6 w-6" />
+          <p className="font-semibold text-lg">{isBn ? 'আপনার অর্ডার সফলভাবে সম্পন্ন হয়েছে!' : 'Your order has been placed successfully!'}</p>
+        </div>
+      )}
+
       <Link href={`/${lang}/orders`} className="flex items-center text-sm text-primary hover:underline">
         <ArrowLeft className="h-4 w-4 mr-1" />
         {isBn ? 'অর্ডারে ফিরে যান' : 'Back to Orders'}

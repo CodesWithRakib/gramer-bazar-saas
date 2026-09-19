@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { DeliveryStatus } from '@/features/deliveries/deliveriesApi';
 import Link from 'next/link';
-import { MapPin, Phone } from 'lucide-react';
+import { MapPin, Phone, Banknote, Navigation } from 'lucide-react';
 
 export default function RiderDashboardPage({ params }: { params: Promise<{ lang: string }> }) {
   const [lang, setLang] = useState('en');
@@ -29,11 +29,47 @@ export default function RiderDashboardPage({ params }: { params: Promise<{ lang:
 
   const pendingDeliveries = deliveries?.filter(d => d.status === DeliveryStatus.ASSIGNED) || [];
 
+  const completedDeliveries = deliveries?.filter(d => d.status === DeliveryStatus.DELIVERED) || [];
+  
+  // Mock earnings calculation based on completed deliveries
+  const totalEarnings = completedDeliveries.length * 60; // 60 BDT per delivery
+
   return (
-    <div className="space-y-6 pt-4">
-      <div>
-        <h1 className="text-2xl font-bold">{isBn ? 'ড্যাশবোর্ড' : 'Dashboard'}</h1>
-        <p className="text-muted-foreground">{isBn ? 'আজকের কাজ' : 'Today\'s tasks'}</p>
+    <div className="space-y-6 pt-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{isBn ? 'ড্যাশবোর্ড' : 'Dashboard'}</h1>
+          <p className="text-muted-foreground text-sm">{isBn ? 'আজকের কাজ' : 'Today\'s tasks'}</p>
+        </div>
+        <Badge variant={activeDeliveries.length > 0 ? "default" : "secondary"} className="h-8">
+          {activeDeliveries.length > 0 ? (isBn ? 'কাজে আছেন' : 'On Duty') : (isBn ? 'অপেক্ষমাণ' : 'Standby')}
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="bg-primary/20 p-3 rounded-full text-primary">
+              <Banknote className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{isBn ? 'আজকের আয়' : 'Today\'s Earnings'}</p>
+              <h3 className="text-lg font-bold">৳{totalEarnings}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="bg-primary/20 p-3 rounded-full text-primary">
+              <Navigation className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{isBn ? 'সম্পন্ন' : 'Completed'}</p>
+              <h3 className="text-lg font-bold">{completedDeliveries.length} {isBn ? 'টি' : ''}</h3>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {activeDeliveries.length > 0 && (

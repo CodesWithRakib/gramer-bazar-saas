@@ -52,7 +52,7 @@ export default function SellerOrdersPage({ params }: { params: Promise<{ lang: s
       cell: ({ row }) => (
         <div>
           <div>{row.original.user?.firstName || 'User'}</div>
-          <div className="text-xs text-muted-foreground">{row.getValue('user_phone')}</div>
+          <div className="text-xs text-muted-foreground">{row.original.user?.phone || row.getValue('user.phone')}</div>
         </div>
       ),
     },

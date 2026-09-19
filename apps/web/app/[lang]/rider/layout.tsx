@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { Bike, List, LogOut } from 'lucide-react';
+import { LayoutDashboard, Map, ListOrdered, User, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
-import { NotificationBell } from '@/components/ui/NotificationBell';
 
 export default function RiderLayout({
   children,
@@ -17,14 +16,14 @@ export default function RiderLayout({
   params: Promise<{ lang: string }>;
 }) {
   const router = useRouter();
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = React.useState('en');
+  const isBn = lang === 'bn';
   const pathname = usePathname();
   
-  useEffect(() => {
+  React.useEffect(() => {
     params.then((p) => setLang(p.lang));
   }, [params]);
 
-  const isBn = lang === 'bn';
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -44,41 +43,68 @@ export default function RiderLayout({
   }
 
   const links = [
-    { href: `/${lang}/rider`, label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', icon: Bike },
-    { href: `/${lang}/rider/deliveries`, label: isBn ? 'অ্যাসাইনমেন্ট' : 'Assignments', icon: List },
+    { href: `/${lang}/rider`, label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', icon: LayoutDashboard },
+    { href: `/${lang}/rider/deliveries`, label: isBn ? 'ডেলিভারি' : 'Deliveries', icon: ListOrdered },
+    { href: `/${lang}/rider/profile`, label: isBn ? 'প্রোফাইল' : 'Profile', icon: User },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-muted/20">
-      <header className="sticky top-0 z-40 bg-background border-b flex items-center justify-between p-4">
-        <h1 className="font-bold text-lg text-primary">Rider App</h1>
-        <NotificationBell lang={lang} />
-      </header>
-      <main className="flex-1 pb-16">
-        <div className="container p-4 max-w-md mx-auto">
-          {children}
+    <div className="container py-4 md:py-8 max-w-6xl">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:block w-full md:w-64 space-y-2">
+          <div className="p-4 bg-primary/10 text-primary rounded-lg mb-6 border border-primary/20">
+            <h2 className="font-bold text-lg">{isBn ? 'রাইডার পোর্টাল' : 'Rider Portal'}</h2>
+            <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
+          </div>
+          <nav className="flex flex-col space-y-1">
+            {links.map((link) => {
+              const isActive = pathname === link.href;
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground font-medium'
+                      : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* Mobile top nav (horizontal scroll) */}
+        <div className="md:hidden flex overflow-x-auto gap-2 pb-2 scrollbar-hide -mx-4 px-4">
+          {links.map((link) => {
+            const isActive = pathname === link.href;
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
-      </main>
-      
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around p-2 z-50">
-        {links.map((link) => {
-          const isActive = pathname === link.href;
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center justify-center w-full py-2 ${
-                isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Icon className="h-6 w-6 mb-1" />
-              <span className="text-xs font-medium">{link.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+
+        <main className="flex-1 min-h-[500px]">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

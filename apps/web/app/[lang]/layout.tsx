@@ -63,6 +63,7 @@ export const metadata: Metadata = {
 import { LoginModal } from "@/components/auth/LoginModal";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { CSPostHogProvider } from "@/providers/PostHogProvider";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 export default async function RootLayout({
   children,
@@ -93,6 +94,7 @@ export default async function RootLayout({
               <LoginModal lang={lang} />
               <CartDrawer lang={lang} />
               <MobileBottomNav lang={lang} />
+              <InstallPrompt lang={lang} />
             </SocketProvider>
           </ReduxProvider>
         </CSPostHogProvider>
