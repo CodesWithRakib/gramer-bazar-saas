@@ -11,7 +11,7 @@ import { SellerProduct, useGetRelatedProductsQuery } from '@/features/catalog/ca
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
 import { useGetUserWishlistQuery, useAddProductToWishlistMutation, useRemoveProductFromWishlistMutation } from '@/features/wishlists/wishlistsApi';
-import { useGetProductReviewsQuery, useAddReviewMutation } from '@/features/reviews/reviewsApi';
+import { ProductReviews } from '@/components/reviews/ProductReviews';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -67,10 +67,6 @@ export function ProductDetailsClient({
   const isOutOfStock = stock <= 0;
 
   const { data: relatedProducts } = useGetRelatedProductsQuery(product.productVariant.product.slug);
-  const { data: reviewsResponse, refetch: refetchReviews } = useGetProductReviewsQuery(
-    { productId: product.id },
-    { skip: !product?.id }
-  );
   
   // Auth state
   const { isAuthenticated } = useSelector((state: any) => state.auth);
@@ -100,22 +96,6 @@ export function ProductDetailsClient({
     }
   };
 
-  // Review state
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
-  const [addReview, { isLoading: isAddingReview }] = useAddReviewMutation();
-
-  const handleReviewSubmit = async () => {
-    if (!isAuthenticated) return;
-    try {
-      await addReview({ productId: product.productVariant.product.id, rating, comment }).unwrap();
-      toast.success(isBn ? 'রিভিউ জমা দেওয়া হয়েছে' : 'Review submitted successfully');
-      setComment('');
-      refetchReviews();
-    } catch (error: any) {
-      toast.error(error?.data?.message || (isBn ? 'রিভিউ জমা দিতে সমস্যা হয়েছে' : 'Failed to submit review'));
-    }
-  };
 
   const handleAddToCart = () => {
     dispatch(addToCart({
@@ -352,61 +332,7 @@ export function ProductDetailsClient({
         </Button>
       </div>
 
-      {/* Reviews Section */}
-      <div className="mt-12 bg-card p-6 md:p-8 rounded-2xl border shadow-sm">
-        <h2 className="text-2xl font-bold mb-6">{isBn ? 'গ্রাহকদের মতামত' : 'Customer Reviews'}</h2>
-        
-        {isAuthenticated && (
-          <div className="mb-8 p-4 border rounded-xl bg-muted/30">
-            <h3 className="font-semibold mb-4">{isBn ? 'মতামত লিখুন' : 'Write a Review'}</h3>
-            <div className="flex gap-2 mb-4">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button 
-                  key={star} 
-                  type="button" 
-                  onClick={() => setRating(star)}
-                  className="focus:outline-none"
-                >
-                  <Star className={`w-6 h-6 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'}`} />
-                </button>
-              ))}
-            </div>
-            <Textarea 
-              placeholder={isBn ? 'আপনার অভিজ্ঞতা শেয়ার করুন...' : 'Share your experience...'}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              className="mb-4 bg-background"
-            />
-            <Button onClick={handleReviewSubmit} disabled={isAddingReview}>
-              {isAddingReview ? (isBn ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...') : (isBn ? 'জমা দিন' : 'Submit Review')}
-            </Button>
-            <p className="text-xs text-muted-foreground mt-2">
-              {isBn ? 'বিঃদ্রঃ শুধুমাত্র যারা পণ্যটি কিনেছেন তারাই রিভিউ দিতে পারবেন।' : 'Note: Only customers who have purchased this product can leave a review.'}
-            </p>
-          </div>
-        )}
-
-        {reviewsResponse && reviewsResponse.data && reviewsResponse.data.length > 0 ? (
-          <div className="space-y-6">
-            {reviewsResponse.data.map(review => (
-              <div key={review.id} className="border-b pb-6 last:border-0 last:pb-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-muted'}`} />
-                    ))}
-                  </div>
-                  <span className="font-medium ml-2">{review.user?.name || 'Anonymous'}</span>
-                </div>
-                {review.comment && <p className="text-muted-foreground mt-2">{review.comment}</p>}
-                <p className="text-xs text-muted-foreground mt-2">{new Date(review.createdAt).toLocaleDateString()}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted-foreground">{isBn ? 'এখনও কোন মতামত নেই।' : 'No reviews yet.'}</p>
-        )}
-      </div>
+      <ProductReviews productId={product.productVariant.product.id} isBn={isBn} lang={lang} />
 
       {/* Related Products Section */}
       <div className="mt-12">

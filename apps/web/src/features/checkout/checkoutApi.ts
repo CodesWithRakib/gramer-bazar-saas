@@ -31,6 +31,7 @@ export interface CheckoutRequest {
     sellerProductId: string;
     quantity: number;
   }[];
+  couponCode?: string;
 }
 
 export interface CheckoutResponse {

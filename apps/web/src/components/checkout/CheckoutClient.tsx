@@ -11,6 +11,7 @@ import { useCreateOrderMutation, useGetAddressesQuery, FrontendPaymentMethod } f
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { CouponInput } from '@/components/coupons/CouponInput';
 
 export function CheckoutClient({ lang }: { lang: string }) {
   const isBn = lang === 'bn';
@@ -22,6 +23,9 @@ export function CheckoutClient({ lang }: { lang: string }) {
 
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const { data: addresses, isLoading: isAddressesLoading } = useGetAddressesQuery(undefined, {
     skip: !isAuthenticated,
@@ -31,7 +35,7 @@ export function CheckoutClient({ lang }: { lang: string }) {
 
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const deliveryFee = 50; // hardcoded for now based on plan
-  const total = subtotal + deliveryFee;
+  const total = Math.max(0, subtotal - discountAmount) + deliveryFee;
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -89,6 +93,7 @@ export function CheckoutClient({ lang }: { lang: string }) {
         addressId: selectedAddress,
         paymentMethod: FrontendPaymentMethod.COD,
         items: orderItems,
+        ...(appliedCoupon ? { couponCode: appliedCoupon } : {})
       }).unwrap();
 
       dispatch(clearCart());
@@ -199,13 +204,37 @@ export function CheckoutClient({ lang }: { lang: string }) {
                   <span className="text-muted-foreground">{isBn ? 'ডেলিভারি ফি' : 'Delivery Fee'}</span>
                   <span>৳{deliveryFee.toFixed(2)}</span>
                 </div>
+                
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-sm font-medium text-green-600 bg-green-50/50 -mx-6 px-6 py-2 border-y border-green-100">
+                    <span>{isBn ? 'ডিসকাউন্ট' : 'Discount'} ({appliedCoupon})</span>
+                    <span>-৳{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="border-t pt-4 flex justify-between font-bold text-lg">
                   <span>{isBn ? 'সর্বমোট' : 'Total'}</span>
                   <span className="text-primary">৳{total.toFixed(2)}</span>
                 </div>
               </div>
+              <div className="mt-6 mb-4">
+                <CouponInput 
+                  isBn={isBn} 
+                  subtotal={subtotal} 
+                  appliedCoupon={appliedCoupon}
+                  onApply={(amount, code) => {
+                    setDiscountAmount(amount);
+                    setAppliedCoupon(code);
+                  }}
+                  onRemove={() => {
+                    setDiscountAmount(0);
+                    setAppliedCoupon(null);
+                  }}
+                />
+              </div>
+
               <Button 
-                className="w-full mt-6" 
+                className="w-full mt-2" 
                 size="lg" 
                 onClick={handlePlaceOrder}
                 disabled={isCreatingOrder || !selectedAddress || items.length === 0}
