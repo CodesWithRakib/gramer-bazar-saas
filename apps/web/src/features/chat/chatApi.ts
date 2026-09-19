@@ -1,21 +1,28 @@
-import { api } from '@/store/api';
-import { User } from '../users/usersApi';
+import { api } from '../../store/api';
 
-export interface Message {
+export interface ChatMessage {
   id: string;
-  content: string;
-  senderId: string;
-  sender?: User;
   conversationId: string;
+  senderId: string;
+  content: string;
   isRead: boolean;
   createdAt: string;
 }
 
+export interface ConversationParticipant {
+  id: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
 export interface Conversation {
   id: string;
-  participants: User[];
-  messages: Message[];
-  createdAt: string;
+  participant1Id: string;
+  participant2Id: string;
+  participant1: ConversationParticipant;
+  participant2: ConversationParticipant;
+  messages: ChatMessage[];
   updatedAt: string;
 }
 
@@ -33,16 +40,16 @@ export const chatApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Conversation'],
     }),
-    getMessages: builder.query<Message[], string>({
+    getMessages: builder.query<ChatMessage[], string>({
       query: (conversationId) => `/chat/conversations/${conversationId}/messages`,
-      providesTags: (_result, _error, id) => [{ type: 'Message', id }],
+      providesTags: (result, error, id) => [{ type: 'Message', id }],
     }),
     markAsRead: builder.mutation<{ success: boolean }, string>({
       query: (conversationId) => ({
         url: `/chat/conversations/${conversationId}/read`,
         method: 'PATCH',
       }),
-      invalidatesTags: ['Conversation'],
+      invalidatesTags: (result, error, id) => [{ type: 'Message', id }, 'Conversation'],
     }),
   }),
 });

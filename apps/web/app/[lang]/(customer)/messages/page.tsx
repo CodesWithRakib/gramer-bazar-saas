@@ -7,9 +7,10 @@ import { RootState } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import { useGetConversationsQuery, Conversation } from '@/features/chat/chatApi';
 import { ChatWindow } from '@/components/chat/ChatWindow';
+import { Card, CardContent } from '@/components/ui/card';
 import { MessageSquare, User } from 'lucide-react';
 
-export default function SellerMessagesPage({ params }: { params: Promise<{ lang: string }> }) {
+export default function CustomerMessagesPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const router = useRouter();
@@ -22,10 +23,10 @@ export default function SellerMessagesPage({ params }: { params: Promise<{ lang:
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.roles?.includes('SELLER')) {
-      router.push(`/${lang}/login?redirect=/${lang}/seller/messages`);
+    if (!isAuthenticated) {
+      router.push(`/${lang}/login?redirect=/${lang}/messages`);
     }
-  }, [isAuthenticated, user?.roles, router, lang]);
+  }, [isAuthenticated, router, lang]);
 
   if (!isAuthenticated || !user) return null;
 
@@ -38,18 +39,16 @@ export default function SellerMessagesPage({ params }: { params: Promise<{ lang:
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-tight">{isBn ? 'গ্রাহক বার্তা' : 'Customer Messages'}</h1>
-      </div>
+    <div className="container max-w-6xl py-8">
+      <h1 className="text-2xl font-bold mb-6">{isBn ? 'আমার বার্তা' : 'My Messages'}</h1>
       
-      <div className="flex h-[calc(100vh-200px)] border rounded-2xl overflow-hidden bg-card shadow-sm">
+      <div className="flex h-[700px] border rounded-2xl overflow-hidden bg-card shadow-sm">
         {/* Conversations List (Sidebar) */}
         <div className="w-full md:w-1/3 border-r flex flex-col">
           <div className="p-4 border-b bg-muted/30">
             <h2 className="font-semibold flex items-center gap-2">
               <MessageSquare className="h-5 w-5 text-primary" />
-              {isBn ? 'চ্যাট তালিকা' : 'Chat List'}
+              {isBn ? 'কথোপকথন' : 'Conversations'}
             </h2>
           </div>
           <div className="flex-1 overflow-y-auto">
