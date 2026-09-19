@@ -1,6 +1,7 @@
 import { getDictionary } from '@/lib/dictionary';
 import type { Locale } from '@/config/i18n';
 import { Button } from '@/components/ui/button';
+import { HomeClient } from '@/components/home/HomeClient';
 
 export default async function CustomerPage({
   params,
@@ -25,16 +26,7 @@ export default async function CustomerPage({
         </div>
       </section>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="border rounded-lg p-4 shadow-sm bg-card flex flex-col items-center">
-            <div className="w-full aspect-square bg-muted rounded-md mb-4 flex items-center justify-center text-muted-foreground text-sm">{dict.home.productImage}</div>
-            <h3 className="font-semibold text-card-foreground">{dict.home.localProduct} {i}</h3>
-            <p className="text-primary font-bold mt-2">৳ 120</p>
-            <Button className="w-full mt-4" variant="secondary">{dict.home.addToCart}</Button>
-          </div>
-        ))}
-      </section>
+      <HomeClient lang={lang} dict={dict} />
     </div>
   );
 }

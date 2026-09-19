@@ -1,4 +1,22 @@
 import { api } from '../../store/api';
+import { PaginationMeta } from '../catalog/catalogApi';
+import { User } from '../users/usersApi';
+import { Order } from '../orders/ordersApi';
+
+export interface Delivery {
+  id: string;
+  orderId: string;
+  order: Order;
+  riderId: string;
+  rider: User;
+  status: DeliveryStatus;
+  assignedAt: string;
+  pickupTime: string;
+  deliveryTime: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export enum DeliveryStatus {
   UNASSIGNED = 'UNASSIGNED',
@@ -14,18 +32,18 @@ export enum DeliveryStatus {
 export const deliveriesApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // ADMIN ENDPOINTS
-    getAdminDeliveries: builder.query<{ data: any[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+    getAdminDeliveries: builder.query<{ data: Delivery[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
       query: (params) => ({
         url: '/deliveries/admin',
         params,
       }),
       providesTags: ['Order'],
     }),
-    getRiders: builder.query<any[], void>({
+    getRiders: builder.query<User[], void>({
       query: () => '/deliveries/admin/riders',
       providesTags: ['User'],
     }),
-    assignDelivery: builder.mutation<any, { orderId: string; riderId: string }>({
+    assignDelivery: builder.mutation<Delivery, { orderId: string; riderId: string }>({
       query: (body) => ({
         url: '/deliveries/admin/assign',
         method: 'POST',
@@ -35,15 +53,15 @@ export const deliveriesApi = api.injectEndpoints({
     }),
 
     // RIDER ENDPOINTS
-    getRiderDeliveries: builder.query<any[], void>({
+    getRiderDeliveries: builder.query<Delivery[], void>({
       query: () => '/deliveries/rider/assigned',
       providesTags: ['Order'],
     }),
-    getRiderDeliveryDetails: builder.query<any, string>({
+    getRiderDeliveryDetails: builder.query<Delivery, string>({
       query: (id) => `/deliveries/rider/${id}`,
       providesTags: (result, error, id) => [{ type: 'Order', id }],
     }),
-    updateDeliveryStatus: builder.mutation<any, { id: string; status: DeliveryStatus; notes?: string }>({
+    updateDeliveryStatus: builder.mutation<Delivery, { id: string; status: DeliveryStatus; notes?: string }>({
       query: ({ id, ...body }) => ({
         url: `/deliveries/rider/${id}/status`,
         method: 'PATCH',
@@ -53,7 +71,7 @@ export const deliveriesApi = api.injectEndpoints({
     }),
 
     // CUSTOMER ENDPOINTS
-    getCustomerDelivery: builder.query<any, string>({
+    getCustomerDelivery: builder.query<Delivery, string>({
       query: (orderId) => `/deliveries/customer/${orderId}`,
       providesTags: (result, error, id) => [{ type: 'Order', id }],
     }),

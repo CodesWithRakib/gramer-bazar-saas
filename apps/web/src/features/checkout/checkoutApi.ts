@@ -1,4 +1,22 @@
 import { api } from '../../store/api';
+
+export interface Address {
+  id: string;
+  userId: string;
+  title: string;
+  contactName: string;
+  contactPhone: string;
+  countryId: string;
+  divisionId: string;
+  districtId: string;
+  upazilaId: string;
+  unionId: string;
+  areaId: string;
+  streetAddress: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 import { PaymentMethod } from '../../../../api/src/orders/enums/order-status.enum'; // Actually, let's redefine locally to avoid coupling to api/src.
 
 export enum FrontendPaymentMethod {
@@ -30,11 +48,11 @@ export const checkoutApi = api.injectEndpoints({
         body,
       }),
     }),
-    getAddresses: builder.query<any[], void>({
+    getAddresses: builder.query<Address[], void>({
       query: () => '/addresses',
       providesTags: ['Address'],
     }),
-    addAddress: builder.mutation<any, any>({
+    addAddress: builder.mutation<Address, Partial<Address>>({
       query: (body) => ({
         url: '/addresses',
         method: 'POST',

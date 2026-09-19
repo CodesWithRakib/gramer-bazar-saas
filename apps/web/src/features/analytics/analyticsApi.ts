@@ -1,5 +1,25 @@
 import { api } from '../../store/api';
 
+export interface DashboardMetrics {
+  metrics: {
+    totalUsers: number;
+    totalOrders: number;
+    pendingOrders: number;
+    totalCustomers: number;
+    totalProducts: number;
+    totalSales: number;
+    activeSellers: number;
+    totalSellers: number;
+    totalRiders: number;
+  };
+  recentOrders: Array<{
+    id: string;
+    customerName: string;
+    totalAmount: string | number;
+    status: string;
+  }>;
+}
+
 export interface DemandReport {
   popularProducts: Array<{
     productId: string;
@@ -36,7 +56,7 @@ export interface DemandReport {
 
 export const analyticsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getDashboardMetrics: builder.query<any, void>({
+    getDashboardMetrics: builder.query<DashboardMetrics, void>({
       query: () => '/admin/analytics/dashboard',
       providesTags: ['Order', 'User', 'Catalog'], // Invalidate if any of these change
     }),

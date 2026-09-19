@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState } from 'react';
@@ -13,6 +14,7 @@ import { useGetUserWishlistQuery, useAddProductToWishlistMutation, useRemoveProd
 import { useGetProductReviewsQuery, useAddReviewMutation } from '@/features/reviews/reviewsApi';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function ProductDetailsClient({ 
   products, 
@@ -48,7 +50,15 @@ export function ProductDetailsClient({
   // In a real scenario with complex variants, you'd group by variant attributes.
   const product = products[selectedVariantIdx];
   const name = isBn ? product.productVariant.nameBn || product.productVariant.product.nameBn : product.productVariant.nameEn || product.productVariant.product.nameEn;
-  const image = product.productVariant.images?.[0] || 'https://placehold.co/800x800?text=No+Image';
+  const images = product.productVariant.images?.length ? product.productVariant.images : ['https://placehold.co/800x800?text=No+Image'];
+  
+  const [activeImage, setActiveImage] = useState(images[0]);
+  
+  // Reset active image when variant changes
+  React.useEffect(() => {
+    setActiveImage(images[0]);
+  }, [selectedVariantIdx, product.productVariant.id]);
+
   const price = Number(product.price);
   const discountPrice = product.discountPrice ? Number(product.discountPrice) : null;
   const currentPrice = discountPrice ?? price;
@@ -56,7 +66,10 @@ export function ProductDetailsClient({
   const isOutOfStock = stock <= 0;
 
   const { data: relatedProducts } = useGetRelatedProductsQuery(product.productVariant.product.slug);
-  const { data: reviewsResponse, refetch: refetchReviews } = useGetProductReviewsQuery(product.productVariant.product.id);
+  const { data: reviewsResponse, refetch: refetchReviews } = useGetProductReviewsQuery(
+    { productId: product.id },
+    { skip: !product?.id }
+  );
   
   // Auth state
   const { isAuthenticated } = useSelector((state: any) => state.auth);
@@ -110,7 +123,7 @@ export function ProductDetailsClient({
       price: currentPrice,
       nameEn: product.productVariant.nameEn || product.productVariant.product.nameEn,
       nameBn: product.productVariant.nameBn || product.productVariant.product.nameBn,
-      image,
+      image: activeImage,
       sellerNameEn: product.shop.nameEn,
       sellerNameBn: product.shop.nameBn,
     }));
@@ -126,18 +139,29 @@ export function ProductDetailsClient({
         </Link>
       </Button>
 
-      <div className="grid md:grid-cols-2 gap-8 lg:gap-12 bg-card p-6 md:p-8 rounded-2xl border shadow-sm">
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-12 bg-card p-4 md:p-8 rounded-2xl border shadow-sm">
         {/* Image Gallery */}
         <div className="flex flex-col gap-4">
-          <div className="bg-muted rounded-xl overflow-hidden aspect-square flex items-center justify-center p-4">
-            <img src={image} alt={name} className="max-w-full max-h-full object-contain mix-blend-multiply" />
+          <div className="bg-muted rounded-xl overflow-hidden aspect-square flex items-center justify-center p-4 relative group">
+            <img src={activeImage} alt={name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-300 md:group-hover:scale-110" />
+            {isOutOfStock && (
+              <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
+                <span className="bg-destructive text-destructive-foreground font-bold px-6 py-2 rounded-full text-lg shadow-lg rotate-12">
+                  {isBn ? 'স্টক শেষ' : 'SOLD OUT'}
+                </span>
+              </div>
+            )}
           </div>
-          {product.productVariant.images && product.productVariant.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {product.productVariant.images.map((img, idx) => (
-                <div key={idx} className="w-20 h-20 bg-muted rounded-md flex-shrink-0 border overflow-hidden">
-                  <img src={img} className="w-full h-full object-cover mix-blend-multiply" alt="Thumbnail" />
-                </div>
+          {images.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
+              {images.map((img, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => setActiveImage(img)}
+                  className={`w-20 h-20 bg-muted rounded-lg flex-shrink-0 border-2 overflow-hidden snap-center transition-all ${activeImage === img ? 'border-primary ring-2 ring-primary/20 ring-offset-1' : 'border-transparent hover:border-primary/50'}`}
+                >
+                  <img src={img} className="w-full h-full object-cover mix-blend-multiply" alt={`Thumbnail ${idx + 1}`} />
+                </button>
               ))}
             </div>
           )}
@@ -203,38 +227,47 @@ export function ProductDetailsClient({
             </div>
           )}
 
-          <div className="space-y-4 mb-8">
-            <div className="flex items-center gap-3 text-sm">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Store className="h-4 w-4 text-primary" />
+          <Tabs defaultValue="details" className="mb-8">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="details">{isBn ? 'বিস্তারিত' : 'Details'}</TabsTrigger>
+              <TabsTrigger value="seller">{isBn ? 'বিক্রেতা' : 'Seller'}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="details" className="text-sm text-muted-foreground leading-relaxed">
+              <p>{isBn ? product.productVariant.product.descriptionBn : product.productVariant.product.descriptionEn}</p>
+              
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full shrink-0">
+                    <ShieldCheck className="h-4 w-4 text-primary" />
+                  </div>
+                  <p className="font-medium text-foreground">{isBn ? 'খাঁটি পণ্যের নিশ্চয়তা' : 'Authentic Product Guarantee'}</p>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full shrink-0">
+                    <Truck className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">{isBn ? 'দ্রুত ডেলিভারি' : 'Fast Delivery'}</p>
+                    <p className="text-xs">{isBn ? 'খানসামা উপজেলা জুড়ে' : 'Across Khansama Upazila'}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-muted-foreground">{isBn ? 'বিক্রেতা' : 'Seller'}</p>
-                <p className="font-medium">{isBn ? product.shop.nameBn : product.shop.nameEn}</p>
+            </TabsContent>
+            <TabsContent value="seller">
+              <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-xl border">
+                <div className="bg-primary/10 p-4 rounded-full">
+                  <Store className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-lg text-foreground">{isBn ? product.shop.nameBn : product.shop.nameEn}</h4>
+                  <p className="text-xs text-muted-foreground">{isBn ? 'ভেরিফাইড লোকাল সেলার' : 'Verified Local Seller'}</p>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-center gap-3 text-sm">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <ShieldCheck className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">{isBn ? 'খাঁটি পণ্যের নিশ্চয়তা' : 'Authentic Product Guarantee'}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 text-sm">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Truck className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">{isBn ? 'দ্রুত ডেলিভারি' : 'Fast Delivery'}</p>
-                <p className="text-muted-foreground">{isBn ? 'খানসামা উপজেলা জুড়ে' : 'Across Khansama Upazila'}</p>
-              </div>
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
 
-          <div className="mt-auto space-y-4">
+          <div className="mt-auto space-y-6">
             {/* Quantity Selector */}
             <div className="flex items-center gap-4">
               <span className="font-medium">{isBn ? 'পরিমাণ:' : 'Quantity:'}</span>
@@ -253,23 +286,56 @@ export function ProductDetailsClient({
                   disabled={quantity >= stock || isOutOfStock}
                 >+</Button>
               </div>
-              <span className="text-sm text-muted-foreground">
-                {isOutOfStock ? (isBn ? 'স্টক শেষ' : 'Out of Stock') : (isBn ? `${stock} টি স্টকে আছে` : `${stock} available`)}
-              </span>
+              <div className="flex flex-col gap-1 items-start">
+                <span className="text-sm font-medium">
+                  {isOutOfStock ? (isBn ? 'স্টক শেষ' : 'Out of Stock') : (isBn ? `${stock} টি স্টকে আছে` : `${stock} available`)}
+                </span>
+                {stock > 0 && stock <= 5 && (
+                  <span className="text-xs font-bold text-destructive animate-pulse">
+                    {isBn ? `তাড়াতাড়ি করুন, মাত্র ${stock} টি বাকি!` : `Hurry, only ${stock} left!`}
+                  </span>
+                )}
+              </div>
             </div>
 
-            <Button 
-              size="lg" 
-              className="w-full text-lg h-14 rounded-xl" 
-              disabled={isOutOfStock}
-              onClick={handleAddToCart}
-            >
-              {isOutOfStock 
-                ? (isBn ? 'স্টক শেষ' : 'Out of Stock') 
-                : (isBn ? 'কার্টে যোগ করুন' : 'Add to Cart')}
-            </Button>
+            {/* Desktop Add to Cart */}
+            <div className="hidden md:block">
+              <Button 
+                size="lg" 
+                className="w-full text-lg h-14 rounded-xl shadow-lg transition-transform active:scale-[0.98]" 
+                disabled={isOutOfStock}
+                onClick={handleAddToCart}
+              >
+                {isOutOfStock 
+                  ? (isBn ? 'স্টক শেষ' : 'Out of Stock') 
+                  : (isBn ? 'কার্টে যোগ করুন' : 'Add to Cart')}
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Sticky Add to Cart Footer */}
+      <div className="md:hidden fixed bottom-16 left-0 right-0 p-4 bg-background border-t shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 flex gap-3">
+        <Button
+          variant="outline"
+          size="icon"
+          className={`h-12 w-12 shrink-0 rounded-xl ${isWishlisted ? 'text-red-500 border-red-200 bg-red-50' : 'text-muted-foreground'}`}
+          onClick={toggleWishlist}
+          disabled={isAddingWishlist || isRemovingWishlist}
+        >
+          <Heart className={`h-6 w-6 ${isWishlisted ? 'fill-current' : ''}`} />
+        </Button>
+        <Button 
+          size="lg" 
+          className="flex-grow text-lg h-12 rounded-xl shadow-lg transition-transform active:scale-[0.98]" 
+          disabled={isOutOfStock}
+          onClick={handleAddToCart}
+        >
+          {isOutOfStock 
+            ? (isBn ? 'স্টক শেষ' : 'Out of Stock') 
+            : (isBn ? 'কার্টে যোগ করুন' : 'Add to Cart')}
+        </Button>
       </div>
 
       {/* Reviews Section */}

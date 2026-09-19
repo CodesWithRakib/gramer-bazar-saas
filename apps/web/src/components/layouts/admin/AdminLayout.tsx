@@ -16,52 +16,52 @@ import {
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
+const NavItem = ({ href, icon: Icon, children, pathname, onClick }: { href: string, icon: React.ElementType, children: React.ReactNode, pathname: string, onClick?: () => void }) => {
+  const isActive = pathname === href;
+  return (
+    <Link 
+      onClick={onClick} 
+      href={href} 
+      className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+        isActive 
+          ? 'bg-primary/10 text-primary shadow-sm' 
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm'
+      }`}
+    >
+      <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+      {children}
+    </Link>
+  );
+};
+
 // Helper component for Admin Nav links to avoid duplication
 const AdminNavLinks = ({ onClick }: { onClick?: () => void }) => {
   const pathname = usePathname();
-  
-  const NavItem = ({ href, icon: Icon, children }: { href: string, icon: any, children: React.ReactNode }) => {
-    const isActive = pathname === href;
-    return (
-      <Link 
-        onClick={onClick} 
-        href={href} 
-        className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
-          isActive 
-            ? 'bg-primary/10 text-primary shadow-sm' 
-            : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm'
-        }`}
-      >
-        <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-        {children}
-      </Link>
-    );
-  };
 
   return (
     <div className="space-y-1">
-      <NavItem href="/en/admin" icon={LayoutDashboard}>Dashboard</NavItem>
+      <NavItem href="/en/admin" icon={LayoutDashboard} pathname={pathname} onClick={onClick}>Dashboard</NavItem>
       
       <div className="pt-4 pb-1.5 px-3 text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">Users</div>
-      <NavItem href="/en/admin/users" icon={Users}>All Users</NavItem>
-      <NavItem href="/en/admin/sellers" icon={Store}>Sellers</NavItem>
-      <NavItem href="/en/admin/riders" icon={Bike}>Riders</NavItem>
-      <NavItem href="/en/admin/messages" icon={MessageSquare}>Messages</NavItem>
+      <NavItem href="/en/admin/users" icon={Users} pathname={pathname} onClick={onClick}>All Users</NavItem>
+      <NavItem href="/en/admin/sellers" icon={Store} pathname={pathname} onClick={onClick}>Sellers</NavItem>
+      <NavItem href="/en/admin/riders" icon={Bike} pathname={pathname} onClick={onClick}>Riders</NavItem>
+      <NavItem href="/en/admin/messages" icon={MessageSquare} pathname={pathname} onClick={onClick}>Messages</NavItem>
       
       <div className="pt-4 pb-1.5 px-3 text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">Catalog</div>
-      <NavItem href="/en/admin/categories" icon={Layers}>Categories</NavItem>
-      <NavItem href="/en/admin/brands" icon={Tag}>Brands</NavItem>
-      <NavItem href="/en/admin/products" icon={ShoppingBag}>Products</NavItem>
+      <NavItem href="/en/admin/categories" icon={Layers} pathname={pathname} onClick={onClick}>Categories</NavItem>
+      <NavItem href="/en/admin/brands" icon={Tag} pathname={pathname} onClick={onClick}>Brands</NavItem>
+      <NavItem href="/en/admin/products" icon={ShoppingBag} pathname={pathname} onClick={onClick}>Products</NavItem>
       
       <div className="pt-4 pb-1.5 px-3 text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">Operations</div>
-      <NavItem href="/en/admin/orders" icon={ShoppingCart}>Orders</NavItem>
-      <NavItem href="/en/admin/deliveries" icon={Truck}>Deliveries</NavItem>
-      <NavItem href="/en/admin/product-requests" icon={HeartHandshake}>Requests</NavItem>
-      <NavItem href="/en/admin/reviews" icon={Star}>Reviews</NavItem>
+      <NavItem href="/en/admin/orders" icon={ShoppingCart} pathname={pathname} onClick={onClick}>Orders</NavItem>
+      <NavItem href="/en/admin/deliveries" icon={Truck} pathname={pathname} onClick={onClick}>Deliveries</NavItem>
+      <NavItem href="/en/admin/product-requests" icon={HeartHandshake} pathname={pathname} onClick={onClick}>Requests</NavItem>
+      <NavItem href="/en/admin/reviews" icon={Star} pathname={pathname} onClick={onClick}>Reviews</NavItem>
       
       <div className="pt-4 pb-1.5 px-3 text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">System</div>
-      <NavItem href="/en/admin/settings" icon={Settings}>Settings</NavItem>
-      <NavItem href="/en/admin/audit-logs" icon={Shield}>Audit Logs</NavItem>
+      <NavItem href="/en/admin/settings" icon={Settings} pathname={pathname} onClick={onClick}>Settings</NavItem>
+      <NavItem href="/en/admin/audit-logs" icon={Shield} pathname={pathname} onClick={onClick}>Audit Logs</NavItem>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { api } from '../../store/api';
+import { PaginationMeta } from '../catalog/catalogApi';
 
 export interface ProductRequestHistoryItem {
   id: string;
@@ -59,7 +60,7 @@ export const productRequestsApi = api.injectEndpoints({
     }),
 
     // Admin endpoints
-    getAdminProductRequests: builder.query<{ data: ProductRequest[]; meta: any }, { status?: string; search?: string; page?: number; limit?: number } | void>({
+    getAdminProductRequests: builder.query<{ data: ProductRequest[]; meta: PaginationMeta }, { status?: string; search?: string; page?: number; limit?: number } | void>({
       query: (params) => {
         let url = '/admin/product-requests';
         if (params) {

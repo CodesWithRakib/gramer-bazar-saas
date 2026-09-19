@@ -35,10 +35,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join_conversation')
   async handleJoinConversation(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: string }
+    @MessageBody() data: { conversationId: string },
   ) {
     const room = `conversation_${data.conversationId}`;
-    client.join(room);
+    void client.join(room);
     return { event: 'joined', room };
   }
 
@@ -46,10 +46,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('leave_conversation')
   async handleLeaveConversation(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: string }
+    @MessageBody() data: { conversationId: string },
   ) {
     const room = `conversation_${data.conversationId}`;
-    client.leave(room);
+    void client.leave(room);
     return { event: 'left', room };
   }
 

@@ -12,7 +12,7 @@ import {
 } from '@/features/catalog/catalogApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import { use } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Leaf, Clock, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const fadeUp = {
@@ -36,10 +36,14 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
   );
 
   return (
-    <div className="flex flex-col gap-12 pb-12">
+    <div className="flex flex-col gap-8 md:gap-12 pb-24 md:pb-12">
       {/* Hero Section */}
-      <section className="bg-primary/5 py-12 md:py-20 px-4 overflow-hidden">
-        <div className="container mx-auto text-center max-w-3xl">
+      <section className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-background pt-8 pb-12 md:py-20 px-4 overflow-hidden">
+        {/* Abstract shapes for premium feel */}
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="container mx-auto text-center max-w-3xl relative z-10">
           <motion.h1 
             initial="hidden"
             animate="visible"
@@ -71,24 +75,68 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
               <Link href={`/${lang}/categories`}>{isBn ? 'শপিং শুরু করুন' : 'Start Shopping'}</Link>
             </Button>
             <ProductRequestModal lang={lang} trigger={
-              <Button size="lg" variant="outline" className="rounded-full transition-transform hover:scale-105">{isBn ? 'পণ্য অনুরোধ' : 'Product Request'}</Button>
+              <Button size="lg" variant="outline" className="rounded-full shadow-sm hover:shadow-md transition-all bg-background">{isBn ? 'পণ্য অনুরোধ' : 'Product Request'}</Button>
             } />
           </motion.div>
         </div>
       </section>
 
+      {/* Trust Banners (Location + USPs) */}
+      <section className="container mx-auto px-4 -mt-8 relative z-20">
+        <div className="bg-card rounded-2xl shadow-lg border p-4 md:p-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center divide-x divide-border/50">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1">
+              <MapPin className="h-5 w-5" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold">{isBn ? 'আপনার এলাকায়' : 'In Your Area'}</span>
+            <span className="text-[10px] md:text-xs text-muted-foreground">{isBn ? 'খানসামা, দিনাজপুর' : 'Khansama, Dinajpur'}</span>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold">{isBn ? 'ভেরিফাইড সেলার' : 'Verified Sellers'}</span>
+            <span className="text-[10px] md:text-xs text-muted-foreground">{isBn ? '১০০% নিরাপদ' : '100% Secure'}</span>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1">
+              <Leaf className="h-5 w-5" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold">{isBn ? 'তাজা পণ্য' : 'Fresh Daily'}</span>
+            <span className="text-[10px] md:text-xs text-muted-foreground">{isBn ? 'সরাসরি গ্রাম থেকে' : 'Direct from farms'}</span>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1">
+              <Clock className="h-5 w-5" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold">{isBn ? 'দ্রুত ডেলিভারি' : 'Fast Delivery'}</span>
+            <span className="text-[10px] md:text-xs text-muted-foreground">{isBn ? 'সময়ের আগে' : 'Right on time'}</span>
+          </div>
+        </div>
+      </section>
+
       {/* Categories Section */}
       <section className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">{isBn ? 'ক্যাটাগরি সমূহ' : 'Categories'}</h2>
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight">{isBn ? 'ক্যাটাগরি সমূহ' : 'Categories'}</h2>
           <Link href={`/${lang}/categories`} className="text-primary hover:underline flex items-center gap-1 text-sm font-medium">
             {isBn ? 'সব দেখুন' : 'View All'} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        {isLoadingCats ? renderCategorySkeletons() : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {categories?.slice(0, 6).map((category) => (
-              <CategoryCard key={category.id} category={category} lang={lang} />
+        {isLoadingCats ? (
+          <div className="flex md:grid overflow-x-auto snap-x snap-mandatory md:grid-cols-4 lg:grid-cols-6 gap-4 pb-4 md:pb-0 hide-scrollbar">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="min-w-[120px] md:min-w-0 snap-start">
+                <Skeleton className="h-32 w-full rounded-xl" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex md:grid overflow-x-auto snap-x snap-mandatory md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 pb-4 md:pb-0 hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+            {categories?.slice(0, 8).map((category) => (
+              <div key={category.id} className="min-w-[100px] w-[100px] md:min-w-0 md:w-auto snap-start flex-shrink-0">
+                <CategoryCard category={category} lang={lang} />
+              </div>
             ))}
           </div>
         )}

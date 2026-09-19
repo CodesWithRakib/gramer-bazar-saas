@@ -1,4 +1,5 @@
 import { api } from '../../store/api';
+import { PaginationMeta } from '../catalog/catalogApi';
 
 export interface Coupon {
   id: string;
@@ -18,7 +19,7 @@ export interface Coupon {
 
 export const couponsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getAdminCoupons: builder.query<{ data: Coupon[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+    getAdminCoupons: builder.query<{ data: Coupon[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
       query: (params) => ({
         url: '/admin/coupons',
         params,

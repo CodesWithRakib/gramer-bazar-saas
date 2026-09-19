@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Check, Trash } from 'lucide-react';
+import { Bell, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGetUserNotificationsQuery, useGetUnreadCountQuery, useMarkAsReadMutation, useMarkAllAsReadMutation } from '@/features/notifications/notificationsApi';
 import { useSelector } from 'react-redux';
@@ -41,7 +42,7 @@ export function NotificationBell({ lang }: { lang: string }) {
 
   if (!isAuthenticated) return null;
 
-  const handleNotificationClick = async (id: string, isRead: boolean, data: any) => {
+  const handleNotificationClick = async (id: string, isRead: boolean) => {
     if (!isRead) {
       await markAsRead(id);
     }
@@ -102,7 +103,7 @@ export function NotificationBell({ lang }: { lang: string }) {
                     <Link
                       key={notif.id}
                       href={href}
-                      onClick={() => handleNotificationClick(notif.id, notif.isRead, notif.data)}
+                      onClick={() => handleNotificationClick(notif.id, notif.isRead)}
                       className={`block p-4 border-b last:border-0 hover:bg-muted/50 transition-colors ${!notif.isRead ? 'bg-primary/5' : ''}`}
                     >
                       <div className="flex gap-3">

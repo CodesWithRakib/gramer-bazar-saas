@@ -1,4 +1,5 @@
 import { api } from '../../store/api';
+import { Order } from '../orders/ordersApi';
 
 export interface DashboardMetrics {
   lowStockCount: number;
@@ -35,7 +36,8 @@ export interface SellerProductItem {
     attributes: Record<string, string>;
     product: {
       id: string;
-      name: string;
+      nameEn: string;
+      nameBn: string;
     };
   };
 }
@@ -58,7 +60,7 @@ export const sellerPortalApi = api.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    getSellerProducts: builder.query<any[], string | void>({
+    getSellerProducts: builder.query<SellerProductItem[], string | void>({
       query: (search) => {
         let url = '/seller-portal/products';
         if (search) {
@@ -68,7 +70,7 @@ export const sellerPortalApi = api.injectEndpoints({
       },
       providesTags: ['Catalog'],
     }),
-    addSellerProduct: builder.mutation<SellerProductItem, any>({
+    addSellerProduct: builder.mutation<SellerProductItem, Partial<SellerProductItem>>({
       query: (body) => ({
         url: '/seller-portal/products',
         method: 'POST',
@@ -76,7 +78,7 @@ export const sellerPortalApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Catalog'],
     }),
-    updateSellerProduct: builder.mutation<SellerProductItem, { id: string; data: any }>({
+    updateSellerProduct: builder.mutation<SellerProductItem, { id: string; data: Partial<SellerProductItem> }>({
       query: ({ id, data }) => ({
         url: `/seller-portal/products/${id}`,
         method: 'PATCH',
@@ -92,11 +94,11 @@ export const sellerPortalApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Catalog'],
     }),
-    getSellerOrders: builder.query<any[], void>({
+    getSellerOrders: builder.query<Order[], void>({
       query: () => '/seller-portal/orders',
       providesTags: ['Order'],
     }),
-    getSellerOrderById: builder.query<any, string>({
+    getSellerOrderById: builder.query<Order, string>({
       query: (id) => `/seller-portal/orders/${id}`,
       providesTags: (result, error, id) => [{ type: 'Order', id }],
     }),

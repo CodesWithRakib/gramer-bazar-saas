@@ -38,8 +38,8 @@ export function ProductCard({ product, lang }: ProductCardProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group border-border/50 bg-card/50 backdrop-blur-sm">
-      <Link href={`/${lang}/products/${slug}`} className="block relative pt-[100%] overflow-hidden bg-muted/30">
+    <Card className="h-full flex flex-col overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group border-border bg-card">
+      <Link href={`/${lang}/products/${slug}`} className="block relative pt-[100%] overflow-hidden bg-muted/20">
         <Image 
           src={image} 
           alt={name} 
@@ -49,8 +49,8 @@ export function ProductCard({ product, lang }: ProductCardProps) {
           loading="lazy"
         />
         {discountPrice && (
-          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-sm">
-            Sale
+          <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-sm z-10 shadow-sm uppercase tracking-wider">
+            {lang === 'bn' ? 'ছাড়' : 'Sale'}
           </div>
         )}
       </Link>
@@ -60,14 +60,17 @@ export function ProductCard({ product, lang }: ProductCardProps) {
         </Link>
         <div className="mt-auto">
           {discountPrice ? (
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-primary">৳{discountPrice}</span>
-              <span className="text-sm text-muted-foreground line-through">৳{price}</span>
+            <div className="flex flex-wrap items-baseline gap-1.5">
+              <span className="text-base md:text-lg font-bold text-primary">৳{discountPrice}</span>
+              <span className="text-xs text-muted-foreground line-through">৳{price}</span>
             </div>
           ) : (
-            <span className="text-lg font-bold text-primary">৳{price}</span>
+            <span className="text-base md:text-lg font-bold text-foreground">৳{price}</span>
           )}
-          <p className="text-xs text-muted-foreground mt-1 truncate">Shop: {lang === 'bn' ? product.shop.nameBn : product.shop.nameEn}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground mt-1 truncate">
+            {lang === 'bn' ? 'দোকান: ' : 'Shop: '}
+            <span className="font-medium text-foreground/80">{lang === 'bn' ? product.shop.nameBn : product.shop.nameEn}</span>
+          </p>
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">

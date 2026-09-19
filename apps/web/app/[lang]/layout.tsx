@@ -7,6 +7,7 @@ import { ReduxProvider } from "@/store/provider";
 import { SocketProvider } from "@/providers/SocketProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,7 +22,10 @@ const notoSansBengali = Noto_Sans_Bengali({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#22c55e",
+  themeColor: "#16a34a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export const metadata: Metadata = {
@@ -74,12 +78,13 @@ export default async function RootLayout({
           <ReduxProvider>
             <SocketProvider>
               <Header lang={lang} />
-              <main className="flex-grow flex flex-col">
+              <main className="flex-grow flex flex-col pb-16 md:pb-0">
                 {children}
               </main>
               <Footer lang={lang} />
               <LoginModal lang={lang} />
               <CartDrawer lang={lang} />
+              <MobileBottomNav lang={lang} />
             </SocketProvider>
           </ReduxProvider>
         </CSPostHogProvider>

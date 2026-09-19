@@ -1,8 +1,17 @@
 import { api } from '../../store/api';
+import { Product } from '../catalog/catalogApi';
+
+export interface WishlistItem {
+  id: string;
+  userId: string;
+  productId: string;
+  product: Product;
+  createdAt: string;
+}
 
 export const wishlistsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getUserWishlist: builder.query<any[], void>({
+    getUserWishlist: builder.query<WishlistItem[], void>({
       query: () => '/wishlists',
       providesTags: ['Wishlist'],
     }),

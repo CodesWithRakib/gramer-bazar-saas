@@ -14,12 +14,12 @@ export function CategoryCard({ category, lang }: CategoryCardProps) {
 
   return (
     <Link href={`/${lang}/categories/${category.slug}`}>
-      <Card className="hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer text-center h-full bg-card/50 backdrop-blur-sm">
-        <CardContent className="p-4 flex flex-col items-center justify-center gap-3">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
-            <img src={icon} alt={name} className="w-10 h-10 object-contain" />
+      <Card className="hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer text-center h-full bg-card shadow-sm border-border/50">
+        <CardContent className="p-3 flex flex-col items-center justify-center gap-2">
+          <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform group-hover:bg-primary/10">
+            <img src={icon} alt={name} className="w-8 h-8 object-contain drop-shadow-sm" />
           </div>
-          <span className="text-sm font-medium line-clamp-2">{name}</span>
+          <span className="text-[11px] md:text-xs font-semibold line-clamp-2 leading-tight">{name}</span>
         </CardContent>
       </Card>
     </Link>

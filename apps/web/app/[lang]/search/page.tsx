@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense, use } from "react";
-import {
-  useSearchParams,
-  useRouter,
-  usePathname,
-} from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   useSearchProductsQuery,
   useGetPublicCategoriesQuery,
@@ -14,15 +10,9 @@ import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { ProductRequestModal } from "@/components/catalog/ProductRequestModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Filter, X } from "lucide-react";
+import { ProductFilterSidebar } from "@/components/catalog/ProductFilterSidebar";
+import { ProductSortSelect } from "@/components/catalog/ProductSortSelect";
+import { Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 function SearchPageContent({ lang }: { lang: string }) {
   const router = useRouter();
@@ -33,10 +23,12 @@ function SearchPageContent({ lang }: { lang: string }) {
   const q = searchParams.get("q") || "";
   const categoryId = searchParams.get("categoryId") || "";
   const sort = searchParams.get("sort") || "newest";
+  const minPrice = searchParams.get("minPrice") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
+  const page = parseInt(searchParams.get("page") || "1", 10);
 
   const [localSearch, setLocalSearch] = useState(q);
 
-  // Sync local search when URL changes
   useEffect(() => {
     setLocalSearch(q);
   }, [q]);
@@ -49,90 +41,37 @@ function SearchPageContent({ lang }: { lang: string }) {
     q,
     categoryId,
     sort,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    page,
+    limit: 20,
   });
-
-  const { data: categories } = useGetPublicCategoriesQuery();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateUrl("q", localSearch);
   };
 
-  const updateUrl = (key: string, value: string) => {
+  const updateUrl = (key: string, value: string | number) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) {
-      params.set(key, value);
+      params.set(key, value.toString());
     } else {
       params.delete(key);
     }
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const clearFilters = () => {
-    router.push(pathname);
-  };
-
   const isEmpty = searchResults?.data?.length === 0;
+  const meta = searchResults?.meta;
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Filters */}
-        <aside className="w-full md:w-64 flex-shrink-0 space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              {isBn ? "ফিল্টার" : "Filters"}
-            </h3>
-            {(q || categoryId || sort !== "newest") && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {isBn ? "রিসেট" : "Reset"}
-              </Button>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-medium text-sm">
-              {isBn ? "ক্যাটাগরি" : "Categories"}
-            </h4>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="cat-all"
-                  checked={!categoryId}
-                  onCheckedChange={() => updateUrl("categoryId", "")}
-                />
-                <label htmlFor="cat-all" className="text-sm cursor-pointer">
-                  {isBn ? "সব" : "All"}
-                </label>
-              </div>
-              {categories?.map((cat) => (
-                <div key={cat.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`cat-${cat.id}`}
-                    checked={categoryId === cat.id}
-                    onCheckedChange={(checked) =>
-                      checked
-                        ? updateUrl("categoryId", cat.id)
-                        : updateUrl("categoryId", "")
-                    }
-                  />
-                  <label
-                    htmlFor={`cat-${cat.id}`}
-                    className="text-sm cursor-pointer line-clamp-1"
-                  >
-                    {isBn ? cat.nameBn : cat.nameEn}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
+        {/* Sidebar Filters - Hidden on mobile, visible on md */}
+        <div className="hidden md:block">
+          <ProductFilterSidebar lang={lang} />
+        </div>
 
         {/* Main Content */}
         <div className="flex-grow">
@@ -159,25 +98,10 @@ function SearchPageContent({ lang }: { lang: string }) {
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Select
-                value={sort}
-                onValueChange={(val) => updateUrl("sort", val)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={isBn ? "সর্ট করুন" : "Sort by"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">
-                    {isBn ? "নতুন পণ্য" : "Newest Arrivals"}
-                  </SelectItem>
-                  <SelectItem value="price_asc">
-                    {isBn ? "দাম: কম থেকে বেশি" : "Price: Low to High"}
-                  </SelectItem>
-                  <SelectItem value="price_desc">
-                    {isBn ? "দাম: বেশি থেকে কম" : "Price: High to Low"}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="md:hidden">
+                <ProductFilterSidebar lang={lang} isMobile />
+              </div>
+              <ProductSortSelect lang={lang} />
             </div>
           </div>
 
@@ -217,26 +141,64 @@ function SearchPageContent({ lang }: { lang: string }) {
               </Button>
             </div>
           ) : isEmpty && !isSearchLoading ? (
-            <div className="text-center py-16 px-4 bg-muted/30 rounded-xl border border-dashed">
-              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <div className="text-center py-16 px-4 bg-muted/20 rounded-xl border border-dashed">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
               <h3 className="text-lg font-semibold mb-2">
                 {isBn
                   ? "দুঃখিত, কোনো পণ্য পাওয়া যায়নি"
                   : "Sorry, no products found"}
               </h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto text-sm">
                 {isBn
-                  ? "আপনার খোঁজা পণ্যটি আমাদের স্টকে নেই। তবে আপনি অনুরোধ করলে আমরা এটি সরবরাহ করার চেষ্টা করব।"
-                  : "The product you're looking for isn't in stock right now. But you can request it and we'll try to source it."}
+                  ? "আপনার খোঁজা পণ্যটি আমাদের স্টকে নেই অথবা ফিল্টারের সাথে মিল নেই। তবে আপনি অনুরোধ করলে আমরা এটি সরবরাহ করার চেষ্টা করব।"
+                  : "The product you're looking for isn't in stock right now or doesn't match the filters. But you can request it and we'll try to source it."}
               </p>
-              <ProductRequestModal lang={lang} />
+              <ProductRequestModal
+                lang={lang}
+                trigger={
+                  <Button
+                    variant="secondary"
+                    className="rounded-full font-medium"
+                  >
+                    {isBn ? "পণ্য অনুরোধ করুন" : "Request Product"}
+                  </Button>
+                }
+              />
             </div>
           ) : (
-            <ProductGrid
-              products={searchResults?.data}
-              isLoading={isSearchLoading}
-              lang={lang}
-            />
+            <>
+              <ProductGrid
+                products={searchResults?.data}
+                isLoading={isSearchLoading}
+                lang={lang}
+              />
+
+              {meta && meta.totalPages > 1 && (
+                <div className="mt-8 flex justify-center items-center gap-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page <= 1}
+                    onClick={() => updateUrl("page", page - 1)}
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    {isBn ? "পূর্ববর্তী" : "Prev"}
+                  </Button>
+                  <span className="text-sm font-medium">
+                    {page} / {meta.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= meta.totalPages}
+                    onClick={() => updateUrl("page", page + 1)}
+                  >
+                    {isBn ? "পরবর্তী" : "Next"}
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

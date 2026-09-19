@@ -1,4 +1,5 @@
 import { api } from "../../store/api";
+import { PaginationMeta } from "../catalog/catalogApi";
 
 export interface OrderStatusHistoryItem {
   id: string;
@@ -13,12 +14,12 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   subtotal: number;
-  sellerProduct?: {
+  sellerProduct: {
     productVariant?: {
       nameEn: string;
       nameBn: string;
       images: string[];
-      product?: {
+      product: {
         nameEn: string;
         nameBn: string;
       };
@@ -36,15 +37,26 @@ export interface Order {
   paymentMethod: string;
   paymentStatus: string;
   createdAt: string;
-  items?: OrderItem[];
-  statusHistory?: OrderStatusHistoryItem[];
-  address?: {
+  items: OrderItem[];
+  statusHistory: OrderStatusHistoryItem[];
+  address: {
     id: string;
     title: string;
     streetAddress: string;
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
     contactName: string;
     contactPhone: string;
   };
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+  };
+  sellerSubtotal?: number;
 }
 
 export const ordersApi = api.injectEndpoints({
@@ -72,7 +84,7 @@ export const ordersApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Order"],
     }),
-    getAdminOrders: builder.query<{ data: Order[]; meta: any }, { page?: number; limit?: number; search?: string }>({
+    getAdminOrders: builder.query<{ data: Order[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
       query: (params) => ({
         url: '/orders/admin/all',
         params,

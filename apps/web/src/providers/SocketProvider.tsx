@@ -47,6 +47,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       console.log('Socket disconnected');
     });
 
+    // eslint-disable-next-line
     setSocket(socketInstance);
 
     return () => {

@@ -14,37 +14,37 @@ import {
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
+const NavItem = ({ href, icon: Icon, children, pathname, onClick }: { href: string, icon: React.ElementType, children: React.ReactNode, pathname: string, onClick?: () => void }) => {
+  const isActive = pathname === href;
+  return (
+    <Link 
+      onClick={onClick} 
+      href={href} 
+      className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+        isActive 
+          ? 'bg-primary/10 text-primary shadow-sm' 
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm'
+      }`}
+    >
+      <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+      {children}
+    </Link>
+  );
+};
+
 const SellerNavLinks = ({ onClick }: { onClick?: () => void }) => {
   const pathname = usePathname();
-  
-  const NavItem = ({ href, icon: Icon, children }: { href: string, icon: any, children: React.ReactNode }) => {
-    const isActive = pathname === href;
-    return (
-      <Link 
-        onClick={onClick} 
-        href={href} 
-        className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
-          isActive 
-            ? 'bg-primary/10 text-primary shadow-sm' 
-            : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm'
-        }`}
-      >
-        <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-        {children}
-      </Link>
-    );
-  };
 
   return (
     <div className="space-y-1">
-      <NavItem href="/en/seller" icon={LayoutDashboard}>Overview</NavItem>
-      <NavItem href="/en/seller/products" icon={Package}>My Products</NavItem>
-      <NavItem href="/en/seller/inventory" icon={Warehouse}>Inventory</NavItem>
-      <NavItem href="/en/seller/orders" icon={ShoppingCart}>Orders</NavItem>
-      <NavItem href="/en/seller/messages" icon={MessageSquare}>Messages</NavItem>
-      <NavItem href="/en/seller/reports" icon={BarChart3}>Reports</NavItem>
-      <NavItem href="/en/seller/shop" icon={Store}>Shop Settings</NavItem>
-      <NavItem href="/en/seller/payouts" icon={DollarSign}>Payouts</NavItem>
+      <NavItem href="/en/seller" icon={LayoutDashboard} pathname={pathname} onClick={onClick}>Overview</NavItem>
+      <NavItem href="/en/seller/products" icon={Package} pathname={pathname} onClick={onClick}>My Products</NavItem>
+      <NavItem href="/en/seller/inventory" icon={Warehouse} pathname={pathname} onClick={onClick}>Inventory</NavItem>
+      <NavItem href="/en/seller/orders" icon={ShoppingCart} pathname={pathname} onClick={onClick}>Orders</NavItem>
+      <NavItem href="/en/seller/messages" icon={MessageSquare} pathname={pathname} onClick={onClick}>Messages</NavItem>
+      <NavItem href="/en/seller/reports" icon={BarChart3} pathname={pathname} onClick={onClick}>Reports</NavItem>
+      <NavItem href="/en/seller/shop" icon={Store} pathname={pathname} onClick={onClick}>Shop Settings</NavItem>
+      <NavItem href="/en/seller/payouts" icon={DollarSign} pathname={pathname} onClick={onClick}>Payouts</NavItem>
     </div>
   );
 };

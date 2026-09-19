@@ -11,9 +11,8 @@ import { AddressForm } from '@/features/addresses/components/AddressForm';
 import { useCheckoutOrderMutation } from '@/features/orders/ordersApi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CheckCircle2, Plus, MapPin } from 'lucide-react';
+import { CheckCircle2, Plus, MapPin, CreditCard, ShoppingBag } from 'lucide-react';
 
 export default function CheckoutPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -101,14 +100,14 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1 space-y-8">
           {/* Delivery Address */}
-          <Card>
-            <CardHeader>
+          <Card className="border-0 shadow-sm ring-1 ring-black/5 rounded-2xl overflow-hidden">
+            <CardHeader className="bg-muted/30 border-b pb-4">
               <CardTitle className="text-xl flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-primary" />
                 {isBn ? 'ডেলিভারি ঠিকানা' : 'Delivery Address'}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               {isAddressesLoading ? (
                 <div className="py-4 text-center text-muted-foreground">{isBn ? 'লোড হচ্ছে...' : 'Loading addresses...'}</div>
               ) : (
@@ -168,13 +167,14 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
           </Card>
 
           {/* Payment Method */}
-          <Card>
-            <CardHeader>
+          <Card className="border-0 shadow-sm ring-1 ring-black/5 rounded-2xl overflow-hidden">
+            <CardHeader className="bg-muted/30 border-b pb-4">
               <CardTitle className="text-xl flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-primary" />
                 {isBn ? 'পেমেন্ট পদ্ধতি' : 'Payment Method'}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="relative">
                   <input 
@@ -220,10 +220,13 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
         </div>
 
         {/* Order Summary & Confirm */}
-        <div className="w-full lg:w-[400px]">
-          <Card className="sticky top-24 border-primary/20">
-            <CardHeader className="bg-primary/5 pb-4">
-              <CardTitle className="text-xl">{isBn ? 'অর্ডারের সারসংক্ষেপ' : 'Order Summary'}</CardTitle>
+        <div className="w-full lg:w-[420px]">
+          <Card className="sticky top-24 border-0 shadow-sm ring-1 ring-primary/20 rounded-2xl overflow-hidden">
+            <CardHeader className="bg-primary/5 border-b border-primary/10 pb-4">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-primary" />
+                {isBn ? 'অর্ডারের সারসংক্ষেপ' : 'Order Summary'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 mb-6 border-b pb-6">
@@ -255,7 +258,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
 
               <Button 
                 size="lg" 
-                className="w-full text-lg h-14" 
+                className="w-full text-lg h-14 rounded-xl shadow-lg transition-transform active:scale-[0.98] mt-2" 
                 disabled={isCheckingOut || !selectedAddressId || isAddressesLoading}
                 onClick={handleCheckout}
               >
