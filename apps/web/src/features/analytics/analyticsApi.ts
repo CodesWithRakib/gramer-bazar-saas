@@ -18,6 +18,10 @@ export interface DashboardMetrics {
     totalAmount: string | number;
     status: string;
   }>;
+  revenueData: Array<{
+    name: string;
+    revenue: number;
+  }>;
 }
 
 export interface DemandReport {

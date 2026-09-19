@@ -70,10 +70,50 @@ export class SellerPortalService {
       .select('SUM(item.subtotal)', 'totalSales')
       .getRawOne();
 
+    // Recent Orders (last 5 items, mapped to orders)
+    const recentOrderItems = await this.orderItemRepository
+      .createQueryBuilder('item')
+      .innerJoin('item.sellerProduct', 'sp')
+      .innerJoinAndSelect('item.order', 'order')
+      .innerJoinAndSelect('order.user', 'user')
+      .where('sp.shopId = :shopId', { shopId: shop.id })
+      .orderBy('order.createdAt', 'DESC')
+      .limit(5)
+      .getMany();
+
+    const recentOrders = recentOrderItems.map(item => ({
+      id: item.order.id,
+      customerName: item.order.user ? `${item.order.user.firstName} ${item.order.user.lastName}` : 'Unknown',
+      totalAmount: item.subtotal,
+      status: item.order.status,
+      createdAt: item.order.createdAt,
+    }));
+
+    // Revenue Trend (last 7 days)
+    const revenueTrendRaw = await this.orderItemRepository
+      .createQueryBuilder('item')
+      .innerJoin('item.sellerProduct', 'sp')
+      .innerJoin('item.order', 'order')
+      .select("TO_CHAR(order.createdAt, 'Dy')", 'name')
+      .addSelect("SUM(item.subtotal)", 'revenue')
+      .where('sp.shopId = :shopId', { shopId: shop.id })
+      .andWhere('order.status = :status', { status: OrderStatus.DELIVERED })
+      .andWhere("order.createdAt >= NOW() - INTERVAL '7 days'")
+      .groupBy("TO_CHAR(order.createdAt, 'Dy')")
+      .orderBy("MIN(order.createdAt)", 'ASC')
+      .getRawMany();
+
+    const revenueData = revenueTrendRaw.map(r => ({
+      name: r.name,
+      revenue: Number(r.revenue),
+    }));
+
     return {
       lowStockCount,
       activeOrdersCount,
       totalSales: parseFloat(salesData?.totalSales || '0'),
+      recentOrders,
+      revenueData,
     };
   }
 

@@ -5,6 +5,17 @@ export interface DashboardMetrics {
   lowStockCount: number;
   activeOrdersCount: number;
   totalSales: number;
+  recentOrders: Array<{
+    id: string;
+    customerName: string;
+    totalAmount: string | number;
+    status: string;
+    createdAt: string;
+  }>;
+  revenueData: Array<{
+    name: string;
+    revenue: number;
+  }>;
 }
 
 export interface SellerShop {

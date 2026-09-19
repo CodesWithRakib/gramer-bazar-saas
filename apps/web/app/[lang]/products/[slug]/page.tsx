@@ -44,6 +44,13 @@ export async function generateMetadata(
       description: description || `Buy ${name} at Gramer Bazar.`,
       images: [image],
     },
+    alternates: {
+      canonical: `/${lang}/products/${slug}`,
+      languages: {
+        'en-US': `/en/products/${slug}`,
+        'bn-BD': `/bn/products/${slug}`,
+      },
+    },
   };
 }
 

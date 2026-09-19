@@ -59,6 +59,21 @@ export class AnalyticsService {
       relations: ['user'],
     });
 
+    // Revenue trend (last 7 days)
+    const revenueTrendRaw = await this.orderRepository.createQueryBuilder('order')
+      .select("TO_CHAR(order.createdAt, 'Dy')", 'name')
+      .addSelect("SUM(order.total)", 'revenue')
+      .where('order.status = :status', { status: OrderStatus.DELIVERED })
+      .andWhere("order.createdAt >= NOW() - INTERVAL '7 days'")
+      .groupBy("TO_CHAR(order.createdAt, 'Dy')")
+      .orderBy("MIN(order.createdAt)", 'ASC')
+      .getRawMany();
+
+    const revenueData = revenueTrendRaw.map((r: any) => ({
+      name: r.name,
+      revenue: Number(r.revenue),
+    }));
+
     return {
       metrics: {
         totalOrders,
@@ -76,6 +91,7 @@ export class AnalyticsService {
         status: o.status,
         createdAt: o.createdAt,
       })),
+      revenueData,
     };
   }
 

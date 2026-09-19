@@ -23,18 +23,7 @@ export default function AdminDashboardPage({ params }: { params: Promise<{ lang:
 
   const metrics = data?.metrics;
   const recentOrders = data?.recentOrders || [];
-
-  // Mock data for charts (In a real app, this would come from the API, but since getDashboardMetrics only returns totals right now, we use a trend mock or adapt recentOrders)
-  // Let's create a small trend from recent orders if possible, otherwise use static mock for demonstration of Recharts.
-  const revenueData = [
-    { name: 'Mon', revenue: 4000 },
-    { name: 'Tue', revenue: 3000 },
-    { name: 'Wed', revenue: 5000 },
-    { name: 'Thu', revenue: 2780 },
-    { name: 'Fri', revenue: 8900 },
-    { name: 'Sat', revenue: 10000 },
-    { name: 'Sun', revenue: 12000 },
-  ];
+  const revenueData = data?.revenueData || [];
 
   return (
     <div className="space-y-6">

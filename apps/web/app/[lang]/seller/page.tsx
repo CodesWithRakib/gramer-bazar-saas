@@ -3,9 +3,18 @@ import { use } from 'react';
 
 import React from 'react';
 import { useGetSellerDashboardQuery } from '@/features/seller-portal/sellerPortalApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { PackageX, ShoppingCart, DollarSign } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+} from 'recharts';
 
 export default function SellerDashboardPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -76,6 +85,76 @@ export default function SellerDashboardPage({ params }: { params: Promise<{ lang
           </CardContent>
         </Card>
       </div>
+
+      {metrics && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-6">
+          <Card className="col-span-4">
+            <CardHeader>
+              <CardTitle>{isBn ? 'রাজস্ব ওভারভিউ' : 'Revenue Overview'}</CardTitle>
+              <CardDescription>{isBn ? 'গত ৭ দিনের বিক্রয়' : 'Sales over the last 7 days'}</CardDescription>
+            </CardHeader>
+            <CardContent className="pl-2">
+              <div className="h-[300px] w-full mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={metrics.revenueData || []}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `৳${value}`}
+                    />
+                    <Tooltip 
+                      cursor={{fill: 'transparent'}}
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <Bar dataKey="revenue" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="col-span-3">
+            <CardHeader>
+              <CardTitle>{isBn ? 'সাম্প্রতিক অর্ডার' : 'Recent Orders'}</CardTitle>
+              <CardDescription>{isBn ? 'আপনার স্টোরের সর্বশেষ অর্ডারসমূহ' : 'Latest orders in your store'}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {(metrics.recentOrders || []).map((order) => (
+                  <div key={order.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                        {order.customerName.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium leading-none">{order.customerName}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Order #{order.id.split('-')[0]}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">৳{Number(order.totalAmount).toLocaleString()}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-semibold mt-1">{order.status}</p>
+                    </div>
+                  </div>
+                ))}
+                {(!metrics.recentOrders || metrics.recentOrders.length === 0) && (
+                  <p className="text-sm text-muted-foreground text-center py-4">{isBn ? 'কোন সাম্প্রতিক অর্ডার নেই।' : 'No recent orders found.'}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
