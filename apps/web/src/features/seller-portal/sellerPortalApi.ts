@@ -84,6 +84,14 @@ export const sellerPortalApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Catalog'],
     }),
+    updateInventory: builder.mutation<SellerInventory, { id: string; quantity: number }>({
+      query: ({ id, quantity }) => ({
+        url: `/inventory/${id}`,
+        method: 'PATCH',
+        body: { quantity },
+      }),
+      invalidatesTags: ['Catalog'],
+    }),
     getSellerOrders: builder.query<any[], void>({
       query: () => '/seller-portal/orders',
       providesTags: ['Order'],
@@ -102,6 +110,7 @@ export const {
   useGetSellerProductsQuery,
   useAddSellerProductMutation,
   useUpdateSellerProductMutation,
+  useUpdateInventoryMutation,
   useGetSellerOrdersQuery,
   useGetSellerOrderByIdQuery,
 } = sellerPortalApi;

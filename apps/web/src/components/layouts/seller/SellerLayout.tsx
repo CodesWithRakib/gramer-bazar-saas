@@ -14,8 +14,11 @@ export function SellerLayout({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 p-4 space-y-2">
           <Link href="/en/seller" className="block px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-foreground">Overview</Link>
           <Link href="/en/seller/products" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">My Products</Link>
+          <Link href="/en/seller/inventory" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Inventory</Link>
           <Link href="/en/seller/orders" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Orders</Link>
           <Link href="/en/seller/messages" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Messages</Link>
+          <Link href="/en/seller/reports" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Reports</Link>
+          <Link href="/en/seller/shop" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Shop Settings</Link>
           <Link href="/en/seller/payouts" className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">Payouts</Link>
         </nav>
       </aside>

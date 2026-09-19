@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export function RiderLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,22 +18,22 @@ export function RiderLayout({ children }: { children: React.ReactNode }) {
 
       {/* Bottom Nav Placeholder */}
       <nav className="sticky bottom-0 z-40 w-full border-t bg-background flex items-center justify-around h-16 pb-safe">
-        <div className="flex flex-col items-center">
+        <Link href="/en/rider" className="flex flex-col items-center hover:text-primary transition-colors text-muted-foreground">
           <div className="w-6 h-6 bg-muted rounded-full mb-1"></div>
           <span className="text-[10px] font-medium">Tasks</span>
-        </div>
-        <div className="flex flex-col items-center">
+        </Link>
+        <Link href="/en/rider/map" className="flex flex-col items-center hover:text-primary transition-colors text-muted-foreground">
           <div className="w-6 h-6 bg-muted rounded-full mb-1"></div>
           <span className="text-[10px] font-medium">Map</span>
-        </div>
-        <div className="flex flex-col items-center">
+        </Link>
+        <Link href="/en/rider/earnings" className="flex flex-col items-center hover:text-primary transition-colors text-muted-foreground">
           <div className="w-6 h-6 bg-muted rounded-full mb-1"></div>
           <span className="text-[10px] font-medium">Earnings</span>
-        </div>
-        <div className="flex flex-col items-center">
+        </Link>
+        <Link href="/en/rider/profile" className="flex flex-col items-center hover:text-primary transition-colors text-muted-foreground">
           <div className="w-6 h-6 bg-muted rounded-full mb-1"></div>
           <span className="text-[10px] font-medium">Profile</span>
-        </div>
+        </Link>
       </nav>
     </div>
   );
