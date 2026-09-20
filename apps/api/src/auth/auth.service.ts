@@ -166,4 +166,52 @@ export class AuthService {
     });
     return { message: 'Logged out successfully' };
   }
+  async updateProfile(userId: string, updateProfileDto: any) {
+    const updatedUser = await this.usersService.update(userId, updateProfileDto);
+    return {
+      message: 'Profile updated successfully',
+      user: {
+        id: updatedUser.id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phone: updatedUser.phone,
+        email: updatedUser.email,
+        avatar: updatedUser.avatar,
+      }
+    };
+  }
+
+  async updatePassword(userId: string, updatePasswordDto: any) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    if (user.passwordHash) {
+      const isMatch = await bcrypt.compare(updatePasswordDto.currentPassword, user.passwordHash);
+      if (!isMatch) {
+        throw new BadRequestException('Incorrect current password');
+      }
+    }
+
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(updatePasswordDto.newPassword, salt);
+
+    await this.usersService.update(userId, { passwordHash });
+    return { message: 'Password updated successfully' };
+  }
+
+  async updateAvatar(userId: string, avatarUrl: string) {
+    const updatedUser = await this.usersService.update(userId, { avatar: avatarUrl });
+    return {
+      message: 'Avatar uploaded successfully',
+      avatarUrl: updatedUser.avatar,
+    };
+  }
+
+  async deleteAccount(userId: string) {
+    await this.usersService.update(userId, { status: UserStatus.INACTIVE });
+    // Soft delete or request deletion flow. For MVP, just soft delete the user
+    await this.usersService.remove(userId);
+    return { message: 'Account scheduled for deletion' };
+  }
 }
+

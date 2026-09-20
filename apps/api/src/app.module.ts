@@ -38,9 +38,15 @@ import { WalletsModule } from './wallets/wallets.module.js';
 import { PayoutsModule } from './payouts/payouts.module.js';
 import { DisputesModule } from './disputes/disputes.module.js';
 import { FlashSalesModule } from './flash-sales/flash-sales.module.js';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],

@@ -43,6 +43,9 @@ export class User {
   isEmailVerified: boolean;
 
   @Column({ type: 'varchar', nullable: true })
+  avatar: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
   @Exclude()
   refreshTokenHash: string | null;
 

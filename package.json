@@ -11,6 +11,7 @@
     "test:e2e:web": "pnpm -C apps/e2e exec playwright test"
   },
   "dependencies": {
+    "@types/multer": "^2.2.0",
     "jimp": "^1.6.1",
     "tailwindcss-animate": "^1.0.7"
   },

@@ -64,6 +64,36 @@ export const authApi = api.injectEndpoints({
       query: () => '/auth/me',
       providesTags: ['User'],
     }),
+    updateProfile: builder.mutation<{ message: string; user: UserProfile }, Partial<UserProfile>>({
+      query: (body) => ({
+        url: '/auth/me',
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    updatePassword: builder.mutation<{ message: string }, any>({
+      query: (body) => ({
+        url: '/auth/me/password',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    uploadAvatar: builder.mutation<{ message: string; avatarUrl: string }, FormData>({
+      query: (body) => ({
+        url: '/auth/me/avatar',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    deleteAccount: builder.mutation<{ message: string }, void>({
+      query: () => ({
+        url: '/auth/me',
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -74,4 +104,8 @@ export const {
   useRegisterStaffMutation,
   useGetProfileQuery,
   useLazyGetProfileQuery,
+  useUpdateProfileMutation,
+  useUpdatePasswordMutation,
+  useUploadAvatarMutation,
+  useDeleteAccountMutation,
 } = authApi;

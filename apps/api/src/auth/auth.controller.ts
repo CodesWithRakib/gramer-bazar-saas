@@ -1,5 +1,8 @@
-import { Controller, Post, Body, Get, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Body, Get, Patch, Delete, UseGuards, Request, HttpCode, HttpStatus, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
@@ -7,6 +10,8 @@ import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { RefreshDto } from './dto/refresh.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
+import { UpdatePasswordDto } from './dto/update-password.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 
 @ApiTags('auth')
@@ -74,7 +79,73 @@ export class AuthController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'Current user profile' })
   async getProfile(@Request() req: any) {
-    // req.user is populated by JwtStrategy
     return req.user;
   }
+
+  @Patch('me')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  async updateProfile(@Request() req: any, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.authService.updateProfile(req.user.id, updateProfileDto);
+  }
+
+  @Patch('me/password')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update current user password' })
+  @ApiResponse({ status: 200, description: 'Password updated successfully' })
+  async updatePassword(@Request() req: any, @Body() updatePasswordDto: UpdatePasswordDto) {
+    return this.authService.updatePassword(req.user.id, updatePasswordDto);
+  }
+
+  @Post('me/avatar')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Upload avatar for current user' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads/avatars',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, `${req.user.id}-${uniqueSuffix}${extname(file.originalname)}`);
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+        return cb(new BadRequestException('Only image files are allowed!'), false);
+      }
+      cb(null, true);
+    }
+  }))
+  async uploadAvatar(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    const avatarUrl = `/uploads/avatars/${file.filename}`;
+    return this.authService.updateAvatar(req.user.id, avatarUrl);
+  }
+
+  @Delete('me')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Request account deletion' })
+  @ApiResponse({ status: 200, description: 'Account scheduled for deletion' })
+  async deleteAccount(@Request() req: any) {
+    return this.authService.deleteAccount(req.user.id);
+  }
 }
+
