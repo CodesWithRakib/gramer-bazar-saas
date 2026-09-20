@@ -13,6 +13,9 @@ export interface Delivery {
   assignedAt: string;
   pickupTime: string;
   deliveryTime: string;
+  currentLat?: number;
+  currentLng?: number;
+  lastLocationUpdatedAt?: string;
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -69,6 +72,15 @@ export const deliveriesApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Order', id }, 'Order'],
     }),
+    updateRiderLocation: builder.mutation<Delivery, { id: string; lat: number; lng: number }>({
+      query: ({ id, ...body }) => ({
+        url: `/deliveries/rider/${id}/location`,
+        method: 'PATCH',
+        body,
+      }),
+      // Don't invalidate entire order list for location updates to avoid excessive re-fetching,
+      // it mainly updates the specific delivery query anyway.
+    }),
 
     // CUSTOMER ENDPOINTS
     getCustomerDelivery: builder.query<Delivery, string>({
@@ -85,5 +97,6 @@ export const {
   useGetRiderDeliveriesQuery,
   useGetRiderDeliveryDetailsQuery,
   useUpdateDeliveryStatusMutation,
+  useUpdateRiderLocationMutation,
   useGetCustomerDeliveryQuery,
 } = deliveriesApi;

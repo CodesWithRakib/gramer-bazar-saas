@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { MobileBottomNav } from './MobileBottomNav';
+import { FloatingChatWidget } from '@/components/chat/FloatingChatWidget';
 
 export function ClientLayoutWrapper({ lang, children }: { lang: string; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -26,6 +27,7 @@ export function ClientLayoutWrapper({ lang, children }: { lang: string; children
       </main>
       <Footer lang={lang} />
       <MobileBottomNav lang={lang} />
+      <FloatingChatWidget lang={lang} />
     </>
   );
 }

@@ -47,6 +47,15 @@ export class Delivery {
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 
+  @Column({ name: 'current_lat', type: 'decimal', precision: 10, scale: 8, nullable: true })
+  currentLat: number | null;
+
+  @Column({ name: 'current_lng', type: 'decimal', precision: 11, scale: 8, nullable: true })
+  currentLng: number | null;
+
+  @Column({ name: 'last_location_updated_at', type: 'timestamp', nullable: true })
+  lastLocationUpdatedAt: Date | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

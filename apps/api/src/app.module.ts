@@ -36,6 +36,7 @@ import { SeederModule } from './seeder/seeder.module.js';
 import { BannersModule } from './banners/banners.module.js';
 import { WalletsModule } from './wallets/wallets.module.js';
 import { PayoutsModule } from './payouts/payouts.module.js';
+import { DisputesModule } from './disputes/disputes.module.js';
 
 @Module({
   imports: [
@@ -102,6 +103,7 @@ import { PayoutsModule } from './payouts/payouts.module.js';
     BannersModule,
     WalletsModule,
     PayoutsModule,
+    DisputesModule,
   ],
   controllers: [AppController],
   providers: [

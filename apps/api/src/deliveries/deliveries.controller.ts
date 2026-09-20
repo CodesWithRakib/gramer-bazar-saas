@@ -66,6 +66,18 @@ export class DeliveriesController {
     return this.deliveriesService.updateDeliveryStatus(req.user.id, id, dto, isAdmin);
   }
 
+  @Patch('rider/:id/location')
+  @Roles(Role.RIDER)
+  @ApiOperation({ summary: 'Rider: Update live GPS location' })
+  updateRiderLocation(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body('lat') lat: number,
+    @Body('lng') lng: number,
+  ) {
+    return this.deliveriesService.updateRiderLocation(req.user.id, id, lat, lng);
+  }
+
   // --- CUSTOMER ENDPOINTS ---
 
   @Get('customer/:orderId')

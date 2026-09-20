@@ -34,6 +34,7 @@ export const api = createApi({
     "Wallet",
     "WalletTransaction",
     "Payout",
+    "Dispute",
   ],
   endpoints: () => ({}),
 });

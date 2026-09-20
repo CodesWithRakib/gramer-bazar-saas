@@ -73,6 +73,12 @@ export class Address {
   @Column({ name: 'street_address', type: 'text' })
   streetAddress: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 8, nullable: true })
+  lat: number | null;
+
+  @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
+  lng: number | null;
+
   @Column({ name: 'is_default', default: false })
   isDefault: boolean;
 

@@ -41,6 +41,7 @@ const SellerNavLinks = ({ onClick }: { onClick?: () => void }) => {
       <NavItem href="/en/seller/products" icon={Package} pathname={pathname} onClick={onClick}>My Products</NavItem>
       <NavItem href="/en/seller/inventory" icon={Warehouse} pathname={pathname} onClick={onClick}>Inventory</NavItem>
       <NavItem href="/en/seller/orders" icon={ShoppingCart} pathname={pathname} onClick={onClick}>Orders</NavItem>
+      <NavItem href="/en/seller/disputes" icon={MessageSquare} pathname={pathname} onClick={onClick}>Disputes</NavItem>
       <NavItem href="/en/seller/messages" icon={MessageSquare} pathname={pathname} onClick={onClick}>Messages</NavItem>
       <NavItem href="/en/seller/reports" icon={BarChart3} pathname={pathname} onClick={onClick}>Reports</NavItem>
       <NavItem href="/en/seller/shop" icon={Store} pathname={pathname} onClick={onClick}>Shop Settings</NavItem>

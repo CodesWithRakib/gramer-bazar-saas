@@ -10,6 +10,13 @@ import { Phone, MapPin, Package, ArrowLeft, CheckCircle2, AlertTriangle, Truck }
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { StartChatButton } from '@/components/chat/StartChatButton';
+import dynamic from 'next/dynamic';
+import { useUpdateRiderLocationMutation } from '@/features/deliveries/deliveriesApi';
+
+const LiveTrackingMap = dynamic(
+  () => import('@/components/map/LiveTrackingMap'),
+  { ssr: false, loading: () => <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-muted/20 animate-pulse rounded-md border"><span className="text-muted-foreground">Loading Map...</span></div> }
+);
 
 export default function RiderDeliveryDetailsPage({
   params,
@@ -23,6 +30,48 @@ export default function RiderDeliveryDetailsPage({
 
   const { data: delivery, isLoading, refetch } = useGetRiderDeliveryDetailsQuery(id);
   const [updateStatus, { isLoading: isUpdating }] = useUpdateDeliveryStatusMutation();
+  const [updateLocation] = useUpdateRiderLocationMutation();
+
+  const [currentLat, setCurrentLat] = useState<number | undefined>(undefined);
+  const [currentLng, setCurrentLng] = useState<number | undefined>(undefined);
+  const [trackingError, setTrackingError] = useState<string | null>(null);
+
+  // Live Location Tracking Effect
+  useEffect(() => {
+    if (!delivery || delivery.status !== DeliveryStatus.OUT_FOR_DELIVERY) return;
+
+    if (!('geolocation' in navigator)) {
+      setTrackingError(isBn ? 'আপনার ব্রাউজার জিপিএস সাপোর্ট করে না' : 'Geolocation is not supported by your browser');
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCurrentLat(latitude);
+        setCurrentLng(longitude);
+        setTrackingError(null);
+
+        // Update backend with new coordinates
+        updateLocation({ id, lat: latitude, lng: longitude }).catch(err => {
+          console.error("Failed to update location to server", err);
+        });
+      },
+      (error) => {
+        console.error("Error watching position:", error);
+        setTrackingError(isBn ? 'লোকেশন ট্র্যাক করা যাচ্ছে না। দয়া করে জিপিএস পারমিশন দিন।' : 'Cannot track location. Please allow GPS permissions.');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, [delivery?.status, id, isBn, updateLocation]);
 
   const handleUpdateStatus = async (status: DeliveryStatus) => {
     try {
@@ -132,6 +181,39 @@ export default function RiderDeliveryDetailsPage({
       </Card>
 
       <div className="space-y-3 pt-4">
+        {delivery.status === DeliveryStatus.OUT_FOR_DELIVERY && (
+          <Card className="border-primary/50 shadow-md overflow-hidden">
+            <CardHeader className="bg-primary/5 py-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-primary" />
+                {isBn ? 'লাইভ লোকেশন ট্র্যাকিং' : 'Live Location Tracking'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 h-[300px] relative">
+              {trackingError && (
+                <div className="absolute top-0 left-0 right-0 z-10 bg-destructive/90 text-destructive-foreground text-xs p-2 text-center">
+                  {trackingError}
+                </div>
+              )}
+              {currentLat && currentLng ? (
+                <LiveTrackingMap 
+                  riderLat={currentLat} 
+                  riderLng={currentLng} 
+                  customerLat={Number(order.address?.lat) || undefined}
+                  customerLng={Number(order.address?.lng) || undefined}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                  <div className="flex flex-col items-center text-muted-foreground animate-pulse">
+                    <MapPin className="h-8 w-8 mb-2" />
+                    <span className="text-sm">{isBn ? 'লোকেশন লোড হচ্ছে...' : 'Getting GPS Location...'}</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {delivery.status === DeliveryStatus.ASSIGNED && (
           <Button 
             className="w-full h-12 text-lg" 

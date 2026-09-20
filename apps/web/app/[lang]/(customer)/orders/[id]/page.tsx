@@ -13,6 +13,14 @@ import { ArrowLeft, CheckCircle2, Package, Truck, Store } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { setCartOpen, clearCart, addToCart } from '@/store/slices/cartSlice';
 import { toast } from 'sonner';
+import dynamic from 'next/dynamic';
+import { MapPin } from 'lucide-react';
+import { OpenDisputeDialog } from '@/components/disputes/OpenDisputeDialog';
+
+const LiveTrackingMap = dynamic(
+  () => import('@/components/map/LiveTrackingMap'),
+  { ssr: false, loading: () => <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-muted/20 animate-pulse rounded-md border"><span className="text-muted-foreground">Loading Map...</span></div> }
+);
 
 export default function OrderDetailsPage({ params }: { params: Promise<{ lang: string, id: string }> }) {
   const { lang, id } = use(params);
@@ -21,7 +29,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
   const dispatch = useDispatch();
   
   const { data: order, isLoading, isError } = useGetOrderByIdQuery(id);
-  const { data: delivery } = useGetCustomerDeliveryQuery(id);
+  
+  // Poll delivery location every 10 seconds if it's out for delivery
+  const shouldPoll = order?.status === 'OUT_FOR_DELIVERY';
+  const { data: delivery } = useGetCustomerDeliveryQuery(id, {
+    pollingInterval: shouldPoll ? 10000 : 0,
+    skip: !order,
+  });
+
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
 
   const searchParams = useSearchParams();
@@ -159,6 +174,26 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
             </CardContent>
           </Card>
 
+          {/* Live Tracking Map for Customer */}
+          {delivery?.currentLat && delivery?.currentLng && (
+            <Card className="border-primary/50 shadow-md overflow-hidden">
+              <CardHeader className="bg-primary/5 py-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  {isBn ? 'লাইভ লোকেশন ট্র্যাকিং' : 'Live Location Tracking'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 h-[300px]">
+                <LiveTrackingMap 
+                  riderLat={Number(delivery.currentLat)} 
+                  riderLng={Number(delivery.currentLng)}
+                  customerLat={Number(order.address?.lat) || undefined}
+                  customerLng={Number(order.address?.lng) || undefined}
+                />
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>{isBn ? 'অর্ডারের পণ্যসমূহ' : 'Order Items'}</CardTitle>
@@ -221,6 +256,9 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
                 <Button variant="destructive" className="w-full" onClick={handleCancel} disabled={isCancelling}>
                   {isCancelling ? (isBn ? 'বাতিল হচ্ছে...' : 'Cancelling...') : (isBn ? 'অর্ডার বাতিল করুন' : 'Cancel Order')}
                 </Button>
+              )}
+              {order.status !== 'PENDING' && order.status !== 'CANCELLED' && (
+                <OpenDisputeDialog orderId={id} isBn={isBn} />
               )}
             </CardFooter>
           </Card>

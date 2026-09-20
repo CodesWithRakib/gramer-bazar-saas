@@ -49,6 +49,8 @@ export interface Order {
     country?: string;
     contactName: string;
     contactPhone: string;
+    lat?: number | string | null;
+    lng?: number | string | null;
   };
   user: {
     id: string;

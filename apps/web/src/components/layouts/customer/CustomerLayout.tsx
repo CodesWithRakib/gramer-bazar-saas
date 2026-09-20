@@ -23,6 +23,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
             <Link href="/en/wishlist" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Wishlist</Link>
             <Link href="/en/reviews" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Reviews</Link>
             <Link href="/en/orders" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Orders</Link>
+            <Link href="/en/disputes" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Disputes</Link>
             <div className="pl-2 border-l border-border/50">
               <NotificationBell lang="en" />
             </div>

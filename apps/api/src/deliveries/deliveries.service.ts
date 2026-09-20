@@ -238,6 +238,23 @@ export class DeliveriesService {
     }
   }
 
+  async updateRiderLocation(riderId: string, id: string, lat: number, lng: number) {
+    const delivery = await this.deliveryRepository.findOne({
+      where: { id, riderId },
+    });
+
+    if (!delivery) throw new NotFoundException('Delivery not found or not assigned to you');
+    if (delivery.status !== DeliveryStatus.OUT_FOR_DELIVERY) {
+      throw new BadRequestException('Can only update location when OUT_FOR_DELIVERY');
+    }
+
+    delivery.currentLat = lat;
+    delivery.currentLng = lng;
+    delivery.lastLocationUpdatedAt = new Date();
+
+    return this.deliveryRepository.save(delivery);
+  }
+
   // --- CUSTOMER ACTIONS ---
 
   async getCustomerDelivery(userId: string, orderId: string) {
@@ -257,6 +274,9 @@ export class DeliveriesService {
       assignedAt: delivery.assignedAt,
       pickupTime: delivery.pickupTime,
       deliveryTime: delivery.deliveryTime,
+      currentLat: delivery.currentLat,
+      currentLng: delivery.currentLng,
+      lastLocationUpdatedAt: delivery.lastLocationUpdatedAt,
       rider: delivery.rider ? {
         firstName: delivery.rider.firstName,
         lastName: delivery.rider.lastName,

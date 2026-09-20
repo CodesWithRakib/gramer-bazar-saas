@@ -56,6 +56,7 @@ const AdminNavLinks = ({ onClick }: { onClick?: () => void }) => {
       <div className="pt-4 pb-1.5 px-3 text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">Operations</div>
       <NavItem href="/en/admin/orders" icon={ShoppingCart} pathname={pathname} onClick={onClick}>Orders</NavItem>
       <NavItem href="/en/admin/deliveries" icon={Truck} pathname={pathname} onClick={onClick}>Deliveries</NavItem>
+      <NavItem href="/en/admin/disputes" icon={MessageSquare} pathname={pathname} onClick={onClick}>Disputes</NavItem>
       <NavItem href="/en/admin/product-requests" icon={HeartHandshake} pathname={pathname} onClick={onClick}>Requests</NavItem>
       <NavItem href="/en/admin/reviews" icon={Star} pathname={pathname} onClick={onClick}>Reviews</NavItem>
       

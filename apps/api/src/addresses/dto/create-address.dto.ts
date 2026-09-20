@@ -55,6 +55,14 @@ export class CreateAddressDto {
   @IsNotEmpty()
   streetAddress: string;
 
+  @ApiPropertyOptional({ example: 23.8103 })
+  @IsOptional()
+  lat?: number;
+
+  @ApiPropertyOptional({ example: 90.4125 })
+  @IsOptional()
+  lng?: number;
+
   @ApiPropertyOptional({ example: true })
   @IsBoolean()
   @IsOptional()

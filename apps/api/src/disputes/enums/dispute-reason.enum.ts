@@ -1,0 +1,7 @@
+export enum DisputeReason {
+  DAMAGED = 'DAMAGED',
+  MISSING_ITEM = 'MISSING_ITEM',
+  NOT_AS_DESCRIBED = 'NOT_AS_DESCRIBED',
+  WRONG_ITEM = 'WRONG_ITEM',
+  OTHER = 'OTHER',
+}
