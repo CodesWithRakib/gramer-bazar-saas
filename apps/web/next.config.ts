@@ -36,6 +36,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "plus.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "ghorerbazarbd.com",
+      },
+      {
+        protocol: "https",
+        hostname: "khaasfood.com",
+      },
     ],
   },
 };

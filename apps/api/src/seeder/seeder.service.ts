@@ -20,6 +20,9 @@ import { District } from '../locations/entities/district.entity.js';
 import { Upazila } from '../locations/entities/upazila.entity.js';
 import { Union } from '../locations/entities/union.entity.js';
 import { Area } from '../locations/entities/area.entity.js';
+import { Banner } from '../banners/entities/banner.entity.js';
+import { FlashSale } from '../flash-sales/entities/flash-sale.entity.js';
+import { FlashSaleItem } from '../flash-sales/entities/flash-sale-item.entity.js';
 
 @Injectable()
 export class SeederService {
@@ -43,6 +46,9 @@ export class SeederService {
     @InjectRepository(Upazila) private upazilaRepo: Repository<Upazila>,
     @InjectRepository(Union) private unionRepo: Repository<Union>,
     @InjectRepository(Area) private areaRepo: Repository<Area>,
+    @InjectRepository(Banner) private bannerRepo: Repository<Banner>,
+    @InjectRepository(FlashSale) private flashSaleRepo: Repository<FlashSale>,
+    @InjectRepository(FlashSaleItem) private flashSaleItemRepo: Repository<FlashSaleItem>,
   ) {}
 
   async seed() {
@@ -53,7 +59,8 @@ export class SeederService {
     await this.seedLocations();
     const users = await this.seedUsersAndShops();
     const catalog = await this.seedCatalog();
-    await this.seedInventory(users, catalog.productVariants, catalog.products);
+    const sellerProducts = await this.seedInventory(users, catalog.productVariants, catalog.products);
+    await this.seedMarketing(sellerProducts);
     
     this.logger.log('--- Seeding Process Finished ---');
     return {
@@ -166,37 +173,33 @@ export class SeederService {
 
   private async seedUsersAndShops() {
     this.logger.log('Seeding users and shops...');
-    
-    const adminRole = await this.roleRepo.findOne({ where: { name: Role.SUPER_ADMIN } });
-    const sellerRole = await this.roleRepo.findOne({ where: { name: Role.SELLER } });
+    const adminRole = await this.roleRepo.findOne({ where: { name: Role.ADMIN } });
     const customerRole = await this.roleRepo.findOne({ where: { name: Role.CUSTOMER } });
+    const sellerRole = await this.roleRepo.findOne({ where: { name: Role.SELLER } });
 
-    const passwordHash = await bcrypt.hash('123456', 10);
+    const passwordHash = await bcrypt.hash('password123', 10);
 
-    // Admin
     const admin = await this.userRepo.save(this.userRepo.create({
-      firstName: 'Super', lastName: 'Admin', email: 'admin@gramerbazar.com', phone: '01700000000',
-      passwordHash, roles: [adminRole as RoleEntity],
+      phone: '+8801700000001', email: 'admin@gramerbazar.com', passwordHash,
+      firstName: 'Super', lastName: 'Admin', roles: [adminRole as RoleEntity],
       status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
-    // Customer
     const customer = await this.userRepo.save(this.userRepo.create({
-      firstName: 'Regular', lastName: 'Customer', email: 'customer@test.com', phone: '01800000000',
-      passwordHash, roles: [customerRole as RoleEntity],
+      phone: '+8801700000002', email: 'customer@gramerbazar.com', passwordHash,
+      firstName: 'Rahim', lastName: 'Uddin', roles: [customerRole as RoleEntity],
       status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
-    // Sellers
     const seller1 = await this.userRepo.save(this.userRepo.create({
-      firstName: 'Rahim', lastName: 'Uddin', email: 'rahim@test.com', phone: '01900000001',
-      passwordHash, roles: [sellerRole as RoleEntity],
+      phone: '+8801700000003', email: 'seller1@gramerbazar.com', passwordHash,
+      firstName: 'Abdul', lastName: 'Kader', roles: [sellerRole as RoleEntity],
       status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
     const seller2 = await this.userRepo.save(this.userRepo.create({
-      firstName: 'Karim', lastName: 'Mia', email: 'karim@test.com', phone: '01900000002',
-      passwordHash, roles: [sellerRole as RoleEntity],
+      phone: '+8801700000004', email: 'seller2@gramerbazar.com', passwordHash,
+      firstName: 'Jamal', lastName: 'Hossain', roles: [sellerRole as RoleEntity],
       status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
@@ -210,62 +213,56 @@ export class SeederService {
   }
 
   private async seedCatalog() {
-    this.logger.log('Seeding catalog (categories, brands, products)...');
-
-    // Categories
-    const categories = await this.categoryRepo.save([
-      this.categoryRepo.create({ nameEn: 'Rice & Grains', nameBn: 'চাল ও শস্য', slug: 'rice-grains', isActive: true }),
-      this.categoryRepo.create({ nameEn: 'Fresh Vegetables', nameBn: 'তাজা শাকসবজি', slug: 'fresh-vegetables', isActive: true }),
-      this.categoryRepo.create({ nameEn: 'Spices', nameBn: 'মসলা', slug: 'spices', isActive: true }),
-      this.categoryRepo.create({ nameEn: 'Fish & Meat', nameBn: 'মাছ ও মাংস', slug: 'fish-meat', isActive: true }),
-      this.categoryRepo.create({ nameEn: 'Oils', nameBn: 'তেল', slug: 'oils', isActive: true }),
-      this.categoryRepo.create({ nameEn: 'Dairy & Eggs', nameBn: 'দুধ ও ডিম', slug: 'dairy-eggs', isActive: true }),
-      this.categoryRepo.create({ nameEn: 'Snacks', nameBn: 'স্ন্যাকস', slug: 'snacks', isActive: true }),
-    ]);
+    this.logger.log('Seeding real catalog products...');
 
     // Brands
     const brands = await this.brandRepo.save([
-      this.brandRepo.create({ nameEn: 'Pran', nameBn: 'প্রাণ', slug: 'pran', isActive: true }),
-      this.brandRepo.create({ nameEn: 'Radhuni', nameBn: 'রাঁধুনী', slug: 'radhuni', isActive: true }),
-      this.brandRepo.create({ nameEn: 'Teer', nameBn: 'তীর', slug: 'teer', isActive: true }),
-      this.brandRepo.create({ nameEn: 'Fresh', nameBn: 'ফ্রেশ', slug: 'fresh', isActive: true }),
-      this.brandRepo.create({ nameEn: 'Aarong', nameBn: 'আড়ং', slug: 'aarong', isActive: true }),
+      this.brandRepo.create({ nameEn: 'Khaas Food', nameBn: 'খাস ফুড', slug: 'khaas-food', isActive: true }),
+      this.brandRepo.create({ nameEn: 'Ghorer Bazar', nameBn: 'ঘরের বাজার', slug: 'ghorer-bazar', isActive: true }),
       this.brandRepo.create({ nameEn: 'Local', nameBn: 'স্থানীয়', slug: 'local', isActive: true }),
     ]);
 
-    // Products
-    const findCat = (slug: string) => categories.find(c => c.slug === slug);
-    const findBrand = (slug: string) => brands.find(b => b.slug === slug);
+    const fs = await import('fs');
+    const path = await import('path');
+    const productsPath = path.resolve(process.cwd(), 'src', 'seeder', 'data', 'real_products.json');
+    const productData = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
 
-    const productData = [
-      { name: 'Miniket Rice 50kg', bnName: 'মিনিকেট চাল ৫০ কেজি', slug: 'miniket-rice-50kg', cat: 'rice-grains', brand: 'local', image: 'https://chaldn.com/_mpimage/miniket-rice-premium-50-kg?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D118167&q=best&v=1' },
-      { name: 'Radhuni Beef Masala 100g', bnName: 'রাঁধুনী গরুর মাংসের মসলা ১০০ গ্রাম', slug: 'radhuni-beef-masala-100g', cat: 'spices', brand: 'radhuni', image: 'https://chaldn.com/_mpimage/radhuni-beef-masala-100-gm?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D123164&q=low&v=1' },
-      { name: 'Fresh Soybean Oil 5L', bnName: 'ফ্রেশ সয়াবিন তেল ৫ লিটার', slug: 'fresh-soybean-oil-5l', cat: 'oils', brand: 'fresh', image: 'https://chaldn.com/_mpimage/fresh-soybean-oil-5-ltr?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D152528&q=low&v=1' },
-      { name: 'Deshi Onion 1kg', bnName: 'দেশি পেঁয়াজ ১ কেজি', slug: 'deshi-onion-1kg', cat: 'fresh-vegetables', brand: 'local', image: 'https://chaldn.com/_mpimage/onion-local-deshi-peyaj-1-kg?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D133379&q=low&v=1' },
-      { name: 'Farm Fresh Brown Eggs 12pcs', bnName: 'ফার্ম ফ্রেশ লাল ডিম ১২ পিস', slug: 'farm-fresh-brown-eggs-12pcs', cat: 'dairy-eggs', brand: 'local', image: 'https://chaldn.com/_mpimage/egg-layer-chicken-brown-12-pcs?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D133405&q=low&v=1' },
-      { name: 'Pran Chanachur Spicy 300g', bnName: 'প্রাণ চানাচুর ঝাল ৩০০ গ্রাম', slug: 'pran-chanachur-spicy-300g', cat: 'snacks', brand: 'pran', image: 'https://chaldn.com/_mpimage/pran-hot-spicy-chanachur-300-gm?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D116410&q=low&v=1' },
-      { name: 'Teer Advanced Soyabean Oil 2L', bnName: 'তীর সয়াবিন তেল ২ লিটার', slug: 'teer-soyabean-oil-2l', cat: 'oils', brand: 'teer', image: 'https://chaldn.com/_mpimage/teer-advanced-soyabean-oil-2-ltr?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D117973&q=low&v=1' },
-      { name: 'Aarong Dairy Liquid Milk 1L', bnName: 'আড়ং ডেইরি তরল দুধ ১ লিটার', slug: 'aarong-dairy-liquid-milk-1l', cat: 'dairy-eggs', brand: 'aarong', image: 'https://chaldn.com/_mpimage/aarong-dairy-uht-liquid-milk-1-ltr?src=https%3A%2F%2Feggyolk.chaldal.com%2Fapi%2FPicture%2FRaw%3FpictureId%3D134268&q=low&v=1' },
-    ];
-
+    const categoriesMap = new Map();
     const products = [];
     const productVariants = [];
+
     for (const p of productData) {
+      if (!categoriesMap.has(p.categoryEn)) {
+        const slug = p.categoryEn.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const cat = await this.categoryRepo.save(
+          this.categoryRepo.create({ nameEn: p.categoryEn, nameBn: p.categoryBn, slug, isActive: true })
+        );
+        categoriesMap.set(p.categoryEn, cat);
+      }
+
+      const category = categoriesMap.get(p.categoryEn);
+      const brand = brands[Math.floor(Math.random() * brands.length)];
+      // add a small random suffix to slug to prevent collision
+      const pSlug = p.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(Math.random()*1000);
+
       const prod = await this.productRepo.save(this.productRepo.create({
-        nameEn: p.name, nameBn: p.bnName, slug: p.slug, category: findCat(p.cat) as Category, brand: findBrand(p.brand) as Brand,
-        descriptionEn: `Premium quality ${p.name}.`, descriptionBn: `উন্নত মানের ${p.bnName}।`,
+        nameEn: p.nameEn, nameBn: p.nameBn, slug: pSlug, category, brand,
+        descriptionEn: p.descriptionEn, descriptionBn: p.descriptionBn,
         isActive: true,
       }));
       products.push(prod);
 
       const variant = await this.variantRepo.save(this.variantRepo.create({
-        product: prod, nameEn: 'Default', nameBn: 'ডিফল্ট', sku: `${p.slug}-def`,
-        images: [p.image], isActive: true,
+        product: prod, nameEn: 'Default', nameBn: 'ডিফল্ট', sku: `${pSlug}-def`,
+        images: p.images, isActive: true,
       }));
       productVariants.push(variant);
+      
+      // Store the original price on the variant for the inventory seeder
+      (variant as any)._originalPrice = p.price;
     }
 
-    return { categories, brands, products, productVariants };
+    return { categories: Array.from(categoriesMap.values()), brands, products, productVariants };
   }
 
   private async seedInventory(users: { customer: User; sellers: User[] }, variants: ProductVariant[], products: Product[]) {
@@ -273,18 +270,21 @@ export class SeederService {
     
     // Assign random products to Seller 1 and 2
     let flip = true;
+    const sellerProducts: SellerProduct[] = [];
+    
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
       const prod = products[i];
       const seller = flip ? users.sellers[0] : users.sellers[1];
       const shop = await this.shopRepo.findOne({ where: { seller: { id: seller.id } } });
 
-      const price = Math.floor(Math.random() * 500) + 50;
+      const price = (variant as any)._originalPrice || Math.floor(Math.random() * 500) + 50;
 
       const sp: SellerProduct = await this.sellerProductRepo.save(this.sellerProductRepo.create({
         productVariant: variant, shop: shop as Shop, 
         price, isActive: true, isRegulatedApproved: true
       }));
+      sellerProducts.push(sp);
 
       // Inventory
       await this.inventoryRepo.save(this.inventoryRepo.create({
@@ -300,6 +300,51 @@ export class SeederService {
       }));
 
       flip = !flip;
+    }
+    
+    return sellerProducts;
+  }
+
+  private async seedMarketing(sellerProducts: SellerProduct[]) {
+    this.logger.log('Seeding marketing (Banners and Flash Sales)...');
+    
+    // Seed Banners
+    await this.bannerRepo.save([
+      this.bannerRepo.create({
+        title: 'Organic Food Mega Sale',
+        imageUrl: 'https://ghorerbazarbd.com/wp-content/uploads/2024/02/GB-Website-Banner-v1.jpg',
+        linkUrl: '/products',
+        isActive: true,
+        displayOrder: 1
+      }),
+      this.bannerRepo.create({
+        title: 'Pure Honey Fest',
+        imageUrl: 'https://khaasfood.com/wp-content/uploads/2023/11/Website-Banner-Honey.jpg',
+        linkUrl: '/categories/honey',
+        isActive: true,
+        displayOrder: 2
+      })
+    ]);
+
+    // Seed Flash Sale
+    const flashSale = await this.flashSaleRepo.save(this.flashSaleRepo.create({
+      name: 'Weekend Dhamaka',
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Ends in 7 days
+      isActive: true,
+      bannerImage: 'https://khaasfood.com/wp-content/uploads/2023/12/Winter-Offer-Banner.jpg'
+    }));
+
+    // Add 4 random products to flash sale
+    for (let i = 0; i < Math.min(4, sellerProducts.length); i++) {
+      const sp = sellerProducts[i];
+      await this.flashSaleItemRepo.save(this.flashSaleItemRepo.create({
+        flashSale,
+        sellerProduct: sp,
+        discountPrice: Math.floor(Number(sp.price) * 0.8), // 20% discount
+        quantityAvailable: 50,
+        quantitySold: 5
+      }));
     }
   }
 }

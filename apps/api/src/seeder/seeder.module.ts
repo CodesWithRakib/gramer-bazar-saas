@@ -18,6 +18,9 @@ import { Upazila } from '../locations/entities/upazila.entity.js';
 import { Country } from '../locations/entities/country.entity.js';
 import { Union } from '../locations/entities/union.entity.js';
 import { Area } from '../locations/entities/area.entity.js';
+import { Banner } from '../banners/entities/banner.entity.js';
+import { FlashSale } from '../flash-sales/entities/flash-sale.entity.js';
+import { FlashSaleItem } from '../flash-sales/entities/flash-sale-item.entity.js';
 import { SeederController } from './seeder.controller.js';
 import { SeederService } from './seeder.service.js';
 
@@ -40,6 +43,9 @@ import { SeederService } from './seeder.service.js';
       Country,
       Union,
       Area,
+      Banner,
+      FlashSale,
+      FlashSaleItem,
     ]),
   ],
   controllers: [SeederController],
