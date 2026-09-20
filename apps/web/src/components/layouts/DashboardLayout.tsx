@@ -171,7 +171,9 @@ export function DashboardLayout({
                       {user?.firstName} {user?.lastName}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1 capitalize">
-                      {user?.roles?.[0]?.toLowerCase() || "User"}
+                      {typeof user?.roles?.[0] === 'string' 
+                        ? user.roles[0].toLowerCase() 
+                        : user?.roles?.[0]?.name?.toLowerCase() || "User"}
                     </p>
                   </div>
                   <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />

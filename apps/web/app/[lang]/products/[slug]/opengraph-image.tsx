@@ -16,7 +16,10 @@ export default async function Image({ params }: { params: { slug: string; lang: 
   const { slug, lang } = params;
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    if (typeof window === 'undefined') {
+      baseUrl = baseUrl.replace('localhost', '127.0.0.1');
+    }
     const res = await fetch(`${baseUrl}/public/catalog/${slug}`, { next: { revalidate: 60 } });
     const products = await res.json();
     

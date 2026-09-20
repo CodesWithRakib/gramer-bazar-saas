@@ -41,12 +41,12 @@ export const chatApi = api.injectEndpoints({
       query: (conversationId) => `/chat/conversations/${conversationId}/messages`,
       providesTags: (result, error, id) => [{ type: 'Message', id }],
     }),
-    markAsRead: builder.mutation<{ success: boolean }, string>({
-      query: (conversationId) => ({
-        url: `/chat/conversations/${conversationId}/read`,
-        method: 'PATCH',
+    markMessagesAsRead: builder.mutation<{ success: boolean }, string>({
+      query: (participantId) => ({
+        url: `/chat/conversations/${participantId}/read`,
+        method: 'POST',
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'Message', id }, 'Conversation'],
+      invalidatesTags: ['ChatList', 'UnreadCount'],
     }),
   }),
 });
@@ -55,5 +55,5 @@ export const {
   useGetConversationsQuery,
   useCreateConversationMutation,
   useGetMessagesQuery,
-  useMarkAsReadMutation,
+  useMarkMessagesAsReadMutation,
 } = chatApi;

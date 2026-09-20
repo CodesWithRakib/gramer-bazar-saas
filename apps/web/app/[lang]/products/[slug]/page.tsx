@@ -4,14 +4,22 @@ import { Metadata } from 'next';
 
 // We fetch data directly on the server to populate SEO tags and pass down to client
 async function getProductData(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-  const res = await fetch(`${baseUrl}/public/catalog/${slug}`, { next: { revalidate: 60 } });
-  
-  if (!res.ok) {
+  let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+  // Use 127.0.0.1 instead of localhost for Node fetch to avoid IPv6 resolution issues (ECONNREFUSED)
+  if (typeof window === 'undefined') {
+    baseUrl = baseUrl.replace('localhost', '127.0.0.1');
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/public/catalog/${slug}`, { next: { revalidate: 60 } });
+    if (!res.ok) {
+      return null;
+    }
+    return res.json();
+  } catch (err) {
+    console.error(`Failed to fetch product data for ${slug}:`, err);
     return null;
   }
-  
-  return res.json();
 }
 
 type Props = {

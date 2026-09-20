@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { use, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useGetOrderByIdQuery, useCancelOrderMutation } from '@/features/orders/ordersApi';
@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, MapPin, Receipt, Phone, User, AlertCircle, Ban, Undo2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Receipt, Phone, User, AlertCircle, Ban, Undo2, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { AddReviewModal } from '@/components/reviews/AddReviewModal';
 
 export default function OrderDetailsPage({ params }: { params: Promise<{ lang: string, orderId: string }> }) {
   const { lang, orderId } = use(params);
@@ -20,6 +21,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
 
   const { data: order, isLoading, error } = useGetOrderByIdQuery(orderId);
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
+  const [reviewProductId, setReviewProductId] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -146,16 +148,28 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
                       </div>
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
-                          <h4 className="font-semibold text-sm md:text-base line-clamp-2 mb-1">{name}</h4>
+                          <h4 className="font-semibold text-sm md:text-base line-clamp-2 mb-1">
+                            <Link href={`/${lang}/products/${variant?.product.slug}`} className="hover:underline">
+                              {name}
+                            </Link>
+                          </h4>
                           <p className="text-sm text-muted-foreground">
                             {isBn ? 'পরিমাণ:' : 'Qty:'} <span className="font-medium text-foreground">{item.quantity}</span>
                           </p>
                         </div>
                         <div className="flex justify-between items-end mt-2">
-                          <p className="text-sm text-muted-foreground line-through">
-                            {/* If there was a discount, show original price if available, simplified here */}
-                          </p>
-                          <p className="font-bold text-primary">৳{item.subtotal}</p>
+                          {order.status.toUpperCase() === 'DELIVERED' && variant && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-8"
+                              onClick={() => setReviewProductId(variant.product.id)}
+                            >
+                              <Star className="w-3 h-3 mr-1" />
+                              {isBn ? 'রিভিউ দিন' : 'Write Review'}
+                            </Button>
+                          )}
+                          <p className="font-bold text-primary ml-auto">৳{item.subtotal}</p>
                         </div>
                       </div>
                     </div>
@@ -243,6 +257,15 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
           </Card>
         </div>
       </div>
+      
+      {reviewProductId && (
+        <AddReviewModal
+          isOpen={!!reviewProductId}
+          onClose={() => setReviewProductId(null)}
+          productId={reviewProductId}
+          isBn={isBn}
+        />
+      )}
     </div>
   );
 }

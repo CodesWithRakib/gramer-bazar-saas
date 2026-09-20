@@ -1,5 +1,4 @@
 import { api } from "../../store/api";
-import { Review } from "../reviews/reviewsApi";
 
 export interface PaginationMeta {
   total: number;
@@ -86,6 +85,8 @@ export interface SellerProduct {
       descriptionBn?: string;
       slug: string;
       category: Category;
+      averageRating?: number;
+      totalReviews?: number;
     };
   };
   shop: {
@@ -230,12 +231,6 @@ export const catalogApi = api
           { type: "Catalog", id: `related-${slug}` },
         ],
       }),
-      getProductReviews: builder.query<
-        { data: Review[]; meta: PaginationMeta },
-        string
-      >({
-        query: (productId) => `/public/reviews/product/${productId}`,
-      }),
       validateCart: builder.mutation<
         { valid: boolean },
         { items: { sellerProductId: string; quantity: number }[] }
@@ -259,7 +254,6 @@ export const {
   useGetFeaturedProductsQuery,
   useGetProductDetailsQuery,
   useGetRelatedProductsQuery,
-  useGetProductReviewsQuery,
   useValidateCartMutation,
   useCreateAdminCategoryMutation,
   useUpdateAdminCategoryMutation,

@@ -3,7 +3,7 @@
 import React, { use } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User, MapPin, ShieldCheck, LogOut } from 'lucide-react';
+import { User, MapPin, ShieldCheck, LogOut, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
@@ -32,6 +32,11 @@ export default function ProfileLayout({
       title: isBn ? 'ব্যক্তিগত তথ্য' : 'Personal Info',
       href: `/${lang}/profile`,
       icon: User,
+    },
+    {
+      title: isBn ? 'আমার উইশলিস্ট' : 'My Wishlist',
+      href: `/${lang}/profile/wishlist`,
+      icon: Heart,
     },
     {
       title: isBn ? 'অ্যাড্রেস বুক' : 'Address Book',

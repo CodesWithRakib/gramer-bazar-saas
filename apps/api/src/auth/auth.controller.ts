@@ -119,12 +119,12 @@ export class AuthController {
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: './uploads/avatars',
-      filename: (req, file, cb) => {
+      filename: (req: any, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, `${req.user.id}-${uniqueSuffix}${extname(file.originalname)}`);
       }
     }),
-    fileFilter: (req, file, cb) => {
+    fileFilter: (req: any, file, cb) => {
       if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
         return cb(new BadRequestException('Only image files are allowed!'), false);
       }

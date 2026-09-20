@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { 
   useGetConversationsQuery, 
   useGetMessagesQuery, 
-  useMarkAsReadMutation,
+  useMarkMessagesAsReadMutation,
   chatApi 
 } from '@/features/chat/chatApi';
 import { useGetProfileQuery } from '@/features/auth/authApi';
@@ -35,7 +35,7 @@ export function ChatInterface() {
     { skip: !activeConversationId }
   );
 
-  const [markAsRead] = useMarkAsReadMutation();
+  const [markAsRead] = useMarkMessagesAsReadMutation();
 
   // Scroll to bottom when messages change
   useEffect(() => {

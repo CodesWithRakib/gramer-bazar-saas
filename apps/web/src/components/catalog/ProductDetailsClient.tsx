@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Store, ShieldCheck, Truck, Star, Heart } from 'lucide-react';
+import { ArrowLeft, Store, ShieldCheck, Truck, Star, Heart, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { ProductGrid } from '@/components/catalog/ProductGrid';
@@ -164,33 +164,83 @@ export function ProductDetailsClient({
 
         {/* Product Info */}
         <div className="flex flex-col">
-          <div className="mb-2 text-sm text-primary font-medium">
-            <Link href={`/${lang}/categories/${product.productVariant.product.category.slug}`} className="hover:underline">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <Link href={`/${lang}/categories/${product.productVariant.product.category.slug}`} className="text-primary font-medium hover:underline">
               {isBn ? product.productVariant.product.category.nameBn : product.productVariant.product.category.nameEn}
             </Link>
+            
+            {/* Stock Urgency Indicator */}
+            {stock > 0 && stock <= 5 && (
+              <span className="bg-red-100 text-red-600 font-bold px-2.5 py-0.5 rounded-full text-xs animate-pulse">
+                {isBn ? `মাত্র ${stock} টি বাকি!` : `Only ${stock} left!`}
+              </span>
+            )}
           </div>
           
-          <div className="flex justify-between items-start mb-4 gap-4">
-            <h1 className="text-3xl md:text-4xl font-bold">{name}</h1>
-            <Button
-              variant="outline"
-              size="icon"
-              className={`rounded-full shrink-0 ${isWishlisted ? 'text-red-500 border-red-200 bg-red-50' : 'text-muted-foreground'}`}
-              onClick={toggleWishlist}
-              disabled={isAddingWishlist || isRemovingWishlist}
-            >
-              <Heart className={`h-6 w-6 ${isWishlisted ? 'fill-current' : ''}`} />
-            </Button>
+          <div className="flex justify-between items-start mb-2 gap-4">
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight">{name}</h1>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success(isBn ? 'লিঙ্ক কপি করা হয়েছে' : 'Link copied to clipboard');
+                }}
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className={`rounded-full shrink-0 transition-colors ${isWishlisted ? 'text-red-500 border-red-200 bg-red-50' : 'text-muted-foreground hover:text-primary'}`}
+                onClick={toggleWishlist}
+                disabled={isAddingWishlist || isRemovingWishlist}
+              >
+                <Heart className={`h-6 w-6 ${isWishlisted ? 'fill-current' : ''}`} />
+              </Button>
+            </div>
+          </div>
+          
+          {/* Dynamic Average Rating and Review Count */}
+          <div className="flex items-center gap-2 mb-6 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => {
+            const reviewSection = document.getElementById('product-reviews');
+            if(reviewSection) {
+              const y = reviewSection.getBoundingClientRect().top + window.scrollY - 80;
+              window.scrollTo({top: y, behavior: 'smooth'});
+            }
+          }}>
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => {
+                const avgRating = product.productVariant.product.averageRating || 0;
+                return (
+                  <Star
+                    key={star}
+                    className={`h-5 w-5 ${star <= avgRating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground opacity-20'}`}
+                  />
+                );
+              })}
+            </div>
+            <span className="text-base font-bold text-foreground">
+              {Number(product.productVariant.product.averageRating || 0).toFixed(1)}
+            </span>
+            <span className="text-sm text-muted-foreground ml-1 underline decoration-dotted underline-offset-4">
+              ({product.productVariant.product.totalReviews || 0} {isBn ? 'রিভিউ' : 'reviews'})
+            </span>
           </div>
           
           <div className="flex items-center gap-4 mb-6 pb-6 border-b">
             {discountPrice ? (
               <div className="flex items-end gap-3">
-                <span className="text-3xl font-bold text-primary">৳{discountPrice}</span>
+                <span className="text-4xl font-black text-primary">৳{discountPrice}</span>
                 <span className="text-xl text-muted-foreground line-through mb-1">৳{price}</span>
+                <span className="bg-green-100 text-green-700 font-bold px-2 py-1 rounded text-sm mb-1 ml-2">
+                  -{Math.round(((price - discountPrice) / price) * 100)}%
+                </span>
               </div>
             ) : (
-              <span className="text-3xl font-bold text-primary">৳{price}</span>
+              <span className="text-4xl font-black text-primary">৳{price}</span>
             )}
           </div>
 

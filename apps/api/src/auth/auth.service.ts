@@ -210,7 +210,6 @@ export class AuthService {
   async deleteAccount(userId: string) {
     await this.usersService.update(userId, { status: UserStatus.INACTIVE });
     // Soft delete or request deletion flow. For MVP, just soft delete the user
-    await this.usersService.remove(userId);
     return { message: 'Account scheduled for deletion' };
   }
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { useGetMessagesQuery, useMarkAsReadMutation } from '@/features/chat/chatApi';
+import { useGetMessagesQuery, useMarkMessagesAsReadMutation } from '@/features/chat/chatApi';
 import { useChatSocket } from '@/hooks/useChatSocket';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,7 @@ export function ChatWindow({ conversationId, participantName }: ChatWindowProps)
   const { data: messages, isLoading } = useGetMessagesQuery(conversationId, {
     skip: !conversationId,
   });
-  const [markAsRead] = useMarkAsReadMutation();
+  const [markAsRead] = useMarkMessagesAsReadMutation();
   const { isConnected, sendMessage } = useChatSocket(conversationId);
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);

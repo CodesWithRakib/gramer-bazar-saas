@@ -7,8 +7,11 @@ import { addToCart } from '@/store/slices/cartSlice';
 import { toast } from 'sonner';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Heart, Star } from 'lucide-react';
 import type { SellerProduct } from '@/features/catalog/catalogApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useGetUserWishlistQuery, useAddProductToWishlistMutation, useRemoveProductFromWishlistMutation } from '@/features/wishlists/wishlistsApi';
 
 interface ProductCardProps {
   product: SellerProduct;
@@ -24,6 +27,33 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
   const discountPrice = flashSaleDiscountPrice ? Number(flashSaleDiscountPrice) : (product.discountPrice ? Number(product.discountPrice) : null);
   const slug = product.productVariant.product.slug;
   const currentPrice = discountPrice ?? price;
+  const productId = product.productVariant.product.id;
+
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { data: wishlist } = useGetUserWishlistQuery(undefined, { skip: !isAuthenticated });
+  const [addToWishlist, { isLoading: isAddingWishlist }] = useAddProductToWishlistMutation();
+  const [removeFromWishlist, { isLoading: isRemovingWishlist }] = useRemoveProductFromWishlistMutation();
+
+  const isWishlisted = wishlist?.some(item => item.productId === productId);
+
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating to product details
+    if (!isAuthenticated) {
+      toast.error(lang === 'bn' ? 'দয়া করে লগইন করুন' : 'Please login first');
+      return;
+    }
+    try {
+      if (isWishlisted) {
+        await removeFromWishlist(productId).unwrap();
+        toast.success(lang === 'bn' ? 'উইশলিস্ট থেকে সরানো হয়েছে' : 'Removed from wishlist');
+      } else {
+        await addToWishlist(productId).unwrap();
+        toast.success(lang === 'bn' ? 'উইশলিস্টে যোগ করা হয়েছে' : 'Added to wishlist');
+      }
+    } catch (error) {
+      toast.error(lang === 'bn' ? 'একটি ত্রুটি হয়েছে' : 'An error occurred');
+    }
+  };
 
   const handleAddToCart = () => {
     dispatch(addToCart({
@@ -53,11 +83,40 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
             {lang === 'bn' ? 'ছাড়' : 'Sale'}
           </div>
         )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleWishlist}
+          disabled={isAddingWishlist || isRemovingWishlist}
+          className="absolute top-2 right-2 h-8 w-8 bg-background/80 hover:bg-background/90 backdrop-blur-sm shadow-sm z-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-primary text-primary' : 'text-foreground'}`} />
+          <span className="sr-only">Wishlist</span>
+        </Button>
       </Link>
       <CardContent className="p-4 flex-grow flex flex-col">
-        <Link href={`/${lang}/products/${slug}`} className="line-clamp-2 text-sm font-semibold hover:text-primary transition-colors mb-2">
+        <Link href={`/${lang}/products/${slug}`} className="line-clamp-2 text-sm font-semibold hover:text-primary transition-colors mb-1">
           {name}
         </Link>
+        
+        {/* Dynamic Average Rating */}
+        <div className="flex items-center gap-1 mb-2">
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4, 5].map((star) => {
+              const avgRating = product.productVariant.product.averageRating || 0;
+              return (
+                <Star
+                  key={star}
+                  className={`h-3 w-3 ${star <= avgRating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground opacity-20'}`}
+                />
+              );
+            })}
+          </div>
+          <span className="text-[10px] text-muted-foreground">
+            ({product.productVariant.product.totalReviews || 0})
+          </span>
+        </div>
+
         <div className="mt-auto">
           {discountPrice ? (
             <div className="flex flex-wrap items-baseline gap-1.5">

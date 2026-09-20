@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { MapPin, ShoppingCart, User } from "lucide-react";
+import { MapPin, ShoppingCart, User, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RootState } from "@/store/store";
 import { setLoginModalOpen, logout, setUser } from "@/store/slices/authSlice";
 import { setCartOpen } from "@/store/slices/cartSlice";
 import { useGetProfileQuery } from "@/features/auth/authApi";
+import { useGetUserWishlistQuery } from "@/features/wishlists/wishlistsApi";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,6 +47,11 @@ export function UserActions({ lang }: UserActionsProps) {
     skip: !isAuthenticated || !!user,
   });
 
+  const { data: wishlist } = useGetUserWishlistQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+  const wishlistCount = wishlist?.length || 0;
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -76,6 +82,26 @@ export function UserActions({ lang }: UserActionsProps) {
             {lang === "en" ? "BN" : "EN"}
           </Link>
         </Button>
+
+        {/* Wishlist Button */}
+        {isAuthenticated && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative h-10 w-10 hidden sm:inline-flex"
+            asChild
+          >
+            <Link href={`/${lang}/profile/wishlist`}>
+              <Heart className="h-5 w-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-background">
+                  {wishlistCount}
+                </span>
+              )}
+              <span className="sr-only">{isBn ? "উইশলিস্ট" : "Wishlist"}</span>
+            </Link>
+          </Button>
+        )}
 
         {/* Cart Button */}
         <Button

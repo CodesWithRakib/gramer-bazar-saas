@@ -20,6 +20,8 @@ export interface OrderItem {
       nameBn: string;
       images: string[];
       product: {
+        id: string;
+        slug: string;
         nameEn: string;
         nameBn: string;
       };

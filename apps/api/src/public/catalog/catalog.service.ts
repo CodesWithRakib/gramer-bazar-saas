@@ -74,6 +74,29 @@ export class CatalogService {
       .take(limit)
       .getManyAndCount();
 
+    // Fetch ratings and attach to products
+    const productIds = items.map(i => i.productVariant?.product?.id).filter(Boolean);
+    if (productIds.length > 0) {
+      const ratings = await this.sellerProductRepo.manager.query(`
+        SELECT product_id, COUNT(id)::int as total_reviews, COALESCE(AVG(rating), 0)::float as average_rating
+        FROM reviews
+        WHERE product_id = ANY($1) AND is_approved = true
+        GROUP BY product_id
+      `, [productIds]);
+
+      const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
+        ratings.map((r: any) => [r.product_id, r])
+      );
+
+      items.forEach(item => {
+        if (item.productVariant?.product) {
+          const ratingData = ratingsMap.get(item.productVariant.product.id);
+          (item.productVariant.product as any).totalReviews = ratingData?.total_reviews || 0;
+          (item.productVariant.product as any).averageRating = ratingData?.average_rating || 0;
+        }
+      });
+    }
+
     return {
       data: items,
       meta: {
@@ -106,6 +129,28 @@ export class CatalogService {
       throw new NotFoundException(`Product with slug ${slug} not found`);
     }
 
+    const productIds = items.map(i => i.productVariant?.product?.id).filter(Boolean);
+    if (productIds.length > 0) {
+      const ratings = await this.sellerProductRepo.manager.query(`
+        SELECT product_id, COUNT(id)::int as total_reviews, COALESCE(AVG(rating), 0)::float as average_rating
+        FROM reviews
+        WHERE product_id = ANY($1) AND is_approved = true
+        GROUP BY product_id
+      `, [productIds]);
+
+      const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
+        ratings.map((r: any) => [r.product_id, r])
+      );
+
+      items.forEach(item => {
+        if (item.productVariant?.product) {
+          const ratingData = ratingsMap.get(item.productVariant.product.id);
+          (item.productVariant.product as any).totalReviews = ratingData?.total_reviews || 0;
+          (item.productVariant.product as any).averageRating = ratingData?.average_rating || 0;
+        }
+      });
+    }
+
     return items;
   }
 
@@ -136,6 +181,30 @@ export class CatalogService {
       .orderBy('sp.createdAt', 'DESC')
       .take(limit);
 
-    return await query.getMany();
+    const items = await query.getMany();
+
+    const productIds = items.map(i => i.productVariant?.product?.id).filter(Boolean);
+    if (productIds.length > 0) {
+      const ratings = await this.sellerProductRepo.manager.query(`
+        SELECT product_id, COUNT(id)::int as total_reviews, COALESCE(AVG(rating), 0)::float as average_rating
+        FROM reviews
+        WHERE product_id = ANY($1) AND is_approved = true
+        GROUP BY product_id
+      `, [productIds]);
+
+      const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
+        ratings.map((r: any) => [r.product_id, r])
+      );
+
+      items.forEach(item => {
+        if (item.productVariant?.product) {
+          const ratingData = ratingsMap.get(item.productVariant.product.id);
+          (item.productVariant.product as any).totalReviews = ratingData?.total_reviews || 0;
+          (item.productVariant.product as any).averageRating = ratingData?.average_rating || 0;
+        }
+      });
+    }
+
+    return items;
   }
 }
