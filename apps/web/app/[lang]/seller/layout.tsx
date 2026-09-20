@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { LayoutDashboard, Package, ShoppingCart, Store, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Store, LogOut, Ticket } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SellerLayout({
@@ -46,6 +46,7 @@ export default function SellerLayout({
     { href: `/${lang}/seller`, label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', icon: LayoutDashboard },
     { href: `/${lang}/seller/products`, label: isBn ? 'পণ্য' : 'Products', icon: Package },
     { href: `/${lang}/seller/orders`, label: isBn ? 'অর্ডার' : 'Orders', icon: ShoppingCart },
+    { href: `/${lang}/seller/coupons`, label: isBn ? 'কুপন' : 'Coupons', icon: Ticket },
     { href: `/${lang}/seller/profile`, label: isBn ? 'প্রোফাইল' : 'Shop Profile', icon: Store },
   ];
 

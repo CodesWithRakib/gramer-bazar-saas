@@ -37,6 +37,7 @@ import { BannersModule } from './banners/banners.module.js';
 import { WalletsModule } from './wallets/wallets.module.js';
 import { PayoutsModule } from './payouts/payouts.module.js';
 import { DisputesModule } from './disputes/disputes.module.js';
+import { FlashSalesModule } from './flash-sales/flash-sales.module.js';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { DisputesModule } from './disputes/disputes.module.js';
     WalletsModule,
     PayoutsModule,
     DisputesModule,
+    FlashSalesModule,
   ],
   controllers: [AppController],
   providers: [

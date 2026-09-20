@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, Users, Store, Bike, MessageSquare, 
   Layers, Tag, ShoppingBag, ShoppingCart, Truck, 
-  HeartHandshake, Star, Settings, Shield
+  HeartHandshake, Star, Settings, Shield,
+  Ticket, Flame
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -60,6 +61,10 @@ const AdminNavLinks = ({ onClick }: { onClick?: () => void }) => {
       <NavItem href="/en/admin/product-requests" icon={HeartHandshake} pathname={pathname} onClick={onClick}>Requests</NavItem>
       <NavItem href="/en/admin/reviews" icon={Star} pathname={pathname} onClick={onClick}>Reviews</NavItem>
       
+      <div className="pt-4 pb-1.5 px-3 text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">Offers & Marketing</div>
+      <NavItem href="/en/admin/coupons" icon={Ticket} pathname={pathname} onClick={onClick}>Coupons</NavItem>
+      <NavItem href="/en/admin/flash-sales" icon={Flame} pathname={pathname} onClick={onClick}>Flash Sales</NavItem>
+
       <div className="pt-4 pb-1.5 px-3 text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">System</div>
       <NavItem href="/en/admin/settings" icon={Settings} pathname={pathname} onClick={onClick}>Settings</NavItem>
       <NavItem href="/en/admin/audit-logs" icon={Shield} pathname={pathname} onClick={onClick}>Audit Logs</NavItem>

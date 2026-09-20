@@ -11,6 +11,10 @@ import { Store, CheckCircle, MapPin, Phone, MessageSquare, ArrowLeft } from 'luc
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useGetShopCouponsQuery } from '@/features/coupons/couponsApi';
+import { Scissors } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+
 export default function ShopProfilePage({ 
   params 
 }: { 
@@ -18,6 +22,7 @@ export default function ShopProfilePage({
 }) {
   const { lang, id } = use(params);
   const isBn = lang === 'bn';
+  const { toast } = useToast();
   
   const { data: shop, isLoading: isShopLoading } = useGetShopByIdQuery(id);
   
@@ -26,6 +31,8 @@ export default function ShopProfilePage({
     sellerId: shop?.sellerId,
     limit: 20
   }, { skip: !shop?.sellerId });
+
+  const { data: coupons } = useGetShopCouponsQuery(id);
 
   if (isShopLoading) {
     return (
@@ -63,6 +70,14 @@ export default function ShopProfilePage({
       </div>
     );
   }
+
+  const copyCouponCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({
+      title: isBn ? 'কপি হয়েছে' : 'Copied',
+      description: isBn ? `কুপন কোড ${code} কপি করা হয়েছে` : `Coupon code ${code} copied to clipboard`,
+    });
+  };
 
   return (
     <div className="pb-12">
@@ -131,6 +146,40 @@ export default function ShopProfilePage({
             </Button>
           </div>
         </div>
+
+        {/* Coupons Section */}
+        {coupons && coupons.length > 0 && (
+          <div className="py-6 border-b border-dashed">
+            <h2 className="text-xl font-semibold mb-4">
+              {isBn ? 'এই দোকানের অফার সমূহ' : 'Offers from this shop'}
+            </h2>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {coupons.map((coupon) => (
+                <div key={coupon.id} className="min-w-[280px] bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between shrink-0">
+                  <div>
+                    <p className="font-bold text-lg text-primary">
+                      {coupon.discountType === 'PERCENTAGE' 
+                        ? `${coupon.discountValue}% ${isBn ? 'ছাড়' : 'OFF'}` 
+                        : `৳${coupon.discountValue} ${isBn ? 'ছাড়' : 'OFF'}`}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {isBn ? 'সর্বনিম্ন অর্ডার:' : 'Min. Order:'} ৳{coupon.minOrderAmount}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="bg-background border border-dashed border-primary/50 text-primary font-mono font-bold px-3 py-1.5 rounded-lg text-sm">
+                      {coupon.code}
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-8 text-xs hover:bg-primary/10" onClick={() => copyCouponCode(coupon.code)}>
+                      <Scissors className="h-3 w-3 mr-1" />
+                      {isBn ? 'কপি করুন' : 'Copy'}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Shop Products Section */}
         <div className="py-8">

@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { setCartOpen, updateQuantity, removeFromCart } from '@/store/slices/cartSlice';
+import { setCartOpen, updateQuantity, removeFromCart, applyCoupon, removeCoupon } from '@/store/slices/cartSlice';
+import { useValidateCouponMutation } from '@/features/coupons/couponsApi';
 import {
   Sheet,
   SheetContent,
@@ -13,15 +14,44 @@ import {
   SheetFooter,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Trash2, ShoppingBag, Plus, Minus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Trash2, ShoppingBag, Plus, Minus, Tag, X } from 'lucide-react';
 import { CustomImage } from '@/components/ui/CustomImage';
+import { useToast } from '@/components/ui/use-toast';
 
 export function CartDrawer({ lang }: { lang: string }) {
   const isBn = lang === 'bn';
   const dispatch = useDispatch();
-  const { items, isOpen } = useSelector((state: RootState) => state.cart);
+  const { items, isOpen, appliedCoupon } = useSelector((state: RootState) => state.cart);
+  const [couponCode, setCouponCode] = useState('');
+  const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation();
+  const { toast } = useToast();
 
   const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const total = appliedCoupon ? subtotal - appliedCoupon.discountAmount : subtotal;
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    try {
+      const result = await validateCoupon({ code: couponCode, subtotal }).unwrap();
+      dispatch(applyCoupon({
+        code: result.code,
+        discountAmount: result.discountAmount,
+        couponId: result.couponId,
+      }));
+      setCouponCode('');
+      toast({
+        title: isBn ? 'কুপন প্রয়োগ করা হয়েছে' : 'Coupon applied',
+        description: isBn ? `আপনি ৳${result.discountAmount} ছাড় পেয়েছেন` : `You got a discount of ৳${result.discountAmount}`,
+      });
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: isBn ? 'কুপন প্রয়োগে ত্রুটি' : 'Coupon Error',
+        description: error.data?.message || (isBn ? 'অবৈধ কুপন' : 'Invalid coupon'),
+      });
+    }
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => dispatch(setCartOpen(open))}>
@@ -118,10 +148,57 @@ export function CartDrawer({ lang }: { lang: string }) {
             </div>
 
             <SheetFooter className="border-t pt-4 flex-col gap-4 sm:flex-col mt-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center justify-between w-full font-semibold text-lg">
-                <span>{isBn ? 'সর্বমোট (আনুমানিক):' : 'Subtotal (Est):'}</span>
-                <span className="text-primary text-xl">৳{subtotal.toFixed(2)}</span>
+              {/* Promo Code Section */}
+              <div className="w-full space-y-2">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between p-2 px-3 bg-primary/10 rounded-lg border border-primary/20">
+                    <div className="flex items-center gap-2 text-primary">
+                      <Tag className="h-4 w-4" />
+                      <span className="font-semibold text-sm">{appliedCoupon.code}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-primary font-medium text-sm">
+                      -৳{appliedCoupon.discountAmount.toFixed(2)}
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-primary/20 text-primary" onClick={() => dispatch(removeCoupon())}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder={isBn ? "প্রোমো কোড" : "Promo Code"} 
+                      className="flex-1"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                    />
+                    <Button 
+                      variant="secondary" 
+                      onClick={handleApplyCoupon}
+                      disabled={!couponCode.trim() || isValidating}
+                    >
+                      {isBn ? 'প্রয়োগ করুন' : 'Apply'}
+                    </Button>
+                  </div>
+                )}
               </div>
+
+              <div className="flex flex-col gap-1 w-full mt-2">
+                <div className="flex items-center justify-between w-full text-sm text-muted-foreground">
+                  <span>{isBn ? 'সাবটোটাল:' : 'Subtotal:'}</span>
+                  <span>৳{subtotal.toFixed(2)}</span>
+                </div>
+                {appliedCoupon && (
+                  <div className="flex items-center justify-between w-full text-sm text-primary font-medium">
+                    <span>{isBn ? 'ডিসকাউন্ট:' : 'Discount:'}</span>
+                    <span>-৳{appliedCoupon.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between w-full font-bold text-lg border-t pt-2 mt-1">
+                  <span>{isBn ? 'মোট:' : 'Total:'}</span>
+                  <span className="text-primary text-xl">৳{total.toFixed(2)}</span>
+                </div>
+              </div>
+
               <p className="text-xs text-muted-foreground text-center bg-muted/30 p-2 rounded-lg">
                 {isBn ? 'ডেলিভারি চার্জ চেকআউটে হিসাব করা হবে' : 'Delivery fee calculated at checkout'}
               </p>

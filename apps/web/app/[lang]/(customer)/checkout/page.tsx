@@ -21,11 +21,12 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   const dispatch = useDispatch();
 
   const { items } = useSelector((state: RootState) => state.cart);
+  const { appliedCoupon } = useSelector((state: RootState) => state.cart);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   
   const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
   const deliveryFee = 60; // Hardcoded for now, could be dynamic
-  const total = subtotal + deliveryFee;
+  const total = appliedCoupon ? subtotal - appliedCoupon.discountAmount + deliveryFee : subtotal + deliveryFee;
 
   const { data: addresses, isLoading: isAddressesLoading } = useGetAddressesQuery(undefined, { skip: !isAuthenticated });
   const [checkoutOrder, { isLoading: isCheckingOut }] = useCheckoutOrderMutation();
@@ -34,8 +35,6 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   const [paymentMethod, setPaymentMethod] = useState<string>('COD');
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-
-
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -56,8 +55,6 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
 
   if (!isAuthenticated || items.length === 0) return null;
 
-
-
   const handleCheckout = async () => {
     if (!selectedAddressId) {
       setErrorMsg(isBn ? 'দয়া করে একটি ডেলিভারি ঠিকানা নির্বাচন করুন' : 'Please select a delivery address');
@@ -73,6 +70,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
           sellerProductId: item.sellerProductId,
           quantity: item.quantity,
         })),
+        couponCode: appliedCoupon?.code, // Send code instead of ID, backend can process it
       };
 
       const res = await checkoutOrder(orderData).unwrap();
@@ -243,9 +241,15 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-muted-foreground">
-                  <span>{isBn ? 'সর্বমোট' : 'Subtotal'}</span>
+                  <span>{isBn ? 'সাবটোটাল' : 'Subtotal'}</span>
                   <span>৳{subtotal.toFixed(2)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-primary font-medium">
+                    <span>{isBn ? 'ডিসকাউন্ট' : 'Discount'} ({appliedCoupon.code})</span>
+                    <span>-৳{appliedCoupon.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-muted-foreground">
                   <span>{isBn ? 'ডেলিভারি চার্জ' : 'Delivery Fee'}</span>
                   <span>৳{deliveryFee.toFixed(2)}</span>

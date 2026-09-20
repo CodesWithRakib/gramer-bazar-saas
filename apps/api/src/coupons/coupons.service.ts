@@ -35,18 +35,21 @@ export class CouponsService {
     return this.couponRepository.save(coupon);
   }
 
-  async findAll(page?: number, limit?: number, search?: string) {
-    if (!page || !limit) {
-      return this.couponRepository.find({ order: { createdAt: 'DESC' } });
-    }
-
-    const query = this.couponRepository.createQueryBuilder('coupon').orderBy('coupon.createdAt', 'DESC');
+  async findAll(page: number = 1, limit: number = 10, search?: string, shopId?: string) {
+    const query = this.couponRepository.createQueryBuilder('coupon');
 
     if (search) {
-      query.andWhere('coupon.code ILIKE :search', { search: `%${search}%` });
+      query.where('coupon.code ILIKE :search', { search: `%${search}%` });
+    }
+
+    if (shopId) {
+      query.andWhere('coupon.shopId = :shopId', { shopId });
+    } else {
+      query.andWhere('coupon.shopId IS NULL'); // Admin global coupons
     }
 
     const [data, total] = await query
+      .orderBy('coupon.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -86,6 +89,22 @@ export class CouponsService {
     const coupon = await this.findOne(id);
     await this.couponRepository.remove(coupon);
     return { success: true };
+  }
+
+  async updateSellerCoupon(id: string, shopId: string, updateDto: UpdateCouponDto) {
+    const coupon = await this.findOne(id);
+    if (coupon.shopId !== shopId) {
+      throw new BadRequestException('You do not have permission to modify this coupon');
+    }
+    return this.update(id, updateDto);
+  }
+
+  async removeSellerCoupon(id: string, shopId: string) {
+    const coupon = await this.findOne(id);
+    if (coupon.shopId !== shopId) {
+      throw new BadRequestException('You do not have permission to delete this coupon');
+    }
+    return this.remove(id);
   }
 
   // Pure validation for the customer frontend to calculate before checkout
@@ -147,5 +166,16 @@ export class CouponsService {
       discountAmount: discount,
       subtotalAfterDiscount: subtotal - discount,
     };
+  }
+
+  async findActiveCouponsByShop(shopId: string) {
+    const now = new Date();
+    return this.couponRepository.createQueryBuilder('coupon')
+      .where('coupon.shopId = :shopId', { shopId })
+      .andWhere('coupon.isActive = :isActive', { isActive: true })
+      .andWhere('(coupon.startDate IS NULL OR coupon.startDate <= :now)', { now })
+      .andWhere('(coupon.endDate IS NULL OR coupon.endDate >= :now)', { now })
+      .orderBy('coupon.createdAt', 'DESC')
+      .getMany();
   }
 }

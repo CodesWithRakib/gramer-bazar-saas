@@ -46,6 +46,16 @@ export class CreateCouponDto {
   @IsDateString()
   endDate?: Date;
 
+  @ApiProperty({ description: 'Number of times the coupon has been used', default: 0 })
+  @IsNumber()
+  @IsOptional()
+  usedCount?: number;
+
+  @ApiProperty({ description: 'Optional Shop ID for seller-specific coupons', required: false })
+  @IsString()
+  @IsOptional()
+  shopId?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()

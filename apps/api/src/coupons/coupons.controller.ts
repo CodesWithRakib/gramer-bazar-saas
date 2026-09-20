@@ -73,6 +73,49 @@ export class CouponsController {
     return this.couponsService.remove(id);
   }
 
+  @Post('seller/coupons')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SELLER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Seller: Create a shop coupon' })
+  createSellerCoupon(@Request() req: any, @Body() createDto: CreateCouponDto) {
+    // Assuming shopId is fetched from the seller's profile
+    return this.couponsService.create({ ...createDto, shopId: req.user.shopId });
+  }
+
+  @Get('seller/coupons')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SELLER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Seller: Get all shop coupons' })
+  findAllSellerCoupons(
+    @Request() req: any,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('search') search?: string,
+  ) {
+    return this.couponsService.findAll(page, limit, search, req.user.shopId);
+  }
+
+  @Patch('seller/coupons/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SELLER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Seller: Update a shop coupon' })
+  updateSellerCoupon(@Request() req: any, @Param('id') id: string, @Body() updateDto: UpdateCouponDto) {
+    // Ideally add logic in service to check if the coupon belongs to this seller's shop
+    return this.couponsService.updateSellerCoupon(id, req.user.shopId, updateDto);
+  }
+
+  @Delete('seller/coupons/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SELLER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Seller: Delete a shop coupon' })
+  removeSellerCoupon(@Request() req: any, @Param('id') id: string) {
+    return this.couponsService.removeSellerCoupon(id, req.user.shopId);
+  }
+
   @Post('coupons/validate')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -83,5 +126,11 @@ export class CouponsController {
     @Body('subtotal') subtotal: number,
   ) {
     return this.couponsService.validateCoupon(code, req.user.id, subtotal);
+  }
+
+  @Get('coupons/shop/:shopId')
+  @ApiOperation({ summary: 'Public: Get all active coupons for a shop' })
+  findShopCoupons(@Param('shopId') shopId: string) {
+    return this.couponsService.findActiveCouponsByShop(shopId);
   }
 }

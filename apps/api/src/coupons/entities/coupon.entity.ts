@@ -45,6 +45,9 @@ export class Coupon {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ nullable: true })
+  shopId: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
