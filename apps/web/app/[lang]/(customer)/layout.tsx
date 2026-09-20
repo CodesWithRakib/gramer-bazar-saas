@@ -4,5 +4,5 @@ import { customerRoutes } from '@/config/dashboard-routes';
 
 export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
-  return <DashboardLayout routes={customerRoutes} lang={lang}>{children}</DashboardLayout>;
+  return <DashboardLayout routeType="customer" lang={lang}>{children}</DashboardLayout>;
 }

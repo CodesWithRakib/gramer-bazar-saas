@@ -21,7 +21,7 @@ import { CustomImage } from "@/components/ui/CustomImage";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  routes: DashboardRoute[];
+  routeType: "admin" | "seller" | "rider" | "customer";
   lang: string;
 }
 
@@ -59,9 +59,16 @@ const NavItem = ({
 
 export function DashboardLayout({
   children,
-  routes,
+  routeType,
   lang,
 }: DashboardLayoutProps) {
+  const routesMap = {
+    admin: require("@/config/dashboard-routes").adminRoutes,
+    seller: require("@/config/dashboard-routes").sellerRoutes,
+    rider: require("@/config/dashboard-routes").riderRoutes,
+    customer: require("@/config/dashboard-routes").customerRoutes,
+  };
+  const routes: DashboardRoute[] = routesMap[routeType];
   const isBn = lang === "bn";
   const pathname = usePathname();
   const router = useRouter();

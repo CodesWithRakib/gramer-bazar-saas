@@ -37,5 +37,5 @@ export default function SellerLayout({
     return null;
   }
 
-  return <DashboardLayout routes={sellerRoutes} lang={lang}>{children}</DashboardLayout>;
+  return <DashboardLayout routeType="seller" lang={lang}>{children}</DashboardLayout>;
 }

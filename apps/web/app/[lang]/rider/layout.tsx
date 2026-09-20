@@ -37,5 +37,5 @@ export default function RiderLayout({
     return null;
   }
 
-  return <DashboardLayout routes={riderRoutes} lang={lang}>{children}</DashboardLayout>;
+  return <DashboardLayout routeType="rider" lang={lang}>{children}</DashboardLayout>;
 }

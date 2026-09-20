@@ -93,6 +93,29 @@ export function UserActions({ lang }: UserActionsProps) {
           <span className="sr-only">{isBn ? "কার্ট" : "Cart"}</span>
         </Button>
 
+        {/* Quick Access Dashboard Route */}
+        {mounted && isAuthenticated && user?.roles?.includes("ADMIN") && (
+          <Button variant="secondary" className="hidden sm:inline-flex h-10 px-4 rounded-full font-medium" asChild>
+            <Link href={`/${lang}/admin`}>
+              {isBn ? "অ্যাডমিন প্যানেল" : "Admin Panel"}
+            </Link>
+          </Button>
+        )}
+        {mounted && isAuthenticated && user?.roles?.includes("SELLER") && !user?.roles?.includes("ADMIN") && (
+          <Button variant="secondary" className="hidden sm:inline-flex h-10 px-4 rounded-full font-medium" asChild>
+            <Link href={`/${lang}/seller`}>
+              {isBn ? "সেলার পোর্টাল" : "Seller Portal"}
+            </Link>
+          </Button>
+        )}
+        {mounted && isAuthenticated && user?.roles?.includes("RIDER") && !user?.roles?.includes("ADMIN") && !user?.roles?.includes("SELLER") && (
+          <Button variant="secondary" className="hidden sm:inline-flex h-10 px-4 rounded-full font-medium" asChild>
+            <Link href={`/${lang}/rider`}>
+              {isBn ? "রাইডার অ্যাপ" : "Rider App"}
+            </Link>
+          </Button>
+        )}
+
         {/* Auth / Profile */}
         {!mounted ? (
           <div className="w-9 sm:w-20 h-10 bg-muted animate-pulse rounded-full sm:rounded-md ml-1" />
