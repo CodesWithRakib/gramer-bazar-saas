@@ -83,28 +83,15 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
                 {sale.items.map((item) => {
                   if (!item.sellerProduct) return null;
-                  const originalPrice = item.sellerProduct.price;
+                  const originalPrice = Number(item.sellerProduct.price);
                   const discountPercentage = Math.round(((originalPrice - item.discountPrice) / originalPrice) * 100);
-                  
-                  // Mocking standard ProductCard props from FlashSaleItem structure
-                  const productMock = {
-                    id: item.sellerProduct.product.id,
-                    nameEn: item.sellerProduct.product.nameEn,
-                    nameBn: item.sellerProduct.product.nameBn,
-                    categoryId: item.sellerProduct.product.categoryId,
-                    images: item.sellerProduct.product.images,
-                    sellerProductId: item.sellerProductId,
-                    price: item.discountPrice, // Use discounted price
-                    oldPrice: originalPrice, // Show original price as strike-through
-                    inventory: item.quantityAvailable,
-                  };
 
                   return (
                     <div key={item.id} className="relative">
                       <Badge className="absolute top-2 left-2 z-10 bg-red-600 hover:bg-red-700 text-white shadow-md">
                         -{discountPercentage}%
                       </Badge>
-                      <ProductCard product={productMock as any} lang={lang} />
+                      <ProductCard product={item.sellerProduct} lang={lang} flashSaleDiscountPrice={item.discountPrice} />
                       <div className="mt-2 text-xs text-muted-foreground px-1">
                         <div className="w-full bg-muted rounded-full h-1.5 mt-1 overflow-hidden">
                           <div 
