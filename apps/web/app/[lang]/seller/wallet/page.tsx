@@ -1,142 +1,133 @@
 'use client';
 
-import React from 'react';
 import { useGetMyWalletQuery, useGetMyTransactionsQuery } from '@/features/wallets/walletsApi';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
-import { Wallet, ArrowUpRight, ArrowDownLeft, Clock } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
-export default function SellerWalletDashboard() {
-  const { data: wallet, isLoading: isLoadingWallet } = useGetMyWalletQuery();
-  const { data: transactions, isLoading: isLoadingTx } = useGetMyTransactionsQuery();
+export default function SellerWalletPage({ params }: { params: { lang: string } }) {
+  const { data: wallet, isLoading: isWalletLoading } = useGetMyWalletQuery();
+  const { data: transactions, isLoading: isTxLoading } = useGetMyTransactionsQuery();
+  const isBn = params.lang === 'bn';
+
+  if (isWalletLoading) {
+    return <div className="p-8 text-center">{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</div>;
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">My Wallet</h1>
-        <Link href="./wallet/payout">
-          <Button size="lg" className="font-semibold shadow-md">
-            Request Payout
-          </Button>
-        </Link>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{isBn ? 'আমার ওয়ালেট' : 'My Wallet'}</h1>
+          <p className="text-muted-foreground">
+            {isBn ? 'আপনার আয় এবং লেনদেন পরিচালনা করুন' : 'Manage your earnings and transactions'}
+          </p>
+        </div>
+        <Button asChild className="gap-2">
+          <Link href={`/${params.lang}/seller/wallet/payout`}>
+            <Wallet className="h-4 w-4" />
+            {isBn ? 'পেআউট অনুরোধ করুন' : 'Request Payout'}
+          </Link>
+        </Button>
       </div>
 
-      {isLoadingWallet ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="h-24 bg-muted/50 rounded-t-lg" />
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-primary/5 border-primary/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
-              <Wallet className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">৳{Number(wallet?.balance || 0).toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Ready to withdraw</p>
-            </CardContent>
-          </Card>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="bg-primary/5 border-primary/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {isBn ? 'বর্তমান ব্যালেন্স' : 'Available Balance'}
+            </CardTitle>
+            <Wallet className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">৳ {wallet?.balance || 0}</div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Clearance</CardTitle>
-              <Clock className="h-4 w-4 text-amber-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">৳{Number(wallet?.pendingClearance || 0).toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Requested, awaiting review</p>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {isBn ? 'পেন্ডিং ক্লিয়ারেন্স' : 'Pending Clearance'}
+            </CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-500">৳ {wallet?.pendingClearance || 0}</div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Earned</CardTitle>
-              <ArrowDownLeft className="h-4 w-4 text-emerald-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">৳{Number(wallet?.totalEarned || 0).toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">All-time earnings</p>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {isBn ? 'মোট আয়' : 'Total Earned'}
+            </CardTitle>
+            <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald-600">৳ {wallet?.totalEarned || 0}</div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Withdrawn</CardTitle>
-              <ArrowUpRight className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">৳{Number(wallet?.totalWithdrawn || 0).toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Successfully paid out</p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {isBn ? 'মোট উত্তোলন' : 'Total Withdrawn'}
+            </CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">৳ {wallet?.totalWithdrawn || 0}</div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Ledger History</CardTitle>
-          <CardDescription>Recent transactions affecting your wallet balance.</CardDescription>
+          <CardTitle>{isBn ? 'সাম্প্রতিক লেনদেন' : 'Recent Transactions'}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Reference</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoadingTx ? (
+          {isTxLoading ? (
+            <div className="py-8 text-center text-muted-foreground">
+              {isBn ? 'লোড হচ্ছে...' : 'Loading...'}
+            </div>
+          ) : transactions && transactions.length > 0 ? (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                    Loading ledger...
-                  </TableCell>
+                  <TableHead>{isBn ? 'তারিখ' : 'Date'}</TableHead>
+                  <TableHead>{isBn ? 'বিবরণ' : 'Description'}</TableHead>
+                  <TableHead>{isBn ? 'ধরন' : 'Type'}</TableHead>
+                  <TableHead className="text-right">{isBn ? 'পরিমাণ' : 'Amount'}</TableHead>
                 </TableRow>
-              ) : !transactions || transactions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                    No transactions yet. Complete some orders to see your earnings!
-                  </TableCell>
-                </TableRow>
-              ) : (
-                transactions.map((tx) => (
+              </TableHeader>
+              <TableBody>
+                {transactions.map((tx) => (
                   <TableRow key={tx.id}>
                     <TableCell className="whitespace-nowrap">
-                      {format(new Date(tx.createdAt), 'PP p')}
+                      {format(new Date(tx.createdAt), 'MMM dd, yyyy HH:mm')}
                     </TableCell>
+                    <TableCell>{tx.description}</TableCell>
                     <TableCell>
-                      <span className="font-medium">{tx.description}</span>
+                      <Badge variant={tx.type === 'CREDIT' ? 'default' : 'secondary'} className={tx.type === 'CREDIT' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-rose-500 hover:bg-rose-600 text-white'}>
+                        {tx.type}
+                      </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {tx.referenceId || '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {tx.type === 'CREDIT' ? (
-                        <span className="text-emerald-600 font-semibold flex items-center justify-end gap-1">
-                          + ৳{Number(tx.amount).toLocaleString()}
-                        </span>
-                      ) : (
-                        <span className="text-red-600 font-semibold flex items-center justify-end gap-1">
-                          - ৳{Number(tx.amount).toLocaleString()}
-                        </span>
-                      )}
+                    <TableCell className={`text-right font-medium ${tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {tx.type === 'CREDIT' ? '+' : '-'} ৳ {tx.amount}
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="py-8 text-center text-muted-foreground">
+              {isBn ? 'কোন লেনদেন পাওয়া যায়নি' : 'No transactions found'}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

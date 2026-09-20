@@ -1,15 +1,13 @@
-'use client';
-
-import React from 'react';
-import { ChatInbox } from '@/components/chat/ChatInbox';
+import { ChatInterface } from '@/components/chat/ChatInterface';
 
 export default function AdminMessagesPage() {
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Platform Messages</h1>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Messages</h1>
+        <p className="text-muted-foreground">Manage and resolve conversations with users across the platform.</p>
       </div>
-      <ChatInbox />
+      <ChatInterface />
     </div>
   );
 }

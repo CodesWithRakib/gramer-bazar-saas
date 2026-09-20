@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { FlashSaleItem } from './flash-sale-item.entity.js';
+import type { FlashSaleItem } from './flash-sale-item.entity.js';
 
 @Entity('flash_sales')
 export class FlashSale {
@@ -21,7 +21,7 @@ export class FlashSale {
   @Column({ nullable: true })
   bannerImage: string;
 
-  @OneToMany(() => FlashSaleItem, (item) => item.flashSale, { cascade: true })
+  @OneToMany('FlashSaleItem', (item: FlashSaleItem) => item.flashSale, { cascade: true })
   items: FlashSaleItem[];
 
   @CreateDateColumn({ name: 'created_at' })

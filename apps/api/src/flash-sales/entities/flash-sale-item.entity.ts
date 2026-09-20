@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { FlashSale } from './flash-sale.entity.js';
+import type { FlashSale } from './flash-sale.entity.js';
 import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
 
 @Entity('flash_sale_items')
@@ -10,7 +10,7 @@ export class FlashSaleItem {
   @Column()
   flashSaleId: string;
 
-  @ManyToOne(() => FlashSale, (flashSale) => flashSale.items, { onDelete: 'CASCADE' })
+  @ManyToOne('FlashSale', (flashSale: FlashSale) => flashSale.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'flashSaleId' })
   flashSale: FlashSale;
 

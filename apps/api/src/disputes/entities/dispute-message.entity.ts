@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Dispute } from './dispute.entity.js';
+import type { Dispute } from './dispute.entity.js';
 import { User } from '../../users/entities/user.entity.js';
 
 @Entity('dispute_messages')
@@ -17,7 +17,7 @@ export class DisputeMessage {
   @Column({ type: 'uuid' })
   disputeId: string;
 
-  @ManyToOne(() => Dispute, (dispute) => dispute.messages, { onDelete: 'CASCADE' })
+  @ManyToOne('Dispute', (dispute: Dispute) => dispute.messages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'disputeId' })
   dispute: Dispute;
 

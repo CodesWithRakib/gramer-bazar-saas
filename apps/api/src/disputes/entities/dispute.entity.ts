@@ -12,7 +12,7 @@ import { Order } from '../../orders/entities/order.entity.js';
 import { User } from '../../users/entities/user.entity.js';
 import { DisputeReason } from '../enums/dispute-reason.enum.js';
 import { DisputeStatus } from '../enums/dispute-status.enum.js';
-import { DisputeMessage } from './dispute-message.entity.js';
+import type { DisputeMessage } from './dispute-message.entity.js';
 
 @Entity('disputes')
 export class Dispute {
@@ -55,7 +55,7 @@ export class Dispute {
   @Column({ type: 'text', nullable: true })
   adminDecision: string | null;
 
-  @OneToMany(() => DisputeMessage, (message) => message.dispute)
+  @OneToMany('DisputeMessage', (message: DisputeMessage) => message.dispute)
   messages: DisputeMessage[];
 
   @CreateDateColumn()
