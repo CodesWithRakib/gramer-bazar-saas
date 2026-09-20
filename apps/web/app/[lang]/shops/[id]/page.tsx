@@ -13,7 +13,7 @@ import Link from 'next/link';
 
 import { useGetShopCouponsQuery } from '@/features/coupons/couponsApi';
 import { Scissors } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 export default function ShopProfilePage({ 
   params 
@@ -22,7 +22,6 @@ export default function ShopProfilePage({
 }) {
   const { lang, id } = use(params);
   const isBn = lang === 'bn';
-  const { toast } = useToast();
   
   const { data: shop, isLoading: isShopLoading } = useGetShopByIdQuery(id);
   
@@ -73,10 +72,7 @@ export default function ShopProfilePage({
 
   const copyCouponCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast({
-      title: isBn ? 'কপি হয়েছে' : 'Copied',
-      description: isBn ? `কুপন কোড ${code} কপি করা হয়েছে` : `Coupon code ${code} copied to clipboard`,
-    });
+    toast.success(isBn ? `কুপন কোড ${code} কপি করা হয়েছে` : `Coupon code ${code} copied to clipboard`);
   };
 
   return (

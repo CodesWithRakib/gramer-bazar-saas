@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { FlashSale } from './flash-sale.entity.js';
-import { SellerProduct } from '../../products/entities/seller-product.entity.js';
+import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
 
 @Entity('flash_sale_items')
 export class FlashSaleItem {

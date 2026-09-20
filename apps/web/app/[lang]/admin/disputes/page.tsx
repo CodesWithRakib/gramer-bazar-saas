@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useGetAdminDisputesQuery } from '../../../../features/disputes/disputesApi';
+import { useGetAdminDisputesQuery } from '@/features/disputes/disputesApi';
 import Link from 'next/link';
 
 export default function AdminDisputesPage() {

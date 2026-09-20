@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, ShoppingBag, Plus, Minus, Tag, X } from 'lucide-react';
 import { CustomImage } from '@/components/ui/CustomImage';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 export function CartDrawer({ lang }: { lang: string }) {
   const isBn = lang === 'bn';
@@ -25,7 +25,7 @@ export function CartDrawer({ lang }: { lang: string }) {
   const { items, isOpen, appliedCoupon } = useSelector((state: RootState) => state.cart);
   const [couponCode, setCouponCode] = useState('');
   const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation();
-  const { toast } = useToast();
+
 
   const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
   const total = appliedCoupon ? subtotal - appliedCoupon.discountAmount : subtotal;
@@ -40,14 +40,11 @@ export function CartDrawer({ lang }: { lang: string }) {
         couponId: result.couponId,
       }));
       setCouponCode('');
-      toast({
-        title: isBn ? 'কুপন প্রয়োগ করা হয়েছে' : 'Coupon applied',
+      toast.success(isBn ? 'কুপন প্রয়োগ করা হয়েছে' : 'Coupon applied', {
         description: isBn ? `আপনি ৳${result.discountAmount} ছাড় পেয়েছেন` : `You got a discount of ৳${result.discountAmount}`,
       });
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: isBn ? 'কুপন প্রয়োগে ত্রুটি' : 'Coupon Error',
+      toast.error(isBn ? 'কুপন প্রয়োগে ত্রুটি' : 'Coupon Error', {
         description: error.data?.message || (isBn ? 'অবৈধ কুপন' : 'Invalid coupon'),
       });
     }

@@ -9,12 +9,12 @@ export class ChatController {
 
   @Get('conversations')
   async getConversations(@Request() req: any) {
-    return this.chatService.getUserConversations(req.user.userId);
+    return this.chatService.getUserConversations(req.user.id);
   }
 
   @Post('conversations')
   async createConversation(@Request() req: any, @Body('participantId') participantId: string) {
-    return this.chatService.getOrCreateConversation([req.user.userId, participantId]);
+    return this.chatService.getOrCreateConversation([req.user.id, participantId]);
   }
 
   @Get('conversations/:id/messages')
@@ -24,7 +24,7 @@ export class ChatController {
 
   @Patch('conversations/:id/read')
   async markAsRead(@Request() req: any, @Param('id') id: string) {
-    await this.chatService.markAsRead(id, req.user.userId);
+    await this.chatService.markAsRead(id, req.user.id);
     return { success: true };
   }
 }

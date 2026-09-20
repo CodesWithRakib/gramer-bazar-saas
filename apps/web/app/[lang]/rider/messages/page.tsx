@@ -30,7 +30,7 @@ export default function RiderMessagesPage({ params }: { params: Promise<{ lang: 
   if (!isAuthenticated || !user) return null;
 
   const getOtherParticipant = (conv: Conversation) => {
-    return conv.participant1Id === user.id ? conv.participant2 : conv.participant1;
+    return conv.participants.find(p => p.id !== user.id) || conv.participants[0];
   };
 
   const unreadCount = (conv: Conversation) => {

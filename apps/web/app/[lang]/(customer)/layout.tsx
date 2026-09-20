@@ -1,6 +1,8 @@
-import React from 'react';
-import { CustomerLayout } from '@/components/layouts/customer/CustomerLayout';
+import React, { use } from 'react';
+import { DashboardLayout } from '@/components/layouts/DashboardLayout';
+import { customerRoutes } from '@/config/dashboard-routes';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <CustomerLayout>{children}</CustomerLayout>;
+export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
+  return <DashboardLayout routes={customerRoutes} lang={lang}>{children}</DashboardLayout>;
 }

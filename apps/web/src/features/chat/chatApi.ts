@@ -18,10 +18,7 @@ export interface ConversationParticipant {
 
 export interface Conversation {
   id: string;
-  participant1Id: string;
-  participant2Id: string;
-  participant1: ConversationParticipant;
-  participant2: ConversationParticipant;
+  participants: ConversationParticipant[];
   messages: ChatMessage[];
   updatedAt: string;
 }

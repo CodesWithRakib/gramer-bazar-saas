@@ -7,11 +7,11 @@ import {
   useAddAdminDisputeMessageMutation,
   useResolveDisputeMutation,
   DisputeStatus
-} from '../../../../../features/disputes/disputesApi';
-import { FaPaperPlane, FaArrowLeft, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+} from '@/features/disputes/disputesApi';
+import { Send, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../../../store/store';
+import { RootState } from '@/store/store';
 
 export default function AdminDisputeDetailsPage() {
   const { id } = useParams() as { id: string };
@@ -69,7 +69,7 @@ export default function AdminDisputeDetailsPage() {
     <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
       <div className="flex justify-between items-center mb-4">
         <Link href="/admin/disputes" className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-          <FaArrowLeft className="mr-2" /> Back to Disputes
+          <ArrowLeft className="mr-2" /> Back to Disputes
         </Link>
         
         {!isResolved && !showResolutionForm && (
@@ -186,7 +186,7 @@ export default function AdminDisputeDetailsPage() {
         {dispute.adminDecision && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-blue-800 dark:text-blue-300 flex items-center mb-2">
-              {dispute.status === 'RESOLVED_REFUNDED' ? <FaCheckCircle className="mr-2" /> : <FaExclamationCircle className="mr-2" />}
+              {dispute.status === 'RESOLVED_REFUNDED' ? <CheckCircle className="mr-2" /> : <AlertCircle className="mr-2" />}
               Admin Decision
             </h3>
             <p className="text-blue-900 dark:text-blue-200">{dispute.adminDecision}</p>
@@ -241,7 +241,7 @@ export default function AdminDisputeDetailsPage() {
               disabled={isSending || !message.trim()}
               className="absolute right-3 bottom-3 p-2 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <FaPaperPlane />
+              <Send />
             </button>
           </form>
         ) : (

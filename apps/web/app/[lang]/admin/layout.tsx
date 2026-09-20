@@ -1,6 +1,8 @@
-import React from 'react';
-import { AdminLayout } from '@/components/layouts/admin/AdminLayout';
+import React, { use } from 'react';
+import { DashboardLayout } from '@/components/layouts/DashboardLayout';
+import { adminRoutes } from '@/config/dashboard-routes';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <AdminLayout>{children}</AdminLayout>;
+export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ lang: string }> }) {
+  const { lang } = use(params);
+  return <DashboardLayout routes={adminRoutes} lang={lang}>{children}</DashboardLayout>;
 }
