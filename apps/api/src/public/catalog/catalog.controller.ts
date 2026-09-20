@@ -20,6 +20,12 @@ export class CatalogController {
     return this.catalogService.getFeatured();
   }
 
+  @Get('brands')
+  @ApiOperation({ summary: 'Get all active brands for storefront' })
+  getBrands() {
+    return this.catalogService.getBrands();
+  }
+
   @Get(':slug')
   @ApiOperation({ summary: 'Get product details by slug' })
   getProductDetails(@Param('slug') slug: string) {

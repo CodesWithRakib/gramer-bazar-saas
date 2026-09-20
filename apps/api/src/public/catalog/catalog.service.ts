@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
+import { Brand } from '../../catalog/entities/brand.entity.js';
 import { SearchCatalogDto } from './dto/search-catalog.dto.js';
 
 @Injectable()
@@ -9,7 +10,13 @@ export class CatalogService {
   constructor(
     @InjectRepository(SellerProduct)
     private readonly sellerProductRepo: Repository<SellerProduct>,
+    @InjectRepository(Brand)
+    private readonly brandRepo: Repository<Brand>,
   ) {}
+
+  async getBrands() {
+    return this.brandRepo.find({ where: { isActive: true }, order: { nameEn: 'ASC' } });
+  }
 
   async search(searchDto: SearchCatalogDto) {
     const { q, categoryId, minPrice, maxPrice, page = 1, limit = 20, sort = 'newest' } = searchDto;
@@ -43,6 +50,10 @@ export class CatalogService {
 
     if (maxPrice !== undefined) {
       query.andWhere('sp.price <= :maxPrice', { maxPrice });
+    }
+
+    if (searchDto.brandId) {
+      query.andWhere('p.brandId = :brandId', { brandId: searchDto.brandId });
     }
 
     switch (sort) {

@@ -14,6 +14,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { use } from 'react';
 import { ArrowRight, ShieldCheck, Leaf, Clock, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { HeroBanners } from '@/components/home/HeroBanners';
+import { FlashSalesSection } from '@/components/home/FlashSalesSection';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -37,70 +39,13 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
 
   return (
     <div className="flex flex-col gap-8 md:gap-12 pb-24 md:pb-12">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-background pt-8 pb-16 md:py-24 px-4 overflow-hidden border-b">
-        {/* Modern abstract shapes for premium feel */}
-        <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-80 h-80 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
-        
-        <div className="container mx-auto text-center max-w-4xl relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 border border-primary/20 shadow-sm"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            {isBn ? 'আপনার বিশ্বস্ত অনলাইন মার্কেট' : 'Your Trusted Online Market'}
-          </motion.div>
-          <motion.h1 
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-7xl font-extrabold mb-6 text-foreground tracking-tight leading-tight"
-          >
-            {isBn ? 'আপনার প্রয়োজনীয় সবকিছু' : 'Everything You Need,'}
-            <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
-              {isBn ? ' এখন এক ক্লিকে' : ' Just a Click Away'}
-            </span>
-          </motion.h1>
-          <motion.p 
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
-          >
-            {isBn 
-              ? 'গ্রামের বাজার থেকে খাঁটি এবং ফ্রেশ পণ্য কিনুন সরাসরি স্থানীয় বিক্রেতাদের কাছ থেকে। আজই অর্ডার করুন!' 
-              : 'Buy authentic and fresh products directly from local sellers at Gramer Bazar. Shop locally, support locally!'}
-          </motion.p>
-          <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Button size="lg" className="w-full sm:w-auto h-12 px-8 rounded-full shadow-lg shadow-primary/25 transition-transform hover:-translate-y-1 text-base" asChild>
-              <Link href={`/${lang}/categories`}>{isBn ? 'শপিং শুরু করুন' : 'Start Shopping'}</Link>
-            </Button>
-            <ProductRequestModal lang={lang} trigger={
-              <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 rounded-full shadow-sm hover:shadow-md transition-all bg-background/50 backdrop-blur text-base hover:-translate-y-1">
-                {isBn ? 'পণ্য অনুরোধ' : 'Product Request'}
-              </Button>
-            } />
-          </motion.div>
-        </div>
+      {/* Hero Banners Section */}
+      <section className="container mx-auto px-4 mt-6">
+        <HeroBanners lang={lang} />
       </section>
 
       {/* Trust Banners (Location + USPs) */}
-      <section className="container mx-auto px-4 -mt-10 relative z-20">
+      <section className="container mx-auto px-4 mt-2">
         <div className="bg-background/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-black/5 border p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x divide-border">
           <div className="flex flex-col items-center justify-center gap-3 transition-transform hover:-translate-y-1">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-1 shadow-inner">
@@ -140,6 +85,9 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
           </div>
         </div>
       </section>
+
+      {/* Flash Sales Section */}
+      <FlashSalesSection lang={lang} />
 
       {/* Categories Section */}
       <section className="container mx-auto px-4">

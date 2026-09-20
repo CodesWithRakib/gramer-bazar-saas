@@ -39,9 +39,9 @@ export class PaymentsService {
       total_amount: order.total,
       currency: 'BDT',
       tran_id: order.id, // Using Order ID as Transaction ID for simplicity
-      success_url: `${redirectUrl}/success`,
-      fail_url: `${redirectUrl}/fail`,
-      cancel_url: `${redirectUrl}/cancel`,
+      success_url: `${this.configService.get<string>('API_URL')}/payments/success`,
+      fail_url: `${this.configService.get<string>('API_URL')}/payments/fail`,
+      cancel_url: `${this.configService.get<string>('API_URL')}/payments/cancel`,
       ipn_url: `${this.configService.get<string>('API_URL')}/payments/ipn`,
       shipping_method: 'Courier',
       product_name: 'Gramer Bazar Products',
@@ -64,6 +64,7 @@ export class PaymentsService {
       ship_state: 'Dhaka',
       ship_postcode: '1000',
       ship_country: 'Bangladesh',
+      value_a: redirectUrl, // Pass redirectUrl to be used in success/fail callbacks
     };
 
     try {

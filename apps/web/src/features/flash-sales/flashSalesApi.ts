@@ -1,17 +1,12 @@
 import { api } from '../../store/api';
-import { PaginationMeta } from '../catalog/catalogApi';
+import { PaginationMeta, SellerProduct } from '../catalog/catalogApi';
 import { Product } from '../catalog/catalogApi';
 
 export interface FlashSaleItem {
   id: string;
   flashSaleId: string;
   sellerProductId: string;
-  sellerProduct?: {
-    id: string;
-    product: Product;
-    price: number;
-    shopId: string;
-  };
+  sellerProduct?: SellerProduct;
   discountPrice: number;
   quantityAvailable: number;
   quantitySold: number;

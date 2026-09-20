@@ -5,6 +5,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   useSearchProductsQuery,
   useGetPublicCategoriesQuery,
+  useGetPublicBrandsQuery,
 } from "@/features/catalog/catalogApi";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { ProductRequestModal } from "@/components/catalog/ProductRequestModal";
@@ -22,10 +23,14 @@ function SearchPageContent({ lang }: { lang: string }) {
 
   const q = searchParams.get("q") || "";
   const categoryId = searchParams.get("categoryId") || "";
+  const brandId = searchParams.get("brandId") || "";
   const sort = searchParams.get("sort") || "newest";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
   const page = parseInt(searchParams.get("page") || "1", 10);
+
+  const { data: categories } = useGetPublicCategoriesQuery();
+  const { data: brands } = useGetPublicBrandsQuery();
 
   const [localSearch, setLocalSearch] = useState(q);
 
@@ -40,6 +45,7 @@ function SearchPageContent({ lang }: { lang: string }) {
   } = useSearchProductsQuery({
     q,
     categoryId,
+    brandId,
     sort,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -104,6 +110,61 @@ function SearchPageContent({ lang }: { lang: string }) {
               <ProductSortSelect lang={lang} />
             </div>
           </div>
+
+          {/* Active Filter Badges */}
+          {(categoryId || brandId || minPrice || maxPrice) && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {categoryId && (
+                <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
+                  <span className="font-medium text-primary">
+                    {isBn ? "ক্যাটাগরি" : "Category"}:
+                  </span>
+                  <span>
+                    {isBn 
+                      ? categories?.find(c => c.id === categoryId)?.nameBn || "জানা নেই"
+                      : categories?.find(c => c.id === categoryId)?.nameEn || "Unknown"}
+                  </span>
+                  <button onClick={() => updateUrl("categoryId", "")} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {brandId && (
+                <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
+                  <span className="font-medium text-primary">
+                    {isBn ? "ব্র্যান্ড" : "Brand"}:
+                  </span>
+                  <span>
+                    {isBn 
+                      ? brands?.find(b => b.id === brandId)?.nameBn || "জানা নেই"
+                      : brands?.find(b => b.id === brandId)?.nameEn || "Unknown"}
+                  </span>
+                  <button onClick={() => updateUrl("brandId", "")} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {(minPrice || maxPrice) && (
+                <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
+                  <span className="font-medium text-primary">
+                    {isBn ? "দাম" : "Price"}:
+                  </span>
+                  <span>
+                    ৳{minPrice || "0"} - {maxPrice ? `৳${maxPrice}` : (isBn ? "যেকোন" : "Any")}
+                  </span>
+                  <button onClick={() => {
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.delete("minPrice");
+                    params.delete("maxPrice");
+                    params.delete("page");
+                    router.push(`${pathname}?${params.toString()}`);
+                  }} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="mb-6 md:hidden">
             <form onSubmit={handleSearchSubmit} className="relative w-full">

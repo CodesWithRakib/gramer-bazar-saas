@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '@/store/slices/cartSlice';
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
 import { Locale } from '@/config/i18n';
@@ -16,6 +18,12 @@ export default function CheckoutSuccessPage({
   const isBn = lang === 'bn';
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Payment was successful (or COD confirmed), clear the cart
+    dispatch(clearCart());
+  }, [dispatch]);
 
   return (
     <div className="container mx-auto px-4 py-20 flex flex-col items-center text-center">

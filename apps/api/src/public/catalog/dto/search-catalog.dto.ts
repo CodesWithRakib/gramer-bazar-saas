@@ -41,6 +41,18 @@ export class SearchCatalogDto {
   @Min(1)
   limit: number = 20;
 
+  @ApiPropertyOptional({ description: 'Filter by Brand ID' })
+  @IsOptional()
+  @IsUUID()
+  brandId?: string;
+
+  @ApiPropertyOptional({ description: 'Minimum average rating' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  minRating?: number;
+
   @ApiPropertyOptional({ description: 'Sort by field (e.g. price_asc, price_desc, newest)', default: 'newest' })
   @IsOptional()
   @IsString()

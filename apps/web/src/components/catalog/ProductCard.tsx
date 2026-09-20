@@ -13,14 +13,15 @@ import type { SellerProduct } from '@/features/catalog/catalogApi';
 interface ProductCardProps {
   product: SellerProduct;
   lang: string;
+  flashSaleDiscountPrice?: number;
 }
 
-export function ProductCard({ product, lang }: ProductCardProps) {
+export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCardProps) {
   const dispatch = useDispatch();
   const name = lang === 'bn' ? product.productVariant.nameBn || product.productVariant.product.nameBn : product.productVariant.nameEn || product.productVariant.product.nameEn;
   const image = product.productVariant.images?.[0] || '/placeholder.jpg';
   const price = Number(product.price);
-  const discountPrice = product.discountPrice ? Number(product.discountPrice) : null;
+  const discountPrice = flashSaleDiscountPrice ? Number(flashSaleDiscountPrice) : (product.discountPrice ? Number(product.discountPrice) : null);
   const slug = product.productVariant.product.slug;
   const currentPrice = discountPrice ?? price;
 

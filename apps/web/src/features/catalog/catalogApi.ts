@@ -112,6 +112,7 @@ export interface SearchResponse {
 export interface SearchParams {
   q?: string;
   categoryId?: string;
+  brandId?: string;
   sellerId?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -127,6 +128,10 @@ export const catalogApi = api
       getPublicCategories: builder.query<Category[], void>({
         query: () => "/public/categories",
         providesTags: ["Category"],
+      }),
+      getPublicBrands: builder.query<Brand[], void>({
+        query: () => "/public/catalog/brands",
+        providesTags: ["Catalog"],
       }),
       getAdminCategories: builder.query<
         { data: Category[]; meta: PaginationMeta },
@@ -246,6 +251,7 @@ export const catalogApi = api
 
 export const {
   useGetPublicCategoriesQuery,
+  useGetPublicBrandsQuery,
   useGetAdminCategoriesQuery,
   useGetAdminBrandsQuery,
   useGetAdminProductsQuery,

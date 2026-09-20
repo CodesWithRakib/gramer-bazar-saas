@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useGetPublicCategoriesQuery } from "@/features/catalog/catalogApi";
+import { useGetPublicCategoriesQuery, useGetPublicBrandsQuery } from "@/features/catalog/catalogApi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,10 @@ export function ProductFilterSidebar({ lang, isMobile = false }: ProductFilterSi
   const isBn = lang === "bn";
 
   const { data: categories } = useGetPublicCategoriesQuery();
+  const { data: brands } = useGetPublicBrandsQuery();
 
   const currentCategoryId = searchParams.get("categoryId") || "";
+  const currentBrandId = searchParams.get("brandId") || "";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
   
@@ -118,6 +120,41 @@ export function ProductFilterSidebar({ lang, isMobile = false }: ProductFilterSi
                 className="text-sm cursor-pointer line-clamp-1 select-none"
               >
                 {isBn ? cat.nameBn : cat.nameEn}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h4 className="font-medium text-sm">
+          {isBn ? "ব্র্যান্ড" : "Brands"}
+        </h4>
+        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="brand-all"
+              checked={!currentBrandId}
+              onCheckedChange={() => updateUrl("brandId", "")}
+            />
+            <label htmlFor="brand-all" className="text-sm cursor-pointer select-none">
+              {isBn ? "সব ব্র্যান্ড" : "All Brands"}
+            </label>
+          </div>
+          {brands?.map((brand) => (
+            <div key={brand.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={`brand-${brand.id}`}
+                checked={currentBrandId === brand.id}
+                onCheckedChange={(checked) =>
+                  checked ? updateUrl("brandId", brand.id) : updateUrl("brandId", "")
+                }
+              />
+              <label
+                htmlFor={`brand-${brand.id}`}
+                className="text-sm cursor-pointer line-clamp-1 select-none"
+              >
+                {isBn ? brand.nameBn : brand.nameEn}
               </label>
             </div>
           ))}

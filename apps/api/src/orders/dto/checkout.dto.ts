@@ -34,4 +34,9 @@ export class CheckoutDto {
   @IsString()
   @IsOptional()
   couponCode?: string;
+
+  @ApiProperty({ description: 'Language code for redirect URLs', required: false })
+  @IsString()
+  @IsOptional()
+  lang?: string;
 }

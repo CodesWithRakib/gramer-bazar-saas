@@ -13,25 +13,38 @@ export class PaymentsController {
   @Post('success')
   async handleSuccess(@Body() payload: any, @Res() res: Response) {
     const success = await this.paymentsService.handleSuccess(payload);
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-    if (success) {
-      return res.redirect(`${frontendUrl}/en/orders/${payload.tran_id}?success=true`);
+    let baseRedirectUrl = `${this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000'}/en`;
+    if (payload.value_a) {
+      const urlMatch = payload.value_a.match(/^(https?:\/\/[^\/]+)\/([a-z]{2})\/checkout$/);
+      if (urlMatch) baseRedirectUrl = `${urlMatch[1]}/${urlMatch[2]}`;
     }
-    return res.redirect(`${frontendUrl}/en/checkout/fail`);
+    
+    if (success) {
+      return res.redirect(`${baseRedirectUrl}/orders/${payload.tran_id}?success=true`);
+    }
+    return res.redirect(`${baseRedirectUrl}/checkout/fail`);
   }
 
   @Post('fail')
   async handleFail(@Body() payload: any, @Res() res: Response) {
     await this.paymentsService.handleFail(payload);
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-    return res.redirect(`${frontendUrl}/en/checkout/fail?order_id=${payload.tran_id}`);
+    let baseRedirectUrl = `${this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000'}/en`;
+    if (payload.value_a) {
+      const urlMatch = payload.value_a.match(/^(https?:\/\/[^\/]+)\/([a-z]{2})\/checkout$/);
+      if (urlMatch) baseRedirectUrl = `${urlMatch[1]}/${urlMatch[2]}`;
+    }
+    return res.redirect(`${baseRedirectUrl}/checkout/fail?order_id=${payload.tran_id}`);
   }
 
   @Post('cancel')
   async handleCancel(@Body() payload: any, @Res() res: Response) {
     await this.paymentsService.handleCancel(payload);
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-    return res.redirect(`${frontendUrl}/en/checkout/cancel?order_id=${payload.tran_id}`);
+    let baseRedirectUrl = `${this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000'}/en`;
+    if (payload.value_a) {
+      const urlMatch = payload.value_a.match(/^(https?:\/\/[^\/]+)\/([a-z]{2})\/checkout$/);
+      if (urlMatch) baseRedirectUrl = `${urlMatch[1]}/${urlMatch[2]}`;
+    }
+    return res.redirect(`${baseRedirectUrl}/checkout/cancel?order_id=${payload.tran_id}`);
   }
 
   @Post('ipn')

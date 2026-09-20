@@ -18,7 +18,10 @@ export class OrdersController {
   @ApiOperation({ summary: 'Process checkout and create order' })
   async checkout(@Request() req: any, @Body() checkoutDto: CheckoutDto) {
     const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:3000';
-    return this.ordersService.checkout(req.user.id, checkoutDto, originUrl);
+    const baseUrl = originUrl.replace(/\/$/, ''); // Remove trailing slash if any
+    const lang = checkoutDto.lang || 'en';
+    const redirectUrl = `${baseUrl}/${lang}/checkout`;
+    return this.ordersService.checkout(req.user.id, checkoutDto, redirectUrl);
   }
 
   @Get('admin/all')
