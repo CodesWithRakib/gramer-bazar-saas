@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '@/providers/SocketProvider';
-import { useGetConversationsQuery, useGetMessagesQuery, chatApi } from '@/features/chat/chatApi';
+import {
+  useGetConversationsQuery,
+  useGetMessagesQuery,
+  chatApi,
+  ChatMessage,
+} from '@/features/chat/chatApi';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -49,7 +54,7 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
 
     socket.emit('join_conversation', { conversationId: activeConversationId });
 
-    const handleNewMessage = (message: any) => {
+    const handleNewMessage = (message: ChatMessage) => {
       // Optimistically update the RTK cache
       dispatch(
         chatApi.util.updateQueryData('getMessages', activeConversationId, (draft) => {
@@ -122,8 +127,8 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
                     {isBn ? 'কোন মেসেজ নেই' : 'No messages yet'}
                   </div>
                 )}
-                {!isLoadingConversations && conversations?.map((conv: any) => {
-                  const otherParticipant = conv.participants.find((p: any) => p.id !== profile?.id);
+                {!isLoadingConversations && conversations?.map((conv) => {
+                  const otherParticipant = conv.participants.find((p) => p.id !== profile?.id);
                   return (
                     <div
                       key={conv.id}
@@ -137,7 +142,10 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
                       </Avatar>
                       <div className="overflow-hidden flex-1">
                         <p className="font-medium truncate text-sm">{otherParticipant?.firstName} {otherParticipant?.lastName}</p>
-                        <p className="text-xs text-muted-foreground truncate">{conv.lastMessage?.content || (isBn ? 'নতুন মেসেজ নেই' : 'No messages yet')}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {conv.messages?.[conv.messages.length - 1]?.content ||
+                            (isBn ? 'নতুন মেসেজ নেই' : 'No messages yet')}
+                        </p>
                       </div>
                     </div>
                   );
@@ -151,7 +159,7 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
                     <div className="text-center py-4 text-sm text-muted-foreground">{isBn ? 'লোড হচ্ছে...' : 'Loading messages...'}</div>
                   ) : (
                     <div className="space-y-4">
-                      {messages?.map((msg: any) => {
+                      {messages?.map((msg) => {
                         const isMine = msg.senderId === profile?.id;
                         return (
                           <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>

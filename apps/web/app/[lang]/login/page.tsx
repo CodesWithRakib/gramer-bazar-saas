@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
@@ -40,8 +42,8 @@ export default function StaffLoginPage({ params }: { params: Promise<{ lang: str
       } else {
         router.push(`/${lang}/profile`);
       }
-    } catch (err: any) {
-      setErrorMsg(err.data?.message || (isBn ? 'লগইন ব্যর্থ হয়েছে' : 'Login failed'));
+    } catch (err) {
+      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'লগইন ব্যর্থ হয়েছে' : 'Login failed'));
     }
   };
 

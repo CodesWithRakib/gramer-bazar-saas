@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetUsersQuery } from '@/features/users/usersApi';
+import { useGetUsersQuery, User } from '@/features/users/usersApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ export default function AdminSellersPage() {
   const { data, isLoading } = useGetUsersQuery({ page, limit, search, role: Role.SELLER });
   const [updateStatus] = useUpdateUserStatusMutation();
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<User>[] = [
     {
       accessorKey: 'firstName',
       header: 'First Name',

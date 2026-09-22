@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminDeliveriesQuery } from '@/features/deliveries/deliveriesApi';
+import { useGetAdminDeliveriesQuery, Delivery } from '@/features/deliveries/deliveriesApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ export default function AdminDeliveriesPage() {
   
   const { data, isLoading } = useGetAdminDeliveriesQuery({ page, limit, search });
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Delivery>[] = [
     {
       accessorKey: 'id',
       header: 'Delivery ID',
@@ -24,7 +24,7 @@ export default function AdminDeliveriesPage() {
       accessorKey: 'order',
       header: 'Order',
       cell: ({ row }) => {
-        const order = row.getValue('order') as any;
+        const order = row.getValue('order') as { id: string } | null;
         return order ? <span className="font-mono">{String(order.id).substring(0, 8)}...</span> : '-';
       },
     },
@@ -32,7 +32,10 @@ export default function AdminDeliveriesPage() {
       accessorKey: 'rider',
       header: 'Rider',
       cell: ({ row }) => {
-        const rider = row.getValue('rider') as any;
+        const rider = row.getValue('rider') as {
+          firstName: string;
+          lastName: string;
+        } | null;
         return rider ? `${rider.firstName} ${rider.lastName}` : '-';
       },
     },
@@ -41,7 +44,7 @@ export default function AdminDeliveriesPage() {
       header: 'Status',
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
-        let variant: any = 'default';
+        let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'default';
         if (status === 'UNASSIGNED') variant = 'secondary';
         else if (status === 'DELIVERED') variant = 'default';
         else if (status === 'CANCELLED' || status === 'FAILED') variant = 'destructive';

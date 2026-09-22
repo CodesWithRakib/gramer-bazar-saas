@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,8 +52,8 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
         toast.success(isBn ? 'নতুন অ্যাড্রেস যোগ করা হয়েছে' : 'New address added successfully');
       }
       onSuccess();
-    } catch (err: any) {
-      toast.error(err.data?.message || (isBn ? 'সমস্যা হয়েছে' : 'An error occurred'));
+    } catch (err) {
+      toast.error(getApiErrorMessage(err) || (isBn ? 'সমস্যা হয়েছে' : 'An error occurred'));
     }
   };
 

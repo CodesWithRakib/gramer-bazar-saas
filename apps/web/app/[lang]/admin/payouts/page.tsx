@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import { useState } from 'react';
 import { useGetAllPayoutsQuery, useReviewPayoutMutation } from '@/features/payouts/payoutsApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,8 +66,8 @@ export default function AdminPayoutsPage({ params }: { params: { lang: string } 
           : `Payout ${reviewDialog.status.toLowerCase()} successfully`
       );
       setReviewDialog({ isOpen: false, payoutId: null, status: 'APPROVED' });
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to review payout');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to review payout');
     }
   };
 
@@ -94,7 +96,12 @@ export default function AdminPayoutsPage({ params }: { params: { lang: string } 
 
         <div className="flex items-center gap-2">
           <Label>{isBn ? 'ফিল্টার:' : 'Filter:'}</Label>
-          <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
+          <Select
+            value={statusFilter}
+            onValueChange={(v: string) =>
+              setStatusFilter(v as typeof statusFilter)
+            }
+          >
             <SelectTrigger className="w-[150px]">
               <SelectValue />
             </SelectTrigger>

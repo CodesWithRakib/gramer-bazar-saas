@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +11,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useAddSellerProductMutation, useUpdateSellerProductMutation } from '@/features/seller-portal/sellerPortalApi';
+import {
+  useAddSellerProductMutation,
+  useUpdateSellerProductMutation,
+  SellerProductItem,
+} from '@/features/seller-portal/sellerPortalApi';
 
 const addProductSchema = z.object({
   productVariantId: z.string().min(1, 'Product ID is required'), // Ideally, this would be a combobox to search global catalog
@@ -39,8 +45,8 @@ export function AddProductDialog({ isBn }: { isBn: boolean }) {
       toast.success(isBn ? 'প্রোডাক্ট যোগ করা হয়েছে' : 'Product added successfully');
       setOpen(false);
       form.reset();
-    } catch (error: any) {
-      toast.error(error?.data?.message || (isBn ? 'ত্রুটি হয়েছে' : 'Failed to add product'));
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || (isBn ? 'ত্রুটি হয়েছে' : 'Failed to add product'));
     }
   };
 
@@ -102,7 +108,7 @@ const editProductSchema = z.object({
   quantity: z.coerce.number().min(0),
 });
 
-export function EditProductDialog({ isBn, product, open, onOpenChange }: { isBn: boolean, product: any, open: boolean, onOpenChange: (o: boolean) => void }) {
+export function EditProductDialog({ isBn, product, open, onOpenChange }: { isBn: boolean, product: SellerProductItem, open: boolean, onOpenChange: (o: boolean) => void }) {
   const [updateProduct, { isLoading }] = useUpdateSellerProductMutation();
   
   const form = useForm<z.infer<typeof editProductSchema>>({
@@ -120,8 +126,8 @@ export function EditProductDialog({ isBn, product, open, onOpenChange }: { isBn:
       await updateProduct({ id: product.id, data: values }).unwrap();
       toast.success(isBn ? 'আপডেট হয়েছে' : 'Updated successfully');
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error?.data?.message || (isBn ? 'ত্রুটি হয়েছে' : 'Failed to update product'));
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || (isBn ? 'ত্রুটি হয়েছে' : 'Failed to update product'));
     }
   };
 

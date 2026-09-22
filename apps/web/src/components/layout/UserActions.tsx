@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,7 +34,11 @@ interface UserActionsProps {
 export function UserActions({ lang }: UserActionsProps) {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const isBn = lang === "bn";
 
@@ -51,10 +55,6 @@ export function UserActions({ lang }: UserActionsProps) {
     skip: !isAuthenticated,
   });
   const wishlistCount = wishlist?.length || 0;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (profile && !user) {

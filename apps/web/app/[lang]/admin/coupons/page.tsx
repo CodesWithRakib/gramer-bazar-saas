@@ -1,11 +1,19 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
-import { useGetAdminCouponsQuery, useCreateCouponMutation, useUpdateCouponMutation, useDeleteCouponMutation } from '@/features/coupons/couponsApi';
+import {
+  useGetAdminCouponsQuery,
+  useCreateCouponMutation,
+  useUpdateCouponMutation,
+  useDeleteCouponMutation,
+  Coupon,
+} from '@/features/coupons/couponsApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,7 +85,7 @@ export default function AdminCouponsPage({ params }: { params: Promise<{ lang: s
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (coupon: any) => {
+  const handleOpenEditModal = (coupon: Coupon) => {
     setIsEditing(true);
     setFormData({
       id: coupon.id,
@@ -137,8 +145,8 @@ export default function AdminCouponsPage({ params }: { params: Promise<{ lang: s
         toast.success(isBn ? 'কুপন তৈরি হয়েছে' : 'Coupon created successfully');
       }
       setIsModalOpen(false);
-    } catch (error: any) {
-      toast.error(error?.data?.message || (isBn ? 'ব্যর্থ হয়েছে' : 'Operation failed'));
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || (isBn ? 'ব্যর্থ হয়েছে' : 'Operation failed'));
     }
   };
 

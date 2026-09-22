@@ -33,10 +33,11 @@ function SearchPageContent({ lang }: { lang: string }) {
   const { data: brands } = useGetPublicBrandsQuery();
 
   const [localSearch, setLocalSearch] = useState(q);
-
-  useEffect(() => {
+  const [prevQ, setPrevQ] = useState(q);
+  if (q !== prevQ) {
+    setPrevQ(q);
     setLocalSearch(q);
-  }, [q]);
+  }
 
   const {
     data: searchResults,

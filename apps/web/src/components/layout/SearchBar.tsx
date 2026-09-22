@@ -16,12 +16,14 @@ interface SearchBarProps {
 export function SearchBar({ lang, className, id }: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState("");
+  const qParam = searchParams.get("q") || "";
+  const [searchTerm, setSearchTerm] = useState(qParam);
+  const [prevQ, setPrevQ] = useState(qParam);
+  if (qParam !== prevQ) {
+    setPrevQ(qParam);
+    setSearchTerm(qParam);
+  }
   const isBn = lang === "bn";
-
-  useEffect(() => {
-    setSearchTerm(searchParams.get("q") || "");
-  }, [searchParams]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

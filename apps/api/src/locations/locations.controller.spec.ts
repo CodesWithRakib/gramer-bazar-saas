@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LocationsController } from './locations.controller.js';
+import { LocationsService } from './locations.service.js';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../common/guards/roles.guard.js';
 
 describe('LocationsController', () => {
   let controller: LocationsController;
@@ -7,7 +10,13 @@ describe('LocationsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [LocationsController],
-    }).compile();
+      providers: [{ provide: LocationsService, useValue: {} }],
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<LocationsController>(LocationsController);
   });

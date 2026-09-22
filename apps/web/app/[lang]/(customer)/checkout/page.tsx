@@ -1,4 +1,6 @@
 'use client';
+
+import { getApiErrorMessage } from '@/lib/apiError';
 import { use } from 'react';
 
 import React, { useState, useEffect } from 'react';
@@ -44,14 +46,12 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
     }
   }, [isAuthenticated, items.length, router, lang]);
 
-  useEffect(() => {
-    if (addresses && addresses.length > 0 && !selectedAddressId) {
-      const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
-      setSelectedAddressId(defaultAddress.id);
-    } else if (addresses && addresses.length === 0) {
-      setShowAddressForm(true);
-    }
-  }, [addresses, selectedAddressId]);
+  if (addresses && addresses.length > 0 && !selectedAddressId) {
+    const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+    setSelectedAddressId(defaultAddress.id);
+  } else if (addresses && addresses.length === 0 && !showAddressForm) {
+    setShowAddressForm(true);
+  }
 
   if (!isAuthenticated || items.length === 0) return null;
 
@@ -80,8 +80,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
       } else {
         router.push(`/${lang}/orders/${res.order.id}?success=true`);
       }
-    } catch (err: any) {
-      setErrorMsg(err.data?.message || (isBn ? 'অর্ডার তৈরি করতে সমস্যা হয়েছে' : 'Failed to place order'));
+    } catch (err) {
+      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'অর্ডার তৈরি করতে সমস্যা হয়েছে' : 'Failed to place order'));
     }
   };
 

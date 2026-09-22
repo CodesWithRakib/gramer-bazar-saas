@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { useValidateCouponMutation } from '@/features/coupons/couponsApi';
 import { Button } from '@/components/ui/button';
@@ -26,8 +28,8 @@ export function CouponInput({ isBn, subtotal, onApply, onRemove, appliedCoupon }
       const result = await validateCoupon({ code, subtotal }).unwrap();
       onApply(result.discountAmount, result.code);
       toast.success(isBn ? 'কুপন সফলভাবে প্রয়োগ করা হয়েছে!' : 'Coupon applied successfully!');
-    } catch (err: any) {
-      toast.error(err?.data?.message || (isBn ? 'অকার্যকর বা মেয়াদোত্তীর্ণ কুপন' : 'Invalid or expired coupon'));
+    } catch (err) {
+      toast.error(getApiErrorMessage(err) || (isBn ? 'অকার্যকর বা মেয়াদোত্তীর্ণ কুপন' : 'Invalid or expired coupon'));
     }
   };
 

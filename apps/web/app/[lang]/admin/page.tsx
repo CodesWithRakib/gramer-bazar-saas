@@ -121,7 +121,12 @@ export default function AdminDashboardPage({ params }: { params: Promise<{ lang:
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {recentOrders.slice(0, 5).map((order: any) => (
+              {recentOrders.slice(0, 5).map((order: {
+                id: string;
+                customerName: string;
+                totalAmount: string | number;
+                status: string;
+              }) => (
                 <div key={order.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">

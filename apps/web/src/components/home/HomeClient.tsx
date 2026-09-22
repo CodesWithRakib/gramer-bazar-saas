@@ -10,7 +10,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export function HomeClient({ lang, dict }: { lang: string, dict: any }) {
+export function HomeClient({
+  lang,
+  dict,
+}: {
+  lang: string;
+  dict: { home?: { featuredProducts?: string; categories?: string } };
+}) {
   const { data: featuredResponse, isLoading: isLoadingFeatured } = useGetFeaturedProductsQuery();
   const { data: categories, isLoading: isLoadingCategories } = useGetPublicCategoriesQuery();
   const { data: banners, isLoading: isLoadingBanners } = useGetPublicBannersQuery();

@@ -4,6 +4,7 @@ import { use } from 'react';
 import React, { useState } from 'react';
 import {
   useGetSellerProductsQuery,
+  SellerProductItem,
 } from '@/features/seller-portal/sellerPortalApi';
 import {
   Table,
@@ -31,17 +32,21 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingProduct, setEditingProduct] = useState<SellerProductItem | null>(null);
   
   const { data: products, isLoading } = useGetSellerProductsQuery(searchTerm || undefined);
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<SellerProductItem>[] = [
     {
       accessorKey: 'productVariant.product.name',
       header: isBn ? 'প্রোডাক্টের নাম' : 'Product Name',
       cell: ({ row }) => (
         <div>
-          <div className="font-medium">{row.original.productVariant.product.name}</div>
+          <div className="font-medium">
+            {isBn
+              ? row.original.productVariant.product.nameBn
+              : row.original.productVariant.product.nameEn}
+          </div>
           <div className="text-xs text-muted-foreground">SKU: {row.original.productVariant.sku}</div>
         </div>
       ),

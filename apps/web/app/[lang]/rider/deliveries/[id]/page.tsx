@@ -34,16 +34,19 @@ export default function RiderDeliveryDetailsPage({
 
   const [currentLat, setCurrentLat] = useState<number | undefined>(undefined);
   const [currentLng, setCurrentLng] = useState<number | undefined>(undefined);
-  const [trackingError, setTrackingError] = useState<string | null>(null);
+  const [trackingError, setTrackingError] = useState<string | null>(() =>
+    typeof navigator !== 'undefined' && !('geolocation' in navigator)
+      ? isBn
+        ? 'আপনার ব্রাউজার জিপিএস সাপোর্ট করে না'
+        : 'Geolocation is not supported by your browser'
+      : null,
+  );
 
   // Live Location Tracking Effect
   useEffect(() => {
     if (!delivery || delivery.status !== DeliveryStatus.OUT_FOR_DELIVERY) return;
 
-    if (!('geolocation' in navigator)) {
-      setTrackingError(isBn ? 'আপনার ব্রাউজার জিপিএস সাপোর্ট করে না' : 'Geolocation is not supported by your browser');
-      return;
-    }
+    if (!('geolocation' in navigator)) return;
 
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -162,7 +165,7 @@ export default function RiderDeliveryDetailsPage({
         </CardHeader>
         <CardContent className="pt-4">
           <ul className="space-y-3">
-            {order.items?.map((item: any) => (
+            {order.items?.map((item) => (
               <li key={item.id} className="flex justify-between text-sm">
                 <span className="text-muted-foreground line-clamp-1">
                   {item.quantity}x {item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn}

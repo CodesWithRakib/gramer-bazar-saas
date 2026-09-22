@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetUsersQuery } from '@/features/users/usersApi';
+import { useGetUsersQuery, User } from '@/features/users/usersApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -14,12 +14,12 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  const [editingRolesUser, setEditingRolesUser] = useState<any>(null);
+  const [editingRolesUser, setEditingRolesUser] = useState<User | null>(null);
   
   const { data, isLoading } = useGetUsersQuery({ page, limit, search });
   const [updateStatus] = useUpdateUserStatusMutation();
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<User>[] = [
     {
       accessorKey: 'firstName',
       header: 'First Name',

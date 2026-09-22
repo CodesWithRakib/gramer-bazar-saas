@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageSquare } from 'lucide-react';
@@ -44,11 +46,11 @@ export function StartChatButton({
         // Open the floating widget for storefront
         dispatch(openChatWidget(conversation.id));
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to start chat:', error);
       const isBn = lang === 'bn';
       toast.error(
-        error?.data?.message || 
+        getApiErrorMessage(error) || 
         (isBn ? 'চ্যাট শুরু করতে সমস্যা হয়েছে' : 'Failed to start chat')
       );
     }

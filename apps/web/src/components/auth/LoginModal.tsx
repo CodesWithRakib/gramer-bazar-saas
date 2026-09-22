@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -53,8 +55,8 @@ export function LoginModal({ lang }: { lang: string }) {
     try {
       await sendOtp({ phone }).unwrap();
       setStep('otp');
-    } catch (err: any) {
-      setErrorMsg(err.data?.message || (isBn ? 'ওটিপি পাঠাতে সমস্যা হয়েছে' : 'Failed to send OTP'));
+    } catch (err) {
+      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'ওটিপি পাঠাতে সমস্যা হয়েছে' : 'Failed to send OTP'));
     }
   };
 
@@ -74,8 +76,8 @@ export function LoginModal({ lang }: { lang: string }) {
         user: res.user,
       }));
       handleClose();
-    } catch (err: any) {
-      setErrorMsg(err.data?.message || (isBn ? 'ভুল ওটিপি' : 'Invalid OTP'));
+    } catch (err) {
+      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'ভুল ওটিপি' : 'Invalid OTP'));
     }
   };
 

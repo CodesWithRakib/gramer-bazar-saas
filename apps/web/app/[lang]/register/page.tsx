@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
@@ -51,8 +53,8 @@ export default function StaffRegisterPage({ params }: { params: Promise<{ lang: 
       } else {
         router.push(`/${lang}/profile`);
       }
-    } catch (err: any) {
-      setErrorMsg(err.data?.message || (isBn ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে' : 'Registration failed'));
+    } catch (err) {
+      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে' : 'Registration failed'));
     }
   };
 

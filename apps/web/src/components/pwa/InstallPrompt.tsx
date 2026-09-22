@@ -5,8 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Download, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export function InstallPrompt({ lang }: { lang: string }) {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const isBn = lang === 'bn';
   const pathname = usePathname();
@@ -18,8 +24,9 @@ export function InstallPrompt({ lang }: { lang: string }) {
     const handler = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
+      const installEvent = e as BeforeInstallPromptEvent;
       // Stash the event so it can be triggered later.
-      setDeferredPrompt(e);
+      setDeferredPrompt(installEvent);
       // Update UI notify the user they can install the PWA
       // Only show if not previously dismissed
       const hasDismissed = localStorage.getItem('gb-pwa-dismissed');

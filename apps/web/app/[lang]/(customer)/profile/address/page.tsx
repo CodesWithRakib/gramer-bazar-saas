@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { use, useState } from 'react';
 import { useGetAddressesQuery, useDeleteAddressMutation, Address } from '@/features/addresses/addressApi';
 import { AddressForm } from '@/components/profile/AddressForm';
@@ -24,8 +26,8 @@ export default function AddressBookPage({ params }: { params: Promise<{ lang: st
       try {
         await deleteAddress(id).unwrap();
         toast.success(isBn ? 'ঠিকানা মুছে ফেলা হয়েছে' : 'Address deleted successfully');
-      } catch (err: any) {
-        toast.error(err.data?.message || (isBn ? 'সমস্যা হয়েছে' : 'Failed to delete address'));
+      } catch (err) {
+        toast.error(getApiErrorMessage(err) || (isBn ? 'সমস্যা হয়েছে' : 'Failed to delete address'));
       }
     }
   };

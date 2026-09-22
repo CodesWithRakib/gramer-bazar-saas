@@ -70,7 +70,7 @@ export default function SellerOrderDetailsPage({
         </CardHeader>
         <CardContent>
           <div className="divide-y">
-            {order.items.map((item: any) => (
+            {order.items.map((item) => (
               <div key={item.id} className="py-4 flex justify-between">
                 <div>
                   <p className="font-medium">{item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn}</p>

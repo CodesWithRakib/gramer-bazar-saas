@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import { useState } from 'react';
 import { useGetMyWalletQuery } from '@/features/wallets/walletsApi';
 import { useGetMyPayoutsQuery, useRequestPayoutMutation } from '@/features/payouts/payoutsApi';
@@ -54,8 +56,8 @@ export default function PayoutRequestPage({ params }: { params: { lang: string }
       setAmount('');
       setMethod('');
       setAccountDetails('');
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to request payout');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to request payout');
     }
   };
 

@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminProductRequestsQuery } from '@/features/product-requests/productRequestsApi';
+import {
+  useGetAdminProductRequestsQuery,
+  ProductRequest,
+} from '@/features/product-requests/productRequestsApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -14,7 +17,7 @@ export default function AdminProductRequestsPage() {
   
   const { data, isLoading } = useGetAdminProductRequestsQuery({ page, limit, search });
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<ProductRequest>[] = [
     {
       accessorKey: 'requestedProductName',
       header: 'Requested Product',
@@ -23,7 +26,10 @@ export default function AdminProductRequestsPage() {
       accessorKey: 'user',
       header: 'Customer',
       cell: ({ row }) => {
-        const user = row.getValue('user') as any;
+        const user = row.getValue('user') as {
+          firstName: string;
+          lastName: string;
+        } | null;
         return user ? `${user.firstName} ${user.lastName}` : '-';
       },
     },
@@ -32,7 +38,7 @@ export default function AdminProductRequestsPage() {
       header: 'Status',
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
-        let variant: any = 'default';
+        let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'default';
         if (status === 'PENDING') variant = 'secondary';
         else if (status === 'APPROVED' || status === 'FULFILLED') variant = 'default';
         else if (status === 'REJECTED') variant = 'destructive';

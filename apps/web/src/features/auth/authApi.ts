@@ -72,7 +72,10 @@ export const authApi = api.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    updatePassword: builder.mutation<{ message: string }, any>({
+    updatePassword: builder.mutation<
+      { message: string },
+      { currentPassword?: string; newPassword: string }
+    >({
       query: (body) => ({
         url: '/auth/me/password',
         method: 'PATCH',

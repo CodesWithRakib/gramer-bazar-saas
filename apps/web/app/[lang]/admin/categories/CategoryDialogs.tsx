@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +11,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useCreateAdminCategoryMutation, useUpdateAdminCategoryMutation } from '@/features/catalog/catalogApi';
+import {
+  useCreateAdminCategoryMutation,
+  useUpdateAdminCategoryMutation,
+  Category,
+} from '@/features/catalog/catalogApi';
 
 const categorySchema = z.object({
   nameEn: z.string().min(1, 'English name is required'),
@@ -32,8 +38,8 @@ export function AddCategoryDialog() {
       toast.success('Category created successfully');
       setOpen(false);
       form.reset();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to create category');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to create category');
     }
   };
 
@@ -79,7 +85,7 @@ export function AddCategoryDialog() {
   );
 }
 
-export function EditCategoryDialog({ category, open, onOpenChange }: { category: any, open: boolean, onOpenChange: (o: boolean) => void }) {
+export function EditCategoryDialog({ category, open, onOpenChange }: { category: Category, open: boolean, onOpenChange: (o: boolean) => void }) {
   const [updateCategory, { isLoading }] = useUpdateAdminCategoryMutation();
   
   const form = useForm<z.infer<typeof categorySchema>>({
@@ -96,8 +102,8 @@ export function EditCategoryDialog({ category, open, onOpenChange }: { category:
       await updateCategory({ id: category.id, data: values }).unwrap();
       toast.success('Category updated successfully');
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update category');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to update category');
     }
   };
 

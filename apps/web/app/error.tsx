@@ -10,13 +10,12 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const [isBn, setIsBn] = useState(false);
+  const [isBn] = useState(
+    () => typeof window !== 'undefined' && window.location.pathname.startsWith('/bn'),
+  );
 
   useEffect(() => {
     console.error(error);
-    if (typeof window !== 'undefined') {
-      setIsBn(window.location.pathname.startsWith('/bn'));
-    }
   }, [error]);
 
   return (

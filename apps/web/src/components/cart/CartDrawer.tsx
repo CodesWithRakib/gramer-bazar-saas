@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
@@ -43,9 +45,9 @@ export function CartDrawer({ lang }: { lang: string }) {
       toast.success(isBn ? 'কুপন প্রয়োগ করা হয়েছে' : 'Coupon applied', {
         description: isBn ? `আপনি ৳${result.discountAmount} ছাড় পেয়েছেন` : `You got a discount of ৳${result.discountAmount}`,
       });
-    } catch (error: any) {
+    } catch (error) {
       toast.error(isBn ? 'কুপন প্রয়োগে ত্রুটি' : 'Coupon Error', {
-        description: error.data?.message || (isBn ? 'অবৈধ কুপন' : 'Invalid coupon'),
+        description: getApiErrorMessage(error) || (isBn ? 'অবৈধ কুপন' : 'Invalid coupon'),
       });
     }
   };

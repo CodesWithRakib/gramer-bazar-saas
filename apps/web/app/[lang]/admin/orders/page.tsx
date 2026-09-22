@@ -1,7 +1,13 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
-import { useGetAdminOrdersQuery, useUpdateAdminOrderStatusMutation } from '@/features/orders/ordersApi';
+import {
+  useGetAdminOrdersQuery,
+  useUpdateAdminOrderStatusMutation,
+  Order,
+} from '@/features/orders/ordersApi';
 import { useGetRidersQuery, useAssignDeliveryMutation } from '@/features/deliveries/deliveriesApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
@@ -34,8 +40,8 @@ export default function AdminOrdersPage() {
     try {
       await updateStatus({ id, status }).unwrap();
       toast.success('Order status updated');
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update order status');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to update order status');
     }
   };
 
@@ -48,12 +54,12 @@ export default function AdminOrdersPage() {
       setIsAssignModalOpen(false);
       setAssigningOrderId(null);
       setSelectedRiderId('');
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to assign rider');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to assign rider');
     }
   };
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Order>[] = [
     {
       accessorKey: 'id',
       header: 'Order ID',
@@ -63,7 +69,10 @@ export default function AdminOrdersPage() {
       accessorKey: 'user',
       header: 'Customer',
       cell: ({ row }) => {
-        const user = row.getValue('user') as any;
+        const user = row.getValue('user') as {
+          firstName: string;
+          lastName: string;
+        } | null;
         return user ? `${user.firstName} ${user.lastName}` : '-';
       },
     },
@@ -72,7 +81,7 @@ export default function AdminOrdersPage() {
       header: 'Status',
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
-        let variant: any = 'default';
+        let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'default';
         if (status === 'PENDING') variant = 'secondary';
         else if (status === 'DELIVERED') variant = 'default';
         else if (status === 'CANCELLED' || status === 'FAILED') variant = 'destructive';
@@ -183,7 +192,13 @@ export default function AdminOrdersPage() {
               </SelectTrigger>
               <SelectContent>
                 {ridersData && ridersData.length > 0 ? (
-                  ridersData.map((rider: any) => (
+                  ridersData.map(
+                    (rider: {
+                      id: string;
+                      firstName: string;
+                      lastName: string;
+                      phone?: string;
+                    }) => (
                     <SelectItem key={rider.id} value={rider.id}>
                       {rider.firstName} {rider.lastName} - {rider.phone}
                     </SelectItem>

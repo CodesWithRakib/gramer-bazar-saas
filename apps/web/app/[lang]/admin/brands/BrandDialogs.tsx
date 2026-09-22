@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +11,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useCreateAdminBrandMutation, useUpdateAdminBrandMutation } from '@/features/catalog/catalogApi';
+import {
+  useCreateAdminBrandMutation,
+  useUpdateAdminBrandMutation,
+  Brand,
+} from '@/features/catalog/catalogApi';
 
 const brandSchema = z.object({
   nameEn: z.string().min(1, 'English name is required'),
@@ -32,8 +38,8 @@ export function AddBrandDialog() {
       toast.success('Brand created successfully');
       setOpen(false);
       form.reset();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to create brand');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to create brand');
     }
   };
 
@@ -79,7 +85,7 @@ export function AddBrandDialog() {
   );
 }
 
-export function EditBrandDialog({ brand, open, onOpenChange }: { brand: any, open: boolean, onOpenChange: (o: boolean) => void }) {
+export function EditBrandDialog({ brand, open, onOpenChange }: { brand: Brand, open: boolean, onOpenChange: (o: boolean) => void }) {
   const [updateBrand, { isLoading }] = useUpdateAdminBrandMutation();
   
   const form = useForm<z.infer<typeof brandSchema>>({
@@ -96,8 +102,8 @@ export function EditBrandDialog({ brand, open, onOpenChange }: { brand: any, ope
       await updateBrand({ id: brand.id, data: values }).unwrap();
       toast.success('Brand updated successfully');
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update brand');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to update brand');
     }
   };
 

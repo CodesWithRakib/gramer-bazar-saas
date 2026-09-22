@@ -4,6 +4,7 @@ import { use } from 'react';
 import React from 'react';
 import Link from 'next/link';
 import { useGetSellerOrdersQuery } from '@/features/seller-portal/sellerPortalApi';
+import { Order } from '@/features/orders/ordersApi';
 import {
   Table,
   TableBody,
@@ -27,7 +28,7 @@ export default function SellerOrdersPage({ params }: { params: Promise<{ lang: s
   const isBn = lang === 'bn';
   const { data: orders, isLoading } = useGetSellerOrdersQuery();
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Order>[] = [
     {
       accessorKey: 'id',
       header: isBn ? 'অর্ডার আইডি' : 'Order ID',

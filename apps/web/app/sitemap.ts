@@ -8,8 +8,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     apiUrl = apiUrl.replace('localhost', '127.0.0.1');
   }
 
-  let products = [];
-  let categories = [];
+  let products: Array<{ productVariant?: { product?: { slug?: string } } }> = [];
+  let categories: Array<{ slug?: string }> = [];
 
   try {
     const prodRes = await fetch(`${apiUrl}/public/catalog/search?limit=1000`, { next: { revalidate: 3600 } });
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1 : 0.8,
   }));
 
-  const productRoutes = products.flatMap((product: any) => {
+  const productRoutes = products.flatMap((product) => {
     const slug = product.productVariant?.product?.slug;
     if (!slug) return [];
     return [
@@ -65,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   });
 
-  const categoryRoutes = categories.flatMap((cat: any) => {
+  const categoryRoutes = categories.flatMap((cat) => {
     if (!cat.slug) return [];
     return [
       {

@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -9,7 +11,8 @@ import {
   useGetAdminFlashSalesQuery, 
   useCreateFlashSaleMutation,
   useUpdateFlashSaleMutation,
-  useDeleteFlashSaleMutation
+  useDeleteFlashSaleMutation,
+  FlashSale,
 } from '@/features/flash-sales/flashSalesApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,7 +74,7 @@ export default function AdminFlashSalesPage({ params }: { params: Promise<{ lang
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (sale: any) => {
+  const handleOpenEditModal = (sale: FlashSale) => {
     setIsEditing(true);
     setFormData({
       id: sale.id,
@@ -121,8 +124,8 @@ export default function AdminFlashSalesPage({ params }: { params: Promise<{ lang
         toast.success(isBn ? 'ফ্ল্যাশ সেল তৈরি হয়েছে' : 'Flash Sale created successfully');
       }
       setIsModalOpen(false);
-    } catch (error: any) {
-      toast.error(error?.data?.message || (isBn ? 'ব্যর্থ হয়েছে' : 'Operation failed'));
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || (isBn ? 'ব্যর্থ হয়েছে' : 'Operation failed'));
     }
   };
 
@@ -212,7 +215,7 @@ export default function AdminFlashSalesPage({ params }: { params: Promise<{ lang
                 ) : flashSales.length === 0 ? (
                   <tr><td colSpan={5} className="text-center py-8">No flash sales found.</td></tr>
                 ) : (
-                  flashSales.map((sale: any) => (
+                  flashSales.map((sale) => (
                     <tr key={sale.id} className="hover:bg-muted/30">
                       <td className="px-6 py-4 font-semibold">
                         <div className="flex items-center gap-2">

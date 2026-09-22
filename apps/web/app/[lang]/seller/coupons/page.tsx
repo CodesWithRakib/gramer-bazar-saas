@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -9,7 +11,8 @@ import {
   useGetSellerCouponsQuery, 
   useCreateSellerCouponMutation, 
   useUpdateSellerCouponMutation, 
-  useDeleteSellerCouponMutation 
+  useDeleteSellerCouponMutation,
+  Coupon,
 } from '@/features/coupons/couponsApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -82,7 +85,7 @@ export default function SellerCouponsPage({ params }: { params: Promise<{ lang: 
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (coupon: any) => {
+  const handleOpenEditModal = (coupon: Coupon) => {
     setIsEditing(true);
     setFormData({
       id: coupon.id,
@@ -142,8 +145,8 @@ export default function SellerCouponsPage({ params }: { params: Promise<{ lang: 
         toast.success(isBn ? 'কুপন তৈরি হয়েছে' : 'Coupon created successfully');
       }
       setIsModalOpen(false);
-    } catch (error: any) {
-      toast.error(error?.data?.message || (isBn ? 'ব্যর্থ হয়েছে' : 'Operation failed'));
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || (isBn ? 'ব্যর্থ হয়েছে' : 'Operation failed'));
     }
   };
 
@@ -297,7 +300,7 @@ export default function SellerCouponsPage({ params }: { params: Promise<{ lang: 
                 ) : coupons.length === 0 ? (
                   <tr><td colSpan={6} className="text-center py-8">No coupons found.</td></tr>
                 ) : (
-                  coupons.map((coupon: any) => (
+                  coupons.map((coupon) => (
                     <tr key={coupon.id} className="hover:bg-muted/30">
                       <td className="px-6 py-4 font-semibold text-primary">{coupon.code}</td>
                       <td className="px-6 py-4">

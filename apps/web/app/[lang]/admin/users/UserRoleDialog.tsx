@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useUpdateUserRolesMutation, Role } from '@/features/users/usersApi';
+import { useUpdateUserRolesMutation, Role, User } from '@/features/users/usersApi';
 import { Checkbox } from '@/components/ui/checkbox';
 
 const roleSchema = z.object({
@@ -17,13 +19,13 @@ const roleSchema = z.object({
 
 const ALL_ROLES = [Role.CUSTOMER, Role.SELLER, Role.RIDER, Role.ADMIN];
 
-export function UserRoleDialog({ user, open, onOpenChange }: { user: any, open: boolean, onOpenChange: (o: boolean) => void }) {
+export function UserRoleDialog({ user, open, onOpenChange }: { user: User, open: boolean, onOpenChange: (o: boolean) => void }) {
   const [updateRoles, { isLoading }] = useUpdateUserRolesMutation();
   
   const form = useForm<z.infer<typeof roleSchema>>({
     resolver: zodResolver(roleSchema),
     values: {
-      roles: user?.roles?.map((r: any) => r.name) || [Role.CUSTOMER],
+      roles: user?.roles?.map((r) => r.name) || [Role.CUSTOMER],
     }
   });
 
@@ -32,8 +34,8 @@ export function UserRoleDialog({ user, open, onOpenChange }: { user: any, open: 
       await updateRoles({ id: user.id, roles: values.roles }).unwrap();
       toast.success('Roles updated successfully');
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update roles');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Failed to update roles');
     }
   };
 

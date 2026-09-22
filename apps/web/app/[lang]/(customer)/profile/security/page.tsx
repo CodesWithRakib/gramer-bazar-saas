@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { use, useState } from 'react';
 import { useUpdatePasswordMutation, useDeleteAccountMutation } from '@/features/auth/authApi';
 import { Button } from '@/components/ui/button';
@@ -53,8 +55,8 @@ export default function SecurityPage({ params }: { params: Promise<{ lang: strin
       
       toast.success(isBn ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে' : 'Password updated successfully');
       setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (err: any) {
-      toast.error(err.data?.message || (isBn ? 'পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে' : 'Failed to update password'));
+    } catch (err) {
+      toast.error(getApiErrorMessage(err) || (isBn ? 'পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে' : 'Failed to update password'));
     }
   };
 
@@ -65,8 +67,8 @@ export default function SecurityPage({ params }: { params: Promise<{ lang: strin
         toast.success(isBn ? 'একাউন্ট মুছে ফেলার অনুরোধ গ্রহণ করা হয়েছে' : 'Account deletion requested successfully');
         dispatch(logout());
         router.push(`/${lang}`);
-      } catch (err: any) {
-        toast.error(err.data?.message || (isBn ? 'সমস্যা হয়েছে' : 'Failed to request deletion'));
+      } catch (err) {
+        toast.error(getApiErrorMessage(err) || (isBn ? 'সমস্যা হয়েছে' : 'Failed to request deletion'));
       }
     }
   };

@@ -219,7 +219,7 @@ export default function ShopProfilePage({
   );
 }
 
-function PackageIcon(props: any) {
+function PackageIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

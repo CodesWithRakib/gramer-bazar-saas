@@ -111,4 +111,4 @@ async function generateRealProducts() {
     console.log(`Saved ${hardcoded.length} products to ${outPath}`);
 }
 
-generateRealProducts();
+void generateRealProducts();

@@ -1,7 +1,10 @@
 'use client';
 
 import React, { use } from 'react';
-import { useGetUserWishlistQuery } from '@/features/wishlists/wishlistsApi';
+import {
+  useGetUserWishlistQuery,
+  WishlistItem,
+} from '@/features/wishlists/wishlistsApi';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Heart, Trash2 } from 'lucide-react';
 
@@ -60,7 +63,7 @@ import { CustomImage } from '@/components/ui/CustomImage';
 import { useRemoveProductFromWishlistMutation } from '@/features/wishlists/wishlistsApi';
 import { toast } from 'sonner';
 
-function WishlistCard({ item, lang, isBn }: { item: any; lang: string; isBn: boolean }) {
+function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; isBn: boolean }) {
   const [removeFromWishlist, { isLoading }] = useRemoveProductFromWishlistMutation();
 
   const handleRemove = async (e: React.MouseEvent) => {

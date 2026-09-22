@@ -95,7 +95,7 @@ export default function CustomerReviewsPage({ params }: { params: Promise<{ lang
                       </div>
                       
                       {review.comment ? (
-                        <p className="text-foreground text-sm italic">"{review.comment}"</p>
+                        <p className="text-foreground text-sm italic">&ldquo;{review.comment}&rdquo;</p>
                       ) : (
                         <p className="text-muted-foreground text-sm italic">{isBn ? 'কোনো মন্তব্য নেই' : 'No comment provided'}</p>
                       )}

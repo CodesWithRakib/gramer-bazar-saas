@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminProductsQuery } from '@/features/catalog/catalogApi';
+import { useGetAdminProductsQuery, Product } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ export default function AdminProductsPage() {
   
   const { data, isLoading } = useGetAdminProductsQuery({ page, limit, search });
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Product>[] = [
     {
       accessorKey: 'nameEn',
       header: 'Name (EN)',
@@ -22,7 +22,7 @@ export default function AdminProductsPage() {
       accessorKey: 'category',
       header: 'Category',
       cell: ({ row }) => {
-        const category = row.getValue('category') as any;
+        const category = row.getValue('category') as { nameEn: string } | null;
         return category ? category.nameEn : '-';
       },
     },
@@ -30,7 +30,7 @@ export default function AdminProductsPage() {
       accessorKey: 'brand',
       header: 'Brand',
       cell: ({ row }) => {
-        const brand = row.getValue('brand') as any;
+        const brand = row.getValue('brand') as { nameEn: string } | null;
         return brand ? brand.nameEn : '-';
       },
     },
@@ -38,7 +38,7 @@ export default function AdminProductsPage() {
       accessorKey: 'variants',
       header: 'Variants',
       cell: ({ row }) => {
-        const variants = row.getValue('variants') as any[];
+        const variants = row.getValue('variants') as unknown[];
         return variants?.length || 0;
       },
     },

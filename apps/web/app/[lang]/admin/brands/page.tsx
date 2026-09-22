@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminBrandsQuery } from '@/features/catalog/catalogApi';
+import { useGetAdminBrandsQuery, Brand } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -12,11 +12,11 @@ export default function AdminBrandsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  const [editingBrand, setEditingBrand] = useState<any>(null);
+  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   
   const { data, isLoading } = useGetAdminBrandsQuery({ page, limit, search });
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Brand>[] = [
     {
       accessorKey: 'nameEn',
       header: 'Name (EN)',

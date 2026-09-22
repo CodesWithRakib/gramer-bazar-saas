@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { use, useState, useEffect, useRef } from 'react';
 import { useGetProfileQuery, useUpdateProfileMutation, useUploadAvatarMutation } from '@/features/auth/authApi';
 import { Button } from '@/components/ui/button';
@@ -29,15 +31,17 @@ export default function PersonalInfoPage({ params }: { params: Promise<{ lang: s
     email: '',
   });
 
-  useEffect(() => {
-    if (profile) {
-      setFormData({
-        firstName: profile.firstName || '',
-        lastName: profile.lastName || '',
-        email: profile.email || '',
-      });
-    }
-  }, [profile]);
+  const [prevProfileId, setPrevProfileId] = useState<string | undefined>(
+    undefined,
+  );
+  if (profile && profile.id !== prevProfileId) {
+    setPrevProfileId(profile.id);
+    setFormData({
+      firstName: profile.firstName || '',
+      lastName: profile.lastName || '',
+      email: profile.email || '',
+    });
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,8 +58,8 @@ export default function PersonalInfoPage({ params }: { params: Promise<{ lang: s
       
       dispatch(setUser(response.user));
       toast.success(isBn ? 'প্রোফাইল সফলভাবে আপডেট হয়েছে' : 'Profile updated successfully');
-    } catch (err: any) {
-      toast.error(err.data?.message || (isBn ? 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে' : 'Failed to update profile'));
+    } catch (err) {
+      toast.error(getApiErrorMessage(err) || (isBn ? 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে' : 'Failed to update profile'));
     }
   };
 
@@ -85,8 +89,8 @@ export default function PersonalInfoPage({ params }: { params: Promise<{ lang: s
       }
       
       toast.success(isBn ? 'ছবি সফলভাবে আপলোড হয়েছে' : 'Avatar uploaded successfully');
-    } catch (err: any) {
-      toast.error(err.data?.message || (isBn ? 'ছবি আপলোড করতে সমস্যা হয়েছে' : 'Failed to upload avatar'));
+    } catch (err) {
+      toast.error(getApiErrorMessage(err) || (isBn ? 'ছবি আপলোড করতে সমস্যা হয়েছে' : 'Failed to upload avatar'));
     }
   };
 

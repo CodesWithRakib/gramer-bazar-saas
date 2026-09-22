@@ -32,10 +32,15 @@ export function ProductFilterSidebar({ lang, isMobile = false }: ProductFilterSi
   const [localMin, setLocalMin] = React.useState(minPrice);
   const [localMax, setLocalMax] = React.useState(maxPrice);
 
-  React.useEffect(() => {
+  const [prevPriceRange, setPrevPriceRange] = React.useState({
+    min: minPrice,
+    max: maxPrice,
+  });
+  if (prevPriceRange.min !== minPrice || prevPriceRange.max !== maxPrice) {
+    setPrevPriceRange({ min: minPrice, max: maxPrice });
     setLocalMin(minPrice);
     setLocalMax(maxPrice);
-  }, [minPrice, maxPrice]);
+  }
 
   const updateUrl = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());

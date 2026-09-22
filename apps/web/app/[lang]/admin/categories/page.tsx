@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAdminCategoriesQuery } from '@/features/catalog/catalogApi';
+import { useGetAdminCategoriesQuery, Category } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -12,11 +12,11 @@ export default function AdminCategoriesPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   
   const { data, isLoading } = useGetAdminCategoriesQuery({ page, limit, search });
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Category>[] = [
     {
       accessorKey: 'nameEn',
       header: 'Name (EN)',
@@ -33,7 +33,7 @@ export default function AdminCategoriesPage() {
       accessorKey: 'parent',
       header: 'Parent',
       cell: ({ row }) => {
-        const parent = row.getValue('parent') as any;
+        const parent = row.getValue('parent') as Category | null;
         return parent ? parent.nameEn : '-';
       },
     },

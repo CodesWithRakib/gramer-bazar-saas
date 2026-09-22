@@ -1,5 +1,7 @@
 'use client';
 
+import { getApiErrorMessage } from '@/lib/apiError';
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -66,8 +68,8 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
       setComment('');
       setImages([]);
       onClose();
-    } catch (err: any) {
-      toast.error(err?.data?.message || (isBn ? 'রিভিউ সাবমিট করতে সমস্যা হয়েছে' : 'Failed to submit review'));
+    } catch (err) {
+      toast.error(getApiErrorMessage(err) || (isBn ? 'রিভিউ সাবমিট করতে সমস্যা হয়েছে' : 'Failed to submit review'));
     }
   };
 

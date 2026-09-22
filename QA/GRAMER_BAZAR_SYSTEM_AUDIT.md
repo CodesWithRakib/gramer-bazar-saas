@@ -129,15 +129,41 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
     surface implemented admin/seller pages. Also removed an in-render `require()`
     and a `SidebarContent` defined inside render in `DashboardLayout`.
 
+### Test suite (fixed)
+
+16. **API unit suite was red (31/32 files).** The specs were Nest CLI scaffolding
+    (`Test.createTestingModule` with no providers), so DI could not resolve
+    repositories, services, `DataSource`, `EventEmitter2`, `ConfigService`, or the
+    `@UseGuards` guards. Every spec now supplies the required mocks
+    (`getRepositoryToken`, service stubs) and overrides guards where needed.
+    **`pnpm -C apps/api test` → 32/32 files pass.** `oxlint` is down to
+    0 errors / 30 warnings.
+
+### Web lint (fixed)
+
+17. **Web ESLint had 91 errors** (80 `no-explicit-any`, 9
+    `react-hooks/set-state-in-effect`, 2 `react/no-unescaped-entities`). All
+    errors are now resolved:
+    - Introduced `src/lib/apiError.ts` (`getApiErrorMessage`) and replaced every
+      `catch (err: any)` with a typed `unknown` + helper (29 sites).
+    - Replaced `any` in DataTables/dialogs/callbacks with the real API types
+      (`Brand`, `Category`, `Product`, `Delivery`, `Order`, `Coupon`, `FlashSale`,
+      `ProductRequest`, `User`, `WishlistItem`, `SellerProductItem`, `ChatMessage`,
+      `Role`), and typed `sitemap.ts`, `InstallPrompt`, and the `Button` motion
+      spread.
+    - Reworked all `set-state-in-effect` sites to the React "adjust state during
+      render" pattern (URL/prop sync) or lazy initialisation (geolocation,
+      locale in error boundary, hydration flag via `useSyncExternalStore`).
+    - **This surfaced and fixed 5 latent bugs**: seller product list rendered
+      `productVariant.product.name` (a non-existent field instead of
+      `nameEn`/`nameBn`); the floating chat widget read `conv.lastMessage`
+      (field does not exist on `Conversation`).
+    - `pnpm -C apps/web lint` now **exits 0** (86 warnings remain, mostly
+      pre-existing unused imports).
+
 ### Not yet addressed (remaining work)
 
-- **API unit tests: 31 of 32 files fail.** They are Nest CLI scaffolding
-  (`Test.createTestingModule` with no providers), so DI cannot resolve
-  repositories/services. The fix is mechanical: supply
-  `getRepositoryToken(Entity)` mocks and service mocks per spec, or replace the
-  stubs with behaviour tests. The suite does not currently validate anything.
-- **Lint: ~107 errors / ~92 warnings** (`pnpm -C apps/web lint`), dominated by
-  `@typescript-eslint/no-explicit-any` and React Compiler hook warnings.
+- **Web lint warnings (86)** — unused imports, `<img>` usage. Non-blocking.
 - **Two parallel socket clients** (`providers/SocketProvider.tsx` context and
   `hooks/useChatSocket.ts` singleton) — works, but should be consolidated.
 - **Auth token stored in `localStorage`** (not httpOnly cookie) — XSS exposure.
@@ -202,7 +228,7 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 | 4 | Rider journey (assigned → status → location) | 🟡 (earnings out of scope) |
 | 5 | Admin journey (incl. audit logs) | 🟡 audit logs now real |
 | 6 | Cross-system consistency (pagination, error shape, loading states) | ⬜ |
-| 7 | Test suite bootstrap + full E2E + lint cleanup | ⬜ |
+| 7 | Test suite bootstrap + lint cleanup + full E2E | 🟡 suites + lint green; E2E run pending (needs live stack) |
 
 ---
 
@@ -212,4 +238,9 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 - `pnpm -C apps/api run typecheck` — clean.
 - `pnpm -C apps/web run build` — succeeds; route table confirmed.
 - `pnpm -C apps/web run lint` on changed files — clean; repo-wide lint debt recorded above.
-- `pnpm -C apps/api test` — **31/32 files fail** (pre-existing scaffolding).
+- `pnpm -C apps/api test` — **32/32 files pass**.
+- `pnpm -C apps/api run lint` (oxlint) — 0 errors, 30 warnings.
+- `pnpm -C apps/api run typecheck` — clean (specs included).
+- `pnpm -C apps/web run lint` — **exits 0** (0 errors, 86 warnings).
+- `pnpm -C apps/web run build` — succeeds after all refactors.
+- `pnpm -r run typecheck` — all projects clean.

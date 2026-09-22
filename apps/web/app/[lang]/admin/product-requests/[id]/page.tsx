@@ -51,13 +51,15 @@ export default function AdminProductRequestDetailsPage({
   const [linkedProductId, setLinkedProductId] = useState<string>("");
   const [remark, setRemark] = useState<string>("");
 
-  useEffect(() => {
-    if (request) {
-      setStatus(request.status);
-      setAdminNotes(request.adminNotes || "");
-      setLinkedProductId(request.linkedProductId || "");
-    }
-  }, [request]);
+  const [prevRequestId, setPrevRequestId] = useState<string | undefined>(
+    undefined,
+  );
+  if (request && request.id !== prevRequestId) {
+    setPrevRequestId(request.id);
+    setStatus(request.status);
+    setAdminNotes(request.adminNotes || "");
+    setLinkedProductId(request.linkedProductId || "");
+  }
 
   if (isLoading) {
     return (
