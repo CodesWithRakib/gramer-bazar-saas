@@ -6,7 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { logout } from "@/store/slices/authSlice";
-import { DashboardRoute } from "@/config/dashboard-routes";
+import {
+  DashboardRoute,
+  adminRoutes,
+  sellerRoutes,
+  riderRoutes,
+  customerRoutes,
+} from "@/config/dashboard-routes";
 import { Menu, LogOut, ChevronDown, Store } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -17,7 +23,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CustomImage } from "@/components/ui/CustomImage";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -57,30 +62,20 @@ const NavItem = ({
   );
 };
 
-export function DashboardLayout({
-  children,
-  routeType,
+function SidebarContent({
+  routes,
   lang,
-}: DashboardLayoutProps) {
-  const routesMap = {
-    admin: require("@/config/dashboard-routes").adminRoutes,
-    seller: require("@/config/dashboard-routes").sellerRoutes,
-    rider: require("@/config/dashboard-routes").riderRoutes,
-    customer: require("@/config/dashboard-routes").customerRoutes,
-  };
-  const routes: DashboardRoute[] = routesMap[routeType];
-  const isBn = lang === "bn";
-  const pathname = usePathname();
-  const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
-
-  const handleLogout = () => {
-    dispatch(logout());
-    router.push(`/${lang}/login`);
-  };
-
-  const SidebarContent = () => (
+  isBn,
+  pathname,
+  onLogout,
+}: {
+  routes: DashboardRoute[];
+  lang: string;
+  isBn: boolean;
+  pathname: string;
+  onLogout: () => void;
+}) {
+  return (
     <div className="flex flex-col h-full bg-background border-r">
       <div className="p-6">
         <Link href={`/${lang}`} className="flex items-center gap-2">
@@ -107,7 +102,7 @@ export function DashboardLayout({
 
       <div className="p-4 border-t">
         <button
-          onClick={handleLogout}
+          onClick={onLogout}
           className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium rounded-2xl text-red-600 hover:bg-red-50 transition-colors"
         >
           <LogOut className="w-5 h-5" />
@@ -116,6 +111,30 @@ export function DashboardLayout({
       </div>
     </div>
   );
+}
+
+export function DashboardLayout({
+  children,
+  routeType,
+  lang,
+}: DashboardLayoutProps) {
+  const routesMap: Record<DashboardLayoutProps["routeType"], DashboardRoute[]> = {
+    admin: adminRoutes,
+    seller: sellerRoutes,
+    rider: riderRoutes,
+    customer: customerRoutes,
+  };
+  const routes = routesMap[routeType];
+  const isBn = lang === "bn";
+  const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push(`/${lang}/login`);
+  };
 
   // Find current route title for header
   const currentRoute = routes.find(
@@ -128,7 +147,13 @@ export function DashboardLayout({
     <div className="flex min-h-screen bg-muted/20">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen">
-        <SidebarContent />
+        <SidebarContent
+          routes={routes}
+          lang={lang}
+          isBn={isBn}
+          pathname={pathname}
+          onLogout={handleLogout}
+        />
       </aside>
 
       {/* Main Content Area */}
@@ -144,7 +169,13 @@ export function DashboardLayout({
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 p-0">
-                <SidebarContent />
+                <SidebarContent
+                  routes={routes}
+                  lang={lang}
+                  isBn={isBn}
+                  pathname={pathname}
+                  onLogout={handleLogout}
+                />
               </SheetContent>
             </Sheet>
 
@@ -171,9 +202,7 @@ export function DashboardLayout({
                       {user?.firstName} {user?.lastName}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1 capitalize">
-                      {typeof user?.roles?.[0] === 'string' 
-                        ? user.roles[0].toLowerCase() 
-                        : user?.roles?.[0]?.name?.toLowerCase() || "User"}
+                      {user?.roles?.[0]?.toLowerCase() || "User"}
                     </p>
                   </div>
                   <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />

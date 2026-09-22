@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGetRiderDeliveriesQuery } from '@/features/deliveries/deliveriesApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,9 +30,6 @@ export default function RiderDashboardPage({ params }: { params: Promise<{ lang:
   const pendingDeliveries = deliveries?.filter(d => d.status === DeliveryStatus.ASSIGNED) || [];
 
   const completedDeliveries = deliveries?.filter(d => d.status === DeliveryStatus.DELIVERED) || [];
-  
-  // Mock earnings calculation based on completed deliveries
-  const totalEarnings = completedDeliveries.length * 60; // 60 BDT per delivery
 
   return (
     <div className="space-y-6 pt-2">
@@ -53,8 +50,8 @@ export default function RiderDashboardPage({ params }: { params: Promise<{ lang:
               <Banknote className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">{isBn ? 'আজকের আয়' : 'Today\'s Earnings'}</p>
-              <h3 className="text-lg font-bold">৳{totalEarnings}</h3>
+              <p className="text-xs text-muted-foreground">{isBn ? 'নতুন অ্যাসাইনমেন্ট' : 'New Assignments'}</p>
+              <h3 className="text-lg font-bold">{pendingDeliveries.length} {isBn ? 'টি' : ''}</h3>
             </div>
           </CardContent>
         </Card>

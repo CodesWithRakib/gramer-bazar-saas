@@ -93,7 +93,7 @@ export interface SellerProduct {
     id: string;
     nameEn: string;
     nameBn: string;
-    userId: string;
+    sellerId: string;
   };
   inventory: {
     quantity: number;

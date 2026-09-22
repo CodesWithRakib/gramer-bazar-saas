@@ -12,8 +12,11 @@ export const initSocket = (token: string): Socket => {
   }
 
   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const socketUrl = backendUrl.includes('/api/v1') 
+    ? backendUrl.replace('/api/v1', '') 
+    : new URL(backendUrl).origin;
   
-  socket = io(backendUrl, {
+  socket = io(socketUrl, {
     auth: {
       token: `Bearer ${token}`,
     },

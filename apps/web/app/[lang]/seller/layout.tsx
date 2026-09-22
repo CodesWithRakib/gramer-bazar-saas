@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, use } from 'react';
+import React, { useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
-import { sellerRoutes } from '@/config/dashboard-routes';
 
 export default function SellerLayout({
   children,

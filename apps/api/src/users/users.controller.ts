@@ -1,18 +1,32 @@
-import { Controller, Get, Query, UseGuards, Patch, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+  Patch,
+  Param,
+  Body,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
+import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
+import { UserStatus } from './enums/user-status.enum.js';
 
 @ApiTags('Users (Admin)')
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.SUPER_ADMIN)
 @ApiBearerAuth()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all users with pagination and search' })
@@ -32,20 +46,44 @@ export class UsersController {
   @Patch(':id/status')
   @ApiOperation({ summary: 'Update user status (e.g., ACTIVE, INACTIVE, SUSPENDED)' })
   async updateStatus(
+    @Request() req: any,
     @Param('id') id: string,
-    @Body('status') status: string,
+    @Body('status') status: UserStatus,
   ) {
-    return this.usersService.update(id, { status } as any);
+    const updated = await this.usersService.update(id, { status });
+    await this.auditLogsService.record({
+      actorId: req.user?.id,
+      actorName: this.actorName(req.user),
+      action: 'USER_STATUS_UPDATED',
+      targetType: 'User',
+      targetId: id,
+      details: `Status set to ${status}`,
+    });
+    return updated;
   }
 
   @Patch(':id/roles')
   @ApiOperation({ summary: 'Update user roles' })
   async updateRoles(
+    @Request() req: any,
     @Param('id') id: string,
     @Body('roles') roles: string[],
   ) {
-    // For simplicity, we can fetch roles in service and assign. 
-    // This requires a new method in usersService. Let's add it.
-    return this.usersService.updateRoles(id, roles);
+    const updated = await this.usersService.updateRoles(id, roles);
+    await this.auditLogsService.record({
+      actorId: req.user?.id,
+      actorName: this.actorName(req.user),
+      action: 'USER_ROLES_UPDATED',
+      targetType: 'User',
+      targetId: id,
+      details: `Roles set to ${roles.join(', ')}`,
+    });
+    return updated;
+  }
+
+  private actorName(user?: { firstName?: string; lastName?: string }): string | null {
+    if (!user) return null;
+    const name = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    return name || null;
   }
 }

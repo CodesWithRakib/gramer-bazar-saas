@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WishlistsController } from './wishlists.controller';
+import { WishlistsController } from './wishlists.controller.js';
 
 describe('WishlistsController', () => {
   let controller: WishlistsController;

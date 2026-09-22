@@ -1,8 +1,44 @@
-import React, { use } from 'react';
-import { DashboardLayout } from '@/components/layouts/DashboardLayout';
-import { adminRoutes } from '@/config/dashboard-routes';
+'use client';
 
-export default function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ lang: string }> }) {
+import React, { useEffect, use } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { toast } from 'sonner';
+import { DashboardLayout } from '@/components/layouts/DashboardLayout';
+
+export default function AdminLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}) {
+  const router = useRouter();
   const { lang } = use(params);
-  return <DashboardLayout routeType="admin" lang={lang}>{children}</DashboardLayout>;
+  const isBn = lang === 'bn';
+
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push(`/${lang}`);
+      return;
+    }
+    const isAdmin = user?.roles?.some((r) => r === 'ADMIN' || r === 'SUPER_ADMIN');
+    if (user && !isAdmin) {
+      toast.error(isBn ? 'এই পেজটি দেখার অনুমতি নেই' : 'Unauthorized access');
+      router.push(`/${lang}`);
+    }
+  }, [isAuthenticated, user, router, lang, isBn]);
+
+  if (!isAuthenticated || !user?.roles?.some((r) => r === 'ADMIN' || r === 'SUPER_ADMIN')) {
+    return null;
+  }
+
+  return (
+    <DashboardLayout routeType="admin" lang={lang}>
+      {children}
+    </DashboardLayout>
+  );
 }

@@ -19,11 +19,14 @@ import { AuthService } from './auth.service.js';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>(
-          'JWT_SECRET',
+          'JWT_ACCESS_SECRET',
           'super-secret-key-for-dev-only',
         ),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '15m') as any,
+          expiresIn: configService.get<string>(
+            'JWT_ACCESS_EXPIRES_IN',
+            '1h',
+          ) as any,
         },
       }),
       inject: [ConfigService],

@@ -23,12 +23,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly chatService: ChatService) {}
 
-  handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
+  handleConnection(_client: Socket) {
+    // Connection is authenticated lazily per-message via WsJwtGuard.
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+  handleDisconnect(_client: Socket) {
+    // No server-side cleanup required; rooms are dropped with the socket.
   }
 
   @UseGuards(WsJwtGuard)
@@ -60,7 +60,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { conversationId: string; content: string }
   ) {
     const senderId = client.user.userId || client.user.sub;
-    
+
     // Save to DB
     const message = await this.chatService.sendMessage(
       senderId,
@@ -69,10 +69,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
 
     const room = `conversation_${data.conversationId}`;
-    
+
     // Broadcast to the room
     this.server.to(room).emit('new_message', message);
-    
+
     // Return for ack
     return message;
   }

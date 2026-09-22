@@ -7,6 +7,14 @@ Welcome to the Gramer Bazar project! This is a monorepo containing the Next.js f
 - pnpm (v12.4.2 or later)
 - PostgreSQL (running locally)
 
+## Documentation
+- `QA/GRAMER_BAZAR_SYSTEM_AUDIT.md` — **as-built** system map, feature
+  inventory, implemented API route table, known issues and phased plan.
+- `Gramer_Bazar_Backend_System_Design_API_Document.md` and
+  `Gramer_Bazar_Frontend_System_Design_Document.md` — original design intent.
+  These are aspirational in places; where they disagree with the code, the audit
+document is authoritative.
+
 ## Local Setup Instructions
 
 1. **Install dependencies**
@@ -18,6 +26,11 @@ Welcome to the Gramer Bazar project! This is a monorepo containing the Next.js f
    - Copy `.env.example` to `.env` in the root directory.
    - Copy `apps/api/.env.example` to `apps/api/.env`.
    - Update `DATABASE_URL` in your `.env` files to match your local PostgreSQL credentials.
+   - The API requires `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` (validated at
+     boot). Optional: `JWT_ACCESS_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`,
+     `CORS_ORIGINS`, `FRONTEND_URL`, `REDIS_URL`.
+   - The web app reads `NEXT_PUBLIC_API_URL` (defaults to
+     `http://localhost:4000/api/v1`).
 
 3. **Database Setup**
    Ensure PostgreSQL is running and create a database named `gramer_bazar`:

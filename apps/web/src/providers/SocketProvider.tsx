@@ -25,13 +25,17 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     // Only connect if the user is logged in
     if (!profile?.id) return;
 
-    const token = typeof document !== 'undefined' 
-      ? document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1]
-      : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     
     if (!token) return;
 
-    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', {
+    const backendUrl =
+      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    const socketUrl = backendUrl.includes('/api/v1') 
+      ? backendUrl.replace('/api/v1', '') 
+      : new URL(backendUrl).origin;
+
+    const socketInstance = io(socketUrl, {
       auth: {
         token: `Bearer ${token}`
       }
@@ -39,12 +43,10 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
     socketInstance.on('connect', () => {
       setIsConnected(true);
-      console.log('Socket connected:', socketInstance.id);
     });
 
     socketInstance.on('disconnect', () => {
       setIsConnected(false);
-      console.log('Socket disconnected');
     });
 
     // eslint-disable-next-line

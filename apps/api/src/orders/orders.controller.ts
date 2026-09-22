@@ -6,11 +6,15 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service.js';
 import { CheckoutDto } from './dto/checkout.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
+import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   @Post('checkout')
   @ApiBearerAuth()
@@ -47,7 +51,16 @@ export class OrdersController {
     @Param('id') id: string,
     @Body('status') status: string
   ) {
-    return this.ordersService.updateAdminOrderStatus(id, status, req.user.id);
+    const result = await this.ordersService.updateAdminOrderStatus(id, status, req.user.id);
+    await this.auditLogsService.record({
+      actorId: req.user?.id,
+      actorName: `${req.user?.firstName ?? ''} ${req.user?.lastName ?? ''}`.trim() || null,
+      action: 'ORDER_STATUS_UPDATED',
+      targetType: 'Order',
+      targetId: id,
+      details: `Status set to ${status}`,
+    });
+    return result;
   }
 
   @Get()

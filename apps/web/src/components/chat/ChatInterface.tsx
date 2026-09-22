@@ -5,19 +5,16 @@ import {
   useGetConversationsQuery, 
   useGetMessagesQuery, 
   useMarkMessagesAsReadMutation,
-  chatApi 
+  type ConversationParticipant,
 } from '@/features/chat/chatApi';
 import { useGetProfileQuery } from '@/features/auth/authApi';
-import { useSocket } from '@/hooks/useSocket';
-import { useAppDispatch } from '@/store/hooks';
-import { Card } from '@/components/ui/card';
+import { useChatSocket } from '@/hooks/useChatSocket';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Search, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
 
 export function ChatInterface() {
   const { data: currentUser } = useGetProfileQuery();
@@ -26,8 +23,9 @@ export function ChatInterface() {
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
   
-  const { socket, isConnected } = useSocket();
-  const dispatch = useAppDispatch();
+  const { isConnected, sendMessage } = useChatSocket(
+    activeConversationId ?? undefined,
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: messages, isLoading: isMessagesLoading } = useGetMessagesQuery(
@@ -51,67 +49,15 @@ export function ChatInterface() {
     }
   }, [activeConversationId, markAsRead, messages]);
 
-  // Handle incoming socket events
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleNewMessage = (newMessage: any) => {
-      // Optimistically update the message list
-      dispatch(
-        chatApi.util.updateQueryData('getMessages', newMessage.conversationId, (draft) => {
-          // Prevent duplicates
-          if (!draft.find((m) => m.id === newMessage.id)) {
-            draft.push(newMessage);
-          }
-        })
-      );
-      
-      // Update the conversations list with latest message
-      dispatch(
-        chatApi.util.updateQueryData('getConversations', undefined, (draft) => {
-          const conv = draft.find(c => c.id === newMessage.conversationId);
-          if (conv) {
-            // Push the new message to the conversation preview if not duplicate
-            if (!conv.messages.find((m) => m.id === newMessage.id)) {
-                conv.messages.push(newMessage);
-                conv.updatedAt = new Date().toISOString();
-            }
-          }
-        })
-      );
-
-      // If we are currently looking at this conversation, mark it as read immediately
-      if (activeConversationId === newMessage.conversationId && newMessage.senderId !== currentUser?.id) {
-        markAsRead(newMessage.conversationId).catch(console.error);
-      }
-    };
-
-    socket.on('newMessage', handleNewMessage);
-    
-    // Sometimes backend emits 'receiveMessage' instead of 'newMessage'
-    socket.on('receiveMessage', handleNewMessage);
-
-    return () => {
-      socket.off('newMessage', handleNewMessage);
-      socket.off('receiveMessage', handleNewMessage);
-    };
-  }, [socket, dispatch, activeConversationId, currentUser?.id, markAsRead]);
-
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageInput.trim() || !activeConversationId || !socket) return;
+    if (!messageInput.trim() || !activeConversationId || !isConnected) return;
 
-    const content = messageInput.trim();
+    sendMessage(messageInput.trim());
     setMessageInput('');
-
-    // Emit via socket
-    socket.emit('sendMessage', {
-      conversationId: activeConversationId,
-      content,
-    });
   };
 
-  const getOtherParticipant = (participants: any[]) => {
+  const getOtherParticipant = (participants: ConversationParticipant[]) => {
     return participants.find((p) => p.id !== currentUser?.id) || participants[0];
   };
 

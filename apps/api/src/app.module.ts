@@ -38,6 +38,7 @@ import { WalletsModule } from './wallets/wallets.module.js';
 import { PayoutsModule } from './payouts/payouts.module.js';
 import { DisputesModule } from './disputes/disputes.module.js';
 import { FlashSalesModule } from './flash-sales/flash-sales.module.js';
+import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -112,6 +113,7 @@ import { join } from 'path';
     PayoutsModule,
     DisputesModule,
     FlashSalesModule,
+    AuditLogsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -80,7 +80,16 @@ export const ordersApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Order", id }, "Order"],
     }),
-    checkoutOrder: builder.mutation<{ order: Order; paymentUrl: string | null }, { addressId: string, paymentMethod: string, items: { sellerProductId: string, quantity: number }[] }>({
+    checkoutOrder: builder.mutation<
+      { order: Order; paymentUrl: string | null },
+      {
+        addressId: string;
+        paymentMethod: string;
+        items: { sellerProductId: string; quantity: number }[];
+        couponCode?: string;
+        lang?: string;
+      }
+    >({
       query: (body) => ({
         url: `/orders/checkout`,
         method: "POST",

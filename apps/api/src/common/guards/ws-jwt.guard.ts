@@ -20,7 +20,10 @@ export class WsJwtGuard implements CanActivate {
       }
 
       const payload = await this.jwtService.verifyAsync(authToken, {
-        secret: this.configService.get<string>('JWT_SECRET', 'super-secret-key-for-dev-only'),
+        secret: this.configService.get<string>(
+          'JWT_ACCESS_SECRET',
+          'super-secret-key-for-dev-only',
+        ),
       });
       
       client.user = payload;

@@ -42,11 +42,11 @@ export const chatApi = api.injectEndpoints({
       providesTags: (result, error, id) => [{ type: 'Message', id }],
     }),
     markMessagesAsRead: builder.mutation<{ success: boolean }, string>({
-      query: (participantId) => ({
-        url: `/chat/conversations/${participantId}/read`,
-        method: 'POST',
+      query: (conversationId) => ({
+        url: `/chat/conversations/${conversationId}/read`,
+        method: 'PATCH',
       }),
-      invalidatesTags: ['ChatList', 'UnreadCount'],
+      invalidatesTags: ['Conversation', 'Message'],
     }),
   }),
 });

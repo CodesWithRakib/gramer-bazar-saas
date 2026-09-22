@@ -8,11 +8,15 @@ import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { ProductRequestStatus } from './enums/product-request-status.enum.js';
+import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 
 @ApiTags('Product Requests')
 @Controller()
 export class ProductRequestsController {
-  constructor(private readonly productRequestsService: ProductRequestsService) {}
+  constructor(
+    private readonly productRequestsService: ProductRequestsService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   // --- Customer Endpoints ---
 
@@ -70,11 +74,24 @@ export class ProductRequestsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update product request status (Admin)' })
-  updateStatus(
+  async updateStatus(
     @Request() req: any,
     @Param('id') id: string,
     @Body() updateDto: UpdateProductRequestStatusDto,
   ) {
-    return this.productRequestsService.updateStatus(id, req.user.id, updateDto);
+    const result = await this.productRequestsService.updateStatus(
+      id,
+      req.user.id,
+      updateDto,
+    );
+    await this.auditLogsService.record({
+      actorId: req.user?.id,
+      actorName: `${req.user?.firstName ?? ''} ${req.user?.lastName ?? ''}`.trim() || null,
+      action: 'PRODUCT_REQUEST_STATUS_UPDATED',
+      targetType: 'ProductRequest',
+      targetId: id,
+      details: `Status set to ${updateDto.status}`,
+    });
+    return result;
   }
 }
