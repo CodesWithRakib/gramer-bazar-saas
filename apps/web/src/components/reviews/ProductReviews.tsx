@@ -19,7 +19,7 @@ interface ProductReviewsProps {
 
 export function ProductReviews({ productId, isBn, lang }: ProductReviewsProps) {
   const router = useRouter();
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);

@@ -8,6 +8,7 @@ import { ProductCardSkeleton, CategoryCardSkeleton } from '@/components/ui/Skele
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CustomImage } from '@/components/ui/CustomImage';
 import Link from 'next/link';
 
 export function HomeClient({
@@ -80,9 +81,11 @@ export function HomeClient({
                     <span className="sr-only">{banners[currentBanner].title}</span>
                   </Link>
                 ) : null}
-                <img
+                <CustomImage
                   src={banners[currentBanner].imageUrl}
                   alt={banners[currentBanner].title}
+                  fill
+                  sizes="100vw"
                   className="w-full h-full object-cover"
                 />
               </motion.div>

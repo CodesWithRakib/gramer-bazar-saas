@@ -79,7 +79,22 @@ export class AuthController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'Current user profile' })
   async getProfile(@Request() req: any) {
-    return req.user;
+    const user = req.user;
+    return {
+      id: user.id,
+      phone: user.phone,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      status: user.status,
+      isPhoneVerified: user.isPhoneVerified,
+      isEmailVerified: user.isEmailVerified,
+      avatar: user.avatar,
+      lastLoginAt: user.lastLoginAt,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      roles: user.roles?.map((r: any) => (typeof r === 'string' ? r : r.name)) || [],
+    };
   }
 
   @Patch('me')

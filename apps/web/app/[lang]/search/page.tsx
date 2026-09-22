@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense, use } from "react";
+import React, {  useState, Suspense, use } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   useSearchProductsQuery,

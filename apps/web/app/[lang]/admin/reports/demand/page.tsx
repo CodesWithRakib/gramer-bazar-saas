@@ -4,7 +4,7 @@ import React, { use } from 'react';
 import { useGetDemandAnalyticsQuery } from '@/features/analytics/analyticsApi';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Eye, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Search,  AlertTriangle, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export default function DemandAnalyticsPage({ params }: { params: Promise<{ lang: string }> }) {

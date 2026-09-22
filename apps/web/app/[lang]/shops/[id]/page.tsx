@@ -7,7 +7,7 @@ import { ProductGrid } from '@/components/catalog/ProductGrid';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Store, CheckCircle, MapPin, Phone, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Store, CheckCircle,  Phone, MessageSquare, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 

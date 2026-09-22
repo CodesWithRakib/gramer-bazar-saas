@@ -6,8 +6,8 @@ import { useGetPublicCategoriesQuery, useGetPublicBrandsQuery } from "@/features
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Filter, X } from "lucide-react";
+import { Sheet, SheetContent,   SheetTrigger } from "@/components/ui/sheet";
+import { Filter } from "lucide-react";
 
 interface ProductFilterSidebarProps {
   lang: string;

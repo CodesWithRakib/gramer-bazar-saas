@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   useGetAdminProductRequestByIdQuery,
   useUpdateProductRequestStatusMutation,
@@ -36,7 +35,6 @@ export default function AdminProductRequestDetailsPage({
   params: { lang: string; id: string };
 }) {
   const isBn = lang === "bn";
-  const router = useRouter();
 
   const {
     data: request,
@@ -93,7 +91,7 @@ export default function AdminProductRequestDetailsPage({
         isBn ? "স্থিতি আপডেট করা হয়েছে" : "Status updated successfully",
       );
       setRemark(""); // Clear remark after submit
-    } catch (error) {
+    } catch {
       toast.error(
         isBn ? "আপডেট করতে ত্রুটি হয়েছে" : "Failed to update status",
       );

@@ -17,13 +17,12 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { MessageCircle, X, ChevronLeft, Send } from 'lucide-react';
 import {
   closeChatWidget,
-  openChatWidget,
+  
   selectActiveConversationId,
   selectIsWidgetOpen,
   setActiveConversation,
   toggleChatWidget,
 } from '@/store/slices/chatSlice';
-import { Badge } from '@/components/ui/badge';
 
 export function FloatingChatWidget({ lang }: { lang: string }) {
   const isBn = lang === 'bn';

@@ -207,7 +207,7 @@ export const catalogApi = api
           // Strip out undefined, null, or empty string values
           const cleanParams = Object.fromEntries(
             Object.entries(params).filter(
-              ([_, v]) => v !== undefined && v !== null && v !== "",
+              ([, v]) => v !== undefined && v !== null && v !== "",
             ),
           );
           return {

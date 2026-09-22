@@ -106,7 +106,7 @@ export default function SellerCouponsPage({ params }: { params: Promise<{ lang: 
     try {
       await updateCoupon({ id, data: { isActive } }).unwrap();
       toast.success(isBn ? 'স্ট্যাটাস আপডেট হয়েছে' : 'Status updated');
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'আপডেট ব্যর্থ হয়েছে' : 'Update failed');
     }
   };
@@ -116,7 +116,7 @@ export default function SellerCouponsPage({ params }: { params: Promise<{ lang: 
     try {
       await deleteCoupon(id).unwrap();
       toast.success(isBn ? 'কুপন মুছে ফেলা হয়েছে' : 'Coupon deleted');
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'মুছতে ব্যর্থ হয়েছে' : 'Deletion failed');
     }
   };

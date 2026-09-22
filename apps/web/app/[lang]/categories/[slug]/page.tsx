@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
 import { useGetPublicCategoriesQuery, useSearchProductsQuery } from '@/features/catalog/catalogApi';
 import { ProductGrid } from '@/components/catalog/ProductGrid';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, ChevronLeft, ChevronRight, PackageSearch } from 'lucide-react';
 import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
+import { CustomImage } from '@/components/ui/CustomImage';
 import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -91,7 +91,7 @@ export default function CategoryDetailsPage({ params }: { params: Promise<{ lang
             <div className="flex items-center gap-4">
               {category.icon && (
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center p-2 shrink-0">
-                  <img src={category.icon} alt="icon" className="w-8 h-8 object-contain" />
+                  <CustomImage src={category.icon} alt="icon" width={32} height={32} className="w-8 h-8 object-contain" />
                 </div>
               )}
               <div>

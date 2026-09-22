@@ -7,7 +7,6 @@ import { useDispatch } from 'react-redux';
 import { clearCart } from '@/store/slices/cartSlice';
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
-import { Locale } from '@/config/i18n';
 
 export default function CheckoutSuccessPage({
   params,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use, useState, useEffect } from 'react';
+import React, {  useState, useEffect } from 'react';
 import { useGetRiderDeliveriesQuery } from '@/features/deliveries/deliveriesApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

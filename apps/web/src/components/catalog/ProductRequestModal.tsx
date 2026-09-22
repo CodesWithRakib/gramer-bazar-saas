@@ -49,7 +49,7 @@ export function ProductRequestModal({ lang, trigger }: ProductRequestModalProps)
         setOpen(false);
         setSuccess(false);
       }, 2000);
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'অনুরোধ জমা দিতে ত্রুটি হয়েছে।' : 'Failed to submit request.');
     }
   };

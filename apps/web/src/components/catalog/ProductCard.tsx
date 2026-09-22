@@ -50,7 +50,7 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         await addToWishlist(productId).unwrap();
         toast.success(lang === 'bn' ? 'উইশলিস্টে যোগ করা হয়েছে' : 'Added to wishlist');
       }
-    } catch (error) {
+    } catch {
       toast.error(lang === 'bn' ? 'একটি ত্রুটি হয়েছে' : 'An error occurred');
     }
   };

@@ -55,9 +55,7 @@ export function ChatInbox() {
     e.preventDefault();
     if (!newMessage.trim() || !socket || !activeConversationId) return;
 
-    socket.emit('send_message', { conversationId: activeConversationId, content: newMessage }, (message: any) => {
-       // Optional ack callback
-    });
+    socket.emit('send_message', { conversationId: activeConversationId, content: newMessage });
     setNewMessage('');
   };
 

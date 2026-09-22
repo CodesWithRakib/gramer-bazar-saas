@@ -17,6 +17,7 @@ import { Menu, LogOut, ChevronDown, Store } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/NotificationBell";
+import { getUserRoles } from "@/lib/roles";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -202,7 +203,7 @@ export function DashboardLayout({
                       {user?.firstName} {user?.lastName}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1 capitalize">
-                      {user?.roles?.[0]?.toLowerCase() || "User"}
+                      {getUserRoles(user)[0]?.toLowerCase() || "User"}
                     </p>
                   </div>
                   <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />

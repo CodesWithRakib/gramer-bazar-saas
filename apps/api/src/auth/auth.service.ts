@@ -183,6 +183,7 @@ export class AuthService {
         phone: updatedUser.phone,
         email: updatedUser.email,
         avatar: updatedUser.avatar,
+        roles: updatedUser.roles?.map((r: any) => (typeof r === 'string' ? r : r.name)) || [],
       }
     };
   }

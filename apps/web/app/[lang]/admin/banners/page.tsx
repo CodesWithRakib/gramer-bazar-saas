@@ -1,31 +1,43 @@
-'use client';
+"use client";
 
-import React, { use, useState } from 'react';
+import React, { use, useState } from "react";
 import {
   useGetAdminBannersQuery,
   useCreateBannerMutation,
   useUpdateBannerMutation,
   useDeleteBannerMutation,
-  Banner
-} from '@/features/banners/bannersApi';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Switch } from '@/components/ui/switch';
+  Banner,
+} from "@/features/banners/bannersApi";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Plus, Image as ImageIcon, Trash2, Edit } from 'lucide-react';
-import Image from 'next/image';
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Plus, Image as ImageIcon, Trash2, Edit } from "lucide-react";
+import Image from "next/image";
+import { CustomImage } from "@/components/ui/CustomImage";
 
-export default function AdminBannersPage({ params }: { params: Promise<{ lang: string }> }) {
-  const { lang } = use(params);
+export default function AdminBannersPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang: _lang } = use(params);
+  void _lang;
   const { data: banners, isLoading } = useGetAdminBannersQuery();
   const [createBanner] = useCreateBannerMutation();
   const [updateBanner] = useUpdateBannerMutation();
@@ -35,9 +47,9 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
 
   const [formData, setFormData] = useState({
-    title: '',
-    imageUrl: '',
-    linkUrl: '',
+    title: "",
+    imageUrl: "",
+    linkUrl: "",
     displayOrder: 0,
     isActive: true,
   });
@@ -48,16 +60,16 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
       setFormData({
         title: banner.title,
         imageUrl: banner.imageUrl,
-        linkUrl: banner.linkUrl || '',
+        linkUrl: banner.linkUrl || "",
         displayOrder: banner.displayOrder,
         isActive: banner.isActive,
       });
     } else {
       setEditingBanner(null);
       setFormData({
-        title: '',
-        imageUrl: '',
-        linkUrl: '',
+        title: "",
+        imageUrl: "",
+        linkUrl: "",
         displayOrder: 0,
         isActive: true,
       });
@@ -80,7 +92,7 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
       }
       setIsModalOpen(false);
     } catch (err) {
-      console.error('Failed to save banner:', err);
+      console.error("Failed to save banner:", err);
     }
   };
 
@@ -88,19 +100,19 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
     try {
       await updateBanner({
         id: banner.id,
-        data: { isActive: !banner.isActive }
+        data: { isActive: !banner.isActive },
       }).unwrap();
     } catch (err) {
-      console.error('Failed to toggle status:', err);
+      console.error("Failed to toggle status:", err);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this banner?')) {
+    if (confirm("Are you sure you want to delete this banner?")) {
       try {
         await deleteBanner(id).unwrap();
       } catch (err) {
-        console.error('Failed to delete banner:', err);
+        console.error("Failed to delete banner:", err);
       }
     }
   };
@@ -109,7 +121,7 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Campaign Banners</h1>
-        
+
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => handleOpenModal()}>
@@ -119,7 +131,9 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
           </DialogTrigger>
           <DialogContent className="sm:max-w-[525px]">
             <DialogHeader>
-              <DialogTitle>{editingBanner ? 'Edit Banner' : 'Create New Banner'}</DialogTitle>
+              <DialogTitle>
+                {editingBanner ? "Edit Banner" : "Create New Banner"}
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 pt-4">
               <div className="grid gap-2">
@@ -127,7 +141,9 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                   placeholder="e.g. Eid Mega Sale"
                   required
                 />
@@ -138,19 +154,20 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
                 <Input
                   id="imageUrl"
                   value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, imageUrl: e.target.value })
+                  }
                   placeholder="https://example.com/banner.jpg"
                   required
                 />
                 {formData.imageUrl && (
                   <div className="mt-2 relative h-32 w-full rounded-md overflow-hidden bg-muted border">
-                    <img 
-                      src={formData.imageUrl} 
-                      alt="Preview" 
+                    <CustomImage
+                      src={formData.imageUrl}
+                      alt="Preview"
+                      fill
+                      sizes="400px"
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgeD0iMyIgeT0iMyIgcng9IjIiIHJ5PSIyIi8+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjIiLz48cGF0aCBkPSJtMjEgMTUtMy4wODYtMy4wODZhMiAyIDAgMCAwLTIuODI4IDBMNiAyMSIvPjwvc3ZnPg==';
-                      }}
                     />
                   </div>
                 )}
@@ -161,7 +178,9 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
                 <Input
                   id="linkUrl"
                   value={formData.linkUrl}
-                  onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, linkUrl: e.target.value })
+                  }
                   placeholder="e.g. /catalog?category=electronics"
                 />
               </div>
@@ -173,26 +192,37 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
                     id="displayOrder"
                     type="number"
                     value={formData.displayOrder}
-                    onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        displayOrder: parseInt(e.target.value) || 0,
+                      })
+                    }
                   />
                 </div>
-                
+
                 <div className="flex items-center space-x-2 mt-8">
                   <Switch
                     id="isActive"
                     checked={formData.isActive}
-                    onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isActive: checked })
+                    }
                   />
                   <Label htmlFor="isActive">Active</Label>
                 </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t">
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsModalOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button type="submit">
-                  {editingBanner ? 'Update Banner' : 'Create Banner'}
+                  {editingBanner ? "Update Banner" : "Create Banner"}
                 </Button>
               </div>
             </form>
@@ -215,13 +245,19 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-muted-foreground"
+                >
                   Loading banners...
                 </TableCell>
               </TableRow>
             ) : !banners || banners.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-muted-foreground"
+                >
                   No banners found. Create one to get started.
                 </TableCell>
               </TableRow>
@@ -231,8 +267,8 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
                   <TableCell>
                     <div className="relative h-12 w-20 rounded overflow-hidden border bg-muted">
                       {banner.imageUrl ? (
-                        <Image 
-                          src={banner.imageUrl} 
+                        <Image
+                          src={banner.imageUrl}
                           alt={banner.title}
                           fill
                           className="object-cover"
@@ -244,7 +280,7 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
                   </TableCell>
                   <TableCell className="font-medium">{banner.title}</TableCell>
                   <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">
-                    {banner.linkUrl || '-'}
+                    {banner.linkUrl || "-"}
                   </TableCell>
                   <TableCell>{banner.displayOrder}</TableCell>
                   <TableCell className="text-center">
@@ -254,10 +290,19 @@ export default function AdminBannersPage({ params }: { params: Promise<{ lang: s
                     />
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleOpenModal(banner)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleOpenModal(banner)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(banner.id)} className="text-red-500">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(banner.id)}
+                      className="text-red-500"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>

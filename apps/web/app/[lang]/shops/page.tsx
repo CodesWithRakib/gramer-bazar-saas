@@ -1,12 +1,11 @@
 'use client';
 
 import React, { use, useState } from 'react';
-import { useGetShopsQuery, Shop } from '@/features/shops/shopsApi';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useGetShopsQuery } from '@/features/shops/shopsApi';
+import { Card, CardContent,  } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Search, Store, CheckCircle, ChevronRight, MapPin } from 'lucide-react';
+import { Search, Store, CheckCircle, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 

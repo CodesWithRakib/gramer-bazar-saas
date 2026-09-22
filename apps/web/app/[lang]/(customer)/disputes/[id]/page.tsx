@@ -13,7 +13,7 @@ import { RootState } from '@/store/store';
 
 export default function DisputeDetailsPage() {
   const { id } = useParams() as { id: string };
-  const router = useRouter();
+  void useRouter;
   const { data: dispute, isLoading } = useGetCustomerDisputeDetailsQuery(id);
   const [addMessage, { isLoading: isSending }] = useAddCustomerDisputeMessageMutation();
   const [message, setMessage] = useState('');

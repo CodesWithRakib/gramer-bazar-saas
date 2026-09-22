@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface RoleRef {
+  id?: string;
+  name?: string;
+}
+
 export interface UserProfile {
   id: string;
   phone: string;
@@ -8,7 +13,27 @@ export interface UserProfile {
   lastName?: string;
   avatar?: string | null;
   roles?: string[];
+  [key: string]: unknown;
 }
+
+const normalizeRole = (r: unknown): string => {
+  if (typeof r === 'string') return r;
+  if (r && typeof r === 'object' && 'name' in r) {
+    const name = (r as RoleRef).name;
+    return typeof name === 'string' ? name : '';
+  }
+  return '';
+};
+
+const normalizeUser = (user: unknown): UserProfile | null => {
+  if (!user || typeof user !== 'object') return null;
+  const u = user as Record<string, unknown>;
+  const roles = Array.isArray(u.roles) ? u.roles.map(normalizeRole).filter(Boolean) : [];
+  return {
+    ...(u as UserProfile),
+    roles,
+  };
+};
 
 export interface AuthState {
   token: string | null;
@@ -44,10 +69,10 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ token: string; user: UserProfile }>
+      action: PayloadAction<{ token: string; user: unknown }>
     ) => {
       state.token = action.payload.token;
-      state.user = action.payload.user;
+      state.user = normalizeUser(action.payload.user);
       state.isAuthenticated = true;
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', action.payload.token);
@@ -64,8 +89,8 @@ const authSlice = createSlice({
     setLoginModalOpen: (state, action: PayloadAction<boolean>) => {
       state.isLoginModalOpen = action.payload;
     },
-    setUser: (state, action: PayloadAction<UserProfile>) => {
-      state.user = action.payload;
+    setUser: (state, action: PayloadAction<unknown>) => {
+      state.user = normalizeUser(action.payload);
     }
   },
 });

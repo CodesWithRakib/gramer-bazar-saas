@@ -13,15 +13,56 @@ export interface CartItem {
   sellerNameBn?: string;
 }
 
+export interface AppliedCoupon {
+  code: string;
+  discountAmount: number;
+  couponId: string;
+}
+
 export interface CartState {
   items: CartItem[];
   isOpen: boolean;
-  appliedCoupon: {
-    code: string;
-    discountAmount: number;
-    couponId: string;
-  } | null;
+  appliedCoupon: AppliedCoupon | null;
 }
+
+const CART_STORAGE_KEY = 'gramer-bazar-cart';
+
+/** Read the persisted cart from localStorage. Safe on the server (returns null). */
+export const loadCartFromStorage = (): {
+  items: CartItem[];
+  appliedCoupon: AppliedCoupon | null;
+} | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as {
+      items?: CartItem[];
+      appliedCoupon?: AppliedCoupon | null;
+    };
+    if (!Array.isArray(parsed.items)) return null;
+    const items = parsed.items.filter(
+      (i): i is CartItem =>
+        !!i && typeof i.sellerProductId === 'string' && typeof i.quantity === 'number',
+    );
+    return { items, appliedCoupon: parsed.appliedCoupon ?? null };
+  } catch {
+    return null;
+  }
+};
+
+/** Write the current cart slice to localStorage. Safe on the server. */
+export const saveCartToStorage = (cart: Pick<CartState, 'items' | 'appliedCoupon'>): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify({ items: cart.items, appliedCoupon: cart.appliedCoupon }),
+    );
+  } catch {
+    // Storage unavailable/full — cart simply won't persist.
+  }
+};
 
 const initialState: CartState = {
   items: [],
@@ -33,6 +74,14 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
+    // Restore a persisted cart after mount (avoids SSR hydration mismatches).
+    hydrateCart: (
+      state,
+      action: PayloadAction<{ items: CartItem[]; appliedCoupon: AppliedCoupon | null }>,
+    ) => {
+      state.items = action.payload.items;
+      state.appliedCoupon = action.payload.appliedCoupon;
+    },
     addToCart: (state, action: PayloadAction<CartItem>) => {
       const existingItem = state.items.find(i => i.sellerProductId === action.payload.sellerProductId);
       if (existingItem) {
@@ -66,7 +115,7 @@ const cartSlice = createSlice({
     setCartOpen: (state, action: PayloadAction<boolean>) => {
       state.isOpen = action.payload;
     },
-    applyCoupon: (state, action: PayloadAction<{ code: string; discountAmount: number; couponId: string }>) => {
+    applyCoupon: (state, action: PayloadAction<AppliedCoupon>) => {
       state.appliedCoupon = action.payload;
     },
     removeCoupon: (state) => {
@@ -75,5 +124,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart, toggleCart, setCartOpen, applyCoupon, removeCoupon } = cartSlice.actions;
+export const { hydrateCart, addToCart, removeFromCart, updateQuantity, clearCart, toggleCart, setCartOpen, applyCoupon, removeCoupon } = cartSlice.actions;
 export default cartSlice.reducer;

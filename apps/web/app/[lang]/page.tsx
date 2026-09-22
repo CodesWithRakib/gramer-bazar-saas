@@ -29,14 +29,6 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
   const { data: categories, isLoading: isLoadingCats } = useGetPublicCategoriesQuery();
   const { data: featuredData, isLoading: isLoadingFeatured } = useGetFeaturedProductsQuery();
 
-  const renderCategorySkeletons = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <Skeleton key={i} className="h-32 w-full rounded-xl" />
-      ))}
-    </div>
-  );
-
   return (
     <div className="flex flex-col gap-8 md:gap-12 pb-24 md:pb-12">
       {/* Hero Banners Section */}

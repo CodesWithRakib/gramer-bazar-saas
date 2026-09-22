@@ -9,6 +9,7 @@ import { updateQuantity, removeFromCart } from '@/store/slices/cartSlice';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Trash2, ShoppingBag, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CustomImage } from '@/components/ui/CustomImage';
 
 export default function CartPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -61,10 +62,13 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                 <CardContent className="p-0">
                   <div className="flex flex-col sm:flex-row gap-4 p-4 sm:p-6">
                     <div className="h-24 w-24 sm:h-32 sm:w-32 bg-muted rounded-md overflow-hidden flex-shrink-0">
-                      <img 
-                        src={item.image} 
-                        alt={isBn ? item.nameBn : item.nameEn} 
-                        className="h-full w-full object-cover mix-blend-multiply" 
+                      <CustomImage
+                        src={item.image}
+                        alt={isBn ? item.nameBn : item.nameEn}
+                        width={128}
+                        height={128}
+                        sizes="128px"
+                        className="h-full w-full object-cover mix-blend-multiply"
                       />
                     </div>
                     

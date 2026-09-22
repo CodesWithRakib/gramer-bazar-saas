@@ -49,7 +49,7 @@ export default function SellerProfilePage({ params }: { params: Promise<{ lang: 
     try {
       await updateShop(values).unwrap();
       toast.success(isBn ? 'প্রোফাইল আপডেট হয়েছে' : 'Profile updated');
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'প্রোফাইল আপডেট করতে ত্রুটি হয়েছে' : 'Failed to update profile');
     }
   };

@@ -7,7 +7,6 @@ import { RootState } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import { useGetConversationsQuery, Conversation } from '@/features/chat/chatApi';
 import { ChatWindow } from '@/components/chat/ChatWindow';
-import { Card, CardContent } from '@/components/ui/card';
 import { MessageSquare, User } from 'lucide-react';
 
 export default function CustomerMessagesPage({ params }: { params: Promise<{ lang: string }> }) {

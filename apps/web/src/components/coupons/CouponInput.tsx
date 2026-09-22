@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useValidateCouponMutation } from '@/features/coupons/couponsApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Ticket, CheckCircle2, XCircle } from 'lucide-react';
+import { Ticket, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CouponInputProps {

@@ -1,6 +1,5 @@
 import { api } from '../../store/api';
 import { PaginationMeta, SellerProduct } from '../catalog/catalogApi';
-import { Product } from '../catalog/catalogApi';
 
 export interface FlashSaleItem {
   id: string;

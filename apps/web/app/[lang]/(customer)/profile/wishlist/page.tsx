@@ -71,7 +71,7 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
     try {
       await removeFromWishlist(item.productId).unwrap();
       toast.success(isBn ? 'উইশলিস্ট থেকে সরানো হয়েছে' : 'Removed from wishlist');
-    } catch (err) {
+    } catch {
       toast.error(isBn ? 'একটি ত্রুটি হয়েছে' : 'An error occurred');
     }
   };

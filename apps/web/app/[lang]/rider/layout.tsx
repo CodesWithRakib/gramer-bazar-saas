@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
+import { userHasRole } from '@/lib/roles';
 
 export default function RiderLayout({
   children,
@@ -17,7 +18,7 @@ export default function RiderLayout({
   const router = useRouter();
   const { lang } = use(params);
   const isBn = lang === 'bn';
-  
+
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -25,14 +26,14 @@ export default function RiderLayout({
       router.push(`/${lang}`);
       return;
     }
-    const isRider = user?.roles?.some((r) => r === 'RIDER');
-    if (user && !isRider) {
+    if (user && !userHasRole(user, 'RIDER')) {
       toast.error(isBn ? 'এই পেজটি দেখার অনুমতি নেই' : 'Unauthorized access');
       router.push(`/${lang}`);
     }
   }, [isAuthenticated, user, router, lang, isBn]);
 
-  if (!isAuthenticated || !user?.roles?.some((r) => r === 'RIDER')) {
+  const isRider = userHasRole(user, 'RIDER');
+  if (!isAuthenticated || !isRider) {
     return null;
   }
 

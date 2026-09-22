@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { 
   useGetAdminDisputeDetailsQuery, 
   useAddAdminDisputeMessageMutation,
@@ -24,7 +24,7 @@ export default function AdminDisputeDetailsPage() {
   const [resolutionStatus, setResolutionStatus] = useState<DisputeStatus.RESOLVED_REFUNDED | DisputeStatus.RESOLVED_REJECTED>(DisputeStatus.RESOLVED_REFUNDED);
   const [showResolutionForm, setShowResolutionForm] = useState(false);
   
-  const user = useSelector((state: RootState) => state.auth.user);
+  void useSelector((state: RootState) => state.auth.user);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

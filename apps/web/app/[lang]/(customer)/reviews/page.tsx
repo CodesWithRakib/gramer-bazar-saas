@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import { useGetUserReviewsQuery } from '@/features/reviews/reviewsApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, } from '@/components/ui/card';
 import { Star, MessageSquareQuote, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 

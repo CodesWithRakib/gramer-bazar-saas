@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store/store';
-import { initSocket, disconnectSocket, getSocket } from '@/lib/socket';
+import { initSocket, disconnectSocket } from '@/lib/socket';
 import { Socket } from 'socket.io-client';
 import { ChatMessage, chatApi } from '@/features/chat/chatApi';
 

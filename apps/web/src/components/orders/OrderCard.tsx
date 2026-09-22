@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { enUS, bn } from 'date-fns/locale';
 import { Order } from '@/features/orders/ordersApi';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent,  CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CustomImage } from '@/components/ui/CustomImage';

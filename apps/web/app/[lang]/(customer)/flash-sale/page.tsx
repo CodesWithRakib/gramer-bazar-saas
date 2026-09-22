@@ -1,12 +1,10 @@
 'use client';
 import { use } from 'react';
-import React, { useState } from 'react';
 import { useGetActiveFlashSalesQuery } from '@/features/flash-sales/flashSalesApi';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { Flame, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { enUS, bn } from 'date-fns/locale';
 

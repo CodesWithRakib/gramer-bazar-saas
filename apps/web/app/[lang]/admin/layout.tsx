@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
+import { userHasRole } from '@/lib/roles';
 
 export default function AdminLayout({
   children,
@@ -25,14 +26,14 @@ export default function AdminLayout({
       router.push(`/${lang}`);
       return;
     }
-    const isAdmin = user?.roles?.some((r) => r === 'ADMIN' || r === 'SUPER_ADMIN');
-    if (user && !isAdmin) {
+    if (user && !userHasRole(user, 'ADMIN', 'SUPER_ADMIN')) {
       toast.error(isBn ? 'এই পেজটি দেখার অনুমতি নেই' : 'Unauthorized access');
       router.push(`/${lang}`);
     }
   }, [isAuthenticated, user, router, lang, isBn]);
 
-  if (!isAuthenticated || !user?.roles?.some((r) => r === 'ADMIN' || r === 'SUPER_ADMIN')) {
+  const isAdmin = userHasRole(user, 'ADMIN', 'SUPER_ADMIN');
+  if (!isAuthenticated || !isAdmin) {
     return null;
   }
 

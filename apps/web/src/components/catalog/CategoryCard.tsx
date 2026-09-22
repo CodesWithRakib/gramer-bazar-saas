@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Category } from '@/features/catalog/catalogApi';
+import { CustomImage } from '@/components/ui/CustomImage';
 
 interface CategoryCardProps {
   category: Category;
@@ -17,7 +18,7 @@ export function CategoryCard({ category, lang }: CategoryCardProps) {
       <Card className="hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer text-center h-full bg-card shadow-sm border-border/50">
         <CardContent className="p-3 flex flex-col items-center justify-center gap-2">
           <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform group-hover:bg-primary/10">
-            <img src={icon} alt={name} className="w-8 h-8 object-contain drop-shadow-sm" />
+            <CustomImage src={icon} alt={name} width={32} height={32} className="w-8 h-8 object-contain drop-shadow-sm" />
           </div>
           <span className="text-[11px] md:text-xs font-semibold line-clamp-2 leading-tight">{name}</span>
         </CardContent>

@@ -3,7 +3,7 @@
 import React, { use } from 'react';
 import { useGetDashboardMetricsQuery } from '@/features/analytics/analyticsApi';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ShoppingCart, Users, DollarSign, Package, UserCheck, Bike, TrendingUp } from 'lucide-react';
+import { ShoppingCart, Users, DollarSign,  UserCheck,  TrendingUp } from 'lucide-react';
 import { 
   BarChart, 
   Bar, 

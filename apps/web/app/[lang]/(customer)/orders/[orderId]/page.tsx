@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useGetOrderByIdQuery, useCancelOrderMutation } from '@/features/orders/ordersApi';
 import { OrderTrackingTimeline } from '@/components/orders/OrderTrackingTimeline';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -57,7 +57,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
       try {
         await cancelOrder(order.id).unwrap();
         toast.success(isBn ? 'অর্ডারটি সফলভাবে বাতিল করা হয়েছে' : 'Order cancelled successfully');
-      } catch (err) {
+      } catch {
         toast.error(isBn ? 'অর্ডার বাতিল করতে সমস্যা হয়েছে' : 'Failed to cancel order');
       }
     }

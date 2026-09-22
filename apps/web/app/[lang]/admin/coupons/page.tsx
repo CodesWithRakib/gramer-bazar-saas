@@ -14,7 +14,7 @@ import {
   useDeleteCouponMutation,
   Coupon,
 } from '@/features/coupons/couponsApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -106,7 +106,7 @@ export default function AdminCouponsPage({ params }: { params: Promise<{ lang: s
     try {
       await updateCoupon({ id, data: { isActive } }).unwrap();
       toast.success(isBn ? 'স্ট্যাটাস আপডেট হয়েছে' : 'Status updated');
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'আপডেট ব্যর্থ হয়েছে' : 'Update failed');
     }
   };
@@ -116,7 +116,7 @@ export default function AdminCouponsPage({ params }: { params: Promise<{ lang: s
     try {
       await deleteCoupon(id).unwrap();
       toast.success(isBn ? 'কুপন মুছে ফেলা হয়েছে' : 'Coupon deleted');
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'মুছতে ব্যর্থ হয়েছে' : 'Deletion failed');
     }
   };

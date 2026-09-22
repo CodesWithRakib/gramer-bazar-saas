@@ -163,7 +163,10 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
 
 ### Not yet addressed (remaining work)
 
-- **Web lint warnings (86)** — unused imports, `<img>` usage. Non-blocking.
+- **Web lint warnings (4)** — React Compiler informational notes only:
+  TanStack Table `useReactTable()` and react-hook-form `form.watch()` return
+  non-memoizable functions, so the compiler skips those 3 components. All
+  actionable warnings/errors are gone (was 86 warnings + 15 errors).
 - **Two parallel socket clients** (`providers/SocketProvider.tsx` context and
   `hooks/useChatSocket.ts` singleton) — works, but should be consolidated.
 - **Auth token stored in `localStorage`** (not httpOnly cookie) — XSS exposure.
@@ -176,6 +179,9 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
 - Empty scaffold docs in `QA/` (`BUG_REPORT`, `MASTER_QA_PLAN`, etc.).
 - Root scratch files `test_full_flow.cjs`, `scratch_test_checkout.js` — move to
   `QA/` or delete.
+- **Eager `useGetProfileQuery()`** in chat components fires `/auth/me` for
+  anonymous visitors (401 console noise). Should pass a `skip: !isAuthenticated`
+  option. Functional impact: none.
 
 ---
 
@@ -223,12 +229,12 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 |---|---|---|
 | 0 | Audit, as-built map, feature inventory | ✅ this document |
 | 1 | Foundation/blocking fixes: typecheck, workspace config, route conflict, JWT config, chat contract, guards, dead code, fake data | ✅ done |
-| 2 | Customer journey end-to-end verification (auth → browse → product → cart → checkout → order) | 🟡 core flows wired; needs E2E execution |
-| 3 | Seller journey (shop → products → inventory → orders → wallet) | 🟡 |
-| 4 | Rider journey (assigned → status → location) | 🟡 (earnings out of scope) |
-| 5 | Admin journey (incl. audit logs) | 🟡 audit logs now real |
+| 2 | Customer journey end-to-end verification (auth → browse → product → cart → checkout → order) | ✅ E2E executed against live stack — 7/7 pass |
+| 3 | Seller journey (shop → products → inventory → orders → wallet) | 🟡 pages wired; E2E pending |
+| 4 | Rider journey (assigned → status → location) | 🟡 pages wired; E2E pending |
+| 5 | Admin journey (incl. audit logs) | 🟡 pages wired; E2E pending |
 | 6 | Cross-system consistency (pagination, error shape, loading states) | ⬜ |
-| 7 | Test suite bootstrap + lint cleanup + full E2E | 🟡 suites + lint green; E2E run pending (needs live stack) |
+| 7 | Test suite bootstrap + lint cleanup + full E2E | ✅ unit suites green, web lint 0 errors, customer E2E 7/7 on live stack |
 
 ---
 
@@ -237,10 +243,28 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 - `pnpm -C apps/web run typecheck` — clean.
 - `pnpm -C apps/api run typecheck` — clean.
 - `pnpm -C apps/web run build` — succeeds; route table confirmed.
-- `pnpm -C apps/web run lint` on changed files — clean; repo-wide lint debt recorded above.
 - `pnpm -C apps/api test` — **32/32 files pass**.
 - `pnpm -C apps/api run lint` (oxlint) — 0 errors, 30 warnings.
-- `pnpm -C apps/api run typecheck` — clean (specs included).
-- `pnpm -C apps/web run lint` — **exits 0** (0 errors, 86 warnings).
-- `pnpm -C apps/web run build` — succeeds after all refactors.
 - `pnpm -r run typecheck` — all projects clean.
+- `pnpm -C apps/web run lint` — **0 errors, 4 informational warnings** (React
+  Compiler notes about TanStack Table / react-hook-form; not actionable).
+- `pnpm -C apps/web run build` — succeeds after all refactors.
+- **Playwright E2E (`apps/e2e`) — 7/7 pass** against the live stack
+  (web :3000, API :4000, Postgres :5432), including the full purchase journey
+  `login → product → add to cart → cart → checkout (COD)`.
+
+### E2E-driven product fixes
+
+Executing the E2E suite surfaced two real customer-journey bugs, both fixed:
+
+1. **Cart was not persisted.** The cart lived only in Redux memory, so any full
+   page load (refresh, direct URL, new tab) emptied it and checkout was
+   unreachable. Added `localStorage` persistence in `cartSlice.ts`
+   (`loadCartFromStorage` / `saveCartToStorage` / `hydrateCart`) wired through
+   `store/provider.tsx` (hydrate on mount, save on change; SSR-safe).
+2. **Hydration race on controlled inputs.** Playwright (and real users on slow
+   devices) could submit forms before React attached controlled-input handlers,
+   sending empty payloads — observed as silent 400s from `POST /auth/login`.
+   The provider now sets `data-hydrated` on `<html>` after mount; tests wait
+   for it. Login navigation now strictly asserts an authenticated URL
+   (`/profile|/admin|/seller|/rider`) instead of any locale path.

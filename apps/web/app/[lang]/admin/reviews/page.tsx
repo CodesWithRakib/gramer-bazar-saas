@@ -41,7 +41,7 @@ export default function AdminReviewsPage({ params }: { params: Promise<{ lang: s
     try {
       await moderateReview({ id, isApproved }).unwrap();
       toast.success(isBn ? 'রিভিউ স্ট্যাটাস আপডেট হয়েছে' : 'Review status updated');
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'স্ট্যাটাস আপডেট করতে সমস্যা হয়েছে' : 'Failed to update review status');
     }
   };

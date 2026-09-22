@@ -2,12 +2,12 @@
 
 import { getApiErrorMessage } from '@/lib/apiError';
 
-import React, { use, useState, useEffect, useRef } from 'react';
+import React, { use, useState,  useRef } from 'react';
 import { useGetProfileQuery, useUpdateProfileMutation, useUploadAvatarMutation } from '@/features/auth/authApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent,  } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Camera, User, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';

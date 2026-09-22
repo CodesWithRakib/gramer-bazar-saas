@@ -2,7 +2,7 @@
 
 import React, { use, useState, useEffect } from 'react';
 import { useGetRiderDeliveryDetailsQuery, useUpdateDeliveryStatusMutation, DeliveryStatus } from '@/features/deliveries/deliveriesApi';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -45,7 +45,6 @@ export default function RiderDeliveryDetailsPage({
   // Live Location Tracking Effect
   useEffect(() => {
     if (!delivery || delivery.status !== DeliveryStatus.OUT_FOR_DELIVERY) return;
-
     if (!('geolocation' in navigator)) return;
 
     const watchId = navigator.geolocation.watchPosition(
@@ -74,14 +73,14 @@ export default function RiderDeliveryDetailsPage({
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [delivery?.status, id, isBn, updateLocation]);
+  }, [delivery, id, isBn, updateLocation]);
 
   const handleUpdateStatus = async (status: DeliveryStatus) => {
     try {
       await updateStatus({ id, status }).unwrap();
       toast.success(isBn ? 'স্ট্যাটাস আপডেট করা হয়েছে' : 'Status updated successfully');
       refetch();
-    } catch (error) {
+    } catch {
       toast.error(isBn ? 'স্ট্যাটাস আপডেট ব্যর্থ হয়েছে' : 'Failed to update status');
     }
   };

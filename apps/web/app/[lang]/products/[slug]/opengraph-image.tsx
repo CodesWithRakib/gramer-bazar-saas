@@ -100,7 +100,7 @@ export default async function Image({ params }: { params: { slug: string; lang: 
         ...size,
       }
     );
-  } catch (e) {
+  } catch {
     return new ImageResponse(
       (
         <div

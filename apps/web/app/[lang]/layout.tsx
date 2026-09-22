@@ -71,7 +71,7 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
-  const dir = getDirection(lang as Locale);
+  const dir = getDirection();
 
   return (
     <html
