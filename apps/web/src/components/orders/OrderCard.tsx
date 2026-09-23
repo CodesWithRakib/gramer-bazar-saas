@@ -56,9 +56,10 @@ export function OrderCard({ order, lang }: OrderCardProps) {
   const dateLocale = isBn ? bn : enUS;
   const formattedDate = format(new Date(order.createdAt), 'MMM dd, yyyy - hh:mm a', { locale: dateLocale });
   
+  const items = order.items || (order as any).orderItems || [];
   // Show first 4 items maximum as thumbnails
-  const displayItems = order.items.slice(0, 4);
-  const remainingCount = Math.max(0, order.items.length - 4);
+  const displayItems = items.slice(0, 4);
+  const remainingCount = Math.max(0, items.length - 4);
 
   return (
     <Card className="w-full overflow-hidden hover:shadow-md transition-all duration-200 border-border group">
@@ -76,7 +77,7 @@ export function OrderCard({ order, lang }: OrderCardProps) {
         </div>
         <div className="text-right">
           <p className="text-sm md:text-base font-bold text-primary">৳{order.total}</p>
-          <p className="text-xs text-muted-foreground">{order.items.length} {isBn ? 'পণ্য' : 'Items'}</p>
+          <p className="text-xs text-muted-foreground">{items.length} {isBn ? 'পণ্য' : 'Items'}</p>
         </div>
       </CardHeader>
 

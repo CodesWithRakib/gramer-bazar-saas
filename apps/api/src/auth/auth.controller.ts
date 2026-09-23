@@ -76,7 +76,7 @@ export class AuthController {
   async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto, @Res({ passthrough: true }) res: Response) {
     const data = await this.authService.verifyOtp(verifyOtpDto.phone, verifyOtpDto.otp);
     this.setCookies(res, data.accessToken, data.refreshToken);
-    return { user: data.user };
+    return data;
   }
 
   @Post('register')
@@ -86,7 +86,7 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const data = await this.authService.registerStaff(registerDto);
     this.setCookies(res, data.accessToken, data.refreshToken);
-    return { user: data.user };
+    return data;
   }
 
   @Post('login')
@@ -97,7 +97,7 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const data = await this.authService.loginWithPassword(loginDto.emailOrPhone, loginDto.password);
     this.setCookies(res, data.accessToken, data.refreshToken);
-    return { user: data.user };
+    return data;
   }
 
   @Post('refresh')
@@ -112,7 +112,7 @@ export class AuthController {
     }
     const data = await this.authService.refreshTokens(refreshToken);
     this.setCookies(res, data.accessToken, data.refreshToken);
-    return { user: data.user };
+    return data;
   }
 
   @Post('logout')

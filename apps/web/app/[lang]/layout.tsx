@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: "Gramer Bazar",
     description: "Your local hyper-marketplace for authentic rural products.",
   },
-  manifest: '/manifest.ts',
+  manifest: '/manifest.webmanifest',
 };
 
 import { LoginModal } from "@/components/auth/LoginModal";

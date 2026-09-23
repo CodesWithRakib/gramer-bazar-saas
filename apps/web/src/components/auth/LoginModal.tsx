@@ -70,8 +70,9 @@ export function LoginModal({ lang }: { lang: string }) {
 
     try {
       const res = await verifyOtp({ phone, otp }).unwrap();
-      dispatch(setCredentials({
+      dispatch(setCredentials({ 
         user: res.user,
+        accessToken: res.accessToken
       }));
       handleClose();
     } catch (err) {

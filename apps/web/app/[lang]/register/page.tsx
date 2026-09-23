@@ -43,7 +43,7 @@ export default function StaffRegisterPage({ params }: { params: Promise<{ lang: 
 
     try {
       const res = await registerStaff(formData).unwrap();
-      dispatch(setCredentials({ user: res.user }));
+      dispatch(setCredentials({ user: res.user, accessToken: res.accessToken }));
       
       const roles = res.user.roles || [];
       if (roles.includes('SELLER')) {

@@ -12,6 +12,8 @@ export interface VerifyOtpRequest {
 
 export interface AuthResponse {
   user: UserProfile;
+  accessToken?: string;
+  refreshToken?: string;
 }
 
 export interface LoginRequest {

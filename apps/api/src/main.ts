@@ -4,6 +4,7 @@ import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/comm
 import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor.js';
 import { ConfigService } from '@nestjs/config';
 
 import cookieParser from 'cookie-parser';
@@ -115,7 +116,10 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // Global Interceptors
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(
+    new ResponseInterceptor(),
+    new ClassSerializerInterceptor(app.get(Reflector)),
+  );
 
   // Swagger Setup
   const config = new DocumentBuilder()

@@ -37,14 +37,20 @@ const normalizeUser = (user: unknown): UserProfile | null => {
 
 export interface AuthState {
   user: UserProfile | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isLoginModalOpen: boolean;
 }
 
 const getInitialState = (): AuthState => {
+  let initialToken = null;
+  if (typeof window !== 'undefined') {
+    initialToken = localStorage.getItem('access_token') || null;
+  }
   return {
     user: null,
-    isAuthenticated: false,
+    accessToken: initialToken,
+    isAuthenticated: !!initialToken,
     isLoginModalOpen: false,
   };
 };
@@ -57,14 +63,24 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: unknown }>
+      action: PayloadAction<{ user: unknown; accessToken?: string }>
     ) => {
       state.user = normalizeUser(action.payload.user);
+      if (action.payload.accessToken) {
+        state.accessToken = action.payload.accessToken;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('access_token', action.payload.accessToken);
+        }
+      }
       state.isAuthenticated = true;
     },
     logout: (state) => {
       state.user = null;
+      state.accessToken = null;
       state.isAuthenticated = false;
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('access_token');
+      }
     },
     setLoginModalOpen: (state, action: PayloadAction<boolean>) => {
       state.isLoginModalOpen = action.payload;
