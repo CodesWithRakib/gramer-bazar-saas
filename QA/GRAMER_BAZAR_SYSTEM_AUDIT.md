@@ -4,7 +4,7 @@
 > not what the original design documents aspire to. Where the two disagree, the
 > discrepancy is called out explicitly.
 
-Last updated: 2026-09-23 (phases 6–7 complete; socket consolidation + chat E2E)
+Last updated: 2026-09-23 (phases 6–8 complete; contact editor, seeded riders, coverage cleanup)
 
 ---
 
@@ -281,6 +281,28 @@ lists, documented as such rather than wrapped for symmetry.
       live; and client-side navigation reuses exactly **one** socket.io
       connection instead of opening parallel ones.
 
+### Seller contact editor & seeded riders — fixed
+
+26. **Seller contact editor and seeded riders, closed together.**
+
+    - **Seeded riders.** `SeederService.seedUsersAndShops` now creates
+      `rider1@gramerbazar.com` (Babul Mia, `+8801700000005`) and
+      `rider2@gramerbazar.com` (Kamal Sheikh, `+8801700000006`), both
+      `password123`, ACTIVE, email-verified — every actor in the BRD (admin,
+      customer, sellers, riders) now has a seeded account out of the box. The
+      rider E2E logs in with the seeded rider and only falls back to public
+      registration when the database predates this seeder.
+    - **Seller contact editor.** The seller profile page gained an **Account
+      Info** form (first/last name, contact phone → `PATCH /auth/me`), closing
+      the gap where the storefront contact number was uneditable by sellers.
+      Both forms (account + shop) localize to Bangla/English. A new E2E test
+      fills the phone, saves, asserts the toast, verifies the change through
+      `GET /auth/me`, and restores the seeded value.
+    - **Coverage cleanup.** `roles` and `seeder` unit specs added (role seeding
+      idempotency; six seeded accounts with hashed passwords; two shops);
+      empty `QA/BUG_REPORT.md` removed; `QA/TEST_MATRIX.md` filled with real
+      per-journey coverage; root scratch scripts moved to `QA/scratch/`.
+
 ### Not yet addressed (remaining work)
 
 - **Web lint warnings (4)** — React Compiler informational notes only:
@@ -295,24 +317,29 @@ lists, documented as such rather than wrapped for symmetry.
   that do **not** match the implemented API (e.g. `GET /categories`, `GET
   /public/catalog/:slug`, `GET /locations/divisions`). Treat the route table in
   this document as authoritative.
-- Empty scaffold docs in `QA/` (`BUG_REPORT`, `MASTER_QA_PLAN`, etc.).
-- Root scratch files `test_full_flow.cjs`, `scratch_test_checkout.js` — move to
-  `QA/` or delete.
+- ~~Empty scaffold docs in `QA/`~~ — the empty `BUG_REPORT.md` scaffold was
+  deleted; `TEST_MATRIX.md` is now filled with real coverage status; the root
+  scratch scripts moved to `QA/scratch/`.
 - ~~**Eager `useGetProfileQuery()`** in chat components fires `/auth/me` for
   anonymous visitors~~ **Fixed (this pass, finding 25).**
 - **Maintenance mode is not implemented.** The setting is gone from the admin UI
   because nothing enforced it; adding it means gating requests (edge/proxy or a
   global API guard with an admin bypass) plus a safe "stuck in maintenance"
   recovery path. Out of scope until that is designed.
-- **Seller account phone/address has no editor.** The storefront renders the
-  contact number from `shop.seller.phone`, which a seller can only change through
-  `PATCH /auth/me` — there is no seller-facing form for it yet.
-- **Rider accounts are not seeded.** `seeder.service.ts` creates admin, customer
-  and two sellers only; the rider E2E registers `rider1@gramerbazar.com` through
-  the public `POST /auth/register` and reuses it afterwards.
-- **Unit spec coverage is uneven.** 39 spec files now cover most modules, but
-  `roles`, `seeder`, the remaining controllers and all gateways/interceptors have
-  no dedicated specs — their behaviour is covered by the E2E journeys.
+- ~~**Rider accounts are not seeded.**~~ **Fixed (this pass, finding 26).**
+  `seeder.service.ts` now creates two riders (`rider1@gramerbazar.com` /
+  `rider2@gramerbazar.com`, `password123`, phones `+8801700000005/6`); the rider
+  E2E uses the seeded account (registration remains a fallback for databases
+  seeded by an older build).
+- ~~**Seller account phone/address has no editor.**~~ **Fixed (this pass,
+  finding 26).** The seller profile page now has an **Account Info** section
+  (first/last name, contact phone) wired to the existing `PATCH /auth/me`,
+  with a note that this is the number customers see on the storefront;
+  validated by a new E2E round-trip test.
+- **Unit spec coverage is uneven.** 41 spec files now cover all services
+  (`roles` and `seeder` specs added this pass); the remaining controllers and
+  gateways/interceptors have no dedicated specs — their behaviour is covered by
+  the E2E journeys.
 
 ---
 
@@ -366,7 +393,7 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 | 4 | Rider journey (assigned → status → location) | ✅ E2E executed — 4/4 pass incl. full delivery lifecycle |
 | 5 | Admin journey (incl. audit logs, settings) | ✅ E2E executed — 6/6 pass (settings made real) |
 | 6 | Cross-system consistency (pagination, error shape, loading states) | ✅ envelope audit done; DataTable gained error/retry + i18n; error shape noted as accepted variance (see finding 23) |
-| 7 | Test suite bootstrap + lint cleanup + full E2E | ✅ unit suites green (39/39 files, 93 tests), web lint 0 errors, E2E **27/27** on the live stack |
+| 7 | Test suite bootstrap + lint cleanup + full E2E | ✅ unit suites green (41/41 files, 101 tests), web lint 0 errors, E2E **28/28** on the live stack |
 
 ---
 
@@ -375,20 +402,20 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 - `pnpm -C apps/web run typecheck` — clean.
 - `pnpm -C apps/api run typecheck` — clean.
 - `pnpm -C apps/web run build` — succeeds; route table confirmed.
-- `pnpm -C apps/api test` — **39/39 files pass, 93 tests** (orders, auth,
-  coupons, users, reviews, audit-logs and settings specs added in phases 6/7).
+- `pnpm -C apps/api test` — **41/41 files pass, 101 tests** (orders, auth,
+  coupons, users, reviews, audit-logs, settings, roles and seeder specs).
 - `pnpm -C apps/api run lint` (oxlint) — 0 errors, 30 warnings.
 - `pnpm -r run typecheck` — all projects clean.
 - `pnpm -C apps/web run lint` — **0 errors, 4 informational warnings** (React
   Compiler notes about TanStack Table / react-hook-form; not actionable).
 - `pnpm -C apps/web run build` — succeeds after all refactors.
-- **Playwright E2E (`apps/e2e`) — 27/27 pass (1 worker, ~2 min)** against the
+- **Playwright E2E (`apps/e2e`) — 28/28 pass (1 worker, ~2.5 min)** against the
   live stack (web :3000, API :4000, Postgres :5432):
 
 | Spec | Tests | Covers |
 |---|---|---|
 | `customer-flow.spec.ts` | 7 | home, categories, search, product details, login, cart drawer, full purchase journey `login → product → add to cart → cart → checkout (COD)` |
-| `seller-flow.spec.ts` | 6 | seller login→dashboard KPIs, sidebar sweep over all 11 seller pages, products/inventory vs API, shop settings save + API round-trip, wallet, customer blocked from `/seller` |
+| `seller-flow.spec.ts` | 7 | seller login→dashboard KPIs, sidebar sweep over all 11 seller pages, products/inventory vs API, shop settings save + API round-trip, wallet, **account contact-phone editor round-trip**, customer blocked from `/seller` |
 | `rider-flow.spec.ts` | 4 | rider login→dashboard, sidebar sweep, **customer order → admin assignment → rider accept/pickup/out-for-delivery/delivered**, customer blocked from `/rider` |
 | `admin-flow.spec.ts` | 6 | admin login→dashboard metrics, sidebar sweep over all 20 admin pages, settings persistence + seller-registration toggle, audit log feed, seller blocked from `/admin` |
 | `chat-flow.spec.ts` | 4 | anonymous visitors trigger zero `/auth/me` calls, all post-login `/auth/me` carry `Authorization`, messages page renders chat live, client-side navigation reuses one socket connection |

@@ -4,7 +4,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
 const RIDER = {
   email: 'rider1@gramerbazar.com',
-  phone: '+8801700000091',
+  phone: '+8801700000005',
   password: 'password123',
   firstName: 'Babul',
   lastName: 'Mia',
@@ -37,8 +37,9 @@ const expectNoErrorBoundary = async (page: Page) => {
 };
 
 /**
- * The seed data has no rider account, so make sure one exists.
- * Registration is public and allows the SELLER/RIDER roles.
+ * Riders are seeded since this pass (rider1@gramerbazar.com / rider2@
+ * gramerbazar.com, password123). If the DB was seeded by an older seeder,
+ * fall back to the public registration endpoint (SELLER/RIDER roles allowed).
  */
 const ensureRiderAccount = async (
   ctx: Awaited<ReturnType<typeof playwrightRequest.newContext>>,

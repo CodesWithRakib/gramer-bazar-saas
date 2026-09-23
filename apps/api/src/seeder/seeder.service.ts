@@ -176,6 +176,7 @@ export class SeederService {
     const adminRole = await this.roleRepo.findOne({ where: { name: Role.ADMIN } });
     const customerRole = await this.roleRepo.findOne({ where: { name: Role.CUSTOMER } });
     const sellerRole = await this.roleRepo.findOne({ where: { name: Role.SELLER } });
+    const riderRole = await this.roleRepo.findOne({ where: { name: Role.RIDER } });
 
     const passwordHash = await bcrypt.hash('password123', 10);
 
@@ -203,13 +204,25 @@ export class SeederService {
       status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
+    const rider1 = await this.userRepo.save(this.userRepo.create({
+      phone: '+8801700000005', email: 'rider1@gramerbazar.com', passwordHash,
+      firstName: 'Babul', lastName: 'Mia', roles: [riderRole as RoleEntity],
+      status: 'ACTIVE' as any, isEmailVerified: true
+    }));
+
+    const rider2 = await this.userRepo.save(this.userRepo.create({
+      phone: '+8801700000006', email: 'rider2@gramerbazar.com', passwordHash,
+      firstName: 'Kamal', lastName: 'Sheikh', roles: [riderRole as RoleEntity],
+      status: 'ACTIVE' as any, isEmailVerified: true
+    }));
+
     // Shops
     await this.shopRepo.save([
       this.shopRepo.create({ nameEn: 'Rahim Traders', nameBn: 'রহিম ট্রেডার্স', slug: 'rahim-traders', seller: seller1 }),
       this.shopRepo.create({ nameEn: 'Karim Groceries', nameBn: 'করিম গ্রোসারিজ', slug: 'karim-groceries', seller: seller2 }),
     ]);
 
-    return { admin, customer, sellers: [seller1, seller2] };
+    return { admin, customer, sellers: [seller1, seller2], riders: [rider1, rider2] };
   }
 
   private async seedCatalog() {

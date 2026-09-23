@@ -1,4 +1,6 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, request as playwrightRequest, type Page } from '@playwright/test';
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
 const SELLER = { email: 'seller1@gramerbazar.com', password: 'password123' };
 const CUSTOMER = { email: 'customer@gramerbazar.com', password: 'password123' };
@@ -151,6 +153,34 @@ test.describe('Seller E2E Workflows', () => {
     await expect(page.getByText(/Available Balance/i).first()).toBeVisible();
     await expect(page.getByText(/Recent Transactions/i).first()).toBeVisible();
     await expectNoErrorBoundary(page);
+  });
+  test('seller can update their account contact info', async ({ page }) => {
+    await page.goto('/en/seller/profile');
+    await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible({ timeout: 25000 });
+
+    const phoneInput = page.getByLabel(/contact phone/i);
+    await expect(phoneInput).toBeVisible({ timeout: 20000 });
+    await phoneInput.fill('+8801712345678');
+    await page.getByRole('button', { name: /save account info/i }).click();
+
+    await expect(page.getByText(/account info updated/i)).toBeVisible({ timeout: 15000 });
+
+    // Round-trip: the API reflects the new phone for this seller
+    const ctx = await playwrightRequest.newContext();
+    const apiLogin = await ctx.post(`${API}/auth/login`, {
+      data: { emailOrPhone: SELLER.email, password: SELLER.password },
+    });
+    const { accessToken } = (await apiLogin.json()) as { accessToken: string };
+    const me = await ctx.get(`${API}/auth/me`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(((await me.json()) as { phone?: string }).phone).toBe('+8801712345678');
+    await ctx.dispose();
+
+    // Restore the seeded phone for later tests
+    await phoneInput.fill('+8801700000003');
+    await page.getByRole('button', { name: /save account info/i }).click();
+    await expect(page.getByText(/account info updated/i)).toBeVisible({ timeout: 15000 });
   });
 });
 
