@@ -14,6 +14,8 @@ import { openChatWidget } from '@/store/slices/chatSlice';
 interface StartChatButtonProps {
   participantId: string;
   lang: string;
+  referenceId?: string;
+  referenceType?: string;
   redirectPath?: string; // e.g., /en/messages or /en/seller/messages
   buttonText?: string;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
@@ -24,6 +26,8 @@ interface StartChatButtonProps {
 export function StartChatButton({ 
   participantId, 
   lang, 
+  referenceId,
+  referenceType,
   redirectPath = `/${lang}/messages`, 
   buttonText, 
   variant = 'outline',
@@ -40,7 +44,11 @@ export function StartChatButton({
         toast.error(lang === 'bn' ? 'বিক্রেতার তথ্য অনুপস্থিত' : 'Seller information missing');
         return;
       }
-      const conversation = await createConversation({ participantId }).unwrap();
+      const conversation = await createConversation({ 
+        participantId, 
+        referenceId, 
+        referenceType 
+      }).unwrap();
       
       const isDashboardRoute = redirectPath.includes('/admin') || redirectPath.includes('/seller') || redirectPath.includes('/rider');
       

@@ -44,6 +44,8 @@ export default function SellerOrderDetailsPage({
                   <StartChatButton 
                     participantId={order.user.id} 
                     lang={lang} 
+                    referenceId={order.id}
+                    referenceType="ORDER"
                     buttonText={isBn ? 'গ্রাহককে মেসেজ দিন' : 'Message Customer'} 
                     redirectPath={`/${lang}/seller/messages`}
                   />

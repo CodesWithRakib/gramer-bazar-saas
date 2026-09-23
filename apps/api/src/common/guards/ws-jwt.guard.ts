@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
 import { ConfigService } from '@nestjs/config';
@@ -14,6 +14,11 @@ export class WsJwtGuard implements CanActivate {
     try {
       const client = context.switchToWs().getClient();
       let authToken = client.handshake.auth.token?.split(' ')[1] || client.handshake.headers.authorization?.split(' ')[1];
+      
+      if (authToken === 'undefined' || authToken === 'null') {
+        authToken = null;
+      }
+
       if (!authToken && client.handshake.headers.cookie) {
         const cookieStr = client.handshake.headers.cookie;
         const match = cookieStr.match(/access_token=([^;]+)/);
@@ -23,7 +28,7 @@ export class WsJwtGuard implements CanActivate {
       }
       
       if (!authToken) {
-        throw new WsException('Unauthorized');
+        return false;
       }
 
       const payload = await this.jwtService.verifyAsync(authToken, {
@@ -36,7 +41,7 @@ export class WsJwtGuard implements CanActivate {
       client.user = payload;
       return true;
     } catch (err) {
-      throw new WsException('Unauthorized');
+      return false;
     }
   }
 }

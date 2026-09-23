@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 
 import cookieParser from 'cookie-parser';
 
+import { AllWsExceptionsFilter } from './common/filters/ws-exception.filter.js';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
@@ -113,7 +115,10 @@ async function bootstrap() {
   );
 
   // Global Exception Filter
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(
+    new AllExceptionsFilter(),
+    new AllWsExceptionsFilter(),
+  );
 
   // Global Interceptors
   app.useGlobalInterceptors(

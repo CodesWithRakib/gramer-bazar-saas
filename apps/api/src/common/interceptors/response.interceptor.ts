@@ -13,7 +13,11 @@ export interface GlobalResponse<T> {
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, GlobalResponse<T>> {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<GlobalResponse<T>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    if (context.getType() !== 'http') {
+      return next.handle();
+    }
+
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<ExpressResponse>();

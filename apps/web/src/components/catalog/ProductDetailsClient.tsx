@@ -282,6 +282,8 @@ export function ProductDetailsClient({
                         <StartChatButton 
                           participantId={product.shop.sellerId} 
                           lang={lang} 
+                          referenceId={product.id}
+                          referenceType="PRODUCT"
                           buttonText={isBn ? 'মেসেজ দিন' : 'Message Seller'} 
                           redirectPath={`/${lang}/messages`}
                         />

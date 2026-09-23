@@ -9,7 +9,8 @@ import { AppService } from './app.service.js';
 import configuration from './config/configuration.js';
 import { envValidationSchema } from './config/env.validation.js';
 import { SettingsModule } from './settings/settings.module.js';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { WsSafeThrottlerGuard } from './common/guards/ws-safe-throttler.guard.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { OtpModule } from './otp/otp.module.js';
@@ -123,7 +124,7 @@ import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
     AppService,
     {
       provide: 'APP_GUARD',
-      useClass: ThrottlerGuard,
+      useClass: WsSafeThrottlerGuard,
     },
     {
       provide: 'APP_GUARD',

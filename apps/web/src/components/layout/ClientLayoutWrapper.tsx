@@ -11,10 +11,10 @@ export function ClientLayoutWrapper({ lang, children }: { lang: string; children
   const pathname = usePathname();
   
   // Dashboard routes where we don't want the global storefront header/footer
-  const isDashboardRoute = pathname.startsWith(`/${lang}/admin`) || 
-                           pathname.startsWith(`/${lang}/seller`) || 
-                           pathname.startsWith(`/${lang}/rider`) ||
-                           pathname.match(new RegExp(`^/${lang}/(profile|orders|messages|disputes|wishlist|product-requests|reviews)`));
+  const dashboardPrefixes = ['/admin', '/seller', '/rider', '/profile', '/orders', '/messages', '/disputes', '/wishlist', '/product-requests', '/reviews'];
+  const isDashboardRoute = dashboardPrefixes.some(prefix => 
+    pathname === `/${lang}${prefix}` || pathname.startsWith(`/${lang}${prefix}/`)
+  );
 
   if (isDashboardRoute) {
     return <main className="flex-grow flex flex-col">{children}</main>;

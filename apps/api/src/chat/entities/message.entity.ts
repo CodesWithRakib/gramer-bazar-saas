@@ -10,6 +10,12 @@ export class Message {
   @Column('text')
   content: string;
 
+  @Column({ type: 'varchar', default: 'TEXT' })
+  messageType: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  senderRole: string | null;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'sender_id' })
   sender: User;

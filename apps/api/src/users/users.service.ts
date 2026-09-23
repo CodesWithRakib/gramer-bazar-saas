@@ -46,6 +46,14 @@ export class UsersService {
     return user;
   }
 
+  async findAdmin(): Promise<User | null> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .innerJoinAndSelect('user.roles', 'role')
+      .where('role.name IN (:...roles)', { roles: ['ADMIN', 'SUPER_ADMIN'] })
+      .getOne();
+  }
+
   async create(userData: Partial<User> & { roleNames?: string[] }): Promise<User> {
     const { roleNames, ...rest } = userData;
     const user = this.userRepository.create(rest);

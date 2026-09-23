@@ -30,7 +30,7 @@ export const useSocket = () => useContext(SocketContext);
  * and refreshed by `AuthInitializer`) — no eager `/auth/me` request here.
  */
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, accessToken } = useSelector((state: RootState) => state.auth);
   const socket = getSocket();
 
   // Connectivity mirrors the live socket. Event handlers keep it fresh, and the
@@ -50,9 +50,26 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    const socketInstance = initSocket();
-    const handleConnect = () => setIsConnected(true);
+    const socketInstance = initSocket(accessToken);
+    if (accessToken) {
+      socketInstance.auth = { token: `Bearer ${accessToken}` };
+    }
+    
+    // Disconnect and reconnect to apply new auth payload
+    if (socketInstance.connected) {
+      socketInstance.disconnect();
+      socketInstance.connect();
+    }
+
+    const handleConnect = () => {
+      setIsConnected(true);
+      socketInstance.emit('join_user');
+    };
     const handleDisconnect = () => setIsConnected(false);
+
+    if (socketInstance.connected) {
+      socketInstance.emit('join_user');
+    }
 
     socketInstance.on('connect', handleConnect);
     socketInstance.on('disconnect', handleDisconnect);
@@ -61,7 +78,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       socketInstance.off('connect', handleConnect);
       socketInstance.off('disconnect', handleDisconnect);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, accessToken]);
 
   return (
     <SocketContext.Provider value={{ socket: getSocket(), isConnected }}>

@@ -1,26 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { store, RootState } from './store';
-import { useLazyGetProfileQuery } from '@/features/auth/authApi';
-import { setUser, logout } from './slices/authSlice';
+import { useEffect } from "react";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { store, RootState } from "./store";
+import { useLazyGetProfileQuery } from "@/features/auth/authApi";
+import { setUser, logout } from "./slices/authSlice";
 import {
   hydrateCart,
   loadCartFromStorage,
   saveCartToStorage,
-} from './slices/cartSlice';
+} from "./slices/cartSlice";
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.auth);
   const cart = useSelector((state: RootState) => state.cart);
   const [getProfile] = useLazyGetProfileQuery();
 
   // Mark hydration completion once mounted (used by E2E tests to avoid
   // interacting with the SSR page before React state is live).
   useEffect(() => {
-    document.documentElement.dataset.hydrated = 'true';
+    document.documentElement.dataset.hydrated = "true";
   }, []);
 
   // Hydrate the persisted cart once on mount (client only).
@@ -36,20 +35,24 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
     saveCartToStorage({ items: cart.items, appliedCoupon: cart.appliedCoupon });
   }, [cart.items, cart.appliedCoupon]);
 
+  const { user, isAuthenticated, accessToken } = useSelector(
+    (state: RootState) => state.auth,
+  );
+
   useEffect(() => {
     const fetchUser = async () => {
-      if (!user) {
+      if (!user && (isAuthenticated || !!accessToken)) {
         try {
           const userData = await getProfile().unwrap();
           dispatch(setUser(userData));
         } catch {
-          // No valid session cookie found, remain anonymous
+          // Token expired or invalid
         }
       }
     };
 
     fetchUser();
-  }, [user, dispatch, getProfile]);
+  }, [user, isAuthenticated, accessToken, dispatch, getProfile]);
 
   return <>{children}</>;
 }

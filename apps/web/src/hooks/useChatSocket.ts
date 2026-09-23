@@ -18,28 +18,25 @@ import { ChatMessage, chatApi } from '@/features/chat/chatApi';
  * `SocketProvider` (connect on login, disconnect on logout).
  */
 export const useChatSocket = (conversationId?: string) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
-  // Connectivity mirrors the live socket; the render-time adjustment keeps it
-  // in sync with connect/disconnect events without setState in effect bodies.
   const socket = getSocket();
   const [isConnected, setIsConnected] = useState<boolean>(() => socket?.connected ?? false);
   if ((socket?.connected ?? false) !== isConnected) {
     setIsConnected(socket?.connected ?? false);
   }
 
-  // Track the conversation the socket is currently joined to so cleanup always
-  // leaves the right room even if `conversationId` changed mid-flight.
   const joinedRef = useRef<string | null>(null);
 
-  // Global message listener → RTK Query cache sync.
+  // Global socket listeners for real-time messages, conversation updates, and read receipts
   useEffect(() => {
     if (!isAuthenticated) return;
     const socketInstance = getSocket();
     if (!socketInstance) return;
 
     const handleNewMessage = (message: ChatMessage) => {
+      // 1. Sync into messages cache if this message belongs to any cached conversation
       dispatch(
         chatApi.util.updateQueryData('getMessages', message.conversationId, (draft) => {
           const exists = draft.find((m) => m.id === message.id);
@@ -48,15 +45,61 @@ export const useChatSocket = (conversationId?: string) => {
           }
         }),
       );
+
+      // 2. Optimistically update conversations list in cache
+      dispatch(
+        chatApi.util.updateQueryData('getConversations', undefined, (draft) => {
+          const conv = draft.find((c) => c.id === message.conversationId);
+          if (conv) {
+            conv.lastMessage = message;
+            conv.messages = [message];
+            conv.updatedAt = message.createdAt;
+            if (message.senderId !== user?.id && conversationId !== message.conversationId) {
+              conv.unreadCount = (conv.unreadCount || 0) + 1;
+            }
+          }
+        }),
+      );
+
+      // 3. Invalidate tags to ensure consistency across unread counts and conversation list
       dispatch(chatApi.util.invalidateTags(['Conversation']));
     };
 
+    const handleConversationUpdated = () => {
+      dispatch(chatApi.util.invalidateTags(['Conversation']));
+    };
+
+    const handleMessagesRead = ({ conversationId: readConvId }: { conversationId: string }) => {
+      dispatch(
+        chatApi.util.updateQueryData('getMessages', readConvId, (draft) => {
+          for (const msg of draft) {
+            msg.isRead = true;
+          }
+        }),
+      );
+      dispatch(
+        chatApi.util.updateQueryData('getConversations', undefined, (draft) => {
+          const conv = draft.find((c) => c.id === readConvId);
+          if (conv) {
+            conv.unreadCount = 0;
+            if (conv.lastMessage) {
+              conv.lastMessage.isRead = true;
+            }
+          }
+        }),
+      );
+    };
+
     socketInstance.on('new_message', handleNewMessage);
+    socketInstance.on('conversation_updated', handleConversationUpdated);
+    socketInstance.on('messages_read', handleMessagesRead);
 
     return () => {
       socketInstance.off('new_message', handleNewMessage);
+      socketInstance.off('conversation_updated', handleConversationUpdated);
+      socketInstance.off('messages_read', handleMessagesRead);
     };
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, user?.id, conversationId, dispatch]);
 
   // Join / leave the conversation room.
   useEffect(() => {
@@ -75,10 +118,10 @@ export const useChatSocket = (conversationId?: string) => {
   }, [conversationId, isConnected]);
 
   const sendMessage = useCallback(
-    (content: string) => {
+    (content: string, messageType = 'TEXT') => {
       const socketInstance = getSocket();
       if (socketInstance && conversationId && isConnected) {
-        socketInstance.emit('send_message', { conversationId, content });
+        socketInstance.emit('send_message', { conversationId, content, messageType });
         return true;
       }
       return false;
@@ -86,5 +129,16 @@ export const useChatSocket = (conversationId?: string) => {
     [conversationId, isConnected],
   );
 
-  return { isConnected, sendMessage };
+  const markRead = useCallback(
+    (convId: string) => {
+      const socketInstance = getSocket();
+      if (socketInstance && isConnected) {
+        socketInstance.emit('mark_read', { conversationId: convId });
+      }
+    },
+    [isConnected],
+  );
+
+  return { isConnected, sendMessage, markRead };
 };
+

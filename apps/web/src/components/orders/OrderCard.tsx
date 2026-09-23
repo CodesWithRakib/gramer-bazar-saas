@@ -56,7 +56,9 @@ export function OrderCard({ order, lang }: OrderCardProps) {
   const dateLocale = isBn ? bn : enUS;
   const formattedDate = format(new Date(order.createdAt), 'MMM dd, yyyy - hh:mm a', { locale: dateLocale });
   
-  const items = order.items || (order as any).orderItems || [];
+  const rawItems = order?.items || (order as any)?.orderItems;
+  const items = Array.isArray(rawItems) ? rawItems : [];
+  
   // Show first 4 items maximum as thumbnails
   const displayItems = items.slice(0, 4);
   const remainingCount = Math.max(0, items.length - 4);

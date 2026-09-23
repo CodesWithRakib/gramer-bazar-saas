@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
 import type { Message } from './message.entity.js';
 
@@ -6,6 +6,12 @@ import type { Message } from './message.entity.js';
 export class Conversation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  referenceId: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  referenceType: string | null;
 
   @ManyToMany(() => User)
   @JoinTable({
@@ -23,4 +29,8 @@ export class Conversation {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  lastMessage?: Message | null;
+
+  unreadCount?: number;
 }

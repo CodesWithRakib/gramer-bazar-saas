@@ -144,6 +144,8 @@ export default function RiderDeliveryDetailsPage({
                   <StartChatButton
                     participantId={order.user.id}
                     lang={lang}
+                    referenceId={order.id}
+                    referenceType="DELIVERY"
                     buttonText={isBn ? 'মেসেজ দিন' : 'Message'}
                     redirectPath={`/${lang}/rider/messages`}
                     size="sm"

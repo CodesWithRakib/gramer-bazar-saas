@@ -13,6 +13,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
+    if (host.getType() !== 'http') {
+      const client = host.switchToWs().getClient();
+      client.emit('exception', {
+        status: 'error',
+        message: exception instanceof Error ? exception.message : 'Internal server error',
+        details: exception instanceof Error ? exception.stack : undefined
+      });
+      return;
+    }
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

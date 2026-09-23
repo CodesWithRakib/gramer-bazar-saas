@@ -8,35 +8,77 @@ import {
   OnGatewayDisconnect
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { UseGuards } from '@nestjs/common';
-import { ChatService } from './chat.service.js';
+import { UseGuards, UseFilters, Logger } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
+import { ChatService, canUserAccessConversation, isUserAdmin } from './chat.service.js';
 import { WsJwtGuard } from '../common/guards/ws-jwt.guard.js';
+import { AllWsExceptionsFilter } from '../common/filters/ws-exception.filter.js';
+import { JoinConversationDto, SendMessageDto } from './dto/chat-gateway.dto.js';
+import { UsersService } from '../users/users.service.js';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
+@UseFilters(AllWsExceptionsFilter)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  private readonly logger = new Logger(ChatGateway.name);
+
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly usersService: UsersService,
+  ) {}
 
   handleConnection(_client: Socket) {
     // Connection is authenticated lazily per-message via WsJwtGuard.
   }
 
   handleDisconnect(_client: Socket) {
-    // No server-side cleanup required; rooms are dropped with the socket.
+    // Rooms are automatically cleaned up when the socket disconnects.
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('join_user')
+  async handleJoinUser(@ConnectedSocket() client: Socket & { user: any }) {
+    const userId = client.user?.userId ?? client.user?.sub;
+    if (!userId) return;
+
+    void client.join(`user_${userId}`);
+
+    const user = await this.usersService.findById(userId).catch(() => null);
+    if (user && isUserAdmin(user)) {
+      void client.join('admin_room');
+    }
+
+    return { event: 'joined_user', userId };
   }
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('join_conversation')
   async handleJoinConversation(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: string },
+    @ConnectedSocket() client: Socket & { user: any },
+    @MessageBody() data: JoinConversationDto,
   ) {
+    const userId = client.user?.userId ?? client.user?.sub;
+    if (!userId) {
+      throw new WsException('Unauthenticated');
+    }
+
+    // Verify access
+    const user = await this.usersService.findById(userId).catch(() => null);
+    if (!user) {
+      throw new WsException('User not found');
+    }
+
+    const conversation = await this.chatService.getConversationById(data.conversationId, user).catch(() => null);
+    if (!conversation) {
+      throw new WsException('Conversation not found or access denied');
+    }
+
     const room = `conversation_${data.conversationId}`;
     void client.join(room);
     return { event: 'joined', room };
@@ -46,7 +88,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('leave_conversation')
   async handleLeaveConversation(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: string },
+    @MessageBody() data: JoinConversationDto,
   ) {
     const room = `conversation_${data.conversationId}`;
     void client.leave(room);
@@ -57,23 +99,77 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('send_message')
   async handleMessage(
     @ConnectedSocket() client: Socket & { user: any },
-    @MessageBody() data: { conversationId: string; content: string }
+    @MessageBody() data: SendMessageDto,
   ) {
-    const senderId = client.user.userId || client.user.sub;
+    try {
+      const senderId = client.user?.userId ?? client.user?.sub;
+      if (!senderId) {
+        throw new WsException('Unauthenticated');
+      }
 
-    // Save to DB
-    const message = await this.chatService.sendMessage(
-      senderId,
-      data.conversationId,
-      data.content,
-    );
+      // Save to DB
+      const message = await this.chatService.sendMessage(
+        senderId,
+        data.conversationId,
+        data.content,
+        data.messageType,
+      );
 
-    const room = `conversation_${data.conversationId}`;
+      const room = `conversation_${data.conversationId}`;
 
-    // Broadcast to the room
-    this.server.to(room).emit('new_message', message);
+      // Broadcast new message to active conversation room
+      this.server.to(room).emit('new_message', message);
 
-    // Return for ack
-    return message;
+      // Notify individual participants so their conversation list and unread counts update
+      const conversation = await this.chatService['conversationRepository'].findOne({
+        where: { id: data.conversationId },
+        relations: ['participants'],
+      });
+
+      if (conversation?.participants) {
+        for (const p of conversation.participants) {
+          this.server.to(`user_${p.id}`).emit('conversation_updated', {
+            conversationId: data.conversationId,
+            lastMessage: message,
+          });
+        }
+      }
+
+      // Also notify all admins in real time
+      this.server.to('admin_room').emit('conversation_updated', {
+        conversationId: data.conversationId,
+        lastMessage: message,
+      });
+
+      return message;
+    } catch (err: unknown) {
+      const error = err as Error;
+      this.logger.error('Error in handleMessage: ' + (error.message || String(err)));
+      throw err;
+    }
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('mark_read')
+  async handleMarkRead(
+    @ConnectedSocket() client: Socket & { user: any },
+    @MessageBody() data: { conversationId: string },
+  ) {
+    const userId = client.user?.userId ?? client.user?.sub;
+    if (!userId || !data?.conversationId) return;
+
+    const user = await this.usersService.findById(userId).catch(() => null);
+    if (!user) return;
+
+    await this.chatService.markAsRead(data.conversationId, user).catch(() => null);
+
+    // Notify room that messages were read
+    this.server.to(`conversation_${data.conversationId}`).emit('messages_read', {
+      conversationId: data.conversationId,
+      readBy: userId,
+    });
+
+    return { success: true };
   }
 }
+

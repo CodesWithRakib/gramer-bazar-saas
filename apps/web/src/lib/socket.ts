@@ -14,8 +14,11 @@ export const resolveSocketUrl = (): string => {
     : new URL(backendUrl).origin;
 };
 
-export const initSocket = (): Socket => {
+export const initSocket = (token?: string | null): Socket => {
   if (socket) {
+    if (token) {
+      socket.auth = { token: `Bearer ${token}` };
+    }
     if (!socket.connected) {
       socket.connect();
     }
@@ -24,6 +27,7 @@ export const initSocket = (): Socket => {
 
   socket = io(resolveSocketUrl(), {
     withCredentials: true,
+    auth: token ? { token: `Bearer ${token}` } : undefined,
     transports: ['websocket', 'polling'],
     autoConnect: true,
   });
