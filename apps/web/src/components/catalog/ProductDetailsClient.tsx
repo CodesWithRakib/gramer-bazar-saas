@@ -227,6 +227,11 @@ export function ProductDetailsClient({
                     <Button
                       variant="secondary"
                       size="icon"
+                      aria-label={
+                        isWishlisted
+                          ? isBn ? 'উইশলিস্ট থেকে সরান' : 'Remove from wishlist'
+                          : isBn ? 'উইশলিস্টে যোগ করুন' : 'Add to wishlist'
+                      }
                       className={`rounded-full shadow-md hover:scale-110 transition-transform ${isWishlisted ? 'text-red-500' : 'text-muted-foreground'}`}
                       onClick={(e) => {
                         e.stopPropagation();

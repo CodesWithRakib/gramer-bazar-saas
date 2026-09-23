@@ -35,7 +35,7 @@ export class AuthService {
     if (!user) {
       // Create a new customer user automatically upon first OTP verification
       user = await this.usersService.create({
-        phone,
+        phone: this.usersService.normalizeBdPhone(phone),
         isPhoneVerified: true,
         status: UserStatus.ACTIVE,
       });

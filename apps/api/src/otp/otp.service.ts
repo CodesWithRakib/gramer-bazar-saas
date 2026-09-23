@@ -27,7 +27,7 @@ export class OtpService {
     });
 
     await this.otpRepository.save(otp);
-    
+
     // In a real app, you would dispatch a background job to send the SMS here.
     return code;
   }
@@ -60,5 +60,25 @@ export class OtpService {
     // OTP matched successfully. Invalidate it by deleting or marking as used.
     await this.otpRepository.remove(otp);
     return true;
+  }
+
+  /**
+   * Dev-only helper: return the most recent active OTP for a phone number.
+   * Used by automated tests because no real SMS provider is wired. Callers
+   * must ensure this is never exposed in production (see OtpController).
+   */
+  async peekLatestOtp(phone: string): Promise<string> {
+    const otp = await this.otpRepository.findOne({
+      where: {
+        phone,
+        expiresAt: MoreThan(new Date()),
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!otp) {
+      throw new BadRequestException('No active OTP for this phone');
+    }
+    return otp.code;
   }
 }

@@ -77,6 +77,7 @@ export default function WishlistPage({ params }: { params: Promise<{ lang: strin
                   <Button 
                     variant="outline" 
                     size="icon"
+                    aria-label={isBn ? 'উইশলিস্ট থেকে সরান' : 'Remove from wishlist'}
                     className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                     onClick={() => handleRemove(item.productId)}
                   >

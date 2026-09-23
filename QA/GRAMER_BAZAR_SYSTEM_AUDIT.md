@@ -4,7 +4,7 @@
 > not what the original design documents aspire to. Where the two disagree, the
 > discrepancy is called out explicitly.
 
-Last updated: 2026-09-23 (phases 6–8 complete; contact editor, seeded riders, coverage cleanup)
+Last updated: 2026-09-23 (phases 6–9 complete; notifications pipeline fixed, OTP shadow-account fix, full E2E coverage)
 
 ---
 
@@ -51,7 +51,7 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
 | Order lifecycle (admin status, history, delivery) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Wishlist | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Reviews + admin moderation | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Notifications | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Notifications | ✅ | ✅ | ✅ | ✅ | ✅ (creation wired this pass — finding 27) |
 | Chat (customer/seller/rider/admin) | ✅ | ✅ | ✅ | ✅ | ✅ (single socket provider, fixed this pass) |
 | Seller portal (shop, products, orders, wallet, payouts, reports) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Inventory | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -303,6 +303,39 @@ lists, documented as such rather than wrapped for symmetry.
       empty `QA/BUG_REPORT.md` removed; `QA/TEST_MATRIX.md` filled with real
       per-journey coverage; root scratch scripts moved to `QA/scratch/`.
 
+### Notifications were never created; OTP login created shadow accounts — fixed
+
+27. **In-app notifications could never appear, and OTP login created shadow
+    accounts.** Discovered while closing the E2E coverage gaps:
+
+    - **Dead notifications pipeline.** The `Notification` entity, service,
+      REST endpoints, bell dropdown and `/notifications` page all existed — but
+      **no code path ever created an in-app notification** (only order
+      confirmation emails were sent). Every documented "customer/rider is
+      notified" journey was dead on arrival. Fixed at the two existing
+      lifecycle transaction points: `updateAdminOrderStatus` now inserts an
+      `ORDER_UPDATE` notification for the customer, and delivery assignment
+      inserts one for the rider. Verified end-to-end by a new E2E test
+      (customer checkout → admin status change → notification visible on
+      `/notifications` → mark-all-read).
+    - **OTP login shadow accounts.** `POST /auth/send-otp` accepts local
+      Bangladeshi numbers (`01700000002`) but users are stored E.164
+      (`+8801700000002`), and `verifyOtp` looked users up with the raw input —
+      so an existing customer OTP-ing in got a **brand-new duplicate account**
+      instead of logging in. `UsersService` now normalizes BD numbers
+      (`01XXXXXXXXX` / `880…` → `+88…`) on lookup and `AuthService` stores the
+      normalized form when creating first-time OTP customers. Verified live:
+      OTP verify now returns a token for the existing user and the users table
+      keeps exactly one row for the phone.
+    - **Dev OTP peek.** `GET /dev/otp/:phone` (dev-only, guarded like
+      `POST /dev/seed`) lets automated tests read the generated code since no
+      SMS provider is wired; the OTP login UI journey is now covered by two
+      E2E tests (happy path + wrong-code rejection).
+    - **Wishlist a11y/testability.** The heart button on product details had
+      no accessible name; it now has localized `Add to wishlist` /
+      `Remove from wishlist` labels (the wishlist page trash button likewise),
+      and a wishlist add → view → remove E2E journey locks the flow in.
+
 ### Not yet addressed (remaining work)
 
 - **Web lint warnings (4)** — React Compiler informational notes only:
@@ -336,10 +369,9 @@ lists, documented as such rather than wrapped for symmetry.
   (first/last name, contact phone) wired to the existing `PATCH /auth/me`,
   with a note that this is the number customers see on the storefront;
   validated by a new E2E round-trip test.
-- **Unit spec coverage is uneven.** 41 spec files now cover all services
-  (`roles` and `seeder` specs added this pass); the remaining controllers and
-  gateways/interceptors have no dedicated specs — their behaviour is covered by
-  the E2E journeys.
+- **E2E scripts for wishlist/notifications/OTP were missing.** All three
+  journeys are now scripted and passing (finding 27); the automated suite
+  covers every documented customer feature and both login modes.
 
 ---
 
@@ -379,6 +411,7 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 | Users (admin) | `GET /users`, `PATCH /users/:id/status`, `PATCH /users/:id/roles` |
 | Shops | `GET /shops`, `GET /shops/:id` (+ admin CRUD) |
 | Seeder | `POST /dev/seed` |
+| Dev OTP peek | `GET /dev/otp/:phone` — dev-only (blocked in production); returns the latest active OTP so automated tests can complete the OTP journey without an SMS provider |
 
 ---
 
@@ -393,7 +426,7 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 | 4 | Rider journey (assigned → status → location) | ✅ E2E executed — 4/4 pass incl. full delivery lifecycle |
 | 5 | Admin journey (incl. audit logs, settings) | ✅ E2E executed — 6/6 pass (settings made real) |
 | 6 | Cross-system consistency (pagination, error shape, loading states) | ✅ envelope audit done; DataTable gained error/retry + i18n; error shape noted as accepted variance (see finding 23) |
-| 7 | Test suite bootstrap + lint cleanup + full E2E | ✅ unit suites green (41/41 files, 101 tests), web lint 0 errors, E2E **28/28** on the live stack |
+| 7 | Test suite bootstrap + lint cleanup + full E2E | ✅ unit suites green (41/41 files, 101 tests), web lint 0 errors, E2E **32/32** on the live stack |
 
 ---
 
@@ -409,7 +442,7 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 - `pnpm -C apps/web run lint` — **0 errors, 4 informational warnings** (React
   Compiler notes about TanStack Table / react-hook-form; not actionable).
 - `pnpm -C apps/web run build` — succeeds after all refactors.
-- **Playwright E2E (`apps/e2e`) — 28/28 pass (1 worker, ~2.5 min)** against the
+- **Playwright E2E (`apps/e2e`) — 32/32 pass (1 worker, ~2.5 min)** against the
   live stack (web :3000, API :4000, Postgres :5432):
 
 | Spec | Tests | Covers |
@@ -419,6 +452,9 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 | `rider-flow.spec.ts` | 4 | rider login→dashboard, sidebar sweep, **customer order → admin assignment → rider accept/pickup/out-for-delivery/delivered**, customer blocked from `/rider` |
 | `admin-flow.spec.ts` | 6 | admin login→dashboard metrics, sidebar sweep over all 20 admin pages, settings persistence + seller-registration toggle, audit log feed, seller blocked from `/admin` |
 | `chat-flow.spec.ts` | 4 | anonymous visitors trigger zero `/auth/me` calls, all post-login `/auth/me` carry `Authorization`, messages page renders chat live, client-side navigation reuses one socket connection |
+| `wishlist-flow.spec.ts` | 1 | login → product details heart → wishlist page shows item → remove round-trip |
+| `notifications-flow.spec.ts` | 1 | customer checkout → admin status change creates `ORDER_UPDATE` notification → visible on `/notifications` → mark all read |
+| `otp-login-flow.spec.ts` | 2 | phone + OTP login via modal using dev OTP peek, wrong-code rejection |
 
 Notes on running them: the dev server must be up (`pnpm dev`), and repeated
 logins from one IP need the raised auth rate limits documented in

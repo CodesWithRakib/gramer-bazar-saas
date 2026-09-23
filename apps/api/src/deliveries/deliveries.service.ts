@@ -8,6 +8,7 @@ import { OrderStatusHistory } from '../orders/entities/order-status-history.enti
 import { User } from '../users/entities/user.entity.js';
 import { DeliveryStatus } from './enums/delivery-status.enum.js';
 import { OrderStatus, PaymentStatus, PaymentMethod } from '../orders/enums/order-status.enum.js';
+import { Notification, NotificationType } from '../notifications/entities/notification.entity.js';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
 import { Role } from '../roles/enums/role.enum.js';
@@ -110,6 +111,16 @@ export class DeliveriesService {
         changedById: adminId,
         notes: `Assigned to rider ${rider.firstName} ${rider.lastName}`,
       });
+
+      // In-app notification for the rider (best-effort inside the same tx)
+      const riderNotification = manager.create(Notification, {
+        userId: rider.id,
+        title: 'New delivery assigned',
+        message: `Order #${order.id.slice(0, 8)} has been assigned to you for delivery.`,
+        type: NotificationType.ORDER_UPDATE,
+        data: { orderId: order.id, deliveryId: delivery.id },
+      });
+      await manager.save(riderNotification);
 
       return delivery;
     });

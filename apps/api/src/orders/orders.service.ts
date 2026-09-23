@@ -11,6 +11,7 @@ import { OrderItem } from './entities/order-item.entity.js';
 import { OrderStatusHistory } from './entities/order-status-history.entity.js';
 import { PaymentsService } from '../payments/payments.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { Notification, NotificationType } from '../notifications/entities/notification.entity.js';
 import { User } from '../users/entities/user.entity.js';
 
 import { OrderStatus, PaymentMethod, PaymentStatus } from './enums/order-status.enum.js';
@@ -370,6 +371,17 @@ export class OrdersService {
       history.remark = `Status updated by Admin (${adminId})`;
 
       await manager.save(OrderStatusHistory, history);
+
+      // In-app notification for the customer (best-effort inside the same tx)
+      const customerNotification = manager.create(Notification, {
+        userId: order.userId,
+        title: 'Order update',
+        message: `Your order #${order.id.slice(0, 8)} is now ${newStatus.replace(/_/g, ' ').toLowerCase()}.`,
+        type: NotificationType.ORDER_UPDATE,
+        data: { orderId: order.id, status: newStatus },
+      });
+      await manager.save(customerNotification);
+
       return manager.save(Order, order);
     });
   }

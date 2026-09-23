@@ -18,6 +18,7 @@ describe('AuthService', () => {
     findByPhone: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    normalizeBdPhone: (phone: string) => phone,
   };
   const otpService = {
     generateOtp: vi.fn(),
@@ -198,7 +199,11 @@ describe('AuthService', () => {
       const result = await service.verifyOtp('+8801', '123456');
 
       expect(usersService.create).toHaveBeenCalledWith(
-        expect.objectContaining({ isPhoneVerified: true, status: UserStatus.ACTIVE }),
+        expect.objectContaining({
+          phone: '+8801',
+          isPhoneVerified: true,
+          status: UserStatus.ACTIVE,
+        }),
       );
       expect(result.accessToken).toBe('signed-token');
     });

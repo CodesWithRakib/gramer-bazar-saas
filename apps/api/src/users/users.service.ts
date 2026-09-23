@@ -14,8 +14,24 @@ export class UsersService {
     private readonly roleRepository: Repository<RoleEntity>,
   ) {}
 
+  /**
+   * Normalize a Bangladeshi phone to the canonical E.164 storage form.
+   * OTP login accepts local `01XXXXXXXXX` input while users are stored as
+   * `+8801XXXXXXXXX`; without this, OTP login would silently create a
+   * shadow account instead of matching the existing user.
+   */
+  normalizeBdPhone(phone: string): string {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 11 && digits.startsWith('01')) return `+88${digits}`;
+    if (digits.length === 13 && digits.startsWith('880')) return `+${digits}`;
+    return phone;
+  }
+
   async findByPhone(phone: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { phone }, relations: ['roles'] });
+    return this.userRepository.findOne({
+      where: { phone: this.normalizeBdPhone(phone) },
+      relations: ['roles'],
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {
