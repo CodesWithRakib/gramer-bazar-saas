@@ -13,7 +13,7 @@ import {
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
-  const { token, user } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const cart = useSelector((state: RootState) => state.cart);
   const [getProfile] = useLazyGetProfileQuery();
 
@@ -38,19 +38,18 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (token && !user) {
+      if (!user) {
         try {
           const userData = await getProfile().unwrap();
           dispatch(setUser(userData));
         } catch {
-          // If token is invalid or expired, log out
-          dispatch(logout());
+          // No valid session cookie found, remain anonymous
         }
       }
     };
 
     fetchUser();
-  }, [token, user, dispatch, getProfile]);
+  }, [user, dispatch, getProfile]);
 
   return <>{children}</>;
 }

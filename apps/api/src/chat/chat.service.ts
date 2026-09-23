@@ -74,29 +74,41 @@ export class ChatService {
   }
 
   async getOrCreateConversation(participantIds: string[]) {
-    // Find a conversation where ALL these participants are exactly the only participants
-    // For simplicity, we just find any conversation that contains these exact participants.
+    const uniqueParticipants = Array.from(new Set(participantIds));
+    const users = await Promise.all(uniqueParticipants.map(id => this.usersService.findById(id)));
     
-    // Simplest approach: create a new one, or find if there is an existing one between these 2.
-    // In PostgreSQL, doing exact array match on join table is complex, so let's do a basic query:
-    
-    const users = await Promise.all(participantIds.map(id => this.usersService.findById(id)));
     if (users.some((u: any) => !u)) {
       throw new NotFoundException('One or more users not found');
     }
 
-    // Attempt to find existing (assuming 2 participants for now, but this is a rough exact match)
-    const existingConvs = await this.conversationRepository
-      .createQueryBuilder('conv')
-      .innerJoin('conv.participants', 'p1', 'p1.id = :id1', { id1: participantIds[0] })
-      .innerJoin('conv.participants', 'p2', 'p2.id = :id2', { id2: participantIds[1] })
-      .getMany();
+    if (uniqueParticipants.length === 1) {
+      const existingConvs = await this.conversationRepository
+        .createQueryBuilder('conv')
+        .innerJoin('conv.participants', 'p1', 'p1.id = :id', { id: uniqueParticipants[0] })
+        .getMany();
 
-    if (existingConvs.length > 0) {
-      return this.conversationRepository.findOne({
-        where: { id: existingConvs[0].id },
-        relations: ['participants', 'participants.roles'],
-      });
+      for (const conv of existingConvs) {
+        const fullConv = await this.conversationRepository.findOne({ 
+          where: { id: conv.id }, 
+          relations: ['participants', 'participants.roles'] 
+        });
+        if (fullConv && fullConv.participants.length === 1) {
+          return fullConv;
+        }
+      }
+    } else {
+      const existingConvs = await this.conversationRepository
+        .createQueryBuilder('conv')
+        .innerJoin('conv.participants', 'p1', 'p1.id = :id1', { id1: uniqueParticipants[0] })
+        .innerJoin('conv.participants', 'p2', 'p2.id = :id2', { id2: uniqueParticipants[1] })
+        .getMany();
+
+      if (existingConvs.length > 0) {
+        return this.conversationRepository.findOne({
+          where: { id: existingConvs[0].id },
+          relations: ['participants', 'participants.roles'],
+        });
+      }
     }
 
     // Create new
@@ -104,7 +116,13 @@ export class ChatService {
       participants: users,
     });
 
-    return this.conversationRepository.save(newConv);
+    const savedConv = await this.conversationRepository.save(newConv);
+    
+    // Return full entity with relations
+    return this.conversationRepository.findOne({
+      where: { id: savedConv.id },
+      relations: ['participants', 'participants.roles'],
+    });
   }
 
   async markAsRead(conversationId: string, userId: string) {

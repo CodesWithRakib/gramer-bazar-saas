@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Get, Patch, Delete, UseGuards, Request, HttpCode, HttpStatus, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Delete, UseGuards, Request, HttpCode, HttpStatus, UseInterceptors, UploadedFile, BadRequestException, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
@@ -36,6 +37,28 @@ const LOGIN_LIMIT = authThrottle('AUTH_LOGIN_THROTTLE_LIMIT', 5);
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  private setCookies(res: Response, accessToken: string, refreshToken: string) {
+    const isProd = process.env.NODE_ENV === 'production';
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+
+  private clearCookies(res: Response) {
+    const isProd = process.env.NODE_ENV === 'production';
+    res.clearCookie('access_token', { httpOnly: true, secure: isProd, sameSite: 'lax' });
+    res.clearCookie('refresh_token', { httpOnly: true, secure: isProd, sameSite: 'lax' });
+  }
+
   @Post('send-otp')
   @Throttle({ default: { limit: SEND_OTP_LIMIT, ttl: 60000 } })
   @ApiOperation({ summary: 'Send OTP to a phone number' })
@@ -50,16 +73,20 @@ export class AuthController {
   @ApiOperation({ summary: 'Verify OTP and get tokens' })
   @ApiResponse({ status: 200, description: 'OTP verified successfully' })
   @HttpCode(HttpStatus.OK)
-  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
-    return this.authService.verifyOtp(verifyOtpDto.phone, verifyOtpDto.otp);
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto, @Res({ passthrough: true }) res: Response) {
+    const data = await this.authService.verifyOtp(verifyOtpDto.phone, verifyOtpDto.otp);
+    this.setCookies(res, data.accessToken, data.refreshToken);
+    return { user: data.user };
   }
 
   @Post('register')
   @Throttle({ default: { limit: REGISTER_LIMIT, ttl: 60000 } })
   @ApiOperation({ summary: 'Register a new staff member (Admin/Seller/Rider)' })
   @ApiResponse({ status: 201, description: 'Registered successfully' })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.registerStaff(registerDto);
+  async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+    const data = await this.authService.registerStaff(registerDto);
+    this.setCookies(res, data.accessToken, data.refreshToken);
+    return { user: data.user };
   }
 
   @Post('login')
@@ -67,8 +94,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Login with password (for admin/seller/rider)' })
   @ApiResponse({ status: 200, description: 'Logged in successfully' })
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.loginWithPassword(loginDto.emailOrPhone, loginDto.password);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const data = await this.authService.loginWithPassword(loginDto.emailOrPhone, loginDto.password);
+    this.setCookies(res, data.accessToken, data.refreshToken);
+    return { user: data.user };
   }
 
   @Post('refresh')
@@ -76,8 +105,14 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body() refreshDto: RefreshDto) {
-    return this.authService.refreshTokens(refreshDto.refreshToken);
+  async refresh(@Request() req: any, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.['refresh_token'];
+    if (!refreshToken) {
+      throw new BadRequestException('Refresh token is missing from cookies');
+    }
+    const data = await this.authService.refreshTokens(refreshToken);
+    this.setCookies(res, data.accessToken, data.refreshToken);
+    return { user: data.user };
   }
 
   @Post('logout')
@@ -86,8 +121,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout and invalidate refresh token' })
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
   @HttpCode(HttpStatus.OK)
-  async logout(@Request() req: any) {
-    return this.authService.logout(req.user.id);
+  async logout(@Request() req: any, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(req.user.id);
+    this.clearCookies(res);
+    return { message: 'Logged out successfully' };
   }
 
   @Get('me')

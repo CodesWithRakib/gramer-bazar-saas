@@ -36,6 +36,10 @@ export function StartChatButton({
 
   const handleStartChat = async () => {
     try {
+      if (!participantId) {
+        toast.error(lang === 'bn' ? 'বিক্রেতার তথ্য অনুপস্থিত' : 'Seller information missing');
+        return;
+      }
       const conversation = await createConversation({ participantId }).unwrap();
       
       const isDashboardRoute = redirectPath.includes('/admin') || redirectPath.includes('/seller') || redirectPath.includes('/rider');
@@ -46,12 +50,12 @@ export function StartChatButton({
         // Open the floating widget for storefront
         dispatch(openChatWidget(conversation.id));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to start chat:', error);
       const isBn = lang === 'bn';
+      const msg = getApiErrorMessage(error);
       toast.error(
-        getApiErrorMessage(error) || 
-        (isBn ? 'চ্যাট শুরু করতে সমস্যা হয়েছে' : 'Failed to start chat')
+        msg || (isBn ? 'চ্যাট শুরু করতে সমস্যা হয়েছে' : 'Failed to start chat')
       );
     }
   };

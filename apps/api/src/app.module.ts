@@ -42,6 +42,7 @@ import { FlashSalesModule } from './flash-sales/flash-sales.module.js';
 import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
 
 @Module({
   imports: [
@@ -123,6 +124,10 @@ import { join } from 'path';
     {
       provide: 'APP_GUARD',
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: MaintenanceGuard,
     },
   ],
 })

@@ -17,4 +17,9 @@ export class UpdateSettingsDto {
   @IsBoolean()
   @IsOptional()
   allowSellerRegistration?: boolean;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  isMaintenanceMode?: boolean;
 }

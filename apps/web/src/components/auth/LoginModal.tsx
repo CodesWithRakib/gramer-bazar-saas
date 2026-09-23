@@ -71,7 +71,6 @@ export function LoginModal({ lang }: { lang: string }) {
     try {
       const res = await verifyOtp({ phone, otp }).unwrap();
       dispatch(setCredentials({
-        token: res.accessToken,
         user: res.user,
       }));
       handleClose();

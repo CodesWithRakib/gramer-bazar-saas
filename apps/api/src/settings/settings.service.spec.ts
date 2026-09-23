@@ -36,6 +36,7 @@ describe('SettingsService', () => {
       platformName: 'Gramer Bazar',
       supportEmail: 'support@gramerbazar.com',
       allowSellerRegistration: true,
+      isMaintenanceMode: false,
     });
   });
 
@@ -49,6 +50,7 @@ describe('SettingsService', () => {
       platformName: 'Gramer Bazar BD',
       supportEmail: 'support@gramerbazar.com',
       allowSellerRegistration: false,
+      isMaintenanceMode: false,
     });
   });
 

@@ -8,18 +8,21 @@ export interface PlatformSettings {
   platformName: string;
   supportEmail: string;
   allowSellerRegistration: boolean;
+  isMaintenanceMode: boolean;
 }
 
 const KEYS = {
   platformName: 'platformName',
   supportEmail: 'supportEmail',
   allowSellerRegistration: 'allowSellerRegistration',
+  isMaintenanceMode: 'isMaintenanceMode',
 } as const;
 
 const DEFAULTS: PlatformSettings = {
   platformName: 'Gramer Bazar',
   supportEmail: 'support@gramerbazar.com',
   allowSellerRegistration: true,
+  isMaintenanceMode: false,
 };
 
 @Injectable()
@@ -39,6 +42,9 @@ export class SettingsService {
       allowSellerRegistration:
         (stored.get(KEYS.allowSellerRegistration) ?? String(DEFAULTS.allowSellerRegistration)) ===
         'true',
+      isMaintenanceMode:
+        (stored.get(KEYS.isMaintenanceMode) ?? String(DEFAULTS.isMaintenanceMode)) ===
+        'true',
     };
   }
 
@@ -49,6 +55,9 @@ export class SettingsService {
     if (dto.supportEmail !== undefined) entries.push([KEYS.supportEmail, dto.supportEmail]);
     if (dto.allowSellerRegistration !== undefined) {
       entries.push([KEYS.allowSellerRegistration, String(dto.allowSellerRegistration)]);
+    }
+    if (dto.isMaintenanceMode !== undefined) {
+      entries.push([KEYS.isMaintenanceMode, String(dto.isMaintenanceMode)]);
     }
 
     if (entries.length > 0) {

@@ -30,7 +30,7 @@ export default function StaffLoginPage({ params }: { params: Promise<{ lang: str
 
     try {
       const res = await loginWithPassword({ emailOrPhone, password }).unwrap();
-      dispatch(setCredentials({ token: res.accessToken, user: res.user }));
+      dispatch(setCredentials({ user: res.user }));
       
       const roles = res.user.roles || [];
       if (roles.includes('ADMIN') || roles.includes('SUPER_ADMIN')) {

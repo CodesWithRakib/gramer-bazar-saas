@@ -36,25 +36,13 @@ const normalizeUser = (user: unknown): UserProfile | null => {
 };
 
 export interface AuthState {
-  token: string | null;
   user: UserProfile | null;
   isAuthenticated: boolean;
   isLoginModalOpen: boolean;
 }
 
-// Initial state, trying to load token from localStorage if available (handled in a safe way for SSR)
 const getInitialState = (): AuthState => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
-    return {
-      token,
-      user: null,
-      isAuthenticated: !!token,
-      isLoginModalOpen: false,
-    };
-  }
   return {
-    token: null,
     user: null,
     isAuthenticated: false,
     isLoginModalOpen: false,
@@ -69,28 +57,21 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ token: string; user: unknown }>
+      action: PayloadAction<{ user: unknown }>
     ) => {
-      state.token = action.payload.token;
       state.user = normalizeUser(action.payload.user);
       state.isAuthenticated = true;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', action.payload.token);
-      }
     },
     logout: (state) => {
-      state.token = null;
       state.user = null;
       state.isAuthenticated = false;
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-      }
     },
     setLoginModalOpen: (state, action: PayloadAction<boolean>) => {
       state.isLoginModalOpen = action.payload;
     },
     setUser: (state, action: PayloadAction<unknown>) => {
       state.user = normalizeUser(action.payload);
+      state.isAuthenticated = true; // If user is set via /auth/me, we are authenticated
     }
   },
 });

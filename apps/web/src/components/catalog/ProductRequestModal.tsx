@@ -18,7 +18,7 @@ export function ProductRequestModal({ lang, trigger }: ProductRequestModalProps)
   const [open, setOpen] = useState(false);
   const [success, setSuccess] = useState(false);
   const [createProductRequest, { isLoading: loading }] = useCreateProductRequestMutation();
-  const token = useSelector((state: RootState) => state.auth.token);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const [formData, setFormData] = useState({
     requestedProductName: '',
@@ -28,7 +28,7 @@ export function ProductRequestModal({ lang, trigger }: ProductRequestModalProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) {
+    if (!isAuthenticated) {
       toast.error(isBn ? 'দয়া করে লগইন করুন' : 'Please login to submit a request');
       setOpen(false);
       // Let the login modal be triggered if possible, or just close
@@ -76,7 +76,7 @@ export function ProductRequestModal({ lang, trigger }: ProductRequestModalProps)
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-            {!token && (
+            {!isAuthenticated && (
               <div className="p-3 bg-yellow-50 text-yellow-800 text-sm rounded-md border border-yellow-200">
                 {isBn ? 'অনুরোধ করতে আপনাকে প্রথমে লগইন করতে হবে।' : 'You must log in to submit a request.'}
               </div>
@@ -88,7 +88,7 @@ export function ProductRequestModal({ lang, trigger }: ProductRequestModalProps)
                 placeholder={isBn ? 'যেমন: ফ্রেশ সয়াবিন তেল ৫ লিটার' : 'e.g. Fresh Soybean Oil 5L'}
                 value={formData.requestedProductName}
                 onChange={(e) => setFormData({ ...formData, requestedProductName: e.target.value })}
-                disabled={!token}
+                disabled={!isAuthenticated}
               />
             </div>
             <div className="space-y-2">
@@ -97,7 +97,7 @@ export function ProductRequestModal({ lang, trigger }: ProductRequestModalProps)
                 placeholder={isBn ? 'ব্র্যান্ড, পরিমাণ, ইত্যাদি' : 'Brand, quantity, etc.'}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                disabled={!token}
+                disabled={!isAuthenticated}
               />
             </div>
             <div className="space-y-2">
@@ -106,10 +106,10 @@ export function ProductRequestModal({ lang, trigger }: ProductRequestModalProps)
                 placeholder={isBn ? 'দোকানের নাম বা অন্য কিছু' : 'Preferred shop, origin, etc.'} 
                 value={formData.preferredInformation}
                 onChange={(e) => setFormData({ ...formData, preferredInformation: e.target.value })}
-                disabled={!token}
+                disabled={!isAuthenticated}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading || !token}>
+            <Button type="submit" className="w-full" disabled={loading || !isAuthenticated}>
               {loading ? (isBn ? 'জমা হচ্ছে...' : 'Submitting...') : (isBn ? 'অনুরোধ জমা দিন' : 'Submit Request')}
             </Button>
           </form>
