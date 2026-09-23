@@ -14,13 +14,30 @@ import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdatePasswordDto } from './dto/update-password.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 
+/**
+ * Auth endpoint rate limits (requests per minute, per IP).
+ *
+ * The defaults are production-safe. Automated journeys (local E2E, load tests)
+ * log in repeatedly from a single IP and would trip the limits, so each value
+ * can be raised through the environment without changing the defaults.
+ */
+const authThrottle = (envKey: string, fallback: number) => {
+  const raw = Number(process.env[envKey]);
+  return Number.isFinite(raw) && raw > 0 ? raw : fallback;
+};
+
+const SEND_OTP_LIMIT = authThrottle('AUTH_SEND_OTP_THROTTLE_LIMIT', 3);
+const VERIFY_OTP_LIMIT = authThrottle('AUTH_VERIFY_OTP_THROTTLE_LIMIT', 5);
+const REGISTER_LIMIT = authThrottle('AUTH_REGISTER_THROTTLE_LIMIT', 5);
+const LOGIN_LIMIT = authThrottle('AUTH_LOGIN_THROTTLE_LIMIT', 5);
+
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('send-otp')
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Throttle({ default: { limit: SEND_OTP_LIMIT, ttl: 60000 } })
   @ApiOperation({ summary: 'Send OTP to a phone number' })
   @ApiResponse({ status: 200, description: 'OTP sent successfully' })
   @HttpCode(HttpStatus.OK)
@@ -29,7 +46,7 @@ export class AuthController {
   }
 
   @Post('verify-otp')
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: VERIFY_OTP_LIMIT, ttl: 60000 } })
   @ApiOperation({ summary: 'Verify OTP and get tokens' })
   @ApiResponse({ status: 200, description: 'OTP verified successfully' })
   @HttpCode(HttpStatus.OK)
@@ -38,7 +55,7 @@ export class AuthController {
   }
 
   @Post('register')
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: REGISTER_LIMIT, ttl: 60000 } })
   @ApiOperation({ summary: 'Register a new staff member (Admin/Seller/Rider)' })
   @ApiResponse({ status: 201, description: 'Registered successfully' })
   async register(@Body() registerDto: RegisterDto) {
@@ -46,7 +63,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: LOGIN_LIMIT, ttl: 60000 } })
   @ApiOperation({ summary: 'Login with password (for admin/seller/rider)' })
   @ApiResponse({ status: 200, description: 'Logged in successfully' })
   @HttpCode(HttpStatus.OK)

@@ -11,7 +11,7 @@ export default function AdminProductsPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
-  const { data, isLoading } = useGetAdminProductsQuery({ page, limit, search });
+  const { data, isLoading, isError, refetch } = useGetAdminProductsQuery({ page, limit, search });
 
   const columns: ColumnDef<Product>[] = [
     {
@@ -82,6 +82,8 @@ export default function AdminProductsPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
     </div>
   );

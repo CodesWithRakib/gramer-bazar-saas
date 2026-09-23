@@ -1,8 +1,10 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { useGetProfileQuery } from '@/features/auth/authApi';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import type { Socket } from 'socket.io-client';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { initSocket, disconnectSocket, getSocket } from '@/lib/socket';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -16,49 +18,53 @@ const SocketContext = createContext<SocketContextType>({
 
 export const useSocket = () => useContext(SocketContext);
 
-export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const { data: profile } = useGetProfileQuery();
+/**
+ * Owns the single app-wide Socket.IO connection (singleton in `lib/socket.ts`).
+ *
+ * The connection follows the auth slice: it opens when a token exists and is
+ * torn down on logout. Components read `{ socket, isConnected }` from
+ * `useSocket()`. The previous parallel connection in `useChatSocket` was merged
+ * into this provider so chat surfaces never open a second socket.
+ *
+ * Auth state comes from the Redux slice (populated from localStorage on boot
+ * and refreshed by `AuthInitializer`) — no eager `/auth/me` request here.
+ */
+export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
+  const { token, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const socket = getSocket();
+
+  // Connectivity mirrors the live socket. Event handlers keep it fresh, and the
+  // render-time adjustment below self-heals any missed transition (React's
+  // "adjust state when external state changes during render" pattern) — e.g. a
+  // socket created between renders.
+  const [isConnected, setIsConnected] = useState<boolean>(() => socket?.connected ?? false);
+  if ((socket?.connected ?? false) !== isConnected) {
+    setIsConnected(socket?.connected ?? false);
+  }
 
   useEffect(() => {
-    // Only connect if the user is logged in
-    if (!profile?.id) return;
+    if (!isAuthenticated || !token) {
+      // Logout: tear the connection down. The resulting disconnect clears
+      // `isConnected` via the render adjustment on the next pass.
+      disconnectSocket();
+      return;
+    }
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    
-    if (!token) return;
+    const socketInstance = initSocket(token);
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
 
-    const backendUrl =
-      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-    const socketUrl = backendUrl.includes('/api/v1') 
-      ? backendUrl.replace('/api/v1', '') 
-      : new URL(backendUrl).origin;
-
-    const socketInstance = io(socketUrl, {
-      auth: {
-        token: `Bearer ${token}`
-      }
-    });
-
-    socketInstance.on('connect', () => {
-      setIsConnected(true);
-    });
-
-    socketInstance.on('disconnect', () => {
-      setIsConnected(false);
-    });
-
-    // eslint-disable-next-line
-    setSocket(socketInstance);
+    socketInstance.on('connect', handleConnect);
+    socketInstance.on('disconnect', handleDisconnect);
 
     return () => {
-      socketInstance.disconnect();
+      socketInstance.off('connect', handleConnect);
+      socketInstance.off('disconnect', handleDisconnect);
     };
-  }, [profile?.id]);
+  }, [isAuthenticated, token]);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected }}>
+    <SocketContext.Provider value={{ socket: getSocket(), isConnected }}>
       {children}
     </SocketContext.Provider>
   );

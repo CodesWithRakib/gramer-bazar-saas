@@ -12,7 +12,7 @@ export default function AdminDeliveriesPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
-  const { data, isLoading } = useGetAdminDeliveriesQuery({ page, limit, search });
+  const { data, isLoading, isError, refetch } = useGetAdminDeliveriesQuery({ page, limit, search });
 
   const columns: ColumnDef<Delivery>[] = [
     {
@@ -92,6 +92,8 @@ export default function AdminDeliveriesPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
     </div>
   );

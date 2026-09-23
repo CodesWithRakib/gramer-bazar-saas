@@ -35,16 +35,15 @@ const NavItem = ({
   href,
   icon: Icon,
   title,
-  pathname,
+  isActive,
   onClick,
 }: {
   href: string;
   icon: React.ElementType;
   title: string;
-  pathname: string;
+  isActive: boolean;
   onClick?: () => void;
 }) => {
-  const isActive = pathname === href || pathname.startsWith(`${href}/`);
   return (
     <Link
       onClick={onClick}
@@ -67,13 +66,13 @@ function SidebarContent({
   routes,
   lang,
   isBn,
-  pathname,
+  activeHref,
   onLogout,
 }: {
   routes: DashboardRoute[];
   lang: string;
   isBn: boolean;
-  pathname: string;
+  activeHref: string | null;
   onLogout: () => void;
 }) {
   return (
@@ -96,7 +95,7 @@ function SidebarContent({
             href={`/${lang}${route.href}`}
             icon={route.icon}
             title={isBn ? route.titleBn : route.title}
-            pathname={pathname}
+            isActive={activeHref === route.href}
           />
         ))}
       </nav>
@@ -137,12 +136,19 @@ export function DashboardLayout({
     router.push(`/${lang}/login`);
   };
 
-  // Find current route title for header
-  const currentRoute = routes.find(
-    (r) =>
-      pathname === `/${lang}${r.href}` ||
-      pathname.startsWith(`/${lang}${r.href}/`),
-  );
+  // Resolve the active route by the LONGEST matching href. A plain `find`
+  // returns the first prefix match, so nested pages such as
+  // `/[lang]/rider/deliveries` would resolve to the `/rider` dashboard entry.
+  const activeHref =
+    routes
+      .filter(
+        (r) =>
+          pathname === `/${lang}${r.href}` ||
+          pathname.startsWith(`/${lang}${r.href}/`),
+      )
+      .sort((a, b) => b.href.length - a.href.length)[0]?.href ?? null;
+
+  const currentRoute = routes.find((r) => r.href === activeHref);
 
   return (
     <div className="flex min-h-screen bg-muted/20">
@@ -152,7 +158,7 @@ export function DashboardLayout({
           routes={routes}
           lang={lang}
           isBn={isBn}
-          pathname={pathname}
+          activeHref={activeHref}
           onLogout={handleLogout}
         />
       </aside>
@@ -174,7 +180,7 @@ export function DashboardLayout({
                   routes={routes}
                   lang={lang}
                   isBn={isBn}
-                  pathname={pathname}
+                  activeHref={activeHref}
                   onLogout={handleLogout}
                 />
               </SheetContent>

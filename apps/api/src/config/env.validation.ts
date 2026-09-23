@@ -12,4 +12,12 @@ export const envValidationSchema = z.object({
   CORS_ORIGINS: z
     .string()
     .default('http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001'),
+  // Rate limiting. Defaults are production-safe; raise them (e.g. in .env for
+  // local E2E runs) when automated journeys hit the limits from one IP.
+  THROTTLE_TTL_MS: z.coerce.number().optional(),
+  THROTTLE_LIMIT: z.coerce.number().optional(),
+  AUTH_SEND_OTP_THROTTLE_LIMIT: z.coerce.number().optional(),
+  AUTH_VERIFY_OTP_THROTTLE_LIMIT: z.coerce.number().optional(),
+  AUTH_REGISTER_THROTTLE_LIMIT: z.coerce.number().optional(),
+  AUTH_LOGIN_THROTTLE_LIMIT: z.coerce.number().optional(),
 });

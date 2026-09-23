@@ -13,7 +13,7 @@ export default function AdminRidersPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
-  const { data, isLoading } = useGetUsersQuery({ page, limit, search, role: Role.RIDER });
+  const { data, isLoading, isError, refetch } = useGetUsersQuery({ page, limit, search, role: Role.RIDER });
 
   const columns: ColumnDef<User>[] = [
     {
@@ -84,6 +84,8 @@ export default function AdminRidersPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
     </div>
   );

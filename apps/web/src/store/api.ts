@@ -37,6 +37,7 @@ export const api = createApi({
     "Dispute",
     "FlashSale",
     "AuditLog",
+    "Settings",
   ],
   endpoints: () => ({}),
 });

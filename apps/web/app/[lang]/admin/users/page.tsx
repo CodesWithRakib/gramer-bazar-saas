@@ -16,7 +16,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [editingRolesUser, setEditingRolesUser] = useState<User | null>(null);
   
-  const { data, isLoading } = useGetUsersQuery({ page, limit, search });
+  const { data, isLoading, isError, refetch } = useGetUsersQuery({ page, limit, search });
   const [updateStatus] = useUpdateUserStatusMutation();
 
   const columns: ColumnDef<User>[] = [
@@ -123,6 +123,8 @@ export default function AdminUsersPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
 
       {editingRolesUser && (

@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useSocket } from '@/providers/SocketProvider';
-import {
-  useGetConversationsQuery,
+import { useSocket } from '@/providers/SocketProvider';import { useGetConversationsQuery,
   useGetMessagesQuery,
   chatApi,
   ChatMessage,
@@ -12,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useGetProfileQuery } from '@/features/auth/authApi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { MessageCircle, X, ChevronLeft, Send } from 'lucide-react';
 import {
@@ -31,7 +28,9 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
   const activeConversationId = useAppSelector(selectActiveConversationId);
 
   const { socket, isConnected } = useSocket();
-  const { data: profile } = useGetProfileQuery();
+  // Identity comes from the auth slice (populated by AuthInitializer), so the
+  // widget never fires /auth/me for anonymous visitors.
+  const profile = useAppSelector((state) => state.auth.user);
   const { data: conversations, isLoading: isLoadingConversations } = useGetConversationsQuery(undefined, {
     pollingInterval: 30000,
     skip: !profile, // Don't fetch if not logged in

@@ -4,7 +4,7 @@
 > not what the original design documents aspire to. Where the two disagree, the
 > discrepancy is called out explicitly.
 
-Last updated: 2026-09-22
+Last updated: 2026-09-23 (phases 6–7 complete; socket consolidation + chat E2E)
 
 ---
 
@@ -15,7 +15,7 @@ Last updated: 2026-09-22
 | Web app | `apps/web` | Next.js 16 (App Router, `[lang]` locale segment), React 19, Redux Toolkit + RTK Query, Tailwind v4, shadcn/ui, Socket.IO client, Serwist PWA, Sentry |
 | API | `apps/api` | NestJS 12, TypeORM (Postgres), Passport JWT, Socket.IO gateway, Swagger, class-validator, SSLCommerz, Resend |
 | Shared | `packages/types`, `packages/tsconfig`, `packages/eslint-config` | workspace packages |
-| E2E | `apps/e2e` | Playwright (single `customer-flow.spec.ts`) |
+| E2E | `apps/e2e` | Playwright — `customer-flow`, `seller-flow`, `rider-flow`, `admin-flow`, `chat-flow` specs |
 | Docs | `Gramer_Bazar_*_Document.md`, `QA/*` | design intent + QA scaffolding |
 
 Commands (root): `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck`,
@@ -52,7 +52,7 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
 | Wishlist | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Reviews + admin moderation | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Notifications | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Chat (customer/seller/rider/admin) | ✅ | ✅ | ✅ | ✅ | 🟡 (two socket mechanisms) |
+| Chat (customer/seller/rider/admin) | ✅ | ✅ | ✅ | ✅ | ✅ (single socket provider, fixed this pass) |
 | Seller portal (shop, products, orders, wallet, payouts, reports) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Inventory | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Rider (assigned deliveries, status, location) | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -64,8 +64,11 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
 | Payments (SSLCommerz success/fail/cancel/ipn) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Analytics (dashboard, demand) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Audit Logs | ✅ | ✅ | ✅ | ✅ | ✅ (implemented in this pass) |
+| Shop settings (seller) | ✅ | ✅ | ✅ | ✅ | ✅ (contract repaired in this pass) |
+| Platform settings (admin) | ✅ | ✅ | ✅ | ✅ | ✅ (real persistence added in this pass) |
 | Rider earnings | 📄 | — | 🔴 | — | Out of scope (no fee model) |
 | Product moderation workflow | ✅ | 🟡 | ✅ | ✅ | Admin product management exists |
+| Maintenance mode | 📄 | 🔴 | 🔴 | — | Out of scope — needs request gating (see §4) |
 
 ---
 
@@ -136,8 +139,8 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
     repositories, services, `DataSource`, `EventEmitter2`, `ConfigService`, or the
     `@UseGuards` guards. Every spec now supplies the required mocks
     (`getRepositoryToken`, service stubs) and overrides guards where needed.
-    **`pnpm -C apps/api test` → 32/32 files pass.** `oxlint` is down to
-    0 errors / 30 warnings.
+    **`pnpm -C apps/api test` → 32/32 files pass** (33/33 after the settings
+    spec added in the journey pass). `oxlint` is down to 0 errors / 30 warnings.
 
 ### Web lint (fixed)
 
@@ -161,14 +164,130 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
     - `pnpm -C apps/web lint` now **exits 0** (86 warnings remain, mostly
       pre-existing unused imports).
 
+### Journey execution — phases 3/4/5 (fixed)
+
+Driving the seller, rider and admin journeys with Playwright against the live
+stack surfaced four more real defects, all fixed:
+
+18. **Seller "Shop Settings" was broken end-to-end.** `PATCH
+    /seller-portal/shop` accepted `name` / `address` / `phone`, but the `Shop`
+    entity (and the `shops` table) has `nameEn` / `nameBn` / `slug` /
+    `description` / `logo` / `banner` — there is no phone or address column, and
+    the storefront reads the contact number from `shop.seller.phone`. Saving the
+    form therefore failed: `name` returned
+    `EntityPropertyNotFoundError: Property "name" was not found in "Shop"` (500),
+    and `phone` was rejected by `@IsPhoneNumber`. The DTO, the service and both
+    seller forms (`/seller/shop` and `/seller/profile`) now use `nameEn`,
+    `nameBn`, `description`, and the service ignores undefined keys so a partial
+    payload can never clear unrelated columns.
+19. **Dashboard header/sidebar highlighted the wrong item on nested routes.**
+    `DashboardLayout` resolved the active route with `routes.find()` (first
+    prefix match), so `/rider/deliveries` activated **Dashboard** — the header
+    read "Dashboard" on every rider sub-page. It now resolves the **longest**
+    matching href, and both the header title and the sidebar active state use it.
+20. **Login rate limiting blocked automated journeys.** `POST /auth/login` is
+    capped at 5 requests/60 s per IP (and `/auth/send-otp` at 3). A single dev
+    IP triggered `429`s after ~three logins, so E2E journeys silently stalled on
+    the login screen. The limits stay production-safe but are now
+    env-configurable (`AUTH_LOGIN_THROTTLE_LIMIT`, `AUTH_SEND_OTP_THROTTLE_LIMIT`,
+    `AUTH_VERIFY_OTP_THROTTLE_LIMIT`, `AUTH_REGISTER_THROTTLE_LIMIT`,
+    `THROTTLE_LIMIT`, `THROTTLE_TTL_MS`), documented in `.env.example`.
+21. **Admin Settings was a fake form.** `/admin/settings` rendered `defaultValue`
+    inputs, a Save button with no handler and unchecked/unwired checkboxes, and
+    there was no settings API at all. Added a real `settings` module
+    (`platform_settings` key/value table, `GET`/`PATCH /admin/settings` guarded to
+    admin, audit-logged on write) and rewired the page to it with
+    loading/error/dirty states. `allowSellerRegistration` is **enforced** in
+    `AuthService.registerStaff`.
+22. **Maintenance mode removed from the UI.** The checkbox promised "only admins
+    can access the website", which needs request gating (edge/proxy or a global
+    API guard with admin bypass) that the current build does not have. Persisting
+    the flag without honouring it would be a fake control, so the toggle was
+    removed and the capability is recorded as out of scope (§3).
+
+The E2E suite itself also had two credibility problems that were fixed: it was
+running 2 workers against a dev server that compiles routes on first hit (causing
+multi-second stalls), and it never actually placed an order. The config now runs
+one worker with a warm-up pass per route, a 90 s test timeout, and the journeys
+cover real order placement and the full delivery lifecycle.
+
+### Cross-system consistency — phase 6 (fixed)
+
+23. **The shared `DataTable` had no error state and hardcoded English strings.**
+    When an admin API call failed (401, 500, network), all nine DataTable-backed
+    admin pages (users, sellers, riders, orders, deliveries, product-requests,
+    products, categories, brands) silently rendered the empty state — a real
+    failure looked identical to an empty table. The shared component now accepts
+    `isError` / `onRetry` / `emptyMessage` / `errorMessage` / `isBn`, renders a
+    distinct error row with a retry button, and localizes the loading/empty/
+    pagination chrome into Bangla/English. All nine pages pass `isError` and
+    `refetch` through.
+
+An envelope audit confirmed the rest of the list endpoints are **already
+consistent** and were left alone: every paginated service (users, orders,
+products, categories, brands, coupons, flash-sales, deliveries, product-requests,
+reviews, audit-logs, public catalog) returns the same `{ data, meta: { total,
+page, limit, totalPages } }` shape, and every frontend consumer types it through
+the shared `PaginationMeta`. Non-paginated admin lists (payouts, banners,
+disputes, shops) intentionally return bare arrays — they are small bounded
+lists, documented as such rather than wrapped for symmetry.
+
+### Unit spec gaps — phase 6 (fixed)
+
+24. **Modules with business-critical logic had no unit specs.** Added focused
+    service specs:
+
+    - `orders.service.spec.ts` (11 tests) — checkout math (subtotal, ৳50 delivery
+      fee, coupon discount incl. max-cap and subtotal clamp), stock deduction and
+      insufficient-stock rejection, address-ownership rejection, expired/limit
+      coupon rejections, online payment initiation, cancellation restoring
+      inventory and refusing non-cancellable statuses.
+    - `auth.service.spec.ts` (12 tests) — password login happy path + wrong
+      password / unknown user / blocked account / OTP-only account, staff
+      registration incl. the seller-registration gate, duplicate rejection, OTP
+      first-verification account creation.
+    - `coupons.service.spec.ts` (10 tests) — percentage/fixed discount math, cap,
+      clamp, and every validation rejection path.
+    - `users.service.spec.ts` (9 tests) — lookups, role attachment on create,
+      update merge, pagination envelope + role filter.
+    - `reviews.service.spec.ts` (7 tests) — verified-purchase rule, duplicate
+      rule, moderation, admin envelope.
+    - `audit-logs.service.spec.ts` (6 tests) — best-effort `record()` semantics
+      (null fallbacks, swallowed failures), search + pagination.
+
+    Combined with the earlier suites: **39 spec files / 93 tests pass.**
+
+### Socket consolidation & anonymous auth noise — fixed
+
+25. **Two parallel socket clients and anonymous `/auth/me` calls, fixed
+    together.**
+
+    - **One socket for the whole app.** `SocketProvider` now exclusively owns the
+      singleton from `lib/socket.ts` (whose stale `:3001` fallback is corrected
+      to `:4000`): it connects when the auth slice has a token and disconnects on
+      logout. `useChatSocket` was rewritten to consume that shared socket —
+      join/leave rooms, sync `new_message` into the RTK Query cache, expose
+      `sendMessage` — and no longer opens its own connection. `SocketProvider`
+      itself no longer runs an eager `useGetProfileQuery()`; it keys off the
+      Redux auth slice (populated from `localStorage` on boot, refreshed by
+      `AuthInitializer`).
+    - **No anonymous `/auth/me`.** `ChatInterface` and `FloatingChatWidget` now
+      read identity from the auth slice and `skip` their chat queries while
+      logged out (the dead `ChatInbox.tsx`, never imported anywhere, was
+      deleted); the customer profile page also passes `skip: !isAuthenticated`.
+    - **Locked in by tests.** New `chat-flow.spec.ts` (4 E2E tests): anonymous
+      visitors trigger zero `/auth/me` calls; every `/auth/me` after login
+      carries an `Authorization` header; the messages page renders ChatInterface
+      live; and client-side navigation reuses exactly **one** socket.io
+      connection instead of opening parallel ones.
+
 ### Not yet addressed (remaining work)
 
 - **Web lint warnings (4)** — React Compiler informational notes only:
   TanStack Table `useReactTable()` and react-hook-form `form.watch()` return
   non-memoizable functions, so the compiler skips those 3 components. All
   actionable warnings/errors are gone (was 86 warnings + 15 errors).
-- **Two parallel socket clients** (`providers/SocketProvider.tsx` context and
-  `hooks/useChatSocket.ts` singleton) — works, but should be consolidated.
+- ~~**Two parallel socket clients**~~ **Consolidated (this pass, finding 25).**
 - **Auth token stored in `localStorage`** (not httpOnly cookie) — XSS exposure.
   Documented as security debt; changing it touches the whole auth flow.
 - **Design documents are aspirational.** The Backend design doc lists routes such
@@ -179,9 +298,21 @@ Legend: ✅ complete · 🟡 partial · 🔴 broken/missing · 📄 doc-only
 - Empty scaffold docs in `QA/` (`BUG_REPORT`, `MASTER_QA_PLAN`, etc.).
 - Root scratch files `test_full_flow.cjs`, `scratch_test_checkout.js` — move to
   `QA/` or delete.
-- **Eager `useGetProfileQuery()`** in chat components fires `/auth/me` for
-  anonymous visitors (401 console noise). Should pass a `skip: !isAuthenticated`
-  option. Functional impact: none.
+- ~~**Eager `useGetProfileQuery()`** in chat components fires `/auth/me` for
+  anonymous visitors~~ **Fixed (this pass, finding 25).**
+- **Maintenance mode is not implemented.** The setting is gone from the admin UI
+  because nothing enforced it; adding it means gating requests (edge/proxy or a
+  global API guard with an admin bypass) plus a safe "stuck in maintenance"
+  recovery path. Out of scope until that is designed.
+- **Seller account phone/address has no editor.** The storefront renders the
+  contact number from `shop.seller.phone`, which a seller can only change through
+  `PATCH /auth/me` — there is no seller-facing form for it yet.
+- **Rider accounts are not seeded.** `seeder.service.ts` creates admin, customer
+  and two sellers only; the rider E2E registers `rider1@gramerbazar.com` through
+  the public `POST /auth/register` and reuses it afterwards.
+- **Unit spec coverage is uneven.** 39 spec files now cover most modules, but
+  `roles`, `seeder`, the remaining controllers and all gateways/interceptors have
+  no dedicated specs — their behaviour is covered by the E2E journeys.
 
 ---
 
@@ -205,7 +336,7 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 | Reviews | `GET /reviews/product/:productId`, `POST /reviews`, `GET /reviews/user` · admin: `GET /reviews/admin`, `PATCH /reviews/admin/:id/moderate` |
 | Notifications | `GET /notifications`, `/notifications/unread-count`, `PATCH /notifications/:id/read`, `/notifications/read-all` |
 | Chat | `GET/POST /chat/conversations`, `GET /chat/conversations/:id/messages`, `PATCH /chat/conversations/:id/read`; socket events `join_conversation`, `leave_conversation`, `send_message`, server emits `new_message` |
-| Seller portal | `GET /seller-portal/dashboard`, `GET/PATCH /seller-portal/shop`, `GET/POST /seller-portal/products`, `PATCH /seller-portal/products/:id`, `GET /seller-portal/orders`, `GET /seller-portal/orders/:id` |
+| Seller portal | `GET /seller-portal/dashboard`, `GET/PATCH /seller-portal/shop` (`nameEn`, `nameBn`, `description`, `logo`, `banner`, `isActive`), `GET/POST /seller-portal/products`, `PATCH /seller-portal/products/:id`, `GET /seller-portal/orders`, `GET /seller-portal/orders/:id` |
 | Inventory | `GET/POST /inventory`, `GET/PATCH/DELETE /inventory/:id`; `GET/POST /seller-products`, `PATCH/DELETE /seller-products/:id` |
 | Deliveries | admin: `GET /deliveries/admin`, `POST /deliveries/admin/assign`, `GET /deliveries/admin/riders`; rider: `GET /deliveries/rider/assigned`, `GET /deliveries/rider/:id`, `PATCH /deliveries/rider/:id/status`, `PATCH /deliveries/rider/:id/location`; `GET /deliveries/customer/:orderId` |
 | Product requests | `POST/GET /product-requests`, `GET /product-requests/:id`; admin: `GET /admin/product-requests`, `GET /admin/product-requests/:id`, `PATCH /admin/product-requests/:id/status` |
@@ -215,7 +346,8 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 | Wallets / payouts | `GET /wallets/my-wallet`, `/wallets/my-transactions`; `POST /payouts/request`, `GET /payouts/my-requests`, `GET /payouts`, `PATCH /payouts/:id/review` |
 | Disputes | customer `POST/GET /disputes/customer`, `GET /disputes/customer/:id`, `POST /disputes/customer/:id/messages`; seller `/disputes/seller...`; admin `/disputes/admin...`, `PATCH /disputes/admin/:id/resolve` |
 | Analytics | `GET /admin/analytics/dashboard`, `GET /admin/analytics/demand`, `POST /analytics/events/bulk` |
-| Audit logs | `GET /admin/audit-logs` |
+| Audit logs | `GET /admin/audit-logs` (paginated `{data, meta}`) |
+| Settings (admin) | `GET /admin/settings`, `PATCH /admin/settings` |
 | Payments | `POST /payments/success|fail|cancel|ipn` |
 | Users (admin) | `GET /users`, `PATCH /users/:id/status`, `PATCH /users/:id/roles` |
 | Shops | `GET /shops`, `GET /shops/:id` (+ admin CRUD) |
@@ -229,12 +361,12 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 |---|---|---|
 | 0 | Audit, as-built map, feature inventory | ✅ this document |
 | 1 | Foundation/blocking fixes: typecheck, workspace config, route conflict, JWT config, chat contract, guards, dead code, fake data | ✅ done |
-| 2 | Customer journey end-to-end verification (auth → browse → product → cart → checkout → order) | ✅ E2E executed against live stack — 7/7 pass |
-| 3 | Seller journey (shop → products → inventory → orders → wallet) | 🟡 pages wired; E2E pending |
-| 4 | Rider journey (assigned → status → location) | 🟡 pages wired; E2E pending |
-| 5 | Admin journey (incl. audit logs) | 🟡 pages wired; E2E pending |
-| 6 | Cross-system consistency (pagination, error shape, loading states) | ⬜ |
-| 7 | Test suite bootstrap + lint cleanup + full E2E | ✅ unit suites green, web lint 0 errors, customer E2E 7/7 on live stack |
+| 2 | Customer journey end-to-end verification (auth → browse → product → cart → checkout → order) | ✅ E2E executed — 7/7 pass (cart persistence + hydration race fixed) |
+| 3 | Seller journey (shop → products → inventory → orders → wallet) | ✅ E2E executed — 6/6 pass (shop settings contract fixed) |
+| 4 | Rider journey (assigned → status → location) | ✅ E2E executed — 4/4 pass incl. full delivery lifecycle |
+| 5 | Admin journey (incl. audit logs, settings) | ✅ E2E executed — 6/6 pass (settings made real) |
+| 6 | Cross-system consistency (pagination, error shape, loading states) | ✅ envelope audit done; DataTable gained error/retry + i18n; error shape noted as accepted variance (see finding 23) |
+| 7 | Test suite bootstrap + lint cleanup + full E2E | ✅ unit suites green (39/39 files, 93 tests), web lint 0 errors, E2E **27/27** on the live stack |
 
 ---
 
@@ -243,19 +375,31 @@ All routes are under the global prefix `/api/v1`. Auth column: `-` public,
 - `pnpm -C apps/web run typecheck` — clean.
 - `pnpm -C apps/api run typecheck` — clean.
 - `pnpm -C apps/web run build` — succeeds; route table confirmed.
-- `pnpm -C apps/api test` — **32/32 files pass**.
+- `pnpm -C apps/api test` — **39/39 files pass, 93 tests** (orders, auth,
+  coupons, users, reviews, audit-logs and settings specs added in phases 6/7).
 - `pnpm -C apps/api run lint` (oxlint) — 0 errors, 30 warnings.
 - `pnpm -r run typecheck` — all projects clean.
 - `pnpm -C apps/web run lint` — **0 errors, 4 informational warnings** (React
   Compiler notes about TanStack Table / react-hook-form; not actionable).
 - `pnpm -C apps/web run build` — succeeds after all refactors.
-- **Playwright E2E (`apps/e2e`) — 7/7 pass** against the live stack
-  (web :3000, API :4000, Postgres :5432), including the full purchase journey
-  `login → product → add to cart → cart → checkout (COD)`.
+- **Playwright E2E (`apps/e2e`) — 27/27 pass (1 worker, ~2 min)** against the
+  live stack (web :3000, API :4000, Postgres :5432):
+
+| Spec | Tests | Covers |
+|---|---|---|
+| `customer-flow.spec.ts` | 7 | home, categories, search, product details, login, cart drawer, full purchase journey `login → product → add to cart → cart → checkout (COD)` |
+| `seller-flow.spec.ts` | 6 | seller login→dashboard KPIs, sidebar sweep over all 11 seller pages, products/inventory vs API, shop settings save + API round-trip, wallet, customer blocked from `/seller` |
+| `rider-flow.spec.ts` | 4 | rider login→dashboard, sidebar sweep, **customer order → admin assignment → rider accept/pickup/out-for-delivery/delivered**, customer blocked from `/rider` |
+| `admin-flow.spec.ts` | 6 | admin login→dashboard metrics, sidebar sweep over all 20 admin pages, settings persistence + seller-registration toggle, audit log feed, seller blocked from `/admin` |
+| `chat-flow.spec.ts` | 4 | anonymous visitors trigger zero `/auth/me` calls, all post-login `/auth/me` carry `Authorization`, messages page renders chat live, client-side navigation reuses one socket connection |
+
+Notes on running them: the dev server must be up (`pnpm dev`), and repeated
+logins from one IP need the raised auth rate limits documented in
+`apps/api/.env.example`, otherwise `POST /auth/login` returns `429`.
 
 ### E2E-driven product fixes
 
-Executing the E2E suite surfaced two real customer-journey bugs, both fixed:
+Executing the E2E suite surfaced six real journey bugs, all fixed:
 
 1. **Cart was not persisted.** The cart lived only in Redux memory, so any full
    page load (refresh, direct URL, new tab) emptied it and checkout was
@@ -268,3 +412,12 @@ Executing the E2E suite surfaced two real customer-journey bugs, both fixed:
    The provider now sets `data-hydrated` on `<html>` after mount; tests wait
    for it. Login navigation now strictly asserts an authenticated URL
    (`/profile|/admin|/seller|/rider`) instead of any locale path.
+3. **Seller shop settings returned 500 / 400 on save** (`name` / `phone` are not
+   `Shop` columns) — DTO, service and both seller forms realigned on
+   `nameEn` / `nameBn` / `description` (see finding 18).
+4. **Dashboard header/sidebar activated the wrong nav item** on nested routes
+   (see finding 19).
+5. **Login throttling blocked automated journeys** — limits are now
+   env-configurable with production-safe defaults (see finding 20).
+6. **Admin Settings was a fake form** with no API behind it — replaced with a
+   real `settings` module, persisted and enforced (see findings 21–22).

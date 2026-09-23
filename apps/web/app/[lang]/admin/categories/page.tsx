@@ -14,7 +14,7 @@ export default function AdminCategoriesPage() {
   const [search, setSearch] = useState('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   
-  const { data, isLoading } = useGetAdminCategoriesQuery({ page, limit, search });
+  const { data, isLoading, isError, refetch } = useGetAdminCategoriesQuery({ page, limit, search });
 
   const columns: ColumnDef<Category>[] = [
     {
@@ -82,6 +82,8 @@ export default function AdminCategoriesPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
 
       {editingCategory && (

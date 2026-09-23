@@ -7,6 +7,8 @@ import { UsersService } from '../users/users.service.js';
 import { OtpService } from '../otp/otp.service.js';
 import { UserStatus } from '../users/enums/user-status.enum.js';
 import { User } from '../users/entities/user.entity.js';
+import { SettingsService } from '../settings/settings.service.js';
+import { Role } from '../roles/enums/role.enum.js';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
     private readonly otpService: OtpService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   async sendOtp(phone: string): Promise<{ message: string }> {
@@ -73,6 +76,14 @@ export class AuthService {
   }
 
   async registerStaff(registerDto: any) {
+    // The admin Settings page can close seller self-registration.
+    if (registerDto.role === Role.SELLER) {
+      const allowed = await this.settingsService.isSellerRegistrationAllowed();
+      if (!allowed) {
+        throw new BadRequestException('New seller registrations are currently disabled');
+      }
+    }
+
     // Check if user already exists
     let user = await this.usersService.findByPhone(registerDto.phone);
     if (!user && registerDto.email) {

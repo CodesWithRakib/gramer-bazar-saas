@@ -8,6 +8,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import configuration from './config/configuration.js';
 import { envValidationSchema } from './config/env.validation.js';
+import { SettingsModule } from './settings/settings.module.js';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
@@ -82,8 +83,8 @@ import { join } from 'path';
     }),
     EventEmitterModule.forRoot(),
     ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 120,
+      ttl: Number(process.env.THROTTLE_TTL_MS ?? 60000),
+      limit: Number(process.env.THROTTLE_LIMIT ?? 120),
     }]),
     RolesModule,
     PermissionsModule,
@@ -114,6 +115,7 @@ import { join } from 'path';
     DisputesModule,
     FlashSalesModule,
     AuditLogsModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [

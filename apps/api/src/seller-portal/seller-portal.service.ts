@@ -123,7 +123,16 @@ export class SellerPortalService {
 
   async updateShopProfile(sellerId: string, dto: UpdateSellerShopDto) {
     const shop = await this.getShopForSeller(sellerId);
-    await this.shopRepository.update(shop.id, dto);
+
+    // Drop undefined keys so a partial payload never clears unrelated columns,
+    // and skip the query entirely when nothing was sent.
+    const updates = Object.fromEntries(
+      Object.entries(dto).filter(([, value]) => value !== undefined),
+    );
+    if (Object.keys(updates).length > 0) {
+      await this.shopRepository.update(shop.id, updates);
+    }
+
     return this.getShopForSeller(sellerId);
   }
 

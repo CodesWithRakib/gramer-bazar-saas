@@ -14,7 +14,7 @@ export default function AdminBrandsPage() {
   const [search, setSearch] = useState('');
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   
-  const { data, isLoading } = useGetAdminBrandsQuery({ page, limit, search });
+  const { data, isLoading, isError, refetch } = useGetAdminBrandsQuery({ page, limit, search });
 
   const columns: ColumnDef<Brand>[] = [
     {
@@ -74,6 +74,8 @@ export default function AdminBrandsPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
 
       {editingBrand && (

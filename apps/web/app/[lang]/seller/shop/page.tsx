@@ -16,10 +16,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useForm as useReactHookForm } from 'react-hook-form';
 
 const shopSchema = z.object({
-  name: z.string().min(2, 'Shop name is required').max(100),
-  description: z.string().max(500).optional(),
-  phone: z.string().min(11, 'Valid phone number is required'),
-  address: z.string().min(5, 'Address is required'),
+  nameEn: z.string().min(2, 'Shop name is required').max(150),
+  nameBn: z.string().min(2, 'Shop name (Bangla) is required').max(200),
+  description: z.string().max(2000).optional(),
 });
 
 type ShopFormValues = z.infer<typeof shopSchema>;
@@ -43,10 +42,9 @@ export default function SellerShopPage({ params }: { params: Promise<{ lang: str
   useEffect(() => {
     if (shop) {
       reset({
-        name: shop.name || '',
+        nameEn: shop.nameEn || '',
+        nameBn: shop.nameBn || '',
         description: shop.description || '',
-        phone: shop.phone || '',
-        address: shop.address || '',
       });
     }
   }, [shop, reset]);
@@ -84,9 +82,15 @@ export default function SellerShopPage({ params }: { params: Promise<{ lang: str
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">{isBn ? 'দোকানের নাম' : 'Shop Name'}</Label>
-              <Input id="name" {...register('name')} />
-              {errors.name && <p className="text-sm text-destructive">{errors.name.message as string}</p>}
+              <Label htmlFor="nameEn">{isBn ? 'দোকানের নাম (ইংরেজি)' : 'Shop Name (English)'}</Label>
+              <Input id="nameEn" {...register('nameEn')} />
+              {errors.nameEn && <p className="text-sm text-destructive">{errors.nameEn.message as string}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="nameBn">{isBn ? 'দোকানের নাম (বাংলা)' : 'Shop Name (Bangla)'}</Label>
+              <Input id="nameBn" {...register('nameBn')} />
+              {errors.nameBn && <p className="text-sm text-destructive">{errors.nameBn.message as string}</p>}
             </div>
 
             <div className="space-y-2">
@@ -98,18 +102,6 @@ export default function SellerShopPage({ params }: { params: Promise<{ lang: str
                 placeholder={isBn ? 'আপনার দোকান সম্পর্কে কিছু লিখুন...' : 'Write something about your shop...'} 
               />
               {errors.description && <p className="text-sm text-destructive">{errors.description.message as string}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">{isBn ? 'যোগাযোগের নম্বর' : 'Contact Number'}</Label>
-              <Input id="phone" type="tel" {...register('phone')} />
-              {errors.phone && <p className="text-sm text-destructive">{errors.phone.message as string}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address">{isBn ? 'ঠিকানা' : 'Address'}</Label>
-              <Textarea id="address" {...register('address')} rows={2} />
-              {errors.address && <p className="text-sm text-destructive">{errors.address.message as string}</p>}
             </div>
 
             {isSuccess && (

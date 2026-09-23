@@ -23,10 +23,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
 const shopSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().optional(),
-  address: z.string().optional(),
-  phone: z.string().optional(),
+  nameEn: z.string().min(2, 'Shop name is required').max(150),
+  nameBn: z.string().min(2, 'Shop name (Bangla) is required').max(200),
+  description: z.string().max(2000).optional(),
 });
 
 export default function SellerProfilePage({ params }: { params: Promise<{ lang: string }> }) {
@@ -38,10 +37,9 @@ export default function SellerProfilePage({ params }: { params: Promise<{ lang: 
   const form = useForm<z.infer<typeof shopSchema>>({
     resolver: zodResolver(shopSchema),
     values: {
-      name: shop?.name || '',
+      nameEn: shop?.nameEn || '',
+      nameBn: shop?.nameBn || '',
       description: shop?.description || '',
-      address: shop?.address || '',
-      phone: shop?.phone || '',
     },
   });
 
@@ -64,10 +62,23 @@ export default function SellerProfilePage({ params }: { params: Promise<{ lang: 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
-            name="name"
+            name="nameEn"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{isBn ? 'দোকানের নাম' : 'Shop Name'}</FormLabel>
+                <FormLabel>{isBn ? 'দোকানের নাম (ইংরেজি)' : 'Shop Name (English)'}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="nameBn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{isBn ? 'দোকানের নাম (বাংলা)' : 'Shop Name (Bangla)'}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -83,32 +94,6 @@ export default function SellerProfilePage({ params }: { params: Promise<{ lang: 
                 <FormLabel>{isBn ? 'বিবরণ' : 'Description'}</FormLabel>
                 <FormControl>
                   <Textarea {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{isBn ? 'ঠিকানা' : 'Address'}</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{isBn ? 'ফোন নম্বর' : 'Phone'}</FormLabel>
-                <FormControl>
-                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

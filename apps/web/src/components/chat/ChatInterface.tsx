@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { 
+import { useState, useEffect, useRef } from 'react';import { 
   useGetConversationsQuery, 
   useGetMessagesQuery, 
   useMarkMessagesAsReadMutation,
   type ConversationParticipant,
 } from '@/features/chat/chatApi';
-import { useGetProfileQuery } from '@/features/auth/authApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 import { useChatSocket } from '@/hooks/useChatSocket';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,8 +17,13 @@ import { Send, Search, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function ChatInterface() {
-  const { data: currentUser } = useGetProfileQuery();
-  const { data: conversations, isLoading: isConversationsLoading } = useGetConversationsQuery();
+  // Identity comes from the auth slice (populated by AuthInitializer), so this
+  // page never fires /auth/me for anonymous visitors.
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { data: conversations, isLoading: isConversationsLoading } = useGetConversationsQuery(
+    undefined,
+    { skip: !user },
+  );
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
@@ -58,7 +63,7 @@ export function ChatInterface() {
   };
 
   const getOtherParticipant = (participants: ConversationParticipant[]) => {
-    return participants.find((p) => p.id !== currentUser?.id) || participants[0];
+    return participants.find((p) => p.id !== user?.id) || participants[0];
   };
 
   const filteredConversations = conversations?.filter((conv) => {
@@ -67,7 +72,7 @@ export function ChatInterface() {
     return fullName.includes(searchQuery.toLowerCase());
   }).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
-  if (isConversationsLoading || !currentUser) {
+  if (isConversationsLoading || !user) {
     return (
       <div className="flex h-[600px] items-center justify-center border rounded-lg bg-card">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -101,7 +106,7 @@ export function ChatInterface() {
               {filteredConversations?.map((conv) => {
                 const other = getOtherParticipant(conv.participants);
                 const lastMessage = conv.messages[conv.messages.length - 1];
-                const isUnread = lastMessage && lastMessage.senderId !== currentUser.id && !lastMessage.isRead;
+                const isUnread = lastMessage && lastMessage.senderId !== user.id && !lastMessage.isRead;
 
                 return (
                   <button
@@ -130,7 +135,7 @@ export function ChatInterface() {
                       <div className="flex justify-between items-center gap-2">
                         <span className={`text-xs truncate ${isUnread ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
                           {lastMessage ? (
-                            lastMessage.senderId === currentUser.id ? `You: ${lastMessage.content}` : lastMessage.content
+                            lastMessage.senderId === user.id ? `You: ${lastMessage.content}` : lastMessage.content
                           ) : 'No messages yet'}
                         </span>
                         {isUnread && (
@@ -195,7 +200,7 @@ export function ChatInterface() {
               ) : (
                 <div className="flex flex-col gap-4 py-4">
                   {messages?.map((msg) => {
-                    const isMe = msg.senderId === currentUser.id;
+                    const isMe = msg.senderId === user.id;
                     return (
                       <div
                         key={msg.id}

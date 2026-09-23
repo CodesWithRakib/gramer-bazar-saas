@@ -20,10 +20,14 @@ export interface DashboardMetrics {
 
 export interface SellerShop {
   id: string;
-  name: string;
-  description: string;
-  address: string;
-  phone: string;
+  sellerId: string;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  description: string | null;
+  logo: string | null;
+  banner: string | null;
+  isVerified: boolean;
   isActive: boolean;
 }
 

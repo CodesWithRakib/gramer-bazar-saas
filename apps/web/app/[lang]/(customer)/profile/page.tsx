@@ -12,15 +12,19 @@ import { toast } from 'sonner';
 import { Camera, User, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CustomImage } from '@/components/ui/CustomImage';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '@/store/slices/authSlice';
+import { RootState } from '@/store/store';
 
 export default function PersonalInfoPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const dispatch = useDispatch();
 
-  const { data: profile, isLoading } = useGetProfileQuery();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { data: profile, isLoading } = useGetProfileQuery(undefined, {
+    skip: !isAuthenticated,
+  });
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [uploadAvatar, { isLoading: isUploading }] = useUploadAvatarMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -14,7 +14,7 @@ export default function AdminSellersPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   
-  const { data, isLoading } = useGetUsersQuery({ page, limit, search, role: Role.SELLER });
+  const { data, isLoading, isError, refetch } = useGetUsersQuery({ page, limit, search, role: Role.SELLER });
   const [updateStatus] = useUpdateUserStatusMutation();
 
   const columns: ColumnDef<User>[] = [
@@ -100,6 +100,8 @@ export default function AdminSellersPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
     </div>
   );

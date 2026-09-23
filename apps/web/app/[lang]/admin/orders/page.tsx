@@ -30,7 +30,7 @@ export default function AdminOrdersPage() {
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
   const [selectedRiderId, setSelectedRiderId] = useState<string>('');
 
-  const { data, isLoading } = useGetAdminOrdersQuery({ page, limit, search });
+  const { data, isLoading, isError, refetch } = useGetAdminOrdersQuery({ page, limit, search });
   const [updateStatus] = useUpdateAdminOrderStatusMutation();
   
   const { data: ridersData } = useGetRidersQuery(undefined, { skip: !isAssignModalOpen });
@@ -175,6 +175,8 @@ export default function AdminOrdersPage() {
           }
         }}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
       />
 
       <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>

@@ -1,71 +1,90 @@
-import { useEffect, useRef, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '@/store/store';
-import { initSocket, disconnectSocket } from '@/lib/socket';
-import { Socket } from 'socket.io-client';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch } from '@/store/store';
+import { RootState } from '@/store/store';
+import { getSocket } from '@/lib/socket';
 import { ChatMessage, chatApi } from '@/features/chat/chatApi';
 
+/**
+ * Chat hook over the SINGLE app-wide socket owned by `SocketProvider`
+ * (singleton in `lib/socket.ts`).
+ *
+ * Responsibilities:
+ * - join/leave the given conversation room
+ * - listen for `new_message` and sync it into the RTK Query cache
+ * - expose `sendMessage`
+ *
+ * It never opens or closes a socket itself — that lifecycle lives in
+ * `SocketProvider` (connect on login, disconnect on logout).
+ */
 export const useChatSocket = (conversationId?: string) => {
-  const { token, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const [isConnected, setIsConnected] = useState(false);
-  const socketRef = useRef<Socket | null>(null);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
+  // Connectivity mirrors the live socket; the render-time adjustment keeps it
+  // in sync with connect/disconnect events without setState in effect bodies.
+  const socket = getSocket();
+  const [isConnected, setIsConnected] = useState<boolean>(() => socket?.connected ?? false);
+  if ((socket?.connected ?? false) !== isConnected) {
+    setIsConnected(socket?.connected ?? false);
+  }
+
+  // Track the conversation the socket is currently joined to so cleanup always
+  // leaves the right room even if `conversationId` changed mid-flight.
+  const joinedRef = useRef<string | null>(null);
+
+  // Global message listener → RTK Query cache sync.
   useEffect(() => {
-    if (isAuthenticated && token) {
-      const socket = initSocket(token);
-      socketRef.current = socket;
+    if (!isAuthenticated) return;
+    const socketInstance = getSocket();
+    if (!socketInstance) return;
 
-      socket.on('connect', () => {
-        setIsConnected(true);
-      });
+    const handleNewMessage = (message: ChatMessage) => {
+      dispatch(
+        chatApi.util.updateQueryData('getMessages', message.conversationId, (draft) => {
+          const exists = draft.find((m) => m.id === message.id);
+          if (!exists) {
+            draft.push(message);
+          }
+        }),
+      );
+      dispatch(chatApi.util.invalidateTags(['Conversation']));
+    };
 
-      socket.on('disconnect', () => {
-        setIsConnected(false);
-      });
+    socketInstance.on('new_message', handleNewMessage);
 
-      // Global message listener
-      socket.on('new_message', (message: ChatMessage) => {
-        // Optimistically update RTK Query cache for this conversation's messages
-        dispatch(
-          chatApi.util.updateQueryData('getMessages', message.conversationId, (draft) => {
-            const exists = draft.find((m) => m.id === message.id);
-            if (!exists) {
-              draft.push(message);
-            }
-          })
-        );
-        // Also invalidate conversations list to update latest message snippets if needed
-        dispatch(chatApi.util.invalidateTags(['Conversation']));
-      });
+    return () => {
+      socketInstance.off('new_message', handleNewMessage);
+    };
+  }, [isAuthenticated, dispatch]);
 
-      return () => {
-        socket.off('connect');
-        socket.off('disconnect');
-        socket.off('new_message');
-      };
-    } else {
-      disconnectSocket();
-    }
-  }, [isAuthenticated, token, dispatch]);
-
+  // Join / leave the conversation room.
   useEffect(() => {
-    const socket = socketRef.current;
-    if (socket && conversationId && isConnected) {
-      socket.emit('join_conversation', { conversationId });
+    const socketInstance = getSocket();
+    if (!socketInstance || !conversationId || !isConnected) return;
 
-      return () => {
-        socket.emit('leave_conversation', { conversationId });
-      };
-    }
+    socketInstance.emit('join_conversation', { conversationId });
+    joinedRef.current = conversationId;
+
+    return () => {
+      if (joinedRef.current) {
+        socketInstance.emit('leave_conversation', { conversationId: joinedRef.current });
+        joinedRef.current = null;
+      }
+    };
   }, [conversationId, isConnected]);
 
-  const sendMessage = (content: string) => {
-    const socket = socketRef.current;
-    if (socket && conversationId && isConnected) {
-      socket.emit('send_message', { conversationId, content });
-    }
-  };
+  const sendMessage = useCallback(
+    (content: string) => {
+      const socketInstance = getSocket();
+      if (socketInstance && conversationId && isConnected) {
+        socketInstance.emit('send_message', { conversationId, content });
+        return true;
+      }
+      return false;
+    },
+    [conversationId, isConnected],
+  );
 
   return { isConnected, sendMessage };
 };
