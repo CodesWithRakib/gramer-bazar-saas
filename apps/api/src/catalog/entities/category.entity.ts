@@ -63,4 +63,6 @@ export class Category {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  productCount?: number;
 }

@@ -23,10 +23,13 @@ function SearchPageContent({ lang }: { lang: string }) {
 
   const q = searchParams.get("q") || "";
   const categoryId = searchParams.get("categoryId") || "";
+  const categorySlug = searchParams.get("categorySlug") || "";
   const brandId = searchParams.get("brandId") || "";
   const sort = searchParams.get("sort") || "newest";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
+  const inStock = searchParams.get("inStock") === "true" ? true : undefined;
+  const minRating = searchParams.get("minRating") ? Number(searchParams.get("minRating")) : undefined;
   const page = parseInt(searchParams.get("page") || "1", 10);
 
   const { data: categories } = useGetPublicCategoriesQuery();
@@ -45,11 +48,14 @@ function SearchPageContent({ lang }: { lang: string }) {
     isError,
   } = useSearchProductsQuery({
     q,
-    categoryId,
+    categoryId: categoryId || undefined,
+    categorySlug: categorySlug || undefined,
     brandId,
     sort,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    inStock,
+    minRating,
     page,
     limit: 20,
   });

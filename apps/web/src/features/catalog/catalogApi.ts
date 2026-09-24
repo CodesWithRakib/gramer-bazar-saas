@@ -22,6 +22,7 @@ export interface Category {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  productCount?: number;
   children?: Category[];
 }
 
@@ -173,6 +174,7 @@ export interface SellerProduct {
       descriptionBn?: string | null;
       slug: string;
       unit?: string;
+      compareAtPrice?: number | string | null;
       category: Category;
       subCategory?: Category | null;
       brand?: Brand | null;
@@ -204,14 +206,48 @@ export interface SearchResponse {
 export interface SearchParams {
   q?: string;
   categoryId?: string;
+  categorySlug?: string;
   subCategoryId?: string;
+  subCategorySlug?: string;
   brandId?: string;
   sellerId?: string;
   minPrice?: number;
   maxPrice?: number;
+  inStock?: boolean;
+  minRating?: number;
   page?: number;
   limit?: number;
   sort?: string;
+}
+
+export interface CategorySection {
+  category: Category & { subCategories: Array<Category & { productCount: number }> };
+  products: SellerProduct[];
+}
+
+export interface SearchSuggestions {
+  products: Array<{
+    id: string;
+    nameEn: string;
+    nameBn: string;
+    slug: string;
+    price: number;
+    unit: string;
+    thumbnail: string | null;
+  }>;
+  categories: Array<{
+    id: string;
+    nameEn: string;
+    nameBn: string;
+    slug: string;
+    icon: string | null;
+  }>;
+  brands: Array<{
+    id: string;
+    nameEn: string;
+    nameBn: string;
+    slug: string;
+  }>;
 }
 
 export const catalogApi = api
@@ -221,6 +257,21 @@ export const catalogApi = api
       getPublicCategories: builder.query<Category[], void>({
         query: () => "/public/categories",
         providesTags: ["Category"],
+      }),
+      getPublicCategoryTree: builder.query<Category[], void>({
+        query: () => "/public/categories/tree",
+        providesTags: ["Category"],
+      }),
+      getCategorySections: builder.query<CategorySection[], void>({
+        query: () => "/public/catalog/category-sections",
+        providesTags: ["Catalog", "Category"],
+      }),
+      getSearchSuggestions: builder.query<SearchSuggestions, string>({
+        query: (q) => `/public/catalog/suggestions?q=${encodeURIComponent(q)}`,
+      }),
+      getPopularProducts: builder.query<SearchResponse, number | void>({
+        query: (limit = 8) => `/public/catalog/popular?limit=${limit}`,
+        providesTags: ["Catalog"],
       }),
       getPublicBrands: builder.query<Brand[], void>({
         query: () => "/public/catalog/brands",
@@ -437,6 +488,10 @@ export const catalogApi = api
 
 export const {
   useGetPublicCategoriesQuery,
+  useGetPublicCategoryTreeQuery,
+  useGetCategorySectionsQuery,
+  useGetSearchSuggestionsQuery,
+  useGetPopularProductsQuery,
   useGetPublicBrandsQuery,
   useGetCategoriesTreeQuery,
   useGetAdminCategoriesQuery,

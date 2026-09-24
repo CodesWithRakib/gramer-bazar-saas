@@ -44,6 +44,9 @@ export function ProductSortSelect({ lang }: ProductSortSelectProps) {
         <SelectItem value="price_desc">
           {isBn ? "দাম: বেশি থেকে কম" : "Price: High to Low"}
         </SelectItem>
+        <SelectItem value="name_asc">
+          {isBn ? "নাম: ক থেকে য় (A-Z)" : "Name: A to Z"}
+        </SelectItem>
       </SelectContent>
     </Select>
   );

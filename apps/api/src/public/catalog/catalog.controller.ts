@@ -20,6 +20,24 @@ export class CatalogController {
     return this.catalogService.getFeatured();
   }
 
+  @Get('popular')
+  @ApiOperation({ summary: 'Get popular products for homepage' })
+  getPopular(@Query('limit') limit?: string) {
+    return this.catalogService.getPopular(limit ? parseInt(limit, 10) : 8);
+  }
+
+  @Get('suggestions')
+  @ApiOperation({ summary: 'Get live search suggestions for autocomplete' })
+  getSuggestions(@Query('q') q: string) {
+    return this.catalogService.getSuggestions(q);
+  }
+
+  @Get('category-sections')
+  @ApiOperation({ summary: 'Get populated category sections for homepage' })
+  getCategorySections() {
+    return this.catalogService.getCategorySections();
+  }
+
   @Get('brands')
   @ApiOperation({ summary: 'Get all active brands for storefront' })
   getBrands() {

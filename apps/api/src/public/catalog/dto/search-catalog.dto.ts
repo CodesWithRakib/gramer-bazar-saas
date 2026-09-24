@@ -13,10 +13,20 @@ export class SearchCatalogDto {
   @IsUUID()
   categoryId?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by Category Slug' })
+  @IsOptional()
+  @IsString()
+  categorySlug?: string;
+
   @ApiPropertyOptional({ description: 'Filter by SubCategory ID' })
   @IsOptional()
   @IsUUID()
   subCategoryId?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by SubCategory Slug' })
+  @IsOptional()
+  @IsString()
+  subCategorySlug?: string;
 
   @ApiPropertyOptional({ description: 'Minimum price' })
   @IsOptional()
@@ -57,6 +67,11 @@ export class SearchCatalogDto {
   @IsNumber()
   @Min(1)
   minRating?: number;
+
+  @ApiPropertyOptional({ description: 'Filter only in-stock products' })
+  @IsOptional()
+  @Type(() => Boolean)
+  inStock?: boolean;
 
   @ApiPropertyOptional({ description: 'Sort by field (e.g. price_asc, price_desc, newest)', default: 'newest' })
   @IsOptional()
