@@ -22,14 +22,22 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto);
   }
 
+  @Get('tree')
+  @ApiOperation({ summary: 'Get category tree hierarchy' })
+  getTree() {
+    return this.categoriesService.getTree();
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all categories' })
   findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string,
+    @Query('parentId') parentId?: string,
+    @Query('rootsOnly') rootsOnly?: boolean,
   ) {
-    return this.categoriesService.findAll(page, limit, search);
+    return this.categoriesService.findAll(page, limit, search, parentId, rootsOnly);
   }
 
   @Get(':id')

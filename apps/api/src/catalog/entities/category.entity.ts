@@ -40,6 +40,18 @@ export class Category {
   @Column({ type: 'varchar', nullable: true })
   icon: string | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  image: string | null;
+
+  @Column({ name: 'description_en', type: 'text', nullable: true })
+  descriptionEn: string | null;
+
+  @Column({ name: 'description_bn', type: 'text', nullable: true })
+  descriptionBn: string | null;
+
+  @Column({ name: 'sort_order', type: 'int', default: 0 })
+  sortOrder: number;
+
   @Column({ name: 'is_regulated', default: false })
   isRegulated: boolean;
 

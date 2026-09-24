@@ -11,6 +11,8 @@ import { Category } from '../catalog/entities/category.entity.js';
 import { Brand } from '../catalog/entities/brand.entity.js';
 import { Product } from '../catalog/entities/product.entity.js';
 import { ProductVariant } from '../catalog/entities/product-variant.entity.js';
+import { ProductImage } from '../catalog/entities/product-image.entity.js';
+import { ProductStatus } from '../catalog/enums/product-status.enum.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Review } from '../reviews/entities/review.entity.js';
@@ -37,6 +39,7 @@ export class SeederService {
     @InjectRepository(Brand) private brandRepo: Repository<Brand>,
     @InjectRepository(Product) private productRepo: Repository<Product>,
     @InjectRepository(ProductVariant) private variantRepo: Repository<ProductVariant>,
+    @InjectRepository(ProductImage) private imageRepo: Repository<ProductImage>,
     @InjectRepository(SellerProduct) private sellerProductRepo: Repository<SellerProduct>,
     @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
     @InjectRepository(Review) private reviewRepo: Repository<Review>,
@@ -226,95 +229,200 @@ export class SeederService {
   }
 
   private async seedCatalog() {
-    this.logger.log('Seeding real catalog products...');
-
-    // Brands
-    const brands = await this.brandRepo.save([
-      this.brandRepo.create({ nameEn: 'Khaas Food', nameBn: 'খাস ফুড', slug: 'khaas-food', isActive: true }),
-      this.brandRepo.create({ nameEn: 'Ghorer Bazar', nameBn: 'ঘরের বাজার', slug: 'ghorer-bazar', isActive: true }),
-      this.brandRepo.create({ nameEn: 'Local', nameBn: 'স্থানীয়', slug: 'local', isActive: true }),
-    ]);
+    this.logger.log('Seeding primary category & subcategory catalog with local images...');
 
     const fs = await import('fs');
     const path = await import('path');
-    const productsPath = path.resolve(process.cwd(), 'src', 'seeder', 'data', 'real_products.json');
-    const productData = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
+    const catalogPath = path.resolve(process.cwd(), 'src', 'seeder', 'data', 'catalog_seed.json');
+    const catalogData = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
 
-    const categoriesMap = new Map();
-    const products = [];
-    const productVariants = [];
+    const categoryMap = new Map<string, Category>();
 
-    for (const p of productData) {
-      if (!categoriesMap.has(p.categoryEn)) {
-        const slug = p.categoryEn.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        const cat = await this.categoryRepo.save(
-          this.categoryRepo.create({ nameEn: p.categoryEn, nameBn: p.categoryBn, slug, isActive: true })
+    // 1. Seed Categories & Subcategories
+    for (const catData of catalogData.categories) {
+      const rootCat = await this.categoryRepo.save(
+        this.categoryRepo.create({
+          nameEn: catData.nameEn,
+          nameBn: catData.nameBn,
+          slug: catData.slug,
+          icon: catData.icon,
+          sortOrder: catData.sortOrder,
+          isRegulated: catData.isRegulated ?? false,
+          descriptionEn: catData.descriptionEn,
+          descriptionBn: catData.descriptionBn,
+          isActive: true,
+        }),
+      );
+      categoryMap.set(catData.slug, rootCat);
+
+      for (const subData of catData.subcategories) {
+        const subCat = await this.categoryRepo.save(
+          this.categoryRepo.create({
+            nameEn: subData.nameEn,
+            nameBn: subData.nameBn,
+            slug: subData.slug,
+            sortOrder: subData.sortOrder,
+            parentId: rootCat.id,
+            isActive: true,
+            isRegulated: catData.isRegulated ?? false,
+          }),
         );
-        categoriesMap.set(p.categoryEn, cat);
+        categoryMap.set(`${catData.slug}/${subData.slug}`, subCat);
       }
-
-      const category = categoriesMap.get(p.categoryEn);
-      const brand = brands[Math.floor(Math.random() * brands.length)];
-      // add a small random suffix to slug to prevent collision
-      const pSlug = p.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(Math.random()*1000);
-
-      const prod = await this.productRepo.save(this.productRepo.create({
-        nameEn: p.nameEn, nameBn: p.nameBn, slug: pSlug, category, brand,
-        descriptionEn: p.descriptionEn, descriptionBn: p.descriptionBn,
-        isActive: true,
-      }));
-      products.push(prod);
-
-      const variant = await this.variantRepo.save(this.variantRepo.create({
-        product: prod, nameEn: 'Default', nameBn: 'ডিফল্ট', sku: `${pSlug}-def`,
-        images: p.images, isActive: true,
-      }));
-      productVariants.push(variant);
-      
-      // Store the original price on the variant for the inventory seeder
-      (variant as any)._originalPrice = p.price;
     }
 
-    return { categories: Array.from(categoriesMap.values()), brands, products, productVariants };
+    // 2. Seed Brands
+    const brandMap = new Map<string, Brand>();
+    const brandNames = [
+      'Rashid Agro',
+      'Teer',
+      'Radhuni',
+      'ACI Pure',
+      'ACI Healthcare',
+      'Hansaplast',
+      'Amanat Shah',
+      'Walton',
+      'Parachute',
+      'All Time',
+      'Asia Sweetmeat',
+      'Local Farmer',
+      'Aftab Feed',
+      'Khaas Food',
+    ];
+
+    for (const bName of brandNames) {
+      const bSlug = bName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const savedBrand = await this.brandRepo.save(
+        this.brandRepo.create({
+          nameEn: bName,
+          nameBn: bName,
+          slug: bSlug,
+          isActive: true,
+        }),
+      );
+      brandMap.set(bName, savedBrand);
+    }
+
+    // 3. Seed Products with Local Images and Subcategories
+    const products: Product[] = [];
+    const productVariants: ProductVariant[] = [];
+
+    for (const p of catalogData.products) {
+      const rootCat = categoryMap.get(p.categorySlug);
+      const subCat = categoryMap.get(`${p.categorySlug}/${p.subCategorySlug}`);
+      const brand = brandMap.get(p.brand) || brandMap.get('Local Farmer');
+
+      const pSlug = p.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
+      const prod = await this.productRepo.save(
+        this.productRepo.create({
+          categoryId: rootCat ? rootCat.id : (await this.categoryRepo.find())[0].id,
+          subCategoryId: subCat?.id,
+          brand,
+          nameEn: p.nameEn,
+          nameBn: p.nameBn,
+          slug: pSlug,
+          shortDescriptionEn: p.shortDescriptionEn,
+          shortDescriptionBn: p.shortDescriptionBn,
+          descriptionEn: p.descriptionEn,
+          descriptionBn: p.descriptionBn,
+          price: p.price,
+          compareAtPrice: p.compareAtPrice,
+          unit: p.unit,
+          stock: p.stock,
+          sku: p.sku,
+          status: ProductStatus.PUBLISHED,
+          isFeatured: p.isFeatured ?? false,
+          source: 'seed',
+          isActive: true,
+        }),
+      );
+      products.push(prod);
+
+      // Local image
+      const imagePath = `products/2026/09/${p.imageFilename}`;
+      const imageUrl = `/uploads/${imagePath}`;
+
+      await this.imageRepo.save(
+        this.imageRepo.create({
+          productId: prod.id,
+          url: imageUrl,
+          storagePath: imagePath,
+          filename: p.imageFilename,
+          mimeType: 'image/png',
+          sizeBytes: 15000,
+          isPrimary: true,
+          sortOrder: 0,
+          altText: p.nameEn,
+        }),
+      );
+
+      const variant = await this.variantRepo.save(
+        this.variantRepo.create({
+          product: prod,
+          nameEn: 'Default',
+          nameBn: 'ডিফল্ট',
+          sku: p.sku,
+          images: [imageUrl],
+          isActive: true,
+        }),
+      );
+      productVariants.push(variant);
+    }
+
+    return { categories: Array.from(categoryMap.values()), brands: Array.from(brandMap.values()), products, productVariants };
   }
 
   private async seedInventory(users: { customer: User; sellers: User[] }, variants: ProductVariant[], products: Product[]) {
     this.logger.log('Seeding seller products & inventory...');
-    
-    // Assign random products to Seller 1 and 2
+
     let flip = true;
     const sellerProducts: SellerProduct[] = [];
-    
+
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
       const prod = products[i];
       const seller = flip ? users.sellers[0] : users.sellers[1];
       const shop = await this.shopRepo.findOne({ where: { seller: { id: seller.id } } });
 
-      const price = (variant as any)._originalPrice || Math.floor(Math.random() * 500) + 50;
+      const price = prod.price ?? 100;
+      const discountPrice = prod.compareAtPrice ?? null;
 
-      const sp: SellerProduct = await this.sellerProductRepo.save(this.sellerProductRepo.create({
-        productVariant: variant, shop: shop as Shop, 
-        price, isActive: true, isRegulatedApproved: true
-      }));
+      const sp: SellerProduct = await this.sellerProductRepo.save(
+        this.sellerProductRepo.create({
+          productVariant: variant,
+          shop: shop as Shop,
+          price,
+          discountPrice,
+          sellerSku: variant.sku,
+          isActive: true,
+          isRegulatedApproved: true,
+        }),
+      );
       sellerProducts.push(sp);
 
       // Inventory
-      await this.inventoryRepo.save(this.inventoryRepo.create({
-        sellerProduct: sp, quantity: Math.floor(Math.random() * 200) + 20, 
-        lowStockThreshold: 5
-      }));
+      await this.inventoryRepo.save(
+        this.inventoryRepo.create({
+          sellerProduct: sp,
+          quantity: prod.stock || 50,
+          lowStockThreshold: 5,
+        }),
+      );
 
-      // A mock review
-      await this.reviewRepo.save(this.reviewRepo.create({
-        product: prod, user: users.customer,
-        rating: Math.floor(Math.random() * 2) + 4, // 4 or 5 star
-        comment: 'Very good quality product. Fast delivery!',
-      }));
+      // A review
+      await this.reviewRepo.save(
+        this.reviewRepo.create({
+          product: prod,
+          user: users.customer,
+          rating: 5,
+          comment: 'খুব ভালো কোয়ালিটির পণ্য। দ্রুত ডেলিভারি পেয়েছি।',
+        }),
+      );
 
       flip = !flip;
     }
-    
+
     return sellerProducts;
   }
 
@@ -325,14 +433,14 @@ export class SeederService {
     await this.bannerRepo.save([
       this.bannerRepo.create({
         title: 'Organic Food Mega Sale',
-        imageUrl: 'https://ghorerbazarbd.com/wp-content/uploads/2024/02/GB-Website-Banner-v1.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1920&q=80',
         linkUrl: '/products',
         isActive: true,
         displayOrder: 1
       }),
       this.bannerRepo.create({
         title: 'Pure Honey Fest',
-        imageUrl: 'https://khaasfood.com/wp-content/uploads/2023/11/Website-Banner-Honey.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1920&q=80',
         linkUrl: '/categories/honey',
         isActive: true,
         displayOrder: 2
@@ -345,7 +453,7 @@ export class SeederService {
       startDate: new Date(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Ends in 7 days
       isActive: true,
-      bannerImage: 'https://khaasfood.com/wp-content/uploads/2023/12/Winter-Offer-Banner.jpg'
+      bannerImage: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1920&q=80'
     }));
 
     // Add 4 random products to flash sale

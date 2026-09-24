@@ -12,6 +12,7 @@ import { Category } from '../catalog/entities/category.entity.js';
 import { Brand } from '../catalog/entities/brand.entity.js';
 import { Product } from '../catalog/entities/product.entity.js';
 import { ProductVariant } from '../catalog/entities/product-variant.entity.js';
+import { ProductImage } from '../catalog/entities/product-image.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Review } from '../reviews/entities/review.entity.js';
@@ -53,6 +54,7 @@ describe('SeederService - seedUsersAndShops', () => {
         { provide: getRepositoryToken(Brand), useValue: makeRepo() },
         { provide: getRepositoryToken(Product), useValue: makeRepo() },
         { provide: getRepositoryToken(ProductVariant), useValue: makeRepo() },
+        { provide: getRepositoryToken(ProductImage), useValue: makeRepo() },
         { provide: getRepositoryToken(SellerProduct), useValue: makeRepo() },
         { provide: getRepositoryToken(Inventory), useValue: makeRepo() },
         { provide: getRepositoryToken(Review), useValue: makeRepo() },

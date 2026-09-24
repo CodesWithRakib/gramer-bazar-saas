@@ -21,17 +21,25 @@ export default async function Image({ params }: { params: { slug: string; lang: 
       baseUrl = baseUrl.replace('localhost', '127.0.0.1');
     }
     const res = await fetch(`${baseUrl}/public/catalog/${slug}`, { next: { revalidate: 60 } });
-    const products = await res.json();
+    if (!res.ok) {
+      throw new Error('Not found');
+    }
+    const json = await res.json();
+    const products = Array.isArray(json) ? json : (Array.isArray(json?.data) ? json.data : []);
     
-    if (!products || products.length === 0) {
+    if (!products || products.length === 0 || !products[0]?.productVariant) {
       throw new Error('Not found');
     }
 
     const product = products[0];
     const isBn = lang === 'bn';
-    const name = isBn ? (product.productVariant.nameBn || product.productVariant.product.nameBn) : (product.productVariant.nameEn || product.productVariant.product.nameEn);
+    const variant = product.productVariant;
+    const masterProduct = variant?.product;
+    const name = isBn 
+      ? (variant?.nameBn || masterProduct?.nameBn || 'পণ্য') 
+      : (variant?.nameEn || masterProduct?.nameEn || 'Product');
     const price = product.discountPrice ? Number(product.discountPrice) : Number(product.price);
-    const image = product.productVariant.images?.[0] || 'https://via.placeholder.com/600';
+    const image = variant?.images?.[0] || 'https://via.placeholder.com/600';
 
     return new ImageResponse(
       (

@@ -4,7 +4,7 @@ const rawBaseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as any).auth?.accessToken;
+    const token = (getState() as { auth?: { accessToken?: string } }).auth?.accessToken;
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
@@ -17,7 +17,7 @@ const customBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryEr
   
   // Unwrap the globally formatted response: { success: true, data: { ... } }
   if (result.data && typeof result.data === 'object' && 'success' in result.data && 'data' in result.data) {
-    result.data = (result.data as any).data;
+    result.data = (result.data as { data: unknown }).data;
   }
   
   return result;

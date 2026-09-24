@@ -44,7 +44,27 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "khaasfood.com",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "4000",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "4000",
+      },
     ],
+  },
+  async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const baseUrl = apiUrl.replace(/\/api\/v1\/?$/, "");
+    return [
+      {
+        source: "/uploads/:path*",
+        destination: `${baseUrl}/uploads/:path*`,
+      },
+    ];
   },
 };
 

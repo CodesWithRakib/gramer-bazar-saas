@@ -77,7 +77,8 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
   };
 
   const name = isBn ? item.product.nameBn : item.product.nameEn;
-  const image = item.product.images?.[0] || '/placeholder.jpg';
+  const rawImage = item.product.images?.[0];
+  const image = typeof rawImage === 'string' ? rawImage : rawImage?.url || '/placeholder.jpg';
   
   return (
     <Link href={`/${lang}/products/${item.product.slug}`} className="group bg-card rounded-xl border shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col h-full relative">

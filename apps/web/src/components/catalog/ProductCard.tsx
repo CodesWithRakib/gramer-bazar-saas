@@ -122,9 +122,17 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
             <div className="flex flex-wrap items-baseline gap-1.5">
               <span className="text-base md:text-lg font-bold text-primary">৳{discountPrice}</span>
               <span className="text-xs text-muted-foreground line-through">৳{price}</span>
+              {product.productVariant.product.unit && (
+                <span className="text-xs text-muted-foreground">/ {product.productVariant.product.unit}</span>
+              )}
             </div>
           ) : (
-            <span className="text-base md:text-lg font-bold text-foreground">৳{price}</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-base md:text-lg font-bold text-foreground">৳{price}</span>
+              {product.productVariant.product.unit && (
+                <span className="text-xs text-muted-foreground">/ {product.productVariant.product.unit}</span>
+              )}
+            </div>
           )}
           <p className="text-[10px] md:text-xs text-muted-foreground mt-1 truncate">
             {lang === 'bn' ? 'দোকান: ' : 'Shop: '}

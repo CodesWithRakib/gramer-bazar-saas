@@ -58,7 +58,7 @@ export function StartChatButton({
         // Open the floating widget for storefront
         dispatch(openChatWidget(conversation.id));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to start chat:', error);
       const isBn = lang === 'bn';
       const msg = getApiErrorMessage(error);

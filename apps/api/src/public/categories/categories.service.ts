@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { Category } from '../../catalog/entities/category.entity.js';
 
 @Injectable()
@@ -11,12 +11,32 @@ export class CategoriesService {
   ) {}
 
   async findAllActive(): Promise<Category[]> {
-    // Only return active categories. Order by nameEn for now.
-    // Real-world scenarios might need a specific sort_order column.
     return this.categoriesRepository.find({
       where: { isActive: true },
+      relations: ['parent', 'children'],
+      order: { sortOrder: 'ASC', nameEn: 'ASC' },
+    });
+  }
+
+  async getTree(): Promise<Category[]> {
+    return this.categoriesRepository.find({
+      where: { isActive: true, parentId: IsNull() },
       relations: ['children'],
-      order: { nameEn: 'ASC' },
+      order: {
+        sortOrder: 'ASC',
+        nameEn: 'ASC',
+        children: {
+          sortOrder: 'ASC',
+          nameEn: 'ASC',
+        },
+      },
+    });
+  }
+
+  async findBySlug(slug: string): Promise<Category | null> {
+    return this.categoriesRepository.findOne({
+      where: { slug, isActive: true },
+      relations: ['parent', 'children'],
     });
   }
 }

@@ -9,6 +9,7 @@ import { Category } from '../catalog/entities/category.entity.js';
 import { Brand } from '../catalog/entities/brand.entity.js';
 import { Product } from '../catalog/entities/product.entity.js';
 import { ProductVariant } from '../catalog/entities/product-variant.entity.js';
+import { ProductImage } from '../catalog/entities/product-image.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Review } from '../reviews/entities/review.entity.js';
@@ -34,6 +35,7 @@ import { SeederService } from './seeder.service.js';
       Brand,
       Product,
       ProductVariant,
+      ProductImage,
       SellerProduct,
       Inventory,
       Review,

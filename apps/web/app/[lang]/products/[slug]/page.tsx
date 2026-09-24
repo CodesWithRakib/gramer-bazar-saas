@@ -15,7 +15,11 @@ async function getProductData(slug: string) {
     if (!res.ok) {
       return null;
     }
-    return res.json();
+    const json = await res.json();
+    if (Array.isArray(json)) return json;
+    if (Array.isArray(json?.data)) return json.data;
+    if (json?.data && typeof json.data === 'object') return [json.data];
+    return null;
   } catch (err) {
     console.error(`Failed to fetch product data for ${slug}:`, err);
     return null;
@@ -32,7 +36,7 @@ export async function generateMetadata(
   const { slug, lang } = await params;
   const products = await getProductData(slug);
   
-  if (!products || products.length === 0) {
+  if (!products || !Array.isArray(products) || products.length === 0 || !products[0]?.productVariant) {
     return {
       title: 'Product Not Found - Gramer Bazar',
     };
@@ -40,9 +44,13 @@ export async function generateMetadata(
 
   const product = products[0];
   const isBn = lang === 'bn';
-  const name = isBn ? (product.productVariant.nameBn || product.productVariant.product.nameBn) : (product.productVariant.nameEn || product.productVariant.product.nameEn);
-  const description = isBn ? product.productVariant.product.descriptionBn : product.productVariant.product.descriptionEn;
-  const image = product.productVariant.images?.[0] || '/placeholder.jpg';
+  const variant = product.productVariant;
+  const masterProduct = variant?.product;
+  const name = isBn 
+    ? (variant?.nameBn || masterProduct?.nameBn || 'পণ্য') 
+    : (variant?.nameEn || masterProduct?.nameEn || 'Product');
+  const description = isBn ? masterProduct?.descriptionBn : masterProduct?.descriptionEn;
+  const image = variant?.images?.[0] || '/placeholder.jpg';
 
   return {
     title: `${name} | Gramer Bazar`,
@@ -66,7 +74,7 @@ export default async function ProductDetailsPage({ params }: Props) {
   const { lang, slug } = await params;
   const products = await getProductData(slug);
 
-  if (!products || products.length === 0) {
+  if (!products || !Array.isArray(products) || products.length === 0 || !products[0]?.productVariant) {
     const isBn = lang === 'bn';
     return (
       <div className="container mx-auto px-4 py-32 flex flex-col items-center justify-center min-h-[50vh]">
@@ -95,9 +103,13 @@ export default async function ProductDetailsPage({ params }: Props) {
 
   const product = products[0];
   const isBn = lang === 'bn';
-  const name = isBn ? (product.productVariant.nameBn || product.productVariant.product.nameBn) : (product.productVariant.nameEn || product.productVariant.product.nameEn);
-  const description = isBn ? product.productVariant.product.descriptionBn : product.productVariant.product.descriptionEn;
-  const image = product.productVariant.images?.[0] || '/placeholder.jpg';
+  const variant = product.productVariant;
+  const masterProduct = variant?.product;
+  const name = isBn 
+    ? (variant?.nameBn || masterProduct?.nameBn || 'পণ্য') 
+    : (variant?.nameEn || masterProduct?.nameEn || 'Product');
+  const description = isBn ? masterProduct?.descriptionBn : masterProduct?.descriptionEn;
+  const image = variant?.images?.[0] || '/placeholder.jpg';
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -105,14 +117,14 @@ export default async function ProductDetailsPage({ params }: Props) {
     name: name,
     image: image,
     description: description,
-    sku: product.productVariant.sku,
+    sku: variant?.sku || product.sellerSku,
     offers: {
       '@type': 'Offer',
       url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${lang}/products/${slug}`,
       priceCurrency: 'BDT',
       price: product.discountPrice ? Number(product.discountPrice) : Number(product.price),
       itemCondition: 'https://schema.org/NewCondition',
-      availability: product.inventory?.quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      availability: (product.inventory?.quantity ?? 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
     }
   };
 

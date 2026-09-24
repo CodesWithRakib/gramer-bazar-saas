@@ -29,6 +29,25 @@ export class CreateCategoryDto {
   @IsString()
   icon?: string;
 
+  @ApiPropertyOptional({ description: 'Category image URL' })
+  @IsOptional()
+  @IsString()
+  image?: string;
+
+  @ApiPropertyOptional({ description: 'English description of the category' })
+  @IsOptional()
+  @IsString()
+  descriptionEn?: string;
+
+  @ApiPropertyOptional({ description: 'Bangla description of the category' })
+  @IsOptional()
+  @IsString()
+  descriptionBn?: string;
+
+  @ApiPropertyOptional({ description: 'Sort order for display priority', default: 0 })
+  @IsOptional()
+  sortOrder?: number;
+
   @ApiPropertyOptional({ description: 'True if products in this category require a license to sell' })
   @IsOptional()
   @IsBoolean()

@@ -19,12 +19,14 @@ export class CatalogService {
   }
 
   async search(searchDto: SearchCatalogDto) {
-    const { q, categoryId, minPrice, maxPrice, page = 1, limit = 20, sort = 'newest' } = searchDto;
+    const { q, categoryId, subCategoryId, minPrice, maxPrice, page = 1, limit = 20, sort = 'newest' } = searchDto;
 
     const query = this.sellerProductRepo.createQueryBuilder('sp')
       .leftJoinAndSelect('sp.productVariant', 'pv')
       .leftJoinAndSelect('pv.product', 'p')
       .leftJoinAndSelect('p.category', 'cat')
+      .leftJoinAndSelect('p.subCategory', 'subCat')
+      .leftJoinAndSelect('p.images', 'images')
       .leftJoinAndSelect('p.brand', 'b')
       .leftJoinAndSelect('sp.shop', 'shop')
       .leftJoinAndSelect('sp.inventory', 'inv')
@@ -35,13 +37,17 @@ export class CatalogService {
 
     if (q) {
       query.andWhere(
-        '(p.nameEn ILIKE :q OR p.nameBn ILIKE :q OR pv.nameEn ILIKE :q OR pv.nameBn ILIKE :q)',
+        '(p.nameEn ILIKE :q OR p.nameBn ILIKE :q OR pv.nameEn ILIKE :q OR pv.nameBn ILIKE :q OR p.slug ILIKE :q)',
         { q: `%${q}%` }
       );
     }
 
     if (categoryId) {
-      query.andWhere('p.categoryId = :categoryId', { categoryId });
+      query.andWhere('(p.categoryId = :categoryId OR p.subCategoryId = :categoryId)', { categoryId });
+    }
+
+    if (subCategoryId) {
+      query.andWhere('p.subCategoryId = :subCategoryId', { subCategoryId });
     }
 
     if (minPrice !== undefined) {
@@ -74,6 +80,18 @@ export class CatalogService {
       .take(limit)
       .getManyAndCount();
 
+    // Ensure pv.images has images from p.images if variant images is null or empty
+    items.forEach(item => {
+      if (item.productVariant && (!item.productVariant.images || item.productVariant.images.length === 0)) {
+        const pImages = item.productVariant.product?.images;
+        if (pImages && pImages.length > 0) {
+          item.productVariant.images = pImages
+            .sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0))
+            .map(img => img.url);
+        }
+      }
+    });
+
     // Fetch ratings and attach to products
     const productIds = items.map(i => i.productVariant?.product?.id).filter(Boolean);
     if (productIds.length > 0) {
@@ -85,14 +103,15 @@ export class CatalogService {
       `, [productIds]);
 
       const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
-        ratings.map((r: any) => [r.product_id, r])
+        ratings.map((r: { product_id: string; total_reviews: number; average_rating: number }) => [r.product_id, r])
       );
 
       items.forEach(item => {
         if (item.productVariant?.product) {
           const ratingData = ratingsMap.get(item.productVariant.product.id);
-          (item.productVariant.product as any).totalReviews = ratingData?.total_reviews || 0;
-          (item.productVariant.product as any).averageRating = ratingData?.average_rating || 0;
+          const p = item.productVariant.product as unknown as Record<string, unknown>;
+          p.totalReviews = ratingData?.total_reviews || 0;
+          p.averageRating = ratingData?.average_rating || 0;
         }
       });
     }
@@ -117,6 +136,8 @@ export class CatalogService {
       .leftJoinAndSelect('sp.productVariant', 'pv')
       .leftJoinAndSelect('pv.product', 'p')
       .leftJoinAndSelect('p.category', 'cat')
+      .leftJoinAndSelect('p.subCategory', 'subCat')
+      .leftJoinAndSelect('p.images', 'images')
       .leftJoinAndSelect('p.brand', 'b')
       .leftJoinAndSelect('sp.shop', 'shop')
       .leftJoinAndSelect('sp.inventory', 'inv')
@@ -129,6 +150,18 @@ export class CatalogService {
       throw new NotFoundException(`Product with slug ${slug} not found`);
     }
 
+    // Ensure pv.images fallback to p.images
+    items.forEach(item => {
+      if (item.productVariant && (!item.productVariant.images || item.productVariant.images.length === 0)) {
+        const pImages = item.productVariant.product?.images;
+        if (pImages && pImages.length > 0) {
+          item.productVariant.images = pImages
+            .sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0))
+            .map(img => img.url);
+        }
+      }
+    });
+
     const productIds = items.map(i => i.productVariant?.product?.id).filter(Boolean);
     if (productIds.length > 0) {
       const ratings = await this.sellerProductRepo.manager.query(`
@@ -139,14 +172,15 @@ export class CatalogService {
       `, [productIds]);
 
       const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
-        ratings.map((r: any) => [r.product_id, r])
+        ratings.map((r: { product_id: string; total_reviews: number; average_rating: number }) => [r.product_id, r])
       );
 
       items.forEach(item => {
         if (item.productVariant?.product) {
           const ratingData = ratingsMap.get(item.productVariant.product.id);
-          (item.productVariant.product as any).totalReviews = ratingData?.total_reviews || 0;
-          (item.productVariant.product as any).averageRating = ratingData?.average_rating || 0;
+          const p = item.productVariant.product as unknown as Record<string, unknown>;
+          p.totalReviews = ratingData?.total_reviews || 0;
+          p.averageRating = ratingData?.average_rating || 0;
         }
       });
     }
@@ -172,6 +206,8 @@ export class CatalogService {
       .leftJoinAndSelect('sp.productVariant', 'pv')
       .leftJoinAndSelect('pv.product', 'p')
       .leftJoinAndSelect('p.category', 'cat')
+      .leftJoinAndSelect('p.subCategory', 'subCat')
+      .leftJoinAndSelect('p.images', 'images')
       .leftJoinAndSelect('p.brand', 'b')
       .leftJoinAndSelect('sp.shop', 'shop')
       .leftJoinAndSelect('sp.inventory', 'inv')
@@ -183,6 +219,18 @@ export class CatalogService {
 
     const items = await query.getMany();
 
+    // Ensure pv.images fallback to p.images
+    items.forEach(item => {
+      if (item.productVariant && (!item.productVariant.images || item.productVariant.images.length === 0)) {
+        const pImages = item.productVariant.product?.images;
+        if (pImages && pImages.length > 0) {
+          item.productVariant.images = pImages
+            .sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0))
+            .map(img => img.url);
+        }
+      }
+    });
+
     const productIds = items.map(i => i.productVariant?.product?.id).filter(Boolean);
     if (productIds.length > 0) {
       const ratings = await this.sellerProductRepo.manager.query(`
@@ -193,14 +241,15 @@ export class CatalogService {
       `, [productIds]);
 
       const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
-        ratings.map((r: any) => [r.product_id, r])
+        ratings.map((r: { product_id: string; total_reviews: number; average_rating: number }) => [r.product_id, r])
       );
 
       items.forEach(item => {
         if (item.productVariant?.product) {
           const ratingData = ratingsMap.get(item.productVariant.product.id);
-          (item.productVariant.product as any).totalReviews = ratingData?.total_reviews || 0;
-          (item.productVariant.product as any).averageRating = ratingData?.average_rating || 0;
+          const p = item.productVariant.product as unknown as Record<string, unknown>;
+          p.totalReviews = ratingData?.total_reviews || 0;
+          p.averageRating = ratingData?.average_rating || 0;
         }
       });
     }

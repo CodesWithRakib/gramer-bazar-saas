@@ -13,6 +13,11 @@ export class SearchCatalogDto {
   @IsUUID()
   categoryId?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by SubCategory ID' })
+  @IsOptional()
+  @IsUUID()
+  subCategoryId?: string;
+
   @ApiPropertyOptional({ description: 'Minimum price' })
   @IsOptional()
   @Type(() => Number)

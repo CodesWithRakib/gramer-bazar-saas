@@ -14,6 +14,10 @@ export interface Category {
   nameBn: string;
   slug: string;
   icon?: string | null;
+  image?: string | null;
+  descriptionEn?: string | null;
+  descriptionBn?: string | null;
+  sortOrder?: number;
   isRegulated: boolean;
   isActive: boolean;
   createdAt: string;
@@ -32,10 +36,29 @@ export interface Brand {
   updatedAt: string;
 }
 
+export interface ProductImage {
+  id: string;
+  productId: string;
+  url: string;
+  storagePath: string;
+  filename: string;
+  originalFilename?: string | null;
+  mimeType?: string;
+  sizeBytes?: number;
+  isPrimary: boolean;
+  sortOrder: number;
+  altText?: string | null;
+  sourceUrl?: string | null;
+  sourceAttribution?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProductVariant {
   id: string;
   nameEn: string;
   nameBn: string;
+  sku?: string | null;
   images: string[] | null;
   price?: number | string;
   discountPrice?: number | string | null;
@@ -45,25 +68,88 @@ export interface Product {
   id: string;
   nameEn: string;
   nameBn: string;
-  descriptionEn?: string;
-  descriptionBn?: string;
+  shortDescriptionEn?: string | null;
+  shortDescriptionBn?: string | null;
+  descriptionEn?: string | null;
+  descriptionBn?: string | null;
   slug: string;
   categoryId: string;
   category?: Category;
+  subCategoryId?: string | null;
+  subCategory?: Category | null;
   brandId: string | null;
-  brand?: Brand;
-  minPrice: number;
-  maxPrice: number;
-  images: string[];
-  totalStock: number;
-  isAvailable: boolean;
-  averageRating: number;
-  totalReviews: number;
+  brand?: Brand | null;
+  sku?: string | null;
+  barcode?: string | null;
+  price: number | string;
+  compareAtPrice?: number | string | null;
+  stock: number;
+  unit: string;
+  status: string;
+  isFeatured: boolean;
   isActive: boolean;
-  isDeleted: boolean;
+  source?: string | null;
+  sourceProductId?: string | null;
+  sourceUrl?: string | null;
+  sourcePrice?: number | string | null;
+  sourceCurrency?: string | null;
+  images: ProductImage[];
+  variants?: ProductVariant[];
+  totalStock?: number;
+  isAvailable?: boolean;
+  averageRating?: number;
+  totalReviews?: number;
   createdAt: string;
   updatedAt: string;
-  variants?: ProductVariant[];
+}
+
+export interface CreateProductDto {
+  nameEn: string;
+  nameBn: string;
+  shortDescriptionEn?: string | null;
+  shortDescriptionBn?: string | null;
+  descriptionEn?: string | null;
+  descriptionBn?: string | null;
+  categoryId: string;
+  subCategoryId?: string | null;
+  brandId?: string | null;
+  sku?: string | null;
+  barcode?: string | null;
+  price: number;
+  compareAtPrice?: number | null;
+  stock: number;
+  unit: string;
+  status?: string;
+  isFeatured?: boolean;
+  isActive?: boolean;
+}
+
+export interface ImportLog {
+  id: string;
+  source: string;
+  mode: 'DRY_RUN' | 'IMPORT' | 'RETRY_IMAGES';
+  status: 'RUNNING' | 'COMPLETED' | 'FAILED';
+  totalFetched: number;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  duplicatesCount: number;
+  failedCount: number;
+  imageFailuresCount: number;
+  mappingFailuresCount: number;
+  errorSummary?: string | null;
+  details?: Record<string, unknown>;
+  startedAt: string;
+  completedAt?: string | null;
+  createdAt: string;
+}
+
+export interface RunImportDto {
+  source: 'dummyjson' | 'openfoodfacts';
+  mode?: 'DRY_RUN' | 'IMPORT' | 'RETRY_IMAGES';
+  limit?: number;
+  category?: string;
+  updateExisting?: boolean;
 }
 
 
@@ -81,10 +167,15 @@ export interface SellerProduct {
       id: string;
       nameEn: string;
       nameBn: string;
-      descriptionEn?: string;
-      descriptionBn?: string;
+      shortDescriptionEn?: string | null;
+      shortDescriptionBn?: string | null;
+      descriptionEn?: string | null;
+      descriptionBn?: string | null;
       slug: string;
+      unit?: string;
       category: Category;
+      subCategory?: Category | null;
+      brand?: Brand | null;
       averageRating?: number;
       totalReviews?: number;
     };
@@ -113,6 +204,7 @@ export interface SearchResponse {
 export interface SearchParams {
   q?: string;
   categoryId?: string;
+  subCategoryId?: string;
   brandId?: string;
   sellerId?: string;
   minPrice?: number;
@@ -231,6 +323,105 @@ export const catalogApi = api
           { type: "Catalog", id: `related-${slug}` },
         ],
       }),
+      getCategoriesTree: builder.query<Category[], void>({
+        query: () => "/categories/tree",
+        providesTags: ["Category"],
+      }),
+      deleteAdminCategory: builder.mutation<void, string>({
+        query: (id) => ({
+          url: `/categories/${id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Category"],
+      }),
+      createAdminProduct: builder.mutation<Product, CreateProductDto>({
+        query: (body) => ({
+          url: "/products",
+          method: "POST",
+          body,
+        }),
+        invalidatesTags: ["Catalog"],
+      }),
+      updateAdminProduct: builder.mutation<
+        Product,
+        { id: string; data: Partial<CreateProductDto> }
+      >({
+        query: ({ id, data }) => ({
+          url: `/products/${id}`,
+          method: "PATCH",
+          body: data,
+        }),
+        invalidatesTags: ["Catalog"],
+      }),
+      deleteAdminProduct: builder.mutation<void, string>({
+        query: (id) => ({
+          url: `/products/${id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Catalog"],
+      }),
+      uploadProductImages: builder.mutation<
+        ProductImage[],
+        { productId: string; formData: FormData }
+      >({
+        query: ({ productId, formData }) => ({
+          url: `/products/${productId}/images`,
+          method: "POST",
+          body: formData,
+        }),
+        invalidatesTags: ["Catalog"],
+      }),
+      setPrimaryProductImage: builder.mutation<
+        ProductImage,
+        { productId: string; imageId: string }
+      >({
+        query: ({ productId, imageId }) => ({
+          url: `/products/${productId}/images/${imageId}/primary`,
+          method: "PATCH",
+        }),
+        invalidatesTags: ["Catalog"],
+      }),
+      deleteProductImage: builder.mutation<
+        void,
+        { productId: string; imageId: string }
+      >({
+        query: ({ productId, imageId }) => ({
+          url: `/products/${productId}/images/${imageId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Catalog"],
+      }),
+      reorderProductImages: builder.mutation<
+        void,
+        { productId: string; imageIds: string[] }
+      >({
+        query: ({ productId, imageIds }) => ({
+          url: `/products/${productId}/images/reorder`,
+          method: "PATCH",
+          body: { imageIds },
+        }),
+        invalidatesTags: ["Catalog"],
+      }),
+      runProductImport: builder.mutation<
+        { success: boolean; log: ImportLog },
+        RunImportDto
+      >({
+        query: (body) => ({
+          url: "/admin/importer/run",
+          method: "POST",
+          body,
+        }),
+        invalidatesTags: ["Catalog", "Category"],
+      }),
+      getImportLogs: builder.query<
+        { items: ImportLog[]; meta: PaginationMeta },
+        { page?: number; limit?: number }
+      >({
+        query: (params) => ({
+          url: "/admin/importer/logs",
+          params,
+        }),
+      }),
       validateCart: builder.mutation<
         { valid: boolean },
         { items: { sellerProductId: string; quantity: number }[] }
@@ -247,6 +438,7 @@ export const catalogApi = api
 export const {
   useGetPublicCategoriesQuery,
   useGetPublicBrandsQuery,
+  useGetCategoriesTreeQuery,
   useGetAdminCategoriesQuery,
   useGetAdminBrandsQuery,
   useGetAdminProductsQuery,
@@ -257,6 +449,16 @@ export const {
   useValidateCartMutation,
   useCreateAdminCategoryMutation,
   useUpdateAdminCategoryMutation,
+  useDeleteAdminCategoryMutation,
   useCreateAdminBrandMutation,
   useUpdateAdminBrandMutation,
+  useCreateAdminProductMutation,
+  useUpdateAdminProductMutation,
+  useDeleteAdminProductMutation,
+  useUploadProductImagesMutation,
+  useSetPrimaryProductImageMutation,
+  useDeleteProductImageMutation,
+  useReorderProductImagesMutation,
+  useRunProductImportMutation,
+  useGetImportLogsQuery,
 } = catalogApi;

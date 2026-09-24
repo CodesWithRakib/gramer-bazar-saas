@@ -146,13 +146,26 @@ export function ProductDetailsClient({
             {isBn ? 'হোম' : 'Home'}
           </Link>
           <ChevronRight className="h-4 w-4" />
-          <Link href={`/${lang}/search`} className="hover:text-primary transition-colors">
-            {isBn ? 'পণ্য' : 'Products'}
+          <Link href={`/${lang}/categories`} className="hover:text-primary transition-colors">
+            {isBn ? 'ক্যাটাগরি' : 'Categories'}
           </Link>
           <ChevronRight className="h-4 w-4" />
           <Link href={`/${lang}/categories/${product.productVariant.product.category.slug}`} className="hover:text-primary transition-colors">
             {isBn ? product.productVariant.product.category.nameBn : product.productVariant.product.category.nameEn}
           </Link>
+          {product.productVariant.product.subCategory && (
+            <>
+              <ChevronRight className="h-4 w-4" />
+              <Link
+                href={`/${lang}/categories/${product.productVariant.product.category.slug}?subCategoryId=${product.productVariant.product.subCategory.id}`}
+                className="hover:text-primary transition-colors"
+              >
+                {isBn
+                  ? product.productVariant.product.subCategory.nameBn
+                  : product.productVariant.product.subCategory.nameEn}
+              </Link>
+            </>
+          )}
           <ChevronRight className="h-4 w-4" />
           <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-xs">{name}</span>
         </nav>
@@ -372,16 +385,28 @@ export function ProductDetailsClient({
                 <div className="bg-muted/40 p-5 rounded-2xl mb-6">
                   {discountPrice ? (
                     <div className="flex flex-col gap-1">
-                      <div className="flex items-end gap-3">
+                      <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-black text-primary">৳{discountPrice}</span>
-                        <span className="bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-md text-sm mb-1 animate-pulse">
+                        {product.productVariant.product.unit && (
+                          <span className="text-base text-muted-foreground">
+                            / {product.productVariant.product.unit}
+                          </span>
+                        )}
+                        <span className="bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-md text-sm ml-2 animate-pulse">
                           -{Math.round(((price - discountPrice) / price) * 100)}%
                         </span>
                       </div>
                       <span className="text-lg text-muted-foreground line-through">৳{price}</span>
                     </div>
                   ) : (
-                    <span className="text-4xl font-black text-primary">৳{price}</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-black text-primary">৳{price}</span>
+                      {product.productVariant.product.unit && (
+                        <span className="text-base text-muted-foreground">
+                          / {product.productVariant.product.unit}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
 

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useGetPublicBannersQuery } from '@/features/banners/bannersApi';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { CustomImage } from '@/components/ui/CustomImage';
 import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { Button } from '@/components/ui/button';
 
@@ -113,23 +112,25 @@ export function HeroBanners({ lang }: { lang: string }) {
           {banners[currentIndex].linkUrl ? (
             <Link href={banners[currentIndex].linkUrl}>
               <div className="relative w-full h-full">
-                <Image
+                <CustomImage
                   src={banners[currentIndex].imageUrl}
                   alt={banners[currentIndex].title}
                   fill
                   className="object-cover cursor-pointer"
                   priority
+                  unoptimized
                 />
               </div>
             </Link>
           ) : (
             <div className="relative w-full h-full">
-              <Image
+              <CustomImage
                 src={banners[currentIndex].imageUrl}
                 alt={banners[currentIndex].title}
                 fill
                 className="object-cover"
                 priority
+                unoptimized
               />
             </div>
           )}
