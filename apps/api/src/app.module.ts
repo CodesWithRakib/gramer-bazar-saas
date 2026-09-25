@@ -41,6 +41,7 @@ import { PayoutsModule } from './payouts/payouts.module.js';
 import { DisputesModule } from './disputes/disputes.module.js';
 import { FlashSalesModule } from './flash-sales/flash-sales.module.js';
 import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
+import { ApplicationsModule } from './applications/applications.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
@@ -118,6 +119,7 @@ import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
     FlashSalesModule,
     AuditLogsModule,
     SettingsModule,
+    ApplicationsModule,
   ],
   controllers: [AppController],
   providers: [

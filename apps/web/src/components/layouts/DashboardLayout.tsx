@@ -9,11 +9,13 @@ import { logout } from "@/store/slices/authSlice";
 import {
   DashboardRoute,
   adminRoutes,
+  superAdminRoutes,
   sellerRoutes,
   riderRoutes,
   customerRoutes,
 } from "@/config/dashboard-routes";
-import { Menu, LogOut, ChevronDown, Store, User, Settings } from "lucide-react";
+import { api } from "@/store/api";
+import { Menu, LogOut, ChevronDown, Store, User, Settings, ShieldCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/NotificationBell";
@@ -27,7 +29,7 @@ import {
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  routeType: "admin" | "seller" | "rider" | "customer";
+  routeType: "admin" | "seller" | "rider" | "customer" | "super-admin";
   lang: string;
 }
 
@@ -126,19 +128,32 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const routesMap: Record<DashboardLayoutProps["routeType"], DashboardRoute[]> = {
     admin: adminRoutes,
+    'super-admin': superAdminRoutes,
     seller: sellerRoutes,
     rider: riderRoutes,
     customer: customerRoutes,
   };
-  const routes = routesMap[routeType];
+  const routes = routesMap[routeType] || adminRoutes;
   const isBn = lang === "bn";
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+        },
+      });
+    } catch {
+      // Ignore network error on logout
+    }
     dispatch(logout());
+    dispatch(api.util.resetApiState());
     router.push(`/${lang}/login`);
   };
 

@@ -62,7 +62,7 @@ export class DeliveriesController {
   @Roles(Role.RIDER, Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Rider/Admin: Update delivery status' })
   updateDeliveryStatus(@Request() req: any, @Param('id') id: string, @Body() dto: UpdateDeliveryStatusDto) {
-    const isAdmin = req.user.roles?.includes(Role.ADMIN) || req.user.roles?.includes(Role.SUPER_ADMIN);
+    const isAdmin = req.user.roles?.some((r: any) => (r.name || r) === Role.ADMIN || (r.name || r) === Role.SUPER_ADMIN);
     return this.deliveriesService.updateDeliveryStatus(req.user.id, id, dto, isAdmin);
   }
 

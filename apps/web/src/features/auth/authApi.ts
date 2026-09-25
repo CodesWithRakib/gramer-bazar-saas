@@ -27,7 +27,13 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role?: string;
+}
+
+export interface ResetPasswordRequest {
+  phone: string;
+  otp: string;
+  newPassword: string;
 }
 
 export const authApi = api.injectEndpoints({
@@ -53,9 +59,23 @@ export const authApi = api.injectEndpoints({
         body,
       }),
     }),
+    register: builder.mutation<AuthResponse, RegisterRequest>({
+      query: (body) => ({
+        url: '/auth/register',
+        method: 'POST',
+        body,
+      }),
+    }),
     registerStaff: builder.mutation<AuthResponse, RegisterRequest>({
       query: (body) => ({
         url: '/auth/register',
+        method: 'POST',
+        body,
+      }),
+    }),
+    resetPassword: builder.mutation<{ message: string }, ResetPasswordRequest>({
+      query: (body) => ({
+        url: '/auth/reset-password',
         method: 'POST',
         body,
       }),
@@ -104,7 +124,9 @@ export const {
   useSendOtpMutation,
   useVerifyOtpMutation,
   useLoginWithPasswordMutation,
+  useRegisterMutation,
   useRegisterStaffMutation,
+  useResetPasswordMutation,
   useGetProfileQuery,
   useLazyGetProfileQuery,
   useUpdateProfileMutation,

@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Query,
   UseGuards,
   Patch,
@@ -16,6 +17,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 import { UserStatus } from './enums/user-status.enum.js';
+import { CreateUserDto } from './dto/create-user.dto.js';
 
 @ApiTags('Users (Admin)')
 @Controller('users')
@@ -41,6 +43,24 @@ export class UsersController {
     @Query('role') role?: Role,
   ) {
     return this.usersService.findAll(page, limit, search, role);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Admin/Super Admin: Create a new user' })
+  async create(
+    @Request() req: any,
+    @Body() createUserDto: CreateUserDto,
+  ) {
+    const user = await this.usersService.createByAdmin(req.user, createUserDto);
+    await this.auditLogsService.record({
+      actorId: req.user?.id,
+      actorName: this.actorName(req.user),
+      action: 'USER_CREATED',
+      targetType: 'User',
+      targetId: user.id,
+      details: `User created with role ${createUserDto.role}`,
+    });
+    return user;
   }
 
   @Patch(':id/status')

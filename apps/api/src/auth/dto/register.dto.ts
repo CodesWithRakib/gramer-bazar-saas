@@ -28,9 +28,9 @@ export class RegisterDto {
   @IsString()
   lastName: string;
 
-  @ApiProperty({ example: 'SELLER', description: 'Role to register as (SELLER or RIDER)' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'CUSTOMER', description: 'Role (defaults to CUSTOMER)', required: false })
+  @IsOptional()
   @IsString()
-  @IsIn(['SELLER', 'RIDER'])
-  role: string;
+  @IsIn(['CUSTOMER', 'SELLER', 'RIDER'])
+  role?: string;
 }

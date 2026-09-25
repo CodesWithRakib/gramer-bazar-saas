@@ -10,6 +10,7 @@ import { SendOtpDto } from './dto/send-otp.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { RefreshDto } from './dto/refresh.dto.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdatePasswordDto } from './dto/update-password.dto.js';
@@ -77,6 +78,15 @@ export class AuthController {
     const data = await this.authService.verifyOtp(verifyOtpDto.phone, verifyOtpDto.otp);
     this.setCookies(res, data.accessToken, data.refreshToken);
     return data;
+  }
+
+  @Post('reset-password')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @ApiOperation({ summary: 'Reset password with OTP' })
+  @ApiResponse({ status: 200, description: 'Password reset successfully' })
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() resetDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetDto.phone, resetDto.otp, resetDto.newPassword);
   }
 
   @Post('register')

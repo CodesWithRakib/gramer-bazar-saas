@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 import { User } from './entities/user.entity.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
+import { Role } from '../roles/enums/role.enum.js';
 import { UserStatus } from './enums/user-status.enum.js';
+import { CreateUserDto } from './dto/create-user.dto.js';
 
 @Injectable()
 export class UsersService {
@@ -66,6 +69,40 @@ export class UsersService {
     }
 
     return this.userRepository.save(user);
+  }
+
+  async createByAdmin(caller: any, dto: CreateUserDto): Promise<User> {
+    const isSuperAdmin = caller.roles?.some((r: any) => (r.name || r) === Role.SUPER_ADMIN);
+    if (!isSuperAdmin && (dto.role === Role.ADMIN || dto.role === Role.SUPER_ADMIN)) {
+      throw new ForbiddenException('Only Super Admins can create Admin or Super Admin accounts');
+    }
+
+    const normalizedPhone = this.normalizeBdPhone(dto.phone);
+    const existingPhone = await this.userRepository.findOne({ where: { phone: normalizedPhone } });
+    if (existingPhone) {
+      throw new BadRequestException('A user with this phone number already exists');
+    }
+    if (dto.email) {
+      const existingEmail = await this.userRepository.findOne({ where: { email: dto.email } });
+      if (existingEmail) {
+        throw new BadRequestException('A user with this email address already exists');
+      }
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(dto.password, salt);
+
+    return this.create({
+      phone: normalizedPhone,
+      email: dto.email || null,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      passwordHash,
+      status: UserStatus.ACTIVE,
+      isPhoneVerified: true,
+      isEmailVerified: !!dto.email,
+      roleNames: [dto.role],
+    });
   }
 
   async update(id: string, updateData: Partial<User>): Promise<User> {

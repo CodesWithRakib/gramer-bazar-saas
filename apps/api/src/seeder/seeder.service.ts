@@ -176,6 +176,7 @@ export class SeederService {
 
   private async seedUsersAndShops() {
     this.logger.log('Seeding users and shops...');
+    const superAdminRole = await this.roleRepo.findOne({ where: { name: Role.SUPER_ADMIN } });
     const adminRole = await this.roleRepo.findOne({ where: { name: Role.ADMIN } });
     const customerRole = await this.roleRepo.findOne({ where: { name: Role.CUSTOMER } });
     const sellerRole = await this.roleRepo.findOne({ where: { name: Role.SELLER } });
@@ -183,9 +184,15 @@ export class SeederService {
 
     const passwordHash = await bcrypt.hash('password123', 10);
 
+    const superAdmin = await this.userRepo.save(this.userRepo.create({
+      phone: '+8801700000000', email: 'superadmin@gramerbazar.com', passwordHash,
+      firstName: 'Super', lastName: 'Admin', roles: [superAdminRole as RoleEntity],
+      status: 'ACTIVE' as any, isEmailVerified: true
+    }));
+
     const admin = await this.userRepo.save(this.userRepo.create({
       phone: '+8801700000001', email: 'admin@gramerbazar.com', passwordHash,
-      firstName: 'Super', lastName: 'Admin', roles: [adminRole as RoleEntity],
+      firstName: 'System', lastName: 'Admin', roles: [adminRole as RoleEntity],
       status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
@@ -225,7 +232,7 @@ export class SeederService {
       this.shopRepo.create({ nameEn: 'Karim Groceries', nameBn: 'করিম গ্রোসারিজ', slug: 'karim-groceries', seller: seller2 }),
     ]);
 
-    return { admin, customer, sellers: [seller1, seller2], riders: [rider1, rider2] };
+    return { superAdmin, admin, customer, sellers: [seller1, seller2], riders: [rider1, rider2] };
   }
 
   private async seedCatalog() {

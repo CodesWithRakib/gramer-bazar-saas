@@ -27,6 +27,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+import { api } from "@/store/api";
+
 interface UserActionsProps {
   lang: string;
 }
@@ -61,6 +63,8 @@ export function UserActions({ lang }: UserActionsProps) {
       dispatch(setUser(profile));
     }
   }, [profile, user, dispatch]);
+
+  const roles = user?.roles || profile?.roles || [];
 
   return (
     <div className="flex items-center gap-1 sm:gap-2">
@@ -119,7 +123,6 @@ export function UserActions({ lang }: UserActionsProps) {
           <span className="sr-only">{isBn ? "কার্ট" : "Cart"}</span>
         </Button>
 
-        {/* Quick Access Dashboard Routes removed to declutter nav - moved to User Dropdown */}
         {/* Auth / Profile */}
         {!mounted ? (
           <div className="w-9 sm:w-20 h-10 bg-muted animate-pulse rounded-full sm:rounded-md ml-1" />
@@ -134,38 +137,49 @@ export function UserActions({ lang }: UserActionsProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              {user?.roles?.includes("ADMIN") ? (
+              {roles.includes("SUPER_ADMIN") && (
+                <DropdownMenuItem asChild>
+                  <Link href={`/${lang}/super-admin`} className="cursor-pointer font-bold text-amber-600 dark:text-amber-400">
+                    {isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin Console"}
+                  </Link>
+                </DropdownMenuItem>
+              )}
+
+              {(roles.includes("ADMIN") || roles.includes("SUPER_ADMIN")) && (
                 <DropdownMenuItem asChild>
                   <Link href={`/${lang}/admin`} className="cursor-pointer font-medium text-primary">
                     {isBn ? "অ্যাডমিন প্যানেল" : "Admin Dashboard"}
                   </Link>
                 </DropdownMenuItem>
-              ) : user?.roles?.includes("SELLER") ? (
+              )}
+
+              {roles.includes("SELLER") && (
                 <DropdownMenuItem asChild>
-                  <Link href={`/${lang}/seller`} className="cursor-pointer font-medium text-primary">
+                  <Link href={`/${lang}/seller`} className="cursor-pointer font-medium text-emerald-600 dark:text-emerald-400">
                     {isBn ? "সেলার পোর্টাল" : "Seller Portal"}
                   </Link>
                 </DropdownMenuItem>
-              ) : user?.roles?.includes("RIDER") ? (
+              )}
+
+              {roles.includes("RIDER") && (
                 <DropdownMenuItem asChild>
-                  <Link href={`/${lang}/rider`} className="cursor-pointer font-medium text-primary">
+                  <Link href={`/${lang}/rider`} className="cursor-pointer font-medium text-blue-600 dark:text-blue-400">
                     {isBn ? "রাইডার অ্যাপ" : "Rider App"}
                   </Link>
                 </DropdownMenuItem>
-              ) : (
-                <>
-                  <DropdownMenuItem asChild>
-                    <Link href={`/${lang}/profile`} className="cursor-pointer">
-                      {isBn ? "আমার প্রোফাইল" : "My Profile"}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={`/${lang}/orders`} className="cursor-pointer">
-                      {isBn ? "আমার অর্ডার" : "My Orders"}
-                    </Link>
-                  </DropdownMenuItem>
-                </>
               )}
+
+              <DropdownMenuItem asChild>
+                <Link href={`/${lang}/profile`} className="cursor-pointer">
+                  {isBn ? "আমার প্রোফাইল" : "My Profile"}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/${lang}/orders`} className="cursor-pointer">
+                  {isBn ? "আমার অর্ডার" : "My Orders"}
+                </Link>
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
               {/* Add Language Switcher for mobile inside dropdown */}
               <DropdownMenuItem asChild className="sm:hidden">
@@ -186,8 +200,10 @@ export function UserActions({ lang }: UserActionsProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button onClick={() => dispatch(setLoginModalOpen(true))} className="h-10 rounded-full px-6">
-            {isBn ? "লগইন" : "Login"}
+          <Button asChild className="h-10 rounded-full px-6">
+            <Link href={`/${lang}/login`}>
+              {isBn ? "লগইন" : "Login"}
+            </Link>
           </Button>
         )}
       </div>
@@ -213,10 +229,14 @@ export function UserActions({ lang }: UserActionsProps) {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  await fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => {});
+                } catch {}
                 dispatch(logout());
+                dispatch(api.util.resetApiState());
                 setIsLogoutModalOpen(false);
-                router.push(`/${lang}`);
+                router.push(`/${lang}/login`);
               }}
             >
               {isBn ? "লগআউট" : "Logout"}

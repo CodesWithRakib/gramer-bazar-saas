@@ -80,6 +80,8 @@ describe('SeederService - seedUsersAndShops', () => {
   it('creates admin, customer, two sellers and two riders with hashed passwords', async () => {
     roleRepo.findOne.mockImplementation(async ({ where }) => {
       switch (where?.name) {
+        case Role.SUPER_ADMIN:
+          return { id: 'r-super', name: Role.SUPER_ADMIN };
         case Role.ADMIN:
           return { id: 'r-admin', name: Role.ADMIN };
         case Role.CUSTOMER:
@@ -96,17 +98,18 @@ describe('SeederService - seedUsersAndShops', () => {
 
     const result = await service['seedUsersAndShops']();
 
-    expect(userRepo.create).toHaveBeenCalledTimes(6);
+    expect(userRepo.create).toHaveBeenCalledTimes(7);
     const created = userRepo.create.mock.calls.map((c) => c[0]) as Array<Record<string, unknown>>;
 
-    expect(created[0]).toMatchObject({ email: 'admin@gramerbazar.com' });
-    expect(created[3]).toMatchObject({ email: 'seller2@gramerbazar.com' });
-    expect(created[4]).toMatchObject({
+    expect(created[0]).toMatchObject({ email: 'superadmin@gramerbazar.com' });
+    expect(created[1]).toMatchObject({ email: 'admin@gramerbazar.com' });
+    expect(created[4]).toMatchObject({ email: 'seller2@gramerbazar.com' });
+    expect(created[5]).toMatchObject({
       email: 'rider1@gramerbazar.com',
       firstName: 'Babul',
       roles: [{ id: 'r-rider', name: Role.RIDER }],
     });
-    expect(created[5]).toMatchObject({
+    expect(created[6]).toMatchObject({
       email: 'rider2@gramerbazar.com',
       firstName: 'Kamal',
       roles: [{ id: 'r-rider', name: Role.RIDER }],

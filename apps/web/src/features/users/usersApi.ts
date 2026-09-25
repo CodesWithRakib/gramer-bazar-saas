@@ -1,9 +1,11 @@
 import { api } from '../../store/api';
+
 export enum Role {
-  CUSTOMER = 'CUSTOMER',
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ADMIN = 'ADMIN',
   SELLER = 'SELLER',
   RIDER = 'RIDER',
-  ADMIN = 'ADMIN',
+  CUSTOMER = 'CUSTOMER',
 }
 
 export interface User {
@@ -27,6 +29,15 @@ export interface PaginatedUsers {
   };
 }
 
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+  password: string;
+  role: Role;
+}
+
 export const usersApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query<PaginatedUsers, { page?: number; limit?: number; search?: string; role?: string }>({
@@ -35,6 +46,14 @@ export const usersApi = api.injectEndpoints({
         params,
       }),
       providesTags: ['User'],
+    }),
+    createUser: builder.mutation<User, CreateUserRequest>({
+      query: (body) => ({
+        url: '/users',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['User'],
     }),
     updateUserStatus: builder.mutation<User, { id: string; status: string }>({
       query: ({ id, status }) => ({
@@ -55,4 +74,9 @@ export const usersApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetUsersQuery, useUpdateUserStatusMutation, useUpdateUserRolesMutation } = usersApi;
+export const {
+  useGetUsersQuery,
+  useCreateUserMutation,
+  useUpdateUserStatusMutation,
+  useUpdateUserRolesMutation,
+} = usersApi;

@@ -49,6 +49,22 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
+  async resetPassword(phone: string, otp: string, newPassword: string) {
+    await this.otpService.verifyOtp(phone, otp);
+
+    const normalizedPhone = this.usersService.normalizeBdPhone(phone);
+    const user = await this.usersService.findByPhone(normalizedPhone);
+    if (!user) {
+      throw new BadRequestException('User with this phone number not found');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+
+    await this.usersService.update(user.id, { passwordHash });
+    return { message: 'Password reset successfully' };
+  }
+
   async loginWithPassword(emailOrPhone: string, pass: string) {
     let user = await this.usersService.findByEmail(emailOrPhone);
     if (!user) {
@@ -76,7 +92,6 @@ export class AuthService {
   }
 
   async registerStaff(registerDto: any) {
-    // The admin Settings page can close seller self-registration.
     if (registerDto.role === Role.SELLER) {
       const allowed = await this.settingsService.isSellerRegistrationAllowed();
       if (!allowed) {
@@ -85,7 +100,8 @@ export class AuthService {
     }
 
     // Check if user already exists
-    let user = await this.usersService.findByPhone(registerDto.phone);
+    const normalizedPhone = this.usersService.normalizeBdPhone(registerDto.phone);
+    let user = await this.usersService.findByPhone(normalizedPhone);
     if (!user && registerDto.email) {
       user = await this.usersService.findByEmail(registerDto.email);
     }
@@ -97,14 +113,14 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(registerDto.password, salt);
 
     user = await this.usersService.create({
-      phone: registerDto.phone,
-      email: registerDto.email,
+      phone: normalizedPhone,
+      email: registerDto.email || null,
       firstName: registerDto.firstName,
       lastName: registerDto.lastName,
       passwordHash,
       isPhoneVerified: false,
-      status: UserStatus.ACTIVE, // Assuming they are active upon registration for MVP
-      roleNames: [registerDto.role],
+      status: UserStatus.ACTIVE,
+      roleNames: [registerDto.role || Role.CUSTOMER],
     });
 
     return this.generateTokens(user);

@@ -20,6 +20,8 @@ import {
   Image as ImageIcon,
   Star,
   Building2,
+  ShieldCheck,
+  UserPlus,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -33,6 +35,8 @@ export interface DashboardRoute {
 export const adminRoutes: DashboardRoute[] = [
   { title: 'Dashboard', titleBn: 'ড্যাশবোর্ড', href: '/admin', icon: LayoutDashboard },
   { title: 'Users', titleBn: 'ইউজার', href: '/admin/users', icon: Users },
+  { title: 'Seller Applications', titleBn: 'সেলার আবেদন', href: '/admin/seller-applications', icon: ClipboardList },
+  { title: 'Rider Applications', titleBn: 'রাইডার আবেদন', href: '/admin/rider-applications', icon: Truck },
   { title: 'Sellers', titleBn: 'সেলার', href: '/admin/sellers', icon: Store },
   { title: 'Products', titleBn: 'পণ্য', href: '/admin/products', icon: Package },
   { title: 'Categories', titleBn: 'ক্যাটাগরি', href: '/admin/categories', icon: Tag },
@@ -51,6 +55,17 @@ export const adminRoutes: DashboardRoute[] = [
   { title: 'Audit Logs', titleBn: 'অডিট লগ', href: '/admin/audit-logs', icon: ScrollText },
   { title: 'Messages', titleBn: 'বার্তা', href: '/admin/messages', icon: MessageSquare },
   { title: 'Settings', titleBn: 'সেটিংস', href: '/admin/settings', icon: Settings },
+];
+
+export const superAdminRoutes: DashboardRoute[] = [
+  { title: 'Overview', titleBn: 'সারসংক্ষেপ', href: '/super-admin', icon: LayoutDashboard },
+  { title: 'Admin Roster', titleBn: 'অ্যাডমিন পরিচালনা', href: '/super-admin/admins', icon: ShieldCheck },
+  { title: 'Create Staff', titleBn: 'নতুন স্টাফ তৈরি', href: '/super-admin/create-user', icon: UserPlus },
+  { title: 'All Users', titleBn: 'সকল ব্যবহারকারী', href: '/admin/users', icon: Users },
+  { title: 'Seller Applications', titleBn: 'সেলার আবেদন', href: '/admin/seller-applications', icon: ClipboardList },
+  { title: 'Rider Applications', titleBn: 'রাইডার আবেদন', href: '/admin/rider-applications', icon: Truck },
+  { title: 'Audit Logs', titleBn: 'অডিট লগ', href: '/admin/audit-logs', icon: ScrollText },
+  { title: 'System Settings', titleBn: 'সিস্টেম সেটিংস', href: '/admin/settings', icon: Settings },
 ];
 
 export const sellerRoutes: DashboardRoute[] = [

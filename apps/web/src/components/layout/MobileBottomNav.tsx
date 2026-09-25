@@ -39,18 +39,13 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
     },
   ];
 
-  const handleProfileClick = (e: React.MouseEvent) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      dispatch(setLoginModalOpen(true));
-    }
-  };
-
   const getProfileHref = () => {
-    if (!isAuthenticated) return "#";
-    if (user?.roles?.includes("ADMIN")) return `/${lang}/admin`;
-    if (user?.roles?.includes("SELLER")) return `/${lang}/seller`;
-    if (user?.roles?.includes("RIDER")) return `/${lang}/rider`;
+    if (!isAuthenticated) return `/${lang}/login`;
+    const roles = user?.roles || [];
+    if (roles.includes("SUPER_ADMIN")) return `/${lang}/super-admin`;
+    if (roles.includes("ADMIN")) return `/${lang}/admin`;
+    if (roles.includes("SELLER")) return `/${lang}/seller`;
+    if (roles.includes("RIDER")) return `/${lang}/rider`;
     return `/${lang}/profile`;
   };
 
@@ -88,13 +83,14 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
 
         <Link
           href={getProfileHref()}
-          onClick={handleProfileClick}
           className={cn(
             "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
             pathname.includes(`/${lang}/profile`) || 
+            pathname.includes(`/${lang}/super-admin`) || 
             pathname.includes(`/${lang}/admin`) || 
             pathname.includes(`/${lang}/seller`) || 
-            pathname.includes(`/${lang}/rider`) 
+            pathname.includes(`/${lang}/rider`) ||
+            pathname.includes(`/${lang}/login`)
               ? "text-primary" 
               : "text-muted-foreground hover:text-primary"
           )}

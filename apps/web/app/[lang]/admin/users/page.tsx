@@ -9,12 +9,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useUpdateUserStatusMutation } from '@/features/users/usersApi';
 import { UserRoleDialog } from './UserRoleDialog';
+import { AdminCreateUserDialog } from './AdminCreateUserDialog';
+import { UserPlus } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [editingRolesUser, setEditingRolesUser] = useState<User | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   
   const { data, isLoading, isError, refetch } = useGetUsersQuery({ page, limit, search });
   const [updateStatus] = useUpdateUserStatusMutation();
@@ -94,6 +97,10 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">All Users</h1>
+        <Button onClick={() => setIsCreateOpen(true)} className="rounded-xl shadow-sm">
+          <UserPlus className="w-4 h-4 mr-2" />
+          Create User
+        </Button>
       </div>
       
       <div className="flex items-center space-x-2 max-w-sm">
@@ -136,6 +143,11 @@ export default function AdminUsersPage() {
           }}
         />
       )}
+
+      <AdminCreateUserDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+      />
     </div>
   );
 }
