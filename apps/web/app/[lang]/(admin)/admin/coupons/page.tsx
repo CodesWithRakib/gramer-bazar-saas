@@ -66,7 +66,7 @@ export default function AdminCouponsPage({ params }: { params: Promise<{ lang: s
   });
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.roles?.includes('ADMIN')) {
+    if (!isAuthenticated || (!user?.roles?.includes('ADMIN') && !user?.roles?.includes('SUPER_ADMIN'))) {
       router.push(`/${lang}/login`);
     }
   }, [isAuthenticated, user, router, lang]);
@@ -79,7 +79,7 @@ export default function AdminCouponsPage({ params }: { params: Promise<{ lang: s
     return rawCoupons.filter((c) => (statusFilter === 'ACTIVE' ? c.isActive : !c.isActive));
   }, [rawCoupons, statusFilter]);
 
-  if (!isAuthenticated || !user?.roles?.includes('ADMIN')) return null;
+  if (!isAuthenticated || (!user?.roles?.includes('ADMIN') && !user?.roles?.includes('SUPER_ADMIN'))) return null;
 
   const handleOpenCreateModal = () => {
     setIsEditing(false);

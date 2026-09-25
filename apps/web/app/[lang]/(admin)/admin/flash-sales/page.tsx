@@ -57,7 +57,7 @@ export default function AdminFlashSalesPage({ params }: { params: Promise<{ lang
   });
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.roles?.includes('ADMIN')) {
+    if (!isAuthenticated || !user?.roles?.some(r => r === 'ADMIN' || r === 'SUPER_ADMIN')) {
       router.push(`/${lang}/login`);
     }
   }, [isAuthenticated, user, router, lang]);
@@ -73,7 +73,7 @@ export default function AdminFlashSalesPage({ params }: { params: Promise<{ lang
     });
   }, [rawSales, search, statusFilter]);
 
-  if (!isAuthenticated || !user?.roles?.includes('ADMIN')) return null;
+  if (!isAuthenticated || !user?.roles?.some(r => r === 'ADMIN' || r === 'SUPER_ADMIN')) return null;
 
   const handleOpenCreateModal = () => {
     setIsEditing(false);

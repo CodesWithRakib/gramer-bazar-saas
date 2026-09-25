@@ -23,6 +23,7 @@ import {
   ShieldAlert,
   Package,
   HelpCircle,
+  Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +36,9 @@ export function Header({ lang }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isBn = lang === "bn";
 
-  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth,
+  );
   const { data: profile } = useGetProfileQuery(undefined, {
     skip: !isAuthenticated || !!user,
   });
@@ -210,11 +213,23 @@ export function Header({ lang }: HeaderProps) {
               >
                 <Zap className="h-3.5 w-3.5 fill-rose-500 text-rose-500 animate-pulse" />
                 <span>{isBn ? "ফ্ল্যাশ সেল" : "Flash Sale"}</span>
-                <Badge variant="destructive" className="text-[9px] h-4 px-1 py-0 uppercase">
+                <Badge
+                  variant="destructive"
+                  className="text-[9px] h-4 px-1 py-0 uppercase"
+                >
                   {isBn ? "ছাড়" : "Sale"}
                 </Badge>
               </Link>
-
+              {/* Super Admin Coupons Link */}
+              {isSuperAdmin && (
+                <Link
+                  href={`/${lang}/super-admin/coupons`}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 font-medium transition-colors whitespace-nowrap"
+                >
+                  <Ticket className="h-3.5 w-3.5" />
+                  <span>{isBn ? "কুপন" : "Coupons"}</span>
+                </Link>
+              )}
               <Link
                 href={`/${lang}/categories/fresh-vegetables`}
                 className="hover:text-primary transition-colors whitespace-nowrap text-foreground/80 hover:font-semibold"
@@ -254,7 +269,11 @@ export function Header({ lang }: HeaderProps) {
             {/* Right: Trust Badge / Fast Delivery */}
             <div className="hidden xl:flex items-center gap-2 text-muted-foreground text-[11px] whitespace-nowrap">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-              <span>{isBn ? "১০০% খাঁটি পণ্য ও নিরাপদ ক্যাশ অন ডেলিভারি" : "100% Authentic Products & Safe Cash on Delivery"}</span>
+              <span>
+                {isBn
+                  ? "১০০% খাঁটি পণ্য ও নিরাপদ ক্যাশ অন ডেলিভারি"
+                  : "100% Authentic Products & Safe Cash on Delivery"}
+              </span>
             </div>
           </div>
         </div>
