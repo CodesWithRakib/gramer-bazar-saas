@@ -1,13 +1,10 @@
-import { ChatInterface } from '@/components/chat/ChatInterface';
+import { AdminMessagesView } from "@/features/admin/messages";
 
-export default function AdminMessagesPage() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Messages</h1>
-        <p className="text-muted-foreground">Manage and resolve conversations with users across the platform.</p>
-      </div>
-      <ChatInterface />
-    </div>
-  );
+export default async function AdminMessagesPage({
+  params,
+}: {
+  params: Promise<{ lang: "ar" | "en" }>;
+}) {
+  const { lang } = await params;
+  return <AdminMessagesView lang={lang} namespace="admin" />;
 }

@@ -15,14 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { UserRoleDialog } from '../../../app/[lang]/(admin)/admin/users/UserRoleDialog';
-import { AdminCreateUserDialog } from '../../../app/[lang]/(admin)/admin/users/AdminCreateUserDialog';
+import { UserRoleDialog } from './components/UserRoleDialog';
+import { AdminCreateUserDialog } from './components/AdminCreateUserDialog';
 
-interface AdminUsersViewProps {
-  namespace: 'admin' | 'super-admin';
+export interface AdminUsersViewProps {
+  lang?: string;
+  namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminUsersView({ namespace }: AdminUsersViewProps) {
+export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersViewProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');

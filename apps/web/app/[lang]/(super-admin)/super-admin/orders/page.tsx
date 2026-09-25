@@ -1,7 +1,10 @@
-'use client';
+import { AdminOrdersView } from "@/features/super-admin/orders";
 
-import { AdminOrdersView } from '@/features/admin-operations/AdminOrdersView';
-
-export default function SuperAdminOrdersPage() {
-  return <AdminOrdersView namespace="super-admin" />;
+export default async function SuperAdminOrdersPage({
+  params,
+}: {
+  params: Promise<{ lang: "ar" | "en" }>;
+}) {
+  const { lang } = await params;
+  return <AdminOrdersView lang={lang} namespace="super-admin" />;
 }

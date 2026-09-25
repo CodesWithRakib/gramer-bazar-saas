@@ -1,7 +1,10 @@
-'use client';
+import { AdminOrdersView } from "@/features/admin/orders";
 
-import { AdminOrdersView } from '@/features/admin-operations/AdminOrdersView';
-
-export default function AdminOrdersPage() {
-  return <AdminOrdersView namespace="admin" />;
+export default async function AdminOrdersPage({
+  params,
+}: {
+  params: Promise<{ lang: "ar" | "en" }>;
+}) {
+  const { lang } = await params;
+  return <AdminOrdersView lang={lang} namespace="admin" />;
 }
