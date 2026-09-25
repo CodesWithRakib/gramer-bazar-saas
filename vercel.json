@@ -1,7 +1,7 @@
 {
   "version": 2,
   "name": "gramerbazar-web",
-  "buildCommand": "cd apps/web && pnpm build",
+  "buildCommand": "pnpm --filter web build",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs"
 }
