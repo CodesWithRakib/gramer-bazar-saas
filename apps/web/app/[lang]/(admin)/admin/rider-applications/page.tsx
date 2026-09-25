@@ -202,35 +202,18 @@ export default function AdminRiderApplicationsPage({
               : 'Review delivery partner applications to authorize rider app access.'}
           </p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <Label className="text-sm font-medium whitespace-nowrap">
-            {isBn ? 'ফিল্টার:' : 'Filter:'}
-          </Label>
-          <Select
-            value={statusFilter}
-            onValueChange={(val: ApplicationStatus | 'ALL') => {
-              setStatusFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-[160px] rounded-xl">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">{isBn ? 'সকল আবেদন' : 'All Applications'}</SelectItem>
-              <SelectItem value="PENDING">{isBn ? 'অপেক্ষমাণ' : 'Pending'}</SelectItem>
-              <SelectItem value="APPROVED">{isBn ? 'অনুমোদিত' : 'Approved'}</SelectItem>
-              <SelectItem value="REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       <DataTable
         columns={columns}
         data={data?.data || []}
         pageCount={data?.meta?.totalPages ?? -1}
+        totalCount={data?.meta?.total}
+        itemLabel={{
+          singular: isBn ? 'আবেদন' : 'application',
+          plural: isBn ? 'আবেদন' : 'applications',
+        }}
+        isBn={isBn}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
           if (typeof updater === 'function') {
@@ -242,6 +225,27 @@ export default function AdminRiderApplicationsPage({
             setLimit(updater.pageSize);
           }
         }}
+        filterSlot={
+          <div className="w-full sm:w-48">
+            <Select
+              value={statusFilter}
+              onValueChange={(val: ApplicationStatus | 'ALL') => {
+                setStatusFilter(val);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 focus:ring-offset-0 dark:border-border dark:bg-card dark:text-foreground">
+                <SelectValue placeholder={isBn ? 'সকল আবেদন' : 'All Applications'} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">{isBn ? 'সকল আবেদন' : 'All Applications'}</SelectItem>
+                <SelectItem value="PENDING">{isBn ? 'অপেক্ষমাণ' : 'Pending'}</SelectItem>
+                <SelectItem value="APPROVED">{isBn ? 'অনুমোদিত' : 'Approved'}</SelectItem>
+                <SelectItem value="REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        }
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}

@@ -74,6 +74,9 @@ export function AdminOrdersView({ namespace }: AdminOrdersViewProps) {
   const [targetTransition, setTargetTransition] = useState<{ orderId: string; targetStatus: OrderStatus } | null>(null);
   const [transitionReason, setTransitionReason] = useState('');
 
+  // Filter State
+  const [statusFilter, setStatusFilter] = useState('ALL');
+
   const { data, isLoading, isError, refetch } = useGetAdminOrdersQuery({ page, limit, search });
   const [transitionOrder, { isLoading: isTransitioning }] = useTransitionOrderMutation();
 
@@ -81,6 +84,14 @@ export function AdminOrdersView({ namespace }: AdminOrdersViewProps) {
   const [assignDelivery, { isLoading: isAssigning }] = useAssignDeliveryMutation();
 
   const isSuperAdmin = namespace === 'super-admin';
+
+  const filteredOrders = React.useMemo(() => {
+    let list = data?.data || [];
+    if (statusFilter !== 'ALL') {
+      list = list.filter((order) => order.status === statusFilter);
+    }
+    return list;
+  }, [data?.data, statusFilter]);
 
   const executeTransition = async (orderId: string, targetStatus: OrderStatus, reason?: string) => {
     try {
@@ -232,21 +243,12 @@ export function AdminOrdersView({ namespace }: AdminOrdersViewProps) {
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input
-          placeholder="Search order ID..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-      </div>
-
       <DataTable
         columns={columns}
-        data={data?.data || []}
+        data={filteredOrders}
         pageCount={data?.meta?.totalPages ?? -1}
+        totalCount={data?.meta?.total}
+        itemLabel={{ singular: 'order', plural: 'orders' }}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
           if (typeof updater === 'function') {
@@ -258,6 +260,40 @@ export function AdminOrdersView({ namespace }: AdminOrdersViewProps) {
             setLimit(updater.pageSize);
           }
         }}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder="Search order ID..."
+        filterSlot={
+          <div className="w-full sm:w-48">
+            <Select
+              value={statusFilter}
+              onValueChange={(val) => {
+                setStatusFilter(val);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 focus:ring-offset-0 dark:border-border dark:bg-card dark:text-foreground">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Statuses</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                <SelectItem value="PROCESSING">Processing</SelectItem>
+                <SelectItem value="READY_FOR_PICKUP">Ready for Pickup</SelectItem>
+                <SelectItem value="ASSIGNED_TO_RIDER">Assigned to Rider</SelectItem>
+                <SelectItem value="PICKED_UP">Picked Up</SelectItem>
+                <SelectItem value="OUT_FOR_DELIVERY">Out for Delivery</SelectItem>
+                <SelectItem value="DELIVERED">Delivered</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                <SelectItem value="FAILED">Failed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        }
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}

@@ -1,40 +1,52 @@
 'use client';
-import { use } from 'react';
 
-import React, { useState } from 'react';
+import { use, useState, useMemo } from 'react';
+import React from 'react';
 import {
   useGetSellerProductsQuery,
   SellerProductItem,
 } from '@/features/seller-portal/sellerPortalApi';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
-  ColumnDef,
-} from '@tanstack/react-table';
+import { DataTable } from '@/components/ui/data-table';
+import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { BoxSelect } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { AddProductDialog, EditProductDialog } from './ProductDialogs';
 
 export default function SellerProductsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [editingProduct, setEditingProduct] = useState<SellerProductItem | null>(null);
-  
-  const { data: products, isLoading } = useGetSellerProductsQuery(searchTerm || undefined);
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const { data: products, isLoading, isError, refetch } = useGetSellerProductsQuery(
+    searchTerm.trim() || undefined,
+  );
+
+  const filteredProducts = useMemo(() => {
+    let list = products || [];
+    if (statusFilter !== 'ALL') {
+      const wantActive = statusFilter === 'ACTIVE';
+      list = list.filter((p) => p.isActive === wantActive);
+    }
+    return list;
+  }, [products, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / limit));
+  const paginatedProducts = useMemo(() => {
+    const start = (page - 1) * limit;
+    return filteredProducts.slice(start, start + limit);
+  }, [filteredProducts, page, limit]);
 
   const columns: ColumnDef<SellerProductItem>[] = [
     {
@@ -42,44 +54,61 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
       header: isBn ? 'প্রোডাক্টের নাম' : 'Product Name',
       cell: ({ row }) => (
         <div>
-          <div className="font-medium">
+          <div className="font-medium text-foreground">
             {isBn
               ? row.original.productVariant.product.nameBn
               : row.original.productVariant.product.nameEn}
           </div>
-          <div className="text-xs text-muted-foreground">SKU: {row.original.productVariant.sku}</div>
+          <div className="text-xs text-muted-foreground">
+            SKU: {row.original.productVariant.sku}
+          </div>
         </div>
       ),
     },
     {
       accessorKey: 'price',
-      header: isBn ? 'দাম' : 'Price',
-      cell: ({ row }) => `৳ ${row.getValue('price')}`,
+      header: isBn ? 'মূল্য' : 'Price',
+      cell: ({ row }) => (
+        <div>
+          <span className="font-semibold text-foreground">৳{row.original.price}</span>
+          {row.original.discountPrice && (
+            <span className="ml-2 text-xs text-muted-foreground line-through">
+              ৳{row.original.discountPrice}
+            </span>
+          )}
+        </div>
+      ),
     },
     {
       accessorKey: 'inventory.quantity',
-      header: isBn ? 'মজুদ' : 'Inventory',
+      header: isBn ? 'মজুদ' : 'Stock',
       cell: ({ row }) => {
-        const inv = row.original.inventory;
-        const available = inv.quantity - inv.reservedQuantity;
-        const isLowStock = available <= inv.lowStockThreshold;
-        
+        const qty = row.original.inventory?.quantity ?? 0;
+        const low = row.original.inventory?.lowStockThreshold ?? 5;
+        const isLow = qty <= low;
+
         return (
-          <div className="flex flex-col">
-            <span>{isBn ? 'উপলব্ধ' : 'Available'}: <strong className={isLowStock ? 'text-red-500' : ''}>{available}</strong></span>
-            <span className="text-xs text-muted-foreground">{isBn ? 'মোট' : 'Total'}: {inv.quantity} | {isBn ? 'সংরক্ষিত' : 'Reserved'}: {inv.reservedQuantity}</span>
+          <div>
+            <span className={`font-medium ${isLow ? 'text-destructive font-semibold' : 'text-foreground'}`}>
+              {qty}
+            </span>
+            {isLow && (
+              <span className="ml-2 text-xs text-destructive">
+                ({isBn ? 'কম স্টক' : 'Low'})
+              </span>
+            )}
           </div>
         );
       },
     },
     {
       accessorKey: 'isActive',
-      header: isBn ? 'স্ট্যাটাস' : 'Status',
+      header: isBn ? 'অবস্থা' : 'Status',
       cell: ({ row }) => {
-        const isActive = row.getValue('isActive');
+        const isActive = row.original.isActive;
         return (
           <Badge variant={isActive ? 'default' : 'secondary'}>
-            {isActive ? (isBn ? 'সক্রিয়' : 'Active') : (isBn ? 'নিষ্ক্রিয়' : 'Inactive')}
+            {isActive ? (isBn ? 'সক্রিয়' : 'Active') : isBn ? 'নিষ্ক্রিয়' : 'Inactive'}
           </Badge>
         );
       },
@@ -88,122 +117,94 @@ export default function SellerProductsPage({ params }: { params: Promise<{ lang:
       id: 'actions',
       header: isBn ? 'অ্যাকশন' : 'Actions',
       cell: ({ row }) => (
-        <Button variant="outline" size="sm" onClick={() => setEditingProduct(row.original)}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-full h-8 px-3"
+          onClick={() => setEditingProduct(row.original)}
+        >
           {isBn ? 'এডিট' : 'Edit'}
         </Button>
       ),
     },
   ];
 
-  const table = useReactTable({
-    data: products || [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{isBn ? 'আমার প্রোডাক্টসমূহ' : 'My Products'}</h1>
-        <AddProductDialog isBn={isBn} />
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <Input
-          placeholder={isBn ? 'সার্চ করুন...' : 'Search products...'}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-      </div>
-
-      <div className="rounded-md border bg-card">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton className="h-4 w-40 mb-2" /><Skeleton className="h-3 w-20" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-32 mb-2" /><Skeleton className="h-3 w-40" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
-                  <TableCell><Skeleton className="h-9 w-16" /></TableCell>
-                </TableRow>
-              ))
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-64 text-center">
-                  <div className="flex flex-col items-center justify-center text-muted-foreground">
-                    <BoxSelect className="h-12 w-12 mb-4 opacity-20" />
-                    <p className="text-lg font-medium">{isBn ? 'কোনো প্রোডাক্ট পাওয়া যায়নি' : 'No products found'}</p>
-                    <p className="text-sm mt-1">{isBn ? 'নতুন প্রোডাক্ট যোগ করতে উপরে "Add Product" বাটনে ক্লিক করুন' : 'Click "Add Product" above to create a new product.'}</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {isBn ? 'আমার প্রোডাক্টসমূহ' : 'My Products'}
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {isBn
+              ? 'আপনার স্টোরের সমস্ত প্রোডাক্ট ও ইনভেন্টরি পরিচালনা করুন।'
+              : 'Manage products, prices, and stock inventory for your store.'}
+          </p>
+        </div>
       </div>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {isBn ? 'পূর্ববর্তী' : 'Previous'}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          {isBn ? 'পরবর্তী' : 'Next'}
-        </Button>
-      </div>
-      
+      <DataTable
+        columns={columns}
+        data={paginatedProducts}
+        pageCount={totalPages}
+        totalCount={filteredProducts.length}
+        itemLabel={{
+          singular: isBn ? 'প্রোডাক্ট' : 'product',
+          plural: isBn ? 'প্রোডাক্ট' : 'products',
+        }}
+        isBn={isBn}
+        pagination={{ pageIndex: page - 1, pageSize: limit }}
+        onPaginationChange={(updater) => {
+          if (typeof updater === 'function') {
+            const newState = updater({ pageIndex: page - 1, pageSize: limit });
+            setPage(newState.pageIndex + 1);
+            setLimit(newState.pageSize);
+          } else {
+            setPage(updater.pageIndex + 1);
+            setLimit(updater.pageSize);
+          }
+        }}
+        search={searchTerm}
+        onSearchChange={(val) => {
+          setSearchTerm(val);
+          setPage(1);
+        }}
+        searchPlaceholder={isBn ? 'প্রোডাক্ট খুঁজুন...' : 'Search products...'}
+        filterSlot={
+          <div className="w-full sm:w-44">
+            <Select
+              value={statusFilter}
+              onValueChange={(val) => {
+                setStatusFilter(val);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 focus:ring-offset-0 dark:border-border dark:bg-card dark:text-foreground">
+                <SelectValue placeholder={isBn ? 'সব অবস্থা' : 'All Statuses'} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">{isBn ? 'সব অবস্থা' : 'All Statuses'}</SelectItem>
+                <SelectItem value="ACTIVE">{isBn ? 'সক্রিয়' : 'Active'}</SelectItem>
+                <SelectItem value="INACTIVE">{isBn ? 'নিষ্ক্রিয়' : 'Inactive'}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        }
+        actionSlot={<AddProductDialog isBn={isBn} />}
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+      />
+
       {editingProduct && (
         <EditProductDialog
-          isBn={isBn}
           product={editingProduct}
           open={!!editingProduct}
           onOpenChange={(o) => {
             if (!o) setEditingProduct(null);
           }}
+          isBn={isBn}
         />
       )}
     </div>

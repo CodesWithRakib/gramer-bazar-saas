@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import {
   useGetAdminProductRequestsQuery,
   ProductRequest,
 } from '@/features/product-requests/productRequestsApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
 export default function AdminProductRequestsPage() {
+  const routeParams = useParams();
+  const lang = (routeParams?.lang as string) === 'bn' ? 'bn' : 'en';
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -56,18 +59,12 @@ export default function AdminProductRequestsPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Product Requests</h1>
-      </div>
-      
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input 
-          placeholder="Search product requests..." 
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Product Requests</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Review customer product requests and track fulfillment status.
+          </p>
+        </div>
       </div>
       
       <DataTable 
@@ -88,6 +85,25 @@ export default function AdminProductRequestsPage() {
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder={lang === 'bn' ? 'পণ্য অনুরোধ খুঁজুন...' : 'Search product requests...'}
+        totalItems={data?.meta?.total}
+        itemsPerPage={limit}
+        currentPage={page}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+        lang={lang}
+        itemLabel={{
+          singular: lang === 'bn' ? 'অনুরোধ' : 'request',
+          plural: lang === 'bn' ? 'অনুরোধ' : 'requests',
+        }}
       />
     </div>
   );

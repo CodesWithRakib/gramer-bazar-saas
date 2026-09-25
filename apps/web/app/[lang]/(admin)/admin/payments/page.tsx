@@ -18,6 +18,7 @@ import {
   Check,
   ShieldCheck,
   Settings,
+  X,
 } from 'lucide-react';
 import {
   useGetAdminPaymentsQuery,
@@ -38,6 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import AdminPagination from '@/components/AdminPagination';
 
 export default function AdminPaymentsPage({
   params,
@@ -144,210 +146,246 @@ export default function AdminPaymentsPage({
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-card p-4 rounded-2xl border border-border/60 shadow-sm space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={
-              isBn
-                ? 'ট্রানজ্যাকশন আইডি, অর্ডার আইডি, ফোন বা নাম দিয়ে খুঁজুন...'
-                : 'Search by Transaction ID, Order ID, Phone or Name...'
-            }
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            className="pl-9 h-11 bg-background/50 rounded-xl"
-          />
-        </div>
-
-        <div className="flex gap-2.5">
-          <Select
-            value={statusFilter}
-            onValueChange={(val) => {
-              setStatusFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-[140px] h-11 rounded-xl">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">{isBn ? 'সকল স্ট্যাটাস' : 'All Status'}</SelectItem>
-              <SelectItem value="PAID">PAID</SelectItem>
-              <SelectItem value="INITIATED">INITIATED</SelectItem>
-              <SelectItem value="FAILED">FAILED</SelectItem>
-              <SelectItem value="CANCELLED">CANCELLED</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={providerFilter}
-            onValueChange={(val) => {
-              setProviderFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-[140px] h-11 rounded-xl">
-              <SelectValue placeholder="Provider" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">{isBn ? 'সকল প্রোভাইডার' : 'All Providers'}</SelectItem>
-              <SelectItem value="SSLCOMMERZ">SSLCOMMERZ</SelectItem>
-              <SelectItem value="COD">COD</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Transactions Table */}
-      <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-muted/40 text-muted-foreground border-b border-border/60 uppercase text-[11px] font-semibold tracking-wider">
-              <tr>
-                <th className="py-3.5 px-4">{isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}</th>
-                <th className="py-3.5 px-4">{isBn ? 'অর্ডার' : 'Order ID'}</th>
-                <th className="py-3.5 px-4">{isBn ? 'গ্রাহক' : 'Customer'}</th>
-                <th className="py-3.5 px-4">{isBn ? 'পরিমাণ' : 'Amount'}</th>
-                <th className="py-3.5 px-4">{isBn ? 'মেথড / কার্ড' : 'Method'}</th>
-                <th className="py-3.5 px-4">{isBn ? 'স্ট্যাটাস' : 'Status'}</th>
-                <th className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</th>
-                <th className="py-3.5 px-4 text-right">{isBn ? 'পদক্ষেপ' : 'Action'}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/40">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-muted-foreground">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-primary" />
-                    {isBn ? 'পেমেন্ট ডেটা লোড হচ্ছে...' : 'Loading transactions...'}
-                  </td>
-                </tr>
-              ) : payments.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-muted-foreground">
-                    <CreditCard className="w-8 h-8 mx-auto mb-2 text-muted-foreground/60" />
-                    {isBn ? 'কোনো লেনদেন পাওয়া যায়নি।' : 'No payment records found.'}
-                  </td>
-                </tr>
-              ) : (
-                payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-1.5 font-mono text-xs font-semibold">
-                        <span title={p.transactionId}>{p.transactionId}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(p.transactionId)}
-                          className="text-muted-foreground hover:text-foreground transition-colors p-1"
-                          title="Copy"
-                        >
-                          {copiedId === p.transactionId ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-500" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground uppercase font-mono">
-                        {p.provider}
-                      </span>
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <Link
-                        href={`/${lang}/admin/orders?search=${p.orderId}`}
-                        className="font-mono text-xs text-primary hover:underline inline-flex items-center gap-1"
-                      >
-                        {p.orderId.slice(0, 8)}...
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      {p.user ? (
-                        <div>
-                          <p className="font-medium text-foreground">
-                            {p.user.firstName} {p.user.lastName}
-                          </p>
-                          <p className="text-xs text-muted-foreground font-mono">{p.user.phone}</p>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground text-xs font-mono">
-                          {p.userId.slice(0, 8)}
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-bold text-foreground">
-                      ৳{Number(p.amount).toFixed(2)}
-                      <span className="text-[10px] text-muted-foreground ml-1">{p.currency}</span>
-                    </td>
-
-                    <td className="py-3.5 px-4 text-xs font-mono">
-                      {p.cardType || p.cardBrand || 'Online / SSL'}
-                    </td>
-
-                    <td className="py-3.5 px-4">{getStatusBadge(p.status)}</td>
-
-                    <td className="py-3.5 px-4 text-xs text-muted-foreground whitespace-nowrap">
-                      {new Date(p.createdAt).toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedPayment(p)}
-                        className="h-8 gap-1.5"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span className="hidden sm:inline">{isBn ? 'বিস্তারিত' : 'Details'}</span>
-                      </Button>
-                    </td>
-                  </tr>
-                ))
+      {/* Main Table Card */}
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 dark:border-border dark:bg-card">
+        {/* Top Toolbar */}
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full flex-1 flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+            {/* Search Pill */}
+            <div className="relative w-full max-w-md min-w-[200px] flex-1 sm:w-auto">
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                placeholder={
+                  isBn
+                    ? 'ট্রানজ্যাকশন আইডি, অর্ডার আইডি বা নাম...'
+                    : 'Search by Transaction ID, Order ID, Phone or Name...'
+                }
+                className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch('');
+                    setPage(1);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-gray-100 dark:hover:bg-muted"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
               )}
-            </tbody>
-          </table>
-        </div>
+            </div>
 
-        {/* Pagination */}
-        {meta.totalPages > 1 && (
-          <div className="flex items-center justify-between p-4 border-t border-border/60 text-sm">
-            <span className="text-muted-foreground text-xs">
-              {isBn ? 'পৃষ্ঠা' : 'Page'} {page} {isBn ? 'এর' : 'of'} {meta.totalPages} (
-              {meta.total} {isBn ? 'মোট' : 'total'})
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+            {/* Status Filter */}
+            <div className="w-full sm:w-40">
+              <Select
+                value={statusFilter}
+                onValueChange={(val) => {
+                  setStatusFilter(val);
+                  setPage(1);
+                }}
               >
-                {isBn ? 'আগের' : 'Previous'}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= meta.totalPages}
-                onClick={() => setPage((p) => p + 1)}
+                <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 dark:border-border dark:bg-background dark:text-foreground">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">{isBn ? 'সকল স্ট্যাটাস' : 'All Status'}</SelectItem>
+                  <SelectItem value="PAID">PAID</SelectItem>
+                  <SelectItem value="INITIATED">INITIATED</SelectItem>
+                  <SelectItem value="FAILED">FAILED</SelectItem>
+                  <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Provider Filter */}
+            <div className="w-full sm:w-40">
+              <Select
+                value={providerFilter}
+                onValueChange={(val) => {
+                  setProviderFilter(val);
+                  setPage(1);
+                }}
               >
-                {isBn ? 'পরের' : 'Next'}
-              </Button>
+                <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 dark:border-border dark:bg-background dark:text-foreground">
+                  <SelectValue placeholder="Provider" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">{isBn ? 'সকল প্রোভাইডার' : 'All Providers'}</SelectItem>
+                  <SelectItem value="SSLCOMMERZ">SSLCOMMERZ</SelectItem>
+                  <SelectItem value="COD">COD</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="rounded-full h-11 px-5 gap-2 shrink-0"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+            {isBn ? 'রিফ্রেশ' : 'Refresh'}
+          </Button>
+        </div>
+
+        {/* Transactions Table Inner Container */}
+        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xs dark:border-border dark:bg-card">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
+                <tr>
+                  <th className="py-3.5 px-4">{isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}</th>
+                  <th className="py-3.5 px-4">{isBn ? 'অর্ডার' : 'Order ID'}</th>
+                  <th className="py-3.5 px-4">{isBn ? 'গ্রাহক' : 'Customer'}</th>
+                  <th className="py-3.5 px-4">{isBn ? 'পরিমাণ' : 'Amount'}</th>
+                  <th className="py-3.5 px-4">{isBn ? 'মেথড / কার্ড' : 'Method'}</th>
+                  <th className="py-3.5 px-4">{isBn ? 'স্ট্যাটাস' : 'Status'}</th>
+                  <th className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</th>
+                  <th className="py-3.5 px-4 text-right">{isBn ? 'পদক্ষেপ' : 'Action'}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-border">
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <tr key={`skeleton-${index}`} className="animate-pulse">
+                      <td className="py-4 px-4"><div className="h-4 w-28 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4"><div className="h-4 w-32 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4"><div className="h-6 w-20 rounded-full bg-muted"></div></td>
+                      <td className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-muted"></div></td>
+                    </tr>
+                  ))
+                ) : payments.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted/60">
+                          <CreditCard className="h-6 w-6 text-muted-foreground/60" />
+                        </div>
+                        <h3 className="mb-1 text-base font-semibold text-foreground">
+                          {isBn ? 'কোনো লেনদেন পাওয়া যায়নি' : 'No payment records found'}
+                        </h3>
+                        <p className="text-sm text-muted-foreground max-w-sm">
+                          {search || statusFilter !== 'ALL' || providerFilter !== 'ALL'
+                            ? (isBn ? 'আপনার অনুসন্ধানের ফিল্টারের সাথে কোনো লেনদেন মেলেনি' : 'No records match your search or filter.')
+                            : (isBn ? 'বর্তমানে কোনো লেনদেনের রেকর্ড নেই' : 'No payments found.')}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  payments.map((p) => (
+                    <tr key={p.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-1.5 font-mono text-xs font-semibold">
+                          <span title={p.transactionId}>{p.transactionId}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(p.transactionId)}
+                            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                            title="Copy"
+                          >
+                            {copiedId === p.transactionId ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-500" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                          {p.provider}
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <Link
+                          href={`/${lang}/admin/orders?search=${p.orderId}`}
+                          className="font-mono text-xs text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          {p.orderId.slice(0, 8)}...
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        {p.user ? (
+                          <div>
+                            <p className="font-medium text-foreground">
+                              {p.user.firstName} {p.user.lastName}
+                            </p>
+                            <p className="text-xs text-muted-foreground font-mono">{p.user.phone}</p>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-xs font-mono">
+                            {p.userId.slice(0, 8)}
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3.5 px-4 font-bold text-foreground">
+                        ৳{Number(p.amount).toFixed(2)}
+                        <span className="text-[10px] text-muted-foreground ml-1">{p.currency}</span>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-xs font-mono">
+                        {p.cardType || p.cardBrand || 'Online / SSL'}
+                      </td>
+
+                      <td className="py-3.5 px-4">{getStatusBadge(p.status)}</td>
+
+                      <td className="py-3.5 px-4 text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(p.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedPayment(p)}
+                          className="h-8 gap-1.5 rounded-full"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span className="hidden sm:inline">{isBn ? 'বিস্তারিত' : 'Details'}</span>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Pagination inside card */}
+        <AdminPagination
+          totalItems={meta.total}
+          itemsPerPage={15}
+          currentPage={page}
+          onPageChange={setPage}
+          lang={lang}
+          itemLabel={{
+            singular: isBn ? 'লেনদেন' : 'payment',
+            plural: isBn ? 'লেনদেন' : 'payments',
+          }}
+        />
       </div>
 
       {/* Details Dialog */}

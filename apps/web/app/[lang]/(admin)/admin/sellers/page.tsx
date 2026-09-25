@@ -73,21 +73,12 @@ export default function AdminSellersPage() {
         <h1 className="text-3xl font-bold tracking-tight">Sellers</h1>
       </div>
       
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input 
-          placeholder="Search sellers..." 
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-      </div>
-      
       <DataTable 
         columns={columns} 
         data={data?.data || []}
         pageCount={data?.meta.totalPages ?? -1}
+        totalCount={data?.meta?.total}
+        itemLabel={{ singular: 'seller', plural: 'sellers' }}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
           if (typeof updater === 'function') {
@@ -99,6 +90,12 @@ export default function AdminSellersPage() {
             setLimit(updater.pageSize);
           }
         }}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder="Search sellers by name, email, or store..."
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}

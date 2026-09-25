@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import {
   useGetAdminCategoriesQuery,
   useDeleteAdminCategoryMutation,
@@ -122,6 +123,9 @@ export default function AdminCategoriesPage() {
     },
   ];
 
+  const routeParams = useParams();
+  const lang = (routeParams?.lang as string) === 'bn' ? 'bn' : 'en';
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
@@ -131,18 +135,6 @@ export default function AdminCategoriesPage() {
             Manage root categories, subcategories, sort orders, and translations.
           </p>
         </div>
-        <AddCategoryDialog />
-      </div>
-
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input
-          placeholder="Search categories by name or slug..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
       </div>
 
       <DataTable
@@ -163,6 +155,26 @@ export default function AdminCategoriesPage() {
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder={lang === 'bn' ? 'ক্যাটাগরি বা স্লাগ দিয়ে খুঁজুন...' : 'Search categories by name or slug...'}
+        actionSlot={<AddCategoryDialog />}
+        totalItems={data?.meta?.total}
+        itemsPerPage={limit}
+        currentPage={page}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+        lang={lang}
+        itemLabel={{
+          singular: lang === 'bn' ? 'ক্যাটাগরি' : 'category',
+          plural: lang === 'bn' ? 'ক্যাটাগরি' : 'categories',
+        }}
       />
 
       {editingCategory && (

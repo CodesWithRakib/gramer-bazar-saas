@@ -57,21 +57,12 @@ export default function AdminRidersPage() {
         <h1 className="text-3xl font-bold tracking-tight">Riders</h1>
       </div>
       
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input 
-          placeholder="Search riders..." 
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-      </div>
-      
       <DataTable 
         columns={columns} 
         data={data?.data || []}
         pageCount={data?.meta.totalPages ?? -1}
+        totalCount={data?.meta?.total}
+        itemLabel={{ singular: 'rider', plural: 'riders' }}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
           if (typeof updater === 'function') {
@@ -83,6 +74,12 @@ export default function AdminRidersPage() {
             setLimit(updater.pageSize);
           }
         }}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder="Search riders by name, phone, or email..."
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}

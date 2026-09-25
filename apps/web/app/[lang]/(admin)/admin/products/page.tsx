@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import {
   useGetAdminProductsQuery,
   useDeleteAdminProductMutation,
@@ -238,6 +239,9 @@ export default function AdminProductsPage() {
     },
   ];
 
+  const routeParams = useParams();
+  const lang = (routeParams?.lang as string) === 'bn' ? 'bn' : 'en';
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
@@ -247,21 +251,6 @@ export default function AdminProductsPage() {
             Global catalog items, categories, local images, pricing, and bulk import.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <ProductImporterModal />
-          <AddProductDialog />
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input
-          placeholder="Search products by name, SKU, or brand..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
       </div>
 
       <DataTable
@@ -282,6 +271,31 @@ export default function AdminProductsPage() {
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder={lang === 'bn' ? 'নাম, SKU অথবা ব্র্যান্ড দিয়ে খুঁজুন...' : 'Search products by name, SKU, or brand...'}
+        actionSlot={
+          <div className="flex items-center gap-2">
+            <ProductImporterModal />
+            <AddProductDialog />
+          </div>
+        }
+        totalItems={data?.meta?.total}
+        itemsPerPage={limit}
+        currentPage={page}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+        lang={lang}
+        itemLabel={{
+          singular: lang === 'bn' ? 'পণ্য' : 'product',
+          plural: lang === 'bn' ? 'পণ্য' : 'products',
+        }}
       />
 
       {editingProduct && (

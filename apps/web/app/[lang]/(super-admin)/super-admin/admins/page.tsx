@@ -145,31 +145,18 @@ export default function SuperAdminAdminsPage({
               : "Authorized platform operators and administrative personnel."}
           </p>
         </div>
-
-        <Button asChild className="rounded-xl shadow-sm">
-          <Link href={`/${lang}/super-admin/create-user`}>
-            <UserPlus className="w-4 h-4 mr-2" />
-            {isBn ? "নতুন অ্যাডমিন তৈরি" : "Add Admin User"}
-          </Link>
-        </Button>
-      </div>
-
-      <div className="flex items-center max-w-sm">
-        <Input
-          placeholder={isBn ? "অ্যাডমিন খুঁজুন..." : "Search admins..."}
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          className="rounded-xl"
-        />
       </div>
 
       <DataTable
         columns={columns}
         data={data?.data || []}
         pageCount={data?.meta?.totalPages ?? -1}
+        totalCount={data?.meta?.total}
+        itemLabel={{
+          singular: isBn ? "অ্যাডমিন" : "admin",
+          plural: isBn ? "অ্যাডমিন" : "admins",
+        }}
+        isBn={isBn}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
           if (typeof updater === "function") {
@@ -181,6 +168,20 @@ export default function SuperAdminAdminsPage({
             setLimit(updater.pageSize);
           }
         }}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder={isBn ? "অ্যাডমিন খুঁজুন..." : "Search admins..."}
+        actionSlot={
+          <Button asChild className="!h-11 rounded-full px-6 shadow-xs">
+            <Link href={`/${lang}/super-admin/create-user`}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              {isBn ? "নতুন অ্যাডমিন তৈরি" : "Add Admin User"}
+            </Link>
+          </Button>
+        }
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}

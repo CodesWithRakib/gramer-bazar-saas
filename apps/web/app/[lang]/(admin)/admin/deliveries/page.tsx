@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { useGetAdminDeliveriesQuery, Delivery } from '@/features/deliveries/deliveriesApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
 export default function AdminDeliveriesPage() {
+  const routeParams = useParams();
+  const lang = (routeParams?.lang as string) === 'bn' ? 'bn' : 'en';
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -62,18 +65,12 @@ export default function AdminDeliveriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Deliveries</h1>
-      </div>
-      
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input 
-          placeholder="Search delivery ID..." 
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Deliveries</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Track real-time rider assignments and delivery status.
+          </p>
+        </div>
       </div>
       
       <DataTable 
@@ -94,6 +91,25 @@ export default function AdminDeliveriesPage() {
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder={lang === 'bn' ? 'ডেলিভারি আইডি দিয়ে খুঁজুন...' : 'Search delivery ID...'}
+        totalItems={data?.meta?.total}
+        itemsPerPage={limit}
+        currentPage={page}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+        lang={lang}
+        itemLabel={{
+          singular: lang === 'bn' ? 'ডেলিভারি' : 'delivery',
+          plural: lang === 'bn' ? 'ডেলিভারি' : 'deliveries',
+        }}
       />
     </div>
   );

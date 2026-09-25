@@ -8,6 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserPlus } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { UserRoleDialog } from '../../../app/[lang]/(admin)/admin/users/UserRoleDialog';
 import { AdminCreateUserDialog } from '../../../app/[lang]/(admin)/admin/users/AdminCreateUserDialog';
 
@@ -19,6 +26,7 @@ export function AdminUsersView({ namespace }: AdminUsersViewProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('ALL');
   const [editingRolesUser, setEditingRolesUser] = useState<User | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
@@ -26,6 +34,14 @@ export function AdminUsersView({ namespace }: AdminUsersViewProps) {
   const [updateStatus] = useUpdateUserStatusMutation();
 
   const isSuperAdmin = namespace === 'super-admin';
+
+  const filteredUsers = React.useMemo(() => {
+    let list = data?.data || [];
+    if (roleFilter !== 'ALL') {
+      list = list.filter((user) => user.roles?.some((r) => r.name === roleFilter));
+    }
+    return list;
+  }, [data?.data, roleFilter]);
 
   const columns: ColumnDef<User>[] = [
     {
@@ -120,28 +136,14 @@ export function AdminUsersView({ namespace }: AdminUsersViewProps) {
               : 'View and manage platform customer, seller, and rider accounts.'}
           </p>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Create User
-        </Button>
-      </div>
-
-      <div className="flex items-center py-2">
-        <Input
-          placeholder="Search by name, phone or email..."
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-          className="max-w-sm"
-        />
       </div>
 
       <DataTable<User, unknown>
         columns={columns}
-        data={data?.data || []}
+        data={filteredUsers}
         pageCount={data?.meta?.totalPages ?? -1}
+        totalCount={data?.meta?.total}
+        itemLabel={{ singular: 'user', plural: 'users' }}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
           if (typeof updater === 'function') {
@@ -153,6 +155,44 @@ export function AdminUsersView({ namespace }: AdminUsersViewProps) {
             setLimit(updater.pageSize);
           }
         }}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder="Search by name, phone or email..."
+        filterSlot={
+          <div className="w-full sm:w-44">
+            <Select
+              value={roleFilter}
+              onValueChange={(val) => {
+                setRoleFilter(val);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 focus:ring-offset-0 dark:border-border dark:bg-card dark:text-foreground">
+                <SelectValue placeholder="All Roles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Roles</SelectItem>
+                <SelectItem value="CUSTOMER">Customer</SelectItem>
+                <SelectItem value="SELLER">Seller</SelectItem>
+                <SelectItem value="RIDER">Rider</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        }
+        actionSlot={
+          <Button
+            onClick={() => setIsCreateOpen(true)}
+            className="!h-11 rounded-full px-6 font-medium shadow-xs"
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Create User
+          </Button>
+        }
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}

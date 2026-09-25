@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { useGetAdminBrandsQuery, Brand } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AddBrandDialog, EditBrandDialog } from './BrandDialogs';
 
 export default function AdminBrandsPage() {
+  const routeParams = useParams();
+  const lang = (routeParams?.lang as string) === 'bn' ? 'bn' : 'en';
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -43,19 +46,12 @@ export default function AdminBrandsPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Brands</h1>
-        <AddBrandDialog />
-      </div>
-      
-      <div className="flex items-center space-x-2 max-w-sm">
-        <Input 
-          placeholder="Search brands..." 
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Brands</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage manufacturer and producer brands.
+          </p>
+        </div>
       </div>
       
       <DataTable 
@@ -76,6 +72,26 @@ export default function AdminBrandsPage() {
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        searchPlaceholder={lang === 'bn' ? 'ব্র্যান্ড খুঁজুন...' : 'Search brands...'}
+        actionSlot={<AddBrandDialog />}
+        totalItems={data?.meta?.total}
+        itemsPerPage={limit}
+        currentPage={page}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+        lang={lang}
+        itemLabel={{
+          singular: lang === 'bn' ? 'ব্র্যান্ড' : 'brand',
+          plural: lang === 'bn' ? 'ব্র্যান্ড' : 'brands',
+        }}
       />
 
       {editingBrand && (
