@@ -5,6 +5,7 @@ import { Role } from '../roles/enums/role.enum.js';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service.js';
 import { CheckoutDto } from './dto/checkout.dto.js';
+import { TransitionOrderDto } from './dto/transition-order.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 
@@ -85,5 +86,38 @@ export class OrdersController {
   @ApiOperation({ summary: 'Cancel an order' })
   async cancelOrder(@Request() req: any, @Param('id') id: string) {
     return this.ordersService.cancelOrder(req.user.id, id);
+  }
+
+  @Post(':id/transition')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.CUSTOMER, Role.SELLER, Role.RIDER, Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Transition order state via authoritative state machine' })
+  async transitionOrder(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: TransitionOrderDto,
+  ) {
+    const userRoles = (req.user?.roles || []).map((r: any) =>
+      typeof r === 'string' ? r : r.name,
+    );
+
+    const result = await this.ordersService.transitionOrder(id, dto, {
+      id: req.user.id,
+      roles: userRoles,
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
+    await this.auditLogsService.record({
+      actorId: req.user?.id,
+      actorName: `${req.user?.firstName ?? ''} ${req.user?.lastName ?? ''}`.trim() || null,
+      action: 'ORDER_STATE_TRANSITION',
+      targetType: 'Order',
+      targetId: id,
+      details: `Transitioned to ${dto.targetStatus}. Reason: ${dto.reason || 'None provided'}`,
+    });
+
+    return result;
   }
 }

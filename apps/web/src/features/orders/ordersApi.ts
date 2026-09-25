@@ -1,9 +1,42 @@
 import { api } from "../../store/api";
 import { PaginationMeta } from "../catalog/catalogApi";
 
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  PROCESSING = 'PROCESSING',
+  READY_FOR_PICKUP = 'READY_FOR_PICKUP',
+  ASSIGNED_TO_RIDER = 'ASSIGNED_TO_RIDER',
+  PICKED_UP = 'PICKED_UP',
+  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+}
+
+export const VALID_ORDER_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+  [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+  [OrderStatus.PROCESSING]: [OrderStatus.READY_FOR_PICKUP, OrderStatus.CANCELLED],
+  [OrderStatus.READY_FOR_PICKUP]: [OrderStatus.ASSIGNED_TO_RIDER, OrderStatus.PICKED_UP, OrderStatus.CANCELLED],
+  [OrderStatus.ASSIGNED_TO_RIDER]: [OrderStatus.PICKED_UP, OrderStatus.CANCELLED],
+  [OrderStatus.PICKED_UP]: [OrderStatus.OUT_FOR_DELIVERY, OrderStatus.FAILED],
+  [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED, OrderStatus.FAILED],
+  [OrderStatus.DELIVERED]: [OrderStatus.REFUNDED],
+  [OrderStatus.CANCELLED]: [],
+  [OrderStatus.FAILED]: [OrderStatus.CANCELLED],
+  [OrderStatus.REFUNDED]: [],
+};
+
 export interface OrderStatusHistoryItem {
   id: string;
+  fromStatus?: string | null;
+  toStatus?: string | null;
   status: string;
+  changedByUserId?: string | null;
+  changedByRole?: string | null;
+  reason?: string | null;
   remark: string | null;
   createdAt: string;
 }
@@ -112,6 +145,14 @@ export const ordersApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Order", id }, "Order"],
     }),
+    transitionOrder: builder.mutation<Order, { id: string; targetStatus: string; reason?: string }>({
+      query: ({ id, targetStatus, reason }) => ({
+        url: `/orders/${id}/transition`,
+        method: "POST",
+        body: { targetStatus, reason },
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }, "Order"],
+    }),
   }),
 });
 
@@ -122,4 +163,5 @@ export const {
   useCheckoutOrderMutation,
   useGetAdminOrdersQuery,
   useUpdateAdminOrderStatusMutation,
+  useTransitionOrderMutation,
 } = ordersApi;

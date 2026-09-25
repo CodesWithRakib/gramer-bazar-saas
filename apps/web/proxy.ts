@@ -12,8 +12,15 @@ export function proxy(request: NextRequest) {
 
   if (pathnameHasLocale) return;
 
-  // Redirect if there is no locale
-  request.nextUrl.pathname = `/${defaultLocale}${pathname}`;
+  // Determine preferred locale: 1. Cookie, 2. Fallback to defaultLocale
+  const savedLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  const targetLocale =
+    savedLocale && (locales as readonly string[]).includes(savedLocale)
+      ? savedLocale
+      : defaultLocale;
+
+  // Redirect if there is no locale in the URL path, preserving search params
+  request.nextUrl.pathname = `/${targetLocale}${pathname}`;
   return NextResponse.redirect(request.nextUrl);
 }
 

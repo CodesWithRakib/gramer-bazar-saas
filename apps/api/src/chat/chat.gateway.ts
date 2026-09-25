@@ -15,6 +15,7 @@ import { WsJwtGuard } from '../common/guards/ws-jwt.guard.js';
 import { AllWsExceptionsFilter } from '../common/filters/ws-exception.filter.js';
 import { JoinConversationDto, SendMessageDto } from './dto/chat-gateway.dto.js';
 import { UsersService } from '../users/users.service.js';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @WebSocketGateway({
   cors: {
@@ -170,6 +171,46 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     return { success: true };
+  }
+
+  @OnEvent('order.status.updated')
+  handleOrderStatusUpdated(payload: {
+    orderId: string;
+    previousStatus: string;
+    currentStatus: string;
+    userId: string;
+    sellerUserIds?: string[];
+    riderUserId?: string | null;
+    updatedAt: string;
+  }) {
+    if (!this.server) return;
+
+    const eventPayload = {
+      orderId: payload.orderId,
+      previousStatus: payload.previousStatus,
+      currentStatus: payload.currentStatus,
+      updatedAt: payload.updatedAt,
+    };
+
+    // 1. Notify Customer
+    if (payload.userId) {
+      this.server.to(`user_${payload.userId}`).emit('order.status.updated', eventPayload);
+    }
+
+    // 2. Notify Admins and Super Admins
+    this.server.to('admin_room').emit('order.status.updated', eventPayload);
+
+    // 3. Notify Assigned Rider if any
+    if (payload.riderUserId) {
+      this.server.to(`user_${payload.riderUserId}`).emit('order.status.updated', eventPayload);
+    }
+
+    // 4. Notify Sellers associated with items in this order
+    if (payload.sellerUserIds && payload.sellerUserIds.length > 0) {
+      for (const sellerId of payload.sellerUserIds) {
+        this.server.to(`user_${sellerId}`).emit('order.status.updated', eventPayload);
+      }
+    }
   }
 }
 

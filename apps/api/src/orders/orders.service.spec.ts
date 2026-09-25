@@ -9,6 +9,7 @@ import { Address } from '../addresses/entities/address.entity.js';
 import { Coupon } from '../coupons/entities/coupon.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { OrderStatus, PaymentMethod } from './enums/order-status.enum.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -71,6 +72,7 @@ describe('OrdersService', () => {
         { provide: DataSource, useValue: dataSource },
         { provide: PaymentsService, useValue: paymentsService },
         { provide: NotificationsService, useValue: notificationsService },
+        { provide: EventEmitter2, useValue: { emit: vi.fn() } },
       ],
     }).compile();
 

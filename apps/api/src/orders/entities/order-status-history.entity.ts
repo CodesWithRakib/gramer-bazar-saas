@@ -23,13 +23,41 @@ export class OrderStatusHistory {
   order: Relation<Order>;
 
   @Column({
+    name: 'from_status',
+    type: 'enum',
+    enum: OrderStatus,
+    nullable: true,
+  })
+  fromStatus: OrderStatus | null;
+
+  @Column({
     type: 'enum',
     enum: OrderStatus,
   })
   status: OrderStatus;
 
+  @Column({
+    name: 'to_status',
+    type: 'enum',
+    enum: OrderStatus,
+    nullable: true,
+  })
+  toStatus: OrderStatus | null;
+
+  @Column({ name: 'changed_by_user_id', type: 'uuid', nullable: true })
+  changedByUserId: string | null;
+
+  @Column({ name: 'changed_by_role', type: 'varchar', nullable: true })
+  changedByRole: string | null;
+
   @Column({ type: 'text', nullable: true })
   remark: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  reason: string | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  metadata: Record<string, unknown> | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

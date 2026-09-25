@@ -19,7 +19,7 @@ export interface PaymentRecord {
   cardType?: string | null;
   cardBrand?: string | null;
   cardIssuer?: string | null;
-  gatewayResponse?: any;
+  gatewayResponse?: Record<string, unknown> | null;
   paidAt?: string | null;
   failedAt?: string | null;
   createdAt: string;

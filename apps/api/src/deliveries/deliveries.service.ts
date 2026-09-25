@@ -201,6 +201,7 @@ export class DeliveriesService {
       }
 
       if (newOrderStatus && order.status !== newOrderStatus) {
+        const previousOrderStatus = order.status;
         order.status = newOrderStatus;
         
         // Synchronize COD payment status
@@ -210,13 +211,28 @@ export class DeliveriesService {
 
         await manager.save(Order, order);
         
-        await manager.insert(OrderStatusHistory, {
+        const history = new OrderStatusHistory();
+        history.orderId = order.id;
+        history.fromStatus = previousOrderStatus;
+        history.status = newOrderStatus;
+        history.toStatus = newOrderStatus;
+        history.changedByUserId = userId;
+        history.changedByRole = isAdmin ? 'ADMIN' : 'RIDER';
+        history.reason = `Updated via Delivery tracking: ${dto.status}`;
+        history.remark = `Updated via Delivery tracking: ${dto.status}`;
+        await manager.save(OrderStatusHistory, history);
+
+        // Canonical realtime event
+        this.eventEmitter.emit('order.status.updated', {
           orderId: order.id,
-          status: newOrderStatus,
-          remark: `Updated via Delivery tracking: ${dto.status}`,
+          previousStatus: previousOrderStatus,
+          currentStatus: newOrderStatus,
+          updatedAt: new Date(),
+          userId: order.userId,
+          riderUserId: delivery.riderId,
         });
 
-        // Use event emitter to avoid blocking the transaction
+        // Backwards compatibility event
         this.eventEmitter.emit('order.status.changed', {
           orderId: order.id,
           customerId: order.userId,

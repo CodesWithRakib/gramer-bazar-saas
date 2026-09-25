@@ -22,6 +22,11 @@ import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Coupon } from '../coupons/entities/coupon.entity.js';
 import { CouponUsage } from '../coupons/entities/coupon-usage.entity.js';
 import { DiscountType } from '../coupons/enums/discount-type.enum.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { validateRoleTransition } from './state-machine/order-state-machine.js';
+import { TransitionOrderDto } from './dto/transition-order.dto.js';
+import { Delivery } from '../deliveries/entities/delivery.entity.js';
+import { DeliveryStatus } from '../deliveries/enums/delivery-status.enum.js';
 
 @Injectable()
 export class OrdersService {
@@ -31,6 +36,7 @@ export class OrdersService {
     @InjectDataSource() private readonly dataSource: DataSource,
     private paymentsService: PaymentsService,
     private notificationsService: NotificationsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async checkout(userId: string, checkoutDto: CheckoutDto, originUrl: string) {
@@ -266,56 +272,17 @@ export class OrdersService {
   }
 
   async cancelOrder(userId: string, orderId: string) {
-    return this.dataSource.transaction(async (manager) => {
-      // 1. Fetch Order with items and pessimistic write lock
-      const order = await manager.findOne(Order, {
-        where: { id: orderId, userId },
-        relations: ['items'],
-        lock: { mode: 'pessimistic_write' },
-      });
-
-      if (!order) {
-        throw new NotFoundException('Order not found');
-      }
-
-      // 2. Check if cancellation is allowed
-      if (order.status !== OrderStatus.PENDING && order.status !== OrderStatus.CONFIRMED) {
-        throw new BadRequestException(`Order cannot be cancelled because it is already ${order.status}`);
-      }
-
-      // 3. Restore inventory
-      const itemIds = order.items.map((i) => i.sellerProductId);
-      const dbProducts = await manager.find(SellerProduct, {
-        where: { id: In(itemIds) },
-        relations: ['inventory'],
-        lock: { mode: 'pessimistic_write' },
-      });
-
-      const inventoryUpdates: Inventory[] = [];
-      for (const orderItem of order.items) {
-        const dbProduct = dbProducts.find((p) => p.id === orderItem.sellerProductId);
-        if (dbProduct && dbProduct.inventory) {
-          dbProduct.inventory.quantity += orderItem.quantity;
-          inventoryUpdates.push(dbProduct.inventory);
-        }
-      }
-
-      // 4. Update order status
-      order.status = OrderStatus.CANCELLED;
-
-      // 5. Create History Entry
-      const history = new OrderStatusHistory();
-      history.orderId = order.id;
-      history.status = OrderStatus.CANCELLED;
-      history.remark = 'Cancelled by customer';
-
-      // 6. Save updates
-      if (inventoryUpdates.length > 0) {
-        await manager.save(Inventory, inventoryUpdates);
-      }
-      await manager.save(OrderStatusHistory, history);
-      return manager.save(Order, order);
-    });
+    return this.transitionOrder(
+      orderId,
+      {
+        targetStatus: OrderStatus.CANCELLED,
+        reason: 'Cancelled by customer',
+      },
+      {
+        id: userId,
+        roles: ['CUSTOMER'],
+      },
+    );
   }
 
   async findAll(page?: number, limit?: number, search?: string) {
@@ -350,9 +317,41 @@ export class OrdersService {
   }
 
   async updateAdminOrderStatus(orderId: string, status: string, adminId: string) {
-    return this.dataSource.transaction(async (manager) => {
+    if (!Object.values(OrderStatus).includes(status as OrderStatus)) {
+      throw new BadRequestException(`Invalid order status: ${status}`);
+    }
+
+    return this.transitionOrder(
+      orderId,
+      {
+        targetStatus: status as OrderStatus,
+        reason: `Status updated by Admin (${adminId})`,
+      },
+      {
+        id: adminId,
+        roles: ['ADMIN'],
+      },
+    );
+  }
+
+  async transitionOrder(
+    orderId: string,
+    dto: TransitionOrderDto,
+    currentUser: { id: string; roles: string[]; ip?: string; userAgent?: string },
+  ) {
+    const { targetStatus, reason } = dto;
+
+    const transitionResult = await this.dataSource.transaction(async (manager) => {
+      // 1. Fetch Order with items, seller products, shops and lock
       const order = await manager.findOne(Order, {
         where: { id: orderId },
+        relations: [
+          'items',
+          'items.sellerProduct',
+          'items.sellerProduct.shop',
+          'address',
+          'user',
+        ],
         lock: { mode: 'pessimistic_write' },
       });
 
@@ -360,42 +359,147 @@ export class OrdersService {
         throw new NotFoundException('Order not found');
       }
 
-      // Check if status is a valid OrderStatus
-      if (!Object.values(OrderStatus).includes(status as OrderStatus)) {
-        throw new BadRequestException('Invalid order status');
+      if (order.status === targetStatus) {
+        return { order, previousStatus: order.status, delivery: null };
       }
 
-      const newStatus = status as OrderStatus;
-      
-      if (order.status === newStatus) {
-        return order; // No change
-      }
-
-      order.status = newStatus;
-
-      // Also update paymentStatus to PAID if status is DELIVERED and payment method is COD
-      if (newStatus === OrderStatus.DELIVERED && order.paymentMethod === PaymentMethod.COD) {
-        order.paymentStatus = PaymentStatus.PAID;
-      }
-
-      const history = new OrderStatusHistory();
-      history.orderId = order.id;
-      history.status = newStatus;
-      history.remark = `Status updated by Admin (${adminId})`;
-
-      await manager.save(OrderStatusHistory, history);
-
-      // In-app notification for the customer (best-effort inside the same tx)
-      const customerNotification = manager.create(Notification, {
-        userId: order.userId,
-        title: 'Order update',
-        message: `Your order #${order.id.slice(0, 8)} is now ${newStatus.replace(/_/g, ' ').toLowerCase()}.`,
-        type: NotificationType.ORDER_UPDATE,
-        data: { orderId: order.id, status: newStatus },
+      // 2. Fetch associated Delivery if any
+      const delivery = await manager.findOne(Delivery, {
+        where: { orderId: order.id },
       });
-      await manager.save(customerNotification);
 
-      return manager.save(Order, order);
+      // 3. Determine ownership context
+      const isCustomerOwner = order.userId === currentUser.id;
+      const isSellerOwner = (order.items || []).some(
+        (item) => item.sellerProduct?.shop?.sellerId === currentUser.id,
+      );
+      const isAssignedRider = delivery?.riderId === currentUser.id;
+
+      // 4. Validate role-based transition
+      validateRoleTransition(order.status, targetStatus, currentUser.roles, {
+        isCustomerOwner,
+        isSellerOwner,
+        isAssignedRider,
+      });
+
+      const previousStatus = order.status;
+      order.status = targetStatus;
+
+      // 5. Handle side effects based on target status
+      // A. Cancellation: Restore inventory
+      if (targetStatus === OrderStatus.CANCELLED) {
+        const itemIds = (order.items || []).map((i) => i.sellerProductId);
+        if (itemIds.length > 0) {
+          const dbProducts = await manager.find(SellerProduct, {
+            where: { id: In(itemIds) },
+            relations: ['inventory'],
+            lock: { mode: 'pessimistic_write' },
+          });
+
+          const inventoryUpdates: Inventory[] = [];
+          for (const orderItem of order.items) {
+            const dbProduct = dbProducts.find((p) => p.id === orderItem.sellerProductId);
+            if (dbProduct && dbProduct.inventory) {
+              dbProduct.inventory.quantity += orderItem.quantity;
+              inventoryUpdates.push(dbProduct.inventory);
+            }
+          }
+
+          if (inventoryUpdates.length > 0) {
+            await manager.save(Inventory, inventoryUpdates);
+          }
+        }
+
+        if (delivery && delivery.status !== DeliveryStatus.CANCELLED) {
+          delivery.status = DeliveryStatus.CANCELLED;
+          await manager.save(Delivery, delivery);
+        }
+      }
+
+      // B. Delivered: Auto-mark COD as PAID, update delivery completion
+      if (targetStatus === OrderStatus.DELIVERED) {
+        if (order.paymentMethod === PaymentMethod.COD) {
+          order.paymentStatus = PaymentStatus.PAID;
+        }
+        if (delivery && delivery.status !== DeliveryStatus.DELIVERED) {
+          delivery.status = DeliveryStatus.DELIVERED;
+          delivery.deliveryTime = new Date();
+          await manager.save(Delivery, delivery);
+        }
+      }
+
+      // C. Picked up: update delivery pickup time
+      if (targetStatus === OrderStatus.PICKED_UP && delivery) {
+        delivery.status = DeliveryStatus.PICKED_UP;
+        delivery.pickupTime = new Date();
+        await manager.save(Delivery, delivery);
+      }
+
+      // D. Out for delivery
+      if (targetStatus === OrderStatus.OUT_FOR_DELIVERY && delivery) {
+        delivery.status = DeliveryStatus.OUT_FOR_DELIVERY;
+        await manager.save(Delivery, delivery);
+      }
+
+      // E. Failed delivery
+      if (targetStatus === OrderStatus.FAILED && delivery) {
+        delivery.status = DeliveryStatus.FAILED;
+        await manager.save(Delivery, delivery);
+      }
+
+      // 6. Record OrderStatusHistory entry
+      const statusHistory = new OrderStatusHistory();
+      statusHistory.orderId = order.id;
+      statusHistory.fromStatus = previousStatus;
+      statusHistory.status = targetStatus;
+      statusHistory.toStatus = targetStatus;
+      statusHistory.changedByUserId = currentUser.id;
+      statusHistory.changedByRole = currentUser.roles.join(',');
+      statusHistory.reason = reason || `Status changed from ${previousStatus} to ${targetStatus}`;
+      statusHistory.remark = reason || `Status changed from ${previousStatus} to ${targetStatus}`;
+      statusHistory.metadata = {
+        ip: currentUser.ip,
+        userAgent: currentUser.userAgent,
+      };
+      await manager.save(OrderStatusHistory, statusHistory);
+
+      // 7. Save Order
+      const savedOrder = await manager.save(Order, order);
+
+      // 8. Create In-App Notification for Customer
+      const customerNotification = new Notification();
+      customerNotification.userId = order.userId;
+      customerNotification.title = 'Order Status Update';
+      customerNotification.message = `Your order #${order.id.slice(0, 8).toUpperCase()} is now ${targetStatus.replace(/_/g, ' ').toLowerCase()}.`;
+      customerNotification.type = NotificationType.ORDER_UPDATE;
+      customerNotification.data = { orderId: order.id, status: targetStatus, reason };
+      await manager.save(Notification, customerNotification);
+
+      return { order: savedOrder, previousStatus, delivery };
     });
+
+    const { order, previousStatus, delivery } = transitionResult;
+
+    // 9. Collect relevant seller user IDs for realtime notification
+    const sellerUserIds = Array.from(
+      new Set(
+        (order.items || [])
+          .map((i) => i.sellerProduct?.shop?.sellerId)
+          .filter((id): id is string => Boolean(id)),
+      ),
+    );
+
+    // 10. Emit non-blocking event for WebSockets and external listeners
+    this.eventEmitter.emit('order.status.updated', {
+      orderId: order.id,
+      previousStatus,
+      currentStatus: order.status,
+      userId: order.userId,
+      sellerUserIds,
+      riderUserId: delivery?.riderId || null,
+      updatedAt: new Date().toISOString(),
+    });
+
+    return order;
   }
 }

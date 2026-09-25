@@ -5,6 +5,7 @@ import type { Socket } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { initSocket, disconnectSocket, getSocket } from '@/lib/socket';
+import { useOrderRealtimeSync } from '@/hooks/useOrderRealtimeSync';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -32,6 +33,9 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, accessToken } = useSelector((state: RootState) => state.auth);
   const socket = getSocket();
+
+  // Active realtime synchronization for order status updates on canonical socket
+  useOrderRealtimeSync();
 
   // Connectivity mirrors the live socket. Event handlers keep it fresh, and the
   // render-time adjustment below self-heals any missed transition (React's

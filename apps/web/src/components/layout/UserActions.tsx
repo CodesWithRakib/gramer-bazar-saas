@@ -27,6 +27,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { api } from "@/store/api";
 
 interface UserActionsProps {
@@ -80,12 +81,8 @@ export function UserActions({ lang }: UserActionsProps) {
       </Button>
 
       <div className="flex items-center gap-1 sm:gap-2 ml-1">
-        {/* Language Switcher */}
-        <Button variant="ghost" size="sm" className="font-semibold h-10 hidden sm:inline-flex" asChild>
-          <Link href={lang === "en" ? "/bn" : "/en"}>
-            {lang === "en" ? "BN" : "EN"}
-          </Link>
-        </Button>
+        {/* Language Switcher Dropdown */}
+        <LanguageSwitcher currentLocale={lang} className="h-10" />
 
         {/* Wishlist Button */}
         {isAuthenticated && (
@@ -181,13 +178,6 @@ export function UserActions({ lang }: UserActionsProps) {
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
-              {/* Add Language Switcher for mobile inside dropdown */}
-              <DropdownMenuItem asChild className="sm:hidden">
-                <Link href={lang === "en" ? "/bn" : "/en"} className="cursor-pointer font-medium">
-                  {lang === "en" ? "Change to Bengali" : "Change to English"}
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="sm:hidden" />
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();

@@ -19,6 +19,7 @@ import { Menu, LogOut, ChevronDown, Store, User, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/NotificationBell";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { getUserRoles } from "@/lib/roles";
 import {
   DropdownMenu,
@@ -216,7 +217,8 @@ export function DashboardLayout({
             </h1>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <LanguageSwitcher currentLocale={lang} />
             <NotificationBell lang={lang} />
 
             <DropdownMenu>
