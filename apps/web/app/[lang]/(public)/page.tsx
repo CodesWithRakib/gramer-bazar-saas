@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { MarketplaceHero } from '@/components/home/MarketplaceHero';
 import { FlashSalesSection } from '@/components/home/FlashSalesSection';
 import { CategorySections } from '@/components/home/CategorySections';
+import { PromotionalModal } from '@/components/promotions/PromotionalModal';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -35,6 +36,9 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
 
   return (
     <div className="flex flex-col gap-10 md:gap-14 pb-24 md:pb-16">
+      {/* Promotional Campaign Modal (frequency controlled) */}
+      <PromotionalModal lang={lang} />
+
       {/* 1. Hero / Search / Banners (Phase 3 & 4) */}
       <section className="container mx-auto px-4 mt-4">
         <MarketplaceHero lang={lang} />

@@ -34,7 +34,6 @@ export function ProductFilterSidebar({
   const isBn = lang === "bn";
 
   const { data: tree = [] } = useGetPublicCategoryTreeQuery();
-  const { data: brands = [] } = useGetPublicBrandsQuery();
 
   // Auto-detect current category & subcategory from props, query params, or pathname
   const pathParts = pathname.includes("/categories/")
@@ -43,6 +42,27 @@ export function ProductFilterSidebar({
   const querySubCategory = searchParams.get("subCategory") || searchParams.get("subCategorySlug") || "";
   const effectiveCategorySlug = categorySlug || pathParts[0]?.split("?")[0] || "";
   const effectiveSubCategorySlug = subCategorySlug || querySubCategory || pathParts[1]?.split("?")[0] || "";
+
+  // Robust category resolution
+  let currentCategory: Category | null = null;
+  if (effectiveCategorySlug && tree.length > 0) {
+    for (const root of tree) {
+      if (root.slug === effectiveCategorySlug) {
+        currentCategory = root;
+        break;
+      }
+      const child = root.children?.find((c) => c.slug === effectiveCategorySlug);
+      if (child) {
+        currentCategory = root;
+        break;
+      }
+    }
+  }
+
+  // Contextual brands query: only fetch brands relevant to current category if selected
+  const { data: brands = [] } = useGetPublicBrandsQuery(
+    currentCategory?.id ? { categoryId: currentCategory.id } : undefined
+  );
 
   // Query parameter filters
   const currentBrandId = searchParams.get("brandId") || "";
@@ -63,21 +83,6 @@ export function ProductFilterSidebar({
     setLocalMax(maxPrice);
   }
 
-  // Robust category resolution
-  let currentCategory: Category | null = null;
-  if (effectiveCategorySlug && tree.length > 0) {
-    for (const root of tree) {
-      if (root.slug === effectiveCategorySlug) {
-        currentCategory = root;
-        break;
-      }
-      const child = root.children?.find((c) => c.slug === effectiveCategorySlug);
-      if (child) {
-        currentCategory = root;
-        break;
-      }
-    }
-  }
 
   const hasActiveFilters = Boolean(
     minPrice ||

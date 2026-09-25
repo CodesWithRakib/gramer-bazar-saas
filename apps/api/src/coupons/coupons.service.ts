@@ -178,4 +178,15 @@ export class CouponsService {
       .orderBy('coupon.createdAt', 'DESC')
       .getMany();
   }
+
+  async findActivePublicCoupons() {
+    const now = new Date();
+    return this.couponRepository.createQueryBuilder('coupon')
+      .where('coupon.isActive = :isActive', { isActive: true })
+      .andWhere('(coupon.startDate IS NULL OR coupon.startDate <= :now)', { now })
+      .andWhere('(coupon.endDate IS NULL OR coupon.endDate >= :now)', { now })
+      .orderBy('coupon.createdAt', 'DESC')
+      .take(20)
+      .getMany();
+  }
 }

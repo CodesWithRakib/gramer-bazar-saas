@@ -28,4 +28,8 @@ export class CreateBrandDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({ description: 'Associated category IDs', type: [String] })
+  @IsOptional()
+  categoryIds?: string[];
 }

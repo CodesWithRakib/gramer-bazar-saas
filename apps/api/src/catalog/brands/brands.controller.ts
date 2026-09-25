@@ -28,8 +28,16 @@ export class BrandsController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('isActive') isActive?: boolean,
   ) {
-    return this.brandsService.findAll(page, limit, search);
+    return this.brandsService.findAll(page, limit, search, categoryId, isActive);
+  }
+
+  @Get('by-category/:categoryId')
+  @ApiOperation({ summary: 'Get active brands for a category' })
+  findByCategory(@Param('categoryId') categoryId: string) {
+    return this.brandsService.findByCategory(categoryId);
   }
 
   @Get(':id')

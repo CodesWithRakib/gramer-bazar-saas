@@ -33,6 +33,7 @@ export interface Brand {
   slug: string;
   logo?: string | null;
   isActive: boolean;
+  categories?: Category[];
   createdAt: string;
   updatedAt: string;
 }
@@ -273,8 +274,19 @@ export const catalogApi = api
         query: (limit = 8) => `/public/catalog/popular?limit=${limit}`,
         providesTags: ["Catalog"],
       }),
-      getPublicBrands: builder.query<Brand[], void>({
-        query: () => "/public/catalog/brands",
+      getPublicBrands: builder.query<Brand[], { categoryId?: string; search?: string } | void>({
+        query: (params) => {
+          if (!params) return "/public/catalog/brands";
+          const searchParams = new URLSearchParams();
+          if (params.categoryId) searchParams.append("categoryId", params.categoryId);
+          if (params.search) searchParams.append("search", params.search);
+          const queryString = searchParams.toString();
+          return queryString ? `/public/catalog/brands?${queryString}` : "/public/catalog/brands";
+        },
+        providesTags: ["Catalog"],
+      }),
+      getBrandsByCategory: builder.query<Brand[], string>({
+        query: (categoryId) => `/brands/by-category/${categoryId}`,
         providesTags: ["Catalog"],
       }),
       getAdminCategories: builder.query<
@@ -493,6 +505,7 @@ export const {
   useGetSearchSuggestionsQuery,
   useGetPopularProductsQuery,
   useGetPublicBrandsQuery,
+  useGetBrandsByCategoryQuery,
   useGetCategoriesTreeQuery,
   useGetAdminCategoriesQuery,
   useGetAdminBrandsQuery,

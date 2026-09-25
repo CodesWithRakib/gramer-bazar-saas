@@ -24,6 +24,12 @@ export class CreateShopDto {
   @IsNotEmpty()
   slug: string;
 
+  @ApiPropertyOptional({ description: 'Short description' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  shortDescription?: string;
+
   @ApiPropertyOptional({ description: 'Shop description' })
   @IsOptional()
   @IsString()
@@ -38,6 +44,94 @@ export class CreateShopDto {
   @IsOptional()
   @IsString()
   banner?: string;
+
+  @ApiPropertyOptional({ description: 'Public phone number' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  phone?: string;
+
+  @ApiPropertyOptional({ description: 'Secondary phone number' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  secondaryPhone?: string;
+
+  @ApiPropertyOptional({ description: 'WhatsApp contact number' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  whatsapp?: string;
+
+  @ApiPropertyOptional({ description: 'Public contact email' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  email?: string;
+
+  @ApiPropertyOptional({ description: 'Official website URL' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  website?: string;
+
+  @ApiPropertyOptional({ description: 'Facebook page URL' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  facebook?: string;
+
+  @ApiPropertyOptional({ description: 'Instagram profile URL' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  instagram?: string;
+
+  @ApiPropertyOptional({ description: 'Physical address' })
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @ApiPropertyOptional({ description: 'Market/Area' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  area?: string;
+
+  @ApiPropertyOptional({ description: 'District' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  district?: string;
+
+  @ApiPropertyOptional({ description: 'Upazila' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  upazila?: string;
+
+  @ApiPropertyOptional({ description: 'Union' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  union?: string;
+
+  @ApiPropertyOptional({ description: 'Village' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  village?: string;
+
+  @ApiPropertyOptional({ description: 'Opening hours' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  openingHours?: string;
+
+  @ApiPropertyOptional({ description: 'Delivery details / policies' })
+  @IsOptional()
+  @IsString()
+  deliveryInfo?: string;
 
   @ApiPropertyOptional({ description: 'Whether the shop is verified by admin' })
   @IsOptional()

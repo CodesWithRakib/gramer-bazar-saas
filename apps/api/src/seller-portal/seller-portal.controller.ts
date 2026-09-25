@@ -1,5 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Query, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import * as fs from 'fs';
 import { SellerPortalService } from './seller-portal.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
@@ -33,6 +37,64 @@ export class SellerPortalController {
   @ApiOperation({ summary: 'Update current seller shop profile' })
   updateShopProfile(@Request() req: any, @Body() dto: UpdateSellerShopDto) {
     return this.sellerPortalService.updateShopProfile(req.user.id, dto);
+  }
+
+  @Post('shop/logo')
+  @ApiOperation({ summary: 'Upload shop logo' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const uploadDir = './uploads/shops';
+        fs.mkdirSync(uploadDir, { recursive: true });
+        cb(null, uploadDir);
+      },
+      filename: (req: any, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, `logo-${uniqueSuffix}${extname(file.originalname)}`);
+      },
+    }),
+    fileFilter: (req: any, file, cb) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+        return cb(new BadRequestException('Only image files (jpg, jpeg, png, webp) are allowed!'), false);
+      }
+      cb(null, true);
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }))
+  async uploadShopLogo(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('File is required');
+    const logoUrl = `/uploads/shops/${file.filename}`;
+    return this.sellerPortalService.updateShopProfile(req.user.id, { logo: logoUrl });
+  }
+
+  @Post('shop/banner')
+  @ApiOperation({ summary: 'Upload shop cover banner' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const uploadDir = './uploads/shops';
+        fs.mkdirSync(uploadDir, { recursive: true });
+        cb(null, uploadDir);
+      },
+      filename: (req: any, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, `banner-${uniqueSuffix}${extname(file.originalname)}`);
+      },
+    }),
+    fileFilter: (req: any, file, cb) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+        return cb(new BadRequestException('Only image files (jpg, jpeg, png, webp) are allowed!'), false);
+      }
+      cb(null, true);
+    },
+    limits: { fileSize: 8 * 1024 * 1024 },
+  }))
+  async uploadShopBanner(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('File is required');
+    const bannerUrl = `/uploads/shops/${file.filename}`;
+    return this.sellerPortalService.updateShopProfile(req.user.id, { banner: bannerUrl });
   }
 
   @Get('products')

@@ -24,11 +24,32 @@ export interface SellerShop {
   nameEn: string;
   nameBn: string;
   slug: string;
+  shortDescription?: string | null;
   description: string | null;
   logo: string | null;
   banner: string | null;
   isVerified: boolean;
   isActive: boolean;
+  phone?: string | null;
+  secondaryPhone?: string | null;
+  whatsapp?: string | null;
+  email?: string | null;
+  website?: string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  address?: string | null;
+  area?: string | null;
+  district?: string | null;
+  upazila?: string | null;
+  union?: string | null;
+  village?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  openingHours?: string | null;
+  deliveryInfo?: string | null;
+  productCount?: number;
+  averageRating?: number;
+  totalReviews?: number;
 }
 
 export interface SellerInventory {
@@ -71,6 +92,22 @@ export const sellerPortalApi = api.injectEndpoints({
       query: (body) => ({
         url: '/seller-portal/shop',
         method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    uploadShopLogo: builder.mutation<{ logoUrl: string }, FormData>({
+      query: (body) => ({
+        url: '/seller-portal/shop/logo',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    uploadShopBanner: builder.mutation<{ bannerUrl: string }, FormData>({
+      query: (body) => ({
+        url: '/seller-portal/shop/banner',
+        method: 'POST',
         body,
       }),
       invalidatesTags: ['User'],
@@ -124,6 +161,8 @@ export const {
   useGetSellerDashboardQuery,
   useGetSellerShopQuery,
   useUpdateSellerShopMutation,
+  useUploadShopLogoMutation,
+  useUploadShopBannerMutation,
   useGetSellerProductsQuery,
   useAddSellerProductMutation,
   useUpdateSellerProductMutation,

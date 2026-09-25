@@ -122,6 +122,17 @@ export function AddProductDialog() {
     return parent?.children || [];
   }, [selectedCategoryId, tree]);
 
+  const availableBrands = useMemo(() => {
+    if (!brandsData?.data) return [];
+    if (!selectedCategoryId) return brandsData.data;
+    return brandsData.data.filter(
+      (b) =>
+        !b.categories ||
+        b.categories.length === 0 ||
+        b.categories.some((c) => c.id === selectedCategoryId)
+    );
+  }, [brandsData, selectedCategoryId]);
+
   const onSubmit = async (values: ProductFormValues) => {
     try {
       await createProduct({
@@ -333,7 +344,7 @@ export function AddProductDialog() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="NONE">— None / Generic —</SelectItem>
-                          {brandsData?.data?.map((b) => (
+                          {availableBrands.map((b) => (
                             <SelectItem key={b.id} value={b.id}>
                               {b.nameEn}
                             </SelectItem>
@@ -584,6 +595,17 @@ export function EditProductDialog({
     return parent?.children || [];
   }, [selectedCategoryId, tree]);
 
+  const availableBrands = useMemo(() => {
+    if (!brandsData?.data) return [];
+    if (!selectedCategoryId) return brandsData.data;
+    return brandsData.data.filter(
+      (b) =>
+        !b.categories ||
+        b.categories.length === 0 ||
+        b.categories.some((c) => c.id === selectedCategoryId)
+    );
+  }, [brandsData, selectedCategoryId]);
+
   const onSubmit = async (values: ProductFormValues) => {
     try {
       await updateProduct({
@@ -792,7 +814,7 @@ export function EditProductDialog({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="NONE">— None / Generic —</SelectItem>
-                          {brandsData?.data?.map((b) => (
+                          {availableBrands.map((b) => (
                             <SelectItem key={b.id} value={b.id}>
                               {b.nameEn}
                             </SelectItem>

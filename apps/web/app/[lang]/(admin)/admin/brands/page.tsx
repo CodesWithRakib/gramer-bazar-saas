@@ -6,6 +6,7 @@ import { useGetAdminBrandsQuery, Brand } from '@/features/catalog/catalogApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { AddBrandDialog, EditBrandDialog } from './BrandDialogs';
 
 export default function AdminBrandsPage() {
@@ -16,13 +17,14 @@ export default function AdminBrandsPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
-  
+
   const { data, isLoading, isError, refetch } = useGetAdminBrandsQuery({ page, limit, search });
 
   const columns: ColumnDef<Brand>[] = [
     {
       accessorKey: 'nameEn',
       header: 'Name (EN)',
+      cell: ({ row }) => <span className="font-semibold">{row.original.nameEn}</span>,
     },
     {
       accessorKey: 'nameBn',
@@ -31,13 +33,33 @@ export default function AdminBrandsPage() {
     {
       accessorKey: 'slug',
       header: 'Slug',
+      cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original.slug}</span>,
+    },
+    {
+      id: 'categories',
+      header: 'Categories',
+      cell: ({ row }) => {
+        const categories = row.original.categories || [];
+        if (categories.length === 0) {
+          return <span className="text-xs text-muted-foreground italic">None</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1 max-w-xs">
+            {categories.map((c) => (
+              <Badge key={c.id} variant="secondary" className="text-[10px] py-0 px-1.5 font-normal">
+                {lang === 'bn' ? c.nameBn : c.nameEn}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
     },
     {
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => (
         <Button variant="outline" size="sm" onClick={() => setEditingBrand(row.original)}>
-          Edit
+          {lang === 'bn' ? 'সম্পাদনা' : 'Edit'}
         </Button>
       ),
     },
@@ -47,15 +69,19 @@ export default function AdminBrandsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Brands</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {lang === 'bn' ? 'ব্র্যান্ড ব্যবস্থাপনা' : 'Brand Management'}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage manufacturer and producer brands.
+            {lang === 'bn'
+              ? 'উৎপাদক এবং প্রস্তুতকারক ব্র্যান্ড এবং ক্যাটাগরি সংযোগ পরিচালনা করুন'
+              : 'Manage manufacturer brands and their associated marketplace categories.'}
           </p>
         </div>
       </div>
-      
-      <DataTable 
-        columns={columns} 
+
+      <DataTable
+        columns={columns}
         data={data?.data || []}
         pageCount={data?.meta?.totalPages ?? -1}
         pagination={{ pageIndex: page - 1, pageSize: limit }}

@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  ManyToMany,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -57,6 +58,9 @@ export class Category {
 
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
+
+  @ManyToMany('Brand', (brand: any) => brand.categories)
+  brands: Relation<any>[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

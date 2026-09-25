@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity.js';
 import { ProductVariant } from '../entities/product-variant.entity.js';
 import { ProductImage } from '../entities/product-image.entity.js';
+import { Brand } from '../entities/brand.entity.js';
 import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
 import { Shop } from '../../shops/entities/shop.entity.js';
 import { Inventory } from '../../inventory/entities/inventory.entity.js';
@@ -35,6 +36,8 @@ export class ProductsService {
     private readonly variantsRepository: Repository<ProductVariant>,
     @InjectRepository(ProductImage)
     private readonly imagesRepository: Repository<ProductImage>,
+    @InjectRepository(Brand)
+    private readonly brandsRepository: Repository<Brand>,
     @InjectRepository(SellerProduct)
     private readonly sellerProductsRepository: Repository<SellerProduct>,
     @InjectRepository(Shop)
@@ -43,7 +46,26 @@ export class ProductsService {
     private readonly inventoryRepository: Repository<Inventory>,
   ) {}
 
+  private async validateBrandCategory(brandId: string, categoryId: string): Promise<void> {
+    const brand = await this.brandsRepository.findOne({
+      where: { id: brandId },
+      relations: ['categories'],
+    });
+    if (brand && brand.categories && brand.categories.length > 0) {
+      const isAssociated = brand.categories.some((c) => c.id === categoryId);
+      if (!isAssociated) {
+        throw new BadRequestException(
+          `Brand "${brand.nameEn}" is not associated with the selected category.`,
+        );
+      }
+    }
+  }
+
   async create(createProductDto: CreateProductDto): Promise<Product> {
+    if (createProductDto.brandId && createProductDto.categoryId) {
+      await this.validateBrandCategory(createProductDto.brandId, createProductDto.categoryId);
+    }
+
     const product = this.productsRepository.create({
       ...createProductDto,
       status: createProductDto.status || ProductStatus.DRAFT,
@@ -216,6 +238,13 @@ export class ProductsService {
 
   async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
     const product = await this.findOne(id);
+
+    const effectiveBrandId = updateProductDto.brandId !== undefined ? updateProductDto.brandId : product.brandId;
+    const effectiveCategoryId = updateProductDto.categoryId !== undefined ? updateProductDto.categoryId : product.categoryId;
+    if (effectiveBrandId && effectiveCategoryId) {
+      await this.validateBrandCategory(effectiveBrandId, effectiveCategoryId);
+    }
+
     Object.assign(product, updateProductDto);
 
     const saved = await this.productsRepository.save(product);

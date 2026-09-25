@@ -133,4 +133,10 @@ export class CouponsController {
   findShopCoupons(@Param('shopId') shopId: string) {
     return this.couponsService.findActiveCouponsByShop(shopId);
   }
+
+  @Get('public/coupons')
+  @ApiOperation({ summary: 'Public: Get all active marketplace & platform coupons' })
+  findPublicCoupons() {
+    return this.couponsService.findActivePublicCoupons();
+  }
 }

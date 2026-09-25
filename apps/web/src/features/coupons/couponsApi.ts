@@ -84,6 +84,10 @@ export const couponsApi = api.injectEndpoints({
       query: (shopId) => `/coupons/shop/${shopId}`,
       providesTags: ['Coupon'],
     }),
+    getPublicCoupons: builder.query<Coupon[], void>({
+      query: () => '/public/coupons',
+      providesTags: ['Coupon'],
+    }),
     validateCoupon: builder.mutation<{ discountAmount: number; subtotalAfterDiscount: number; code: string; couponId: string }, { code: string; subtotal: number }>({
       query: (body) => ({
         url: '/coupons/validate',
@@ -104,5 +108,6 @@ export const {
   useUpdateSellerCouponMutation,
   useDeleteSellerCouponMutation,
   useGetShopCouponsQuery,
+  useGetPublicCouponsQuery,
   useValidateCouponMutation,
 } = couponsApi;
