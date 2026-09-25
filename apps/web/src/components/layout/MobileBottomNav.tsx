@@ -7,6 +7,7 @@ import { Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setCartOpen } from "@/store/slices/cartSlice";
+import { getUserRoles } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 interface MobileBottomNavProps {
@@ -40,12 +41,12 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
 
   const getProfileHref = () => {
     if (!isAuthenticated) return `/${lang}/login`;
-    const roles = user?.roles || [];
-    if (roles.includes("SUPER_ADMIN")) return `/${lang}/super-admin`;
-    if (roles.includes("ADMIN")) return `/${lang}/admin`;
-    if (roles.includes("SELLER")) return `/${lang}/seller`;
-    if (roles.includes("RIDER")) return `/${lang}/rider`;
-    return `/${lang}/customer/profile`;
+    const userRoles = getUserRoles(user);
+    if (userRoles.includes("SUPER_ADMIN")) return `/${lang}/super-admin`;
+    if (userRoles.includes("ADMIN")) return `/${lang}/admin`;
+    if (userRoles.includes("SELLER")) return `/${lang}/seller`;
+    if (userRoles.includes("RIDER")) return `/${lang}/rider`;
+    return `/${lang}/customer/orders`;
   };
 
   return (

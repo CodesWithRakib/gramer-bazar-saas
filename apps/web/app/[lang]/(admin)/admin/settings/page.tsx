@@ -139,7 +139,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ lang: 
   }
 
   return (
-    <div className="space-y-8 max-w-4xl pb-16">
+    <div className="space-y-8 w-full pb-16">
       {/* Title */}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight">

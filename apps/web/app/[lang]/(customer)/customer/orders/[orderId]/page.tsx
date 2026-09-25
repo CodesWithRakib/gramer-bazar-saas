@@ -41,7 +41,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-5xl space-y-6">
+      <div className="w-full space-y-6">
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-32 w-full rounded-2xl" />
         <div className="grid md:grid-cols-3 gap-6">
@@ -57,7 +57,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
 
   if (error || !order) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
+      <div className="w-full py-16 text-center">
         <AlertCircle className="w-16 h-16 mx-auto text-destructive mb-4" />
         <h2 className="text-2xl font-bold mb-2">{isBn ? 'অর্ডারটি পাওয়া যায়নি' : 'Order not found'}</h2>
         <Button variant="outline" onClick={() => router.back()} className="mt-4">
@@ -88,7 +88,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
   const canReturn = order.status.toUpperCase() === 'DELIVERED';
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">

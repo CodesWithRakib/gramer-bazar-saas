@@ -88,7 +88,7 @@ export function SellerLayout({ children }: { children: React.ReactNode }) {
             <span className="text-sm font-medium">Store Owner</span>
           </div>
         </header>
-        <main className="flex-1 p-6 md:p-8 w-full max-w-7xl mx-auto">
+        <main className="flex-1 p-6 md:p-8 w-full">
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {children}
           </div>

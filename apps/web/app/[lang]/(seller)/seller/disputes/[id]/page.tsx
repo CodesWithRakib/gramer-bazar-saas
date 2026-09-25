@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 
 export default function SellerDisputeDetailsPage() {
-  const { id } = useParams() as { id: string };
+  const { lang, id } = useParams() as { lang: string; id: string };
   const { data: dispute, isLoading } = useGetSellerDisputeDetailsQuery(id);
   const [addMessage, { isLoading: isSending }] = useAddSellerDisputeMessageMutation();
   const [message, setMessage] = useState('');
@@ -43,8 +43,8 @@ export default function SellerDisputeDetailsPage() {
   const isResolved = dispute.status === 'RESOLVED_REFUNDED' || dispute.status === 'RESOLVED_REJECTED';
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
-      <Link href="/seller/disputes" className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+    <div className="w-full space-y-6">
+      <Link href={`/${lang}/seller/disputes`} className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
         <ArrowLeft className="mr-2" /> Back to Disputes
       </Link>
 

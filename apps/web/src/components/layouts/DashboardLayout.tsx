@@ -267,9 +267,9 @@ export function DashboardLayout({
           </div>
         </header>
 
-        {/* Page Content */}
+        {/* Page Content - Full Width on large screens without artificial max-width constraints */}
         <main className="flex-1 p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="w-full">{children}</div>
         </main>
       </div>
     </div>

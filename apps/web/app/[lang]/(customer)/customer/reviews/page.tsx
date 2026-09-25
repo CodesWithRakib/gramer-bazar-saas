@@ -29,8 +29,8 @@ export default function CustomerReviewsPage({ params }: { params: Promise<{ lang
   if (!isAuthenticated || !user) return null;
 
   return (
-    <div className="container max-w-4xl py-8">
-      <h1 className="text-2xl font-bold mb-6">{isBn ? 'আমার রিভিউসমূহ' : 'My Reviews'}</h1>
+    <div className="w-full space-y-6">
+      <h1 className="text-2xl font-bold">{isBn ? 'আমার রিভিউসমূহ' : 'My Reviews'}</h1>
       
       {isLoading ? (
         <div className="text-center py-12 text-muted-foreground">Loading your reviews...</div>

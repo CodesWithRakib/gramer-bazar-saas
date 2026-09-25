@@ -26,7 +26,7 @@ export default function RiderProfilePage({ params }: { params: Promise<{ lang: s
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6 max-w-lg">
+    <div className="w-full space-y-6">
       <div className="flex items-center space-x-4 mb-6">
         <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center text-primary">
           <UserIcon className="w-8 h-8" />

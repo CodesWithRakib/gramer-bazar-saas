@@ -42,7 +42,7 @@ export default function OrdersPage({ params }: { params: Promise<{ lang: string 
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="w-full space-y-6">
         <Skeleton className="h-10 w-48 mb-6" />
         <Skeleton className="h-12 w-full mb-8" />
         <div className="space-y-4">
@@ -56,7 +56,7 @@ export default function OrdersPage({ params }: { params: Promise<{ lang: string 
 
   if (error || !orders) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center max-w-lg">
+      <div className="w-full py-16 text-center">
         <PackageX className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
         <h2 className="text-2xl font-bold mb-2">
           {isBn ? 'অর্ডার লোড করতে সমস্যা হয়েছে' : 'Failed to load orders'}
@@ -69,7 +69,7 @@ export default function OrdersPage({ params }: { params: Promise<{ lang: string 
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="w-full space-y-6">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-foreground">
         {isBn ? 'আমার অর্ডারসমূহ' : 'My Orders'}
       </h1>

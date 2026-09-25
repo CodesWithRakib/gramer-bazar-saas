@@ -62,7 +62,7 @@ export default function SellerShopPage({ params }: { params: Promise<{ lang: str
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 w-full">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
           {isBn ? 'শপ সেটিংস' : 'Shop Settings'}

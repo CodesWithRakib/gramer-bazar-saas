@@ -88,7 +88,7 @@ export default function SellerProfilePage({ params }: { params: Promise<{ lang: 
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="w-full space-y-6">
       <h1 className="text-2xl font-bold">{isBn ? 'প্রোফাইল' : 'Profile'}</h1>
 
       {/* Account contact info — PATCH /auth/me */}

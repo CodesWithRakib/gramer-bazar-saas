@@ -37,8 +37,8 @@ export default function ProductRequestDetailsPage({ params }: { params: Promise<
   };
 
   return (
-    <div className="container max-w-4xl py-8 space-y-6">
-      <Link href={`/${lang}/product-requests`} className="flex items-center text-sm text-primary hover:underline">
+    <div className="w-full space-y-6">
+      <Link href={`/${lang}/customer/product-requests`} className="flex items-center text-sm text-primary hover:underline">
         <ArrowLeft className="h-4 w-4 mr-1" />
         {isBn ? 'অনুরোধ তালিকায় ফিরে যান' : 'Back to Requests'}
       </Link>

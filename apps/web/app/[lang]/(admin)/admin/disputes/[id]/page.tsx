@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 
 export default function AdminDisputeDetailsPage() {
-  const { id } = useParams() as { id: string };
+  const { lang, id } = useParams() as { lang: string; id: string };
   const { data: dispute, isLoading } = useGetAdminDisputeDetailsQuery(id);
   const [addMessage, { isLoading: isSending }] = useAddAdminDisputeMessageMutation();
   const [resolveDispute, { isLoading: isResolving }] = useResolveDisputeMutation();
@@ -66,9 +66,9 @@ export default function AdminDisputeDetailsPage() {
   const isResolved = dispute.status === 'RESOLVED_REFUNDED' || dispute.status === 'RESOLVED_REJECTED';
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex justify-between items-center mb-4">
-        <Link href="/admin/disputes" className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <Link href={`/${lang}/admin/disputes`} className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
           <ArrowLeft className="mr-2" /> Back to Disputes
         </Link>
         

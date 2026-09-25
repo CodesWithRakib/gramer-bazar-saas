@@ -3,11 +3,27 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { getUserRoles } from "@/lib/roles";
+import { useGetProfileQuery } from "@/features/auth/authApi";
 import { SearchBar } from "./SearchBar";
 import { UserActions } from "./UserActions";
 import { CategoryMegaMenu } from "./CategoryMegaMenu";
 import { MobileCategoryDrawer } from "./MobileCategoryDrawer";
-import { Menu, Zap, ShieldCheck } from "lucide-react";
+import {
+  Menu,
+  Zap,
+  ShieldCheck,
+  Phone,
+  Mail,
+  Store,
+  Bike,
+  LayoutDashboard,
+  ShieldAlert,
+  Package,
+  HelpCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -19,9 +35,127 @@ export function Header({ lang }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isBn = lang === "bn";
 
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { data: profile } = useGetProfileQuery(undefined, {
+    skip: !isAuthenticated || !!user,
+  });
+
+  const currentUser = user || profile;
+  const userRoles = getUserRoles(currentUser);
+  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
+  const isAdmin = userRoles.includes("ADMIN") || isSuperAdmin;
+  const isSeller = userRoles.includes("SELLER");
+  const isRider = userRoles.includes("RIDER");
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-xs">
+        {/* Top Utility Bar (Desktop only, role & auth aware) */}
+        <div className="hidden md:block bg-muted/40 border-b border-border/40 py-1.5 px-4 text-xs text-muted-foreground">
+          <div className="container mx-auto flex items-center justify-between gap-4">
+            {/* Left: Contact Hotline */}
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5 font-medium hover:text-foreground transition-colors">
+                <Phone className="h-3.5 w-3.5 text-primary" />
+                <span>+880 1767-476724</span>
+              </span>
+              <span className="hidden lg:flex items-center gap-1.5 hover:text-foreground transition-colors">
+                <Mail className="h-3.5 w-3.5 text-primary" />
+                <span>codeswithrakib@gmail.com</span>
+              </span>
+            </div>
+
+            {/* Right: Dynamic Role & Auth Route Links */}
+            <div className="flex items-center gap-3 lg:gap-5">
+              {/* Super Admin Quick Jump */}
+              {isSuperAdmin && (
+                <Link
+                  href={`/${lang}/super-admin`}
+                  className="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 transition-colors"
+                >
+                  <ShieldAlert className="h-3.5 w-3.5" />
+                  <span>{isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin"}</span>
+                </Link>
+              )}
+
+              {/* Admin Quick Jump */}
+              {isAdmin && !isSuperAdmin && (
+                <Link
+                  href={`/${lang}/admin`}
+                  className="inline-flex items-center gap-1 font-semibold text-primary hover:text-primary/80 transition-colors"
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span>{isBn ? "অ্যাডমিন প্যানেল" : "Admin Panel"}</span>
+                </Link>
+              )}
+
+              {/* Seller Portal Quick Jump (Only if user IS a seller) */}
+              {isSeller && (
+                <Link
+                  href={`/${lang}/seller`}
+                  className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-colors"
+                >
+                  <Store className="h-3.5 w-3.5" />
+                  <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
+                </Link>
+              )}
+
+              {/* Rider Portal Quick Jump (Only if user IS a rider) */}
+              {isRider && (
+                <Link
+                  href={`/${lang}/rider`}
+                  className="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors"
+                >
+                  <Bike className="h-3.5 w-3.5" />
+                  <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider App"}</span>
+                </Link>
+              )}
+
+              {/* Become a Seller link (Hidden if user IS already a seller or admin) */}
+              {!isSeller && !isAdmin && (
+                <Link
+                  href={`/${lang}/become-a-seller`}
+                  className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
+                >
+                  <Store className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>{isBn ? "সেলার হন" : "Become a Seller"}</span>
+                </Link>
+              )}
+
+              {/* Become a Rider link (Hidden if user IS already a rider or admin) */}
+              {!isRider && !isAdmin && (
+                <Link
+                  href={`/${lang}/become-a-rider`}
+                  className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
+                >
+                  <Bike className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>{isBn ? "ডেলিভারি রাইডার হন" : "Become a Rider"}</span>
+                </Link>
+              )}
+
+              {/* Track Orders (Shown if authenticated) */}
+              {isAuthenticated && (
+                <Link
+                  href={`/${lang}/customer/orders`}
+                  className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
+                >
+                  <Package className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>{isBn ? "অর্ডার ট্র্যাকিং" : "Track Orders"}</span>
+                </Link>
+              )}
+
+              {/* Help & Support */}
+              <Link
+                href={`/${lang}/contact`}
+                className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
+              >
+                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>{isBn ? "সহায়তা" : "Help"}</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Main Header Bar */}
         <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-3 sm:gap-6">
           {/* Left Section: Logo & Mobile Menu Trigger */}
@@ -135,3 +269,4 @@ export function Header({ lang }: HeaderProps) {
     </>
   );
 }
+export default Header;

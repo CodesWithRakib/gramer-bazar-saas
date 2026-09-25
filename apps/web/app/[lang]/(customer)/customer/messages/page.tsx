@@ -38,8 +38,8 @@ export default function CustomerMessagesPage({ params }: { params: Promise<{ lan
   };
 
   return (
-    <div className="container max-w-6xl py-8">
-      <h1 className="text-2xl font-bold mb-6">{isBn ? 'আমার বার্তা' : 'My Messages'}</h1>
+    <div className="w-full space-y-6">
+      <h1 className="text-2xl font-bold">{isBn ? 'আমার বার্তা' : 'My Messages'}</h1>
       
       <div className="flex h-[700px] border rounded-2xl overflow-hidden bg-card shadow-sm">
         {/* Conversations List (Sidebar) */}
