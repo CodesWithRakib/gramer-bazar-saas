@@ -169,6 +169,7 @@ export const api = createApi({
     "Settings",
     "SellerApplication",
     "RiderApplication",
+    "Payment",
   ],
   endpoints: () => ({}),
 });

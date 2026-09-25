@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, MapPin, Receipt, Phone, User, AlertCircle, Ban, Undo2, Star } from 'lucide-react';
+import { ArrowLeft, MapPin, Receipt, Phone, User, AlertCircle, Ban, Undo2, Star, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 import { AddReviewModal } from '@/components/reviews/AddReviewModal';
+import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 
 export default function OrderDetailsPage({ params }: { params: Promise<{ lang: string, orderId: string }> }) {
   const { lang, orderId } = use(params);
@@ -21,7 +22,22 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
 
   const { data: order, isLoading, error } = useGetOrderByIdQuery(orderId);
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
+  const [retryPayment, { isLoading: isRetrying }] = useRetryPaymentMutation();
   const [reviewProductId, setReviewProductId] = useState<string | null>(null);
+
+  const handlePayOnline = async () => {
+    if (!order) return;
+    try {
+      const res = await retryPayment({ orderId: order.id, lang }).unwrap();
+      if (res.paymentUrl) {
+        window.location.href = res.paymentUrl;
+      }
+    } catch (err: any) {
+      toast.error(
+        err?.data?.message || (isBn ? 'পেমেন্ট গেটওয়েতে যেতে ব্যর্থ হয়েছে' : 'Failed to redirect to payment gateway'),
+      );
+    }
+  };
 
   if (isLoading) {
     return (
@@ -215,10 +231,23 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ lang: s
               </div>
               <div className="bg-muted/30 p-3 rounded-lg border mt-2 flex items-center justify-between">
                 <span className="text-muted-foreground">{isBn ? 'পেমেন্ট স্ট্যাটাস' : 'Payment Status'}</span>
-                <Badge className={order.paymentStatus === 'PAID' ? 'bg-green-500' : 'bg-yellow-500'}>
+                <Badge className={order.paymentStatus === 'PAID' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-600'}>
                   {order.paymentStatus}
                 </Badge>
               </div>
+
+              {order.paymentStatus !== 'PAID' && order.status.toUpperCase() !== 'CANCELLED' && (
+                <Button
+                  className="w-full mt-3 rounded-xl h-11 shadow-sm gap-2 font-semibold"
+                  disabled={isRetrying}
+                  onClick={handlePayOnline}
+                >
+                  <CreditCard className="w-4 h-4" />
+                  {isRetrying
+                    ? (isBn ? 'রিডাইরেক্ট করা হচ্ছে...' : 'Redirecting...')
+                    : (isBn ? 'অনলাইনে পে করুন (SSLCOMMERZ)' : 'Pay with SSLCOMMERZ')}
+                </Button>
+              )}
             </CardContent>
           </Card>
 

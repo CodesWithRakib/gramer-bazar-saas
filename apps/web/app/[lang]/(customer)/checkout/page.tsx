@@ -37,6 +37,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   const [paymentMethod, setPaymentMethod] = useState<string>('COD');
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -71,16 +72,19 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
           quantity: item.quantity,
         })),
         couponCode: appliedCoupon?.code, // Send code instead of ID, backend can process it
+        lang,
       };
 
       const res = await checkoutOrder(orderData).unwrap();
       dispatch(clearCart());
       if (res.paymentUrl) {
+        setIsRedirecting(true);
         window.location.href = res.paymentUrl;
       } else {
         router.push(`/${lang}/orders/${res.order.id}?success=true`);
       }
     } catch (err) {
+      setIsRedirecting(false);
       setErrorMsg(getApiErrorMessage(err) || (isBn ? 'অর্ডার তৈরি করতে সমস্যা হয়েছে' : 'Failed to place order'));
     }
   };
@@ -205,10 +209,25 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                   />
                   <Label
                     htmlFor="digital"
-                    className="flex flex-col gap-1 p-4 border-2 rounded-lg cursor-pointer hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5"
+                    className="flex flex-col gap-1.5 p-4 border-2 rounded-lg cursor-pointer hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5"
                   >
-                    <span className="font-semibold text-base">{isBn ? 'ডিজিটাল পেমেন্ট' : 'Digital Payment'}</span>
-                    <span className="text-sm text-muted-foreground">{isBn ? 'বিকাশ, রকেট, কার্ড (SSLCommerz)' : 'bKash, Nagad, Cards (SSLCommerz)'}</span>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-base flex items-center gap-2">
+                        {isBn ? 'ডিজিটাল পেমেন্ট (SSLCommerz)' : 'Digital Payment (SSLCommerz)'}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        Instant & Secure
+                      </span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {isBn ? 'বিকাশ, নগদ, রকেট, কার্ড (ভিসা, মাস্টারকার্ড), ইন্টারনেট ব্যাংকিং' : 'bKash, Nagad, Rocket, Cards (Visa, Mastercard), Net Banking'}
+                    </span>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">bKash</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">Nagad</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">Rocket</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">Visa/Mastercard</span>
+                    </div>
                   </Label>
                   {paymentMethod === 'ONLINE' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
                 </div>
@@ -262,11 +281,17 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
 
               <Button 
                 size="lg" 
-                className="w-full text-lg h-14 rounded-xl shadow-lg transition-transform active:scale-[0.98] mt-2" 
-                disabled={isCheckingOut || !selectedAddressId || isAddressesLoading}
+                className="w-full text-base sm:text-lg h-14 rounded-xl shadow-lg transition-transform active:scale-[0.98] mt-2 font-semibold" 
+                disabled={isCheckingOut || isRedirecting || !selectedAddressId || isAddressesLoading}
                 onClick={handleCheckout}
               >
-                {isCheckingOut ? (isBn ? 'প্রক্রিয়াধীন...' : 'Processing...') : (isBn ? 'অর্ডার কনফার্ম করুন' : 'Confirm Order')}
+                {isRedirecting
+                  ? (isBn ? 'SSLCOMMERZ-এ নিয়ে যাওয়া হচ্ছে...' : 'Redirecting to SSLCOMMERZ...')
+                  : isCheckingOut
+                  ? (isBn ? 'প্রক্রিয়াধীন...' : 'Processing...')
+                  : paymentMethod === 'ONLINE'
+                  ? (isBn ? 'অর্ডার প্লেস ও পে করুন' : 'Place Order & Pay with SSLCommerz')
+                  : (isBn ? 'অর্ডার কনফার্ম করুন (ক্যাশ অন ডেলিভারি)' : 'Confirm Order (Cash on Delivery)')}
               </Button>
             </CardContent>
           </Card>

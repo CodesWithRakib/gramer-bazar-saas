@@ -19,6 +19,7 @@ import { OrderItem } from './order-item.entity.js';
 import { OrderStatusHistory } from './order-status-history.entity.js';
 import { User } from '../../users/entities/user.entity.js';
 import { Address } from '../../addresses/entities/address.entity.js';
+import { Payment } from '../../payments/entities/payment.entity.js';
 
 @Entity('orders')
 export class Order {
@@ -84,6 +85,9 @@ export class Order {
 
   @OneToMany(() => OrderStatusHistory, (history) => history.order, { cascade: true })
   statusHistory: Relation<OrderStatusHistory[]>;
+
+  @OneToMany(() => Payment, (payment) => payment.order)
+  payments: Relation<Payment[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

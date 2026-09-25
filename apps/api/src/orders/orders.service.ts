@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, In } from 'typeorm';
@@ -24,6 +25,8 @@ import { DiscountType } from '../coupons/enums/discount-type.enum.js';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
+
   constructor(
     @InjectDataSource() private readonly dataSource: DataSource,
     private paymentsService: PaymentsService,
@@ -31,7 +34,7 @@ export class OrdersService {
   ) {}
 
   async checkout(userId: string, checkoutDto: CheckoutDto, originUrl: string) {
-    return this.dataSource.transaction(async (manager) => {
+    const orderTxResult = await this.dataSource.transaction(async (manager) => {
       // 1. Validate Address
       const address = await manager.findOne(Address, {
         where: { id: checkoutDto.addressId, userId },
@@ -197,27 +200,37 @@ export class OrdersService {
       }
 
       const user = await manager.findOne(User, { where: { id: userId } });
-      
-      let paymentUrl = null;
-      if (savedOrder.paymentMethod !== PaymentMethod.COD) {
-        paymentUrl = await this.paymentsService.initPayment(
-          savedOrder, 
-          { 
-            name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Customer', 
-            email: user?.email, 
-            phone: user?.phone, 
-            address: address.streetAddress 
-          }, 
-          originUrl
-        );
-      }
 
-      if (user?.email) {
-        await this.notificationsService.sendOrderConfirmationEmail(user.email, savedOrder);
-      }
-
-      return { order: savedOrder, paymentUrl };
+      return { savedOrder, user, address };
     });
+
+    const { savedOrder, user, address } = orderTxResult;
+
+    // 8. Payment Gateway Session Initiation (runs after order is committed to satisfy foreign keys)
+    let paymentUrl = null;
+    if (savedOrder.paymentMethod !== PaymentMethod.COD) {
+      paymentUrl = await this.paymentsService.initPayment(
+        savedOrder,
+        {
+          name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Customer',
+          email: user?.email || undefined,
+          phone: user?.phone || undefined,
+          address: address.streetAddress,
+        },
+        originUrl,
+        checkoutDto.lang || 'en',
+      );
+    }
+
+    if (user?.email) {
+      try {
+        await this.notificationsService.sendOrderConfirmationEmail(user.email, savedOrder);
+      } catch (err: any) {
+        this.logger.warn(`Failed to send order confirmation email: ${err.message}`);
+      }
+    }
+
+    return { order: savedOrder, paymentUrl };
   }
 
   async findCustomerOrders(userId: string) {

@@ -28,4 +28,24 @@ export class UpdateSettingsDto {
   @IsBoolean()
   @IsOptional()
   isMaintenanceMode?: boolean;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  sslczStoreId?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  sslczStorePassword?: string;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  sslczIsLive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  sslczPublicUrl?: string;
 }

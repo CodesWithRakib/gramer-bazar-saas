@@ -20,4 +20,16 @@ export const envValidationSchema = z.object({
   AUTH_VERIFY_OTP_THROTTLE_LIMIT: z.coerce.number().optional(),
   AUTH_REGISTER_THROTTLE_LIMIT: z.coerce.number().optional(),
   AUTH_LOGIN_THROTTLE_LIMIT: z.coerce.number().optional(),
+  // SSLCOMMERZ Payment Gateway
+  SSLCOMMERZ_STORE_ID: z.string().optional(),
+  SSLCOMMERZ_STORE_PASSWORD: z.string().optional(),
+  SSLCOMMERZ_IS_LIVE: z
+    .union([z.string(), z.boolean()])
+    .optional()
+    .transform((val) => val === true || val === 'true'),
+  SSLCOMMERZ_PAYMENT_URL: z.string().optional(),
+  SSLCOMMERZ_VALIDATION_URL: z.string().optional(),
+  SSLCOMMERZ_PUBLIC_URL: z.string().optional(),
+  API_URL: z.string().optional(),
 });
+

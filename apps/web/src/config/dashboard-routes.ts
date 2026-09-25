@@ -22,6 +22,7 @@ import {
   Building2,
   ShieldCheck,
   UserPlus,
+  CreditCard,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -42,6 +43,7 @@ export const adminRoutes: DashboardRoute[] = [
   { title: 'Categories', titleBn: 'ক্যাটাগরি', href: '/admin/categories', icon: Tag },
   { title: 'Brands', titleBn: 'ব্র্যান্ড', href: '/admin/brands', icon: Building2 },
   { title: 'Orders', titleBn: 'অর্ডার', href: '/admin/orders', icon: ShoppingCart },
+  { title: 'Payments', titleBn: 'পেমেন্ট', href: '/admin/payments', icon: CreditCard },
   { title: 'Deliveries', titleBn: 'ডেলিভারি', href: '/admin/deliveries', icon: Truck },
   { title: 'Riders', titleBn: 'রাইডার', href: '/admin/riders', icon: Truck },
   { title: 'Product Requests', titleBn: 'পণ্য অনুরোধ', href: '/admin/product-requests', icon: ClipboardList },

@@ -5,6 +5,12 @@ export interface PlatformSettings {
   supportEmail: string;
   supportPhone?: string;
   allowSellerRegistration: boolean;
+  isMaintenanceMode?: boolean;
+  sslczStoreId?: string;
+  sslczStorePassword?: string;
+  sslczIsLive?: boolean;
+  sslczPublicUrl?: string;
+  hasSslczPassword?: boolean;
 }
 
 export type UpdateSettingsRequest = Partial<PlatformSettings>;
