@@ -19,6 +19,8 @@ export interface Address {
   areaId?: string;
   area?: Area;
   streetAddress: string;
+  lat?: number | null;
+  lng?: number | null;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
@@ -26,6 +28,7 @@ export interface Address {
 
 export type CreateAddressRequest = Omit<Address, 'id' | 'createdAt' | 'updatedAt' | 'country' | 'division' | 'district' | 'upazila' | 'union' | 'area'>;
 export type UpdateAddressRequest = Partial<CreateAddressRequest>;
+
 
 export const addressApi = api.injectEndpoints({
   endpoints: (builder) => ({

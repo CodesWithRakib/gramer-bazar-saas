@@ -134,6 +134,12 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                           <span className="font-semibold text-base">{address.title} {address.isDefault && <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full ml-2">Default</span>}</span>
                           <span className="text-sm">{address.contactName} ({address.contactPhone})</span>
                           <span className="text-sm text-muted-foreground">{address.streetAddress}</span>
+                          {address.lat != null && address.lng != null && (
+                            <span className="mt-1 inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
+                              <MapPin className="h-3 w-3" />
+                              {isBn ? 'জিপিএস পিন করা আছে' : 'GPS pinned — live tracking enabled'}
+                            </span>
+                          )}
                         </Label>
                         {selectedAddressId === address.id && (
                           <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />
@@ -141,6 +147,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                       </div>
                     ))}
                   </div>
+
                   )}
 
                   {!showAddressForm && (

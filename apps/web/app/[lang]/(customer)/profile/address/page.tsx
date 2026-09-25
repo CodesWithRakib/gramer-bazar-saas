@@ -8,7 +8,7 @@ import { AddressForm } from '@/components/profile/AddressForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MapPin, Plus, Edit2, Trash2, Home, Star } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Home, Star, LocateFixed } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AddressBookPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -133,6 +133,12 @@ export default function AddressBookPage({ params }: { params: Promise<{ lang: st
                     <p className="text-sm font-medium">{primaryAddress.contactName}</p>
                     <p className="text-sm text-muted-foreground">{primaryAddress.contactPhone}</p>
                     <p className="text-sm mt-2 text-muted-foreground">{primaryAddress.streetAddress}</p>
+                    {primaryAddress.lat != null && primaryAddress.lng != null && (
+                      <span className="mt-1 inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
+                        <LocateFixed className="w-3.5 h-3.5" />
+                        {isBn ? 'জিপিএস পিন করা আছে — লাইভ ট্র্যাকিং চালু' : 'GPS pinned — live tracking enabled'}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-2 self-start shrink-0">
@@ -157,6 +163,12 @@ export default function AddressBookPage({ params }: { params: Promise<{ lang: st
                     <p className="text-sm font-medium">{address.contactName}</p>
                     <p className="text-sm text-muted-foreground">{address.contactPhone}</p>
                     <p className="text-sm mt-1 text-muted-foreground line-clamp-2">{address.streetAddress}</p>
+                    {address.lat != null && address.lng != null && (
+                      <span className="mt-1 inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
+                        <LocateFixed className="w-3 h-3" />
+                        {isBn ? 'GPS পিন করা' : 'GPS pinned'}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use, useState, useEffect } from 'react';
+import React, { use, useState, useEffect, useRef } from 'react';
 import { useGetRiderDeliveryDetailsQuery, useUpdateDeliveryStatusMutation, DeliveryStatus } from '@/features/deliveries/deliveriesApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,7 +42,17 @@ export default function RiderDeliveryDetailsPage({
       : null,
   );
 
-  // Live Location Tracking Effect
+  // Keep a stable ref to updateLocation so the watchPosition effect doesn't
+  // restart every render. RTK Query creates a new function reference each render,
+  // so putting it in the dep array causes an infinite watchPosition restart loop.
+  const updateLocationRef = useRef(updateLocation);
+  useEffect(() => {
+    updateLocationRef.current = updateLocation;
+  }, [updateLocation]);
+
+  // Live Location Tracking Effect.
+  // Intentionally depends on delivery?.status (not the full `delivery` object)
+  // so watchPosition only restarts when the status itself changes, not on refetch.
   useEffect(() => {
     if (!delivery || delivery.status !== DeliveryStatus.OUT_FOR_DELIVERY) return;
     if (!('geolocation' in navigator)) return;
@@ -54,26 +64,32 @@ export default function RiderDeliveryDetailsPage({
         setCurrentLng(longitude);
         setTrackingError(null);
 
-        // Update backend with new coordinates
-        updateLocation({ id, lat: latitude, lng: longitude }).catch(err => {
-          console.error("Failed to update location to server", err);
+        // Use ref to always call the latest updateLocation without adding it to deps
+        updateLocationRef.current({ id, lat: latitude, lng: longitude }).catch((err) => {
+          console.error('Failed to update location to server', err);
+          toast.error(isBn ? 'সার্ভারে লোকেশন আপডেট ব্যর্থ হয়েছে' : 'Failed to sync location with server');
         });
       },
       (error) => {
-        console.error("Error watching position:", error);
-        setTrackingError(isBn ? 'লোকেশন ট্র্যাক করা যাচ্ছে না। দয়া করে জিপিএস পারমিশন দিন।' : 'Cannot track location. Please allow GPS permissions.');
+        console.error('Error watching position:', error);
+        setTrackingError(
+          isBn
+            ? 'লোকেশন ট্র্যাক করা যাচ্ছে না। দয়া করে জিপিএস পারমিশন দিন।'
+            : 'Cannot track location. Please allow GPS permissions.',
+        );
       },
       {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0,
-      }
+      },
     );
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [delivery, id, isBn, updateLocation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [delivery?.status, id, isBn]);
 
   const handleUpdateStatus = async (status: DeliveryStatus) => {
     try {

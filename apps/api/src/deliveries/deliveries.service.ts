@@ -263,7 +263,13 @@ export class DeliveriesService {
     delivery.currentLng = lng;
     delivery.lastLocationUpdatedAt = new Date();
 
-    return this.deliveryRepository.save(delivery);
+    const saved = await this.deliveryRepository.save(delivery);
+    // TypeORM returns decimal columns as strings from PostgreSQL — coerce back to numbers
+    return {
+      ...saved,
+      currentLat: saved.currentLat !== null ? parseFloat(saved.currentLat as unknown as string) : null,
+      currentLng: saved.currentLng !== null ? parseFloat(saved.currentLng as unknown as string) : null,
+    };
   }
 
   // --- CUSTOMER ACTIONS ---

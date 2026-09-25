@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Query, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { DeliveriesService } from './deliveries.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
@@ -75,7 +75,12 @@ export class DeliveriesController {
     @Body('lat') lat: number,
     @Body('lng') lng: number,
   ) {
-    return this.deliveriesService.updateRiderLocation(req.user.id, id, lat, lng);
+    const parsedLat = parseFloat(lat as unknown as string);
+    const parsedLng = parseFloat(lng as unknown as string);
+    if (isNaN(parsedLat) || isNaN(parsedLng)) {
+      throw new BadRequestException('lat and lng must be valid numbers');
+    }
+    return this.deliveriesService.updateRiderLocation(req.user.id, id, parsedLat, parsedLng);
   }
 
   // --- CUSTOMER ENDPOINTS ---
