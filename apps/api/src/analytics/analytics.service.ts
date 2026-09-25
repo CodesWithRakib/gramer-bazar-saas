@@ -111,21 +111,23 @@ export class AnalyticsService {
     // 1. Popular Products (by VIEW, ADD_TO_CART, PURCHASE)
     const popularProductsRaw = await this.demandEventRepository.createQueryBuilder('event')
       .select('event.productId', 'productId')
-      .addSelect('product.name', 'productName')
+      .addSelect('product.nameEn', 'productName')
+      .addSelect('product.nameBn', 'productNameBn')
       .addSelect("COUNT(CASE WHEN event.eventType = 'VIEW' THEN 1 END)", 'views')
       .addSelect("COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)", 'carts')
       .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
       .leftJoin(Product, 'product', 'product.id = event.productId')
       .where('event.productId IS NOT NULL')
       .groupBy('event.productId')
-      .addGroupBy('product.name')
+      .addGroupBy('product.nameEn')
+      .addGroupBy('product.nameBn')
       .orderBy('views', 'DESC')
       .limit(10)
       .getRawMany();
 
     const popularProducts = popularProductsRaw.map((p: any) => ({
       productId: p.productId,
-      productName: p.productName || 'Unknown Product',
+      productName: p.productName || p.productNameBn || 'Unknown Product',
       views: Number(p.views),
       carts: Number(p.carts),
       purchases: Number(p.purchases),
@@ -180,25 +182,32 @@ export class AnalyticsService {
     }));
 
     // 5. Frequently Unavailable Products (Viewed but no stock)
-    // For MVP we just find products with high views in the analytics table 
-    // and inner join their current inventory to check if it's 0.
     const unavailableRaw = await this.demandEventRepository.createQueryBuilder('event')
       .select('event.productId', 'productId')
-      .addSelect('product.name', 'productName')
+      .addSelect('product.nameEn', 'productName')
+      .addSelect('product.nameBn', 'productNameBn')
       .addSelect('COUNT(*)', 'views')
-      .innerJoin('seller_products', 'sp', 'sp.product_id = event.productId')
-      .innerJoin('inventory', 'inv', 'inv.id = sp.inventory_id AND inv.quantity = 0')
       .leftJoin(Product, 'product', 'product.id = event.productId')
       .where("event.eventType = 'VIEW'")
+      .andWhere('event.productId IS NOT NULL')
+      .andWhere(`NOT EXISTS (
+        SELECT 1 FROM product_variants pv
+        JOIN seller_products sp ON sp.product_variant_id = pv.id AND sp.is_active = true
+        JOIN inventory inv ON inv.seller_product_id = sp.id
+        WHERE pv.product_id = event.productId 
+          AND pv.is_active = true 
+          AND (inv.quantity - inv.reserved_quantity) > 0
+      )`)
       .groupBy('event.productId')
-      .addGroupBy('product.name')
+      .addGroupBy('product.nameEn')
+      .addGroupBy('product.nameBn')
       .orderBy('views', 'DESC')
       .limit(10)
       .getRawMany();
 
     const frequentlyUnavailable = unavailableRaw.map((u: any) => ({
       productId: u.productId,
-      productName: u.productName || 'Unknown Product',
+      productName: u.productName || u.productNameBn || 'Unknown Product',
       views: Number(u.views),
     }));
 

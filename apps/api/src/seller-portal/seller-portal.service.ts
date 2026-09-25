@@ -148,7 +148,7 @@ export class SellerPortalService {
 
     if (search) {
       query.andWhere(
-        '(product.name ILIKE :search OR variant.sku ILIKE :search OR sp.sellerSku ILIKE :search)',
+        '(product.nameEn ILIKE :search OR product.nameBn ILIKE :search OR variant.sku ILIKE :search OR sp.sellerSku ILIKE :search)',
         { search: `%${search}%` }
       );
     }

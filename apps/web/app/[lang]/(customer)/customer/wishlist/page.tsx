@@ -9,8 +9,9 @@ import {
 } from '@/features/wishlists/wishlistsApi';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { CustomImage } from '@/components/ui/CustomImage';
-import { Loader2, Heart, Trash2 } from 'lucide-react';
+import { Loader2, Heart, Trash2, Star } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function WishlistPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -78,6 +79,9 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
   const name = isBn ? item.product.nameBn : item.product.nameEn;
   const rawImage = item.product.images?.[0];
   const image = typeof rawImage === 'string' ? rawImage : rawImage?.url || '/placeholder.jpg';
+  const price = Number(item.product.price || 0);
+  const compareAtPrice = item.product.compareAtPrice ? Number(item.product.compareAtPrice) : null;
+  const isAvailable = item.product.isAvailable ?? true;
   
   return (
     <Link href={`/${lang}/products/${item.product.slug}`} className="group bg-card rounded-xl border shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col h-full relative">
@@ -89,6 +93,17 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
           sizes="(max-width: 768px) 50vw, 25vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300" 
         />
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {!isAvailable ? (
+            <Badge variant="destructive" className="text-[10px] px-1.5 py-0.5 shadow-xs">
+              {isBn ? 'স্টক নেই' : 'Out of Stock'}
+            </Badge>
+          ) : compareAtPrice && compareAtPrice > price ? (
+            <Badge className="bg-emerald-600 text-[10px] px-1.5 py-0.5 shadow-xs">
+              {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% {isBn ? 'ছাড়' : 'OFF'}
+            </Badge>
+          ) : null}
+        </div>
         <Button
           variant="destructive"
           size="icon"
@@ -100,10 +115,46 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
         </Button>
       </div>
       <div className="p-3 flex flex-col flex-grow">
+        {item.product.category && (
+          <span className="text-[11px] text-muted-foreground line-clamp-1 mb-0.5">
+            {isBn ? item.product.category.nameBn : item.product.category.nameEn}
+          </span>
+        )}
         <h3 className="font-medium text-sm line-clamp-2 hover:text-primary transition-colors">
           {name}
         </h3>
-        <div className="mt-auto pt-2">
+
+        {/* Price & Unit */}
+        <div className="mt-2 flex items-baseline gap-1.5 flex-wrap">
+          {price > 0 ? (
+            <span className="font-bold text-base text-primary">
+              ৳{price}
+            </span>
+          ) : null}
+          {compareAtPrice && compareAtPrice > price ? (
+            <span className="text-xs text-muted-foreground line-through">
+              ৳{compareAtPrice}
+            </span>
+          ) : null}
+          {item.product.unit ? (
+            <span className="text-[11px] text-muted-foreground">
+              / {item.product.unit}
+            </span>
+          ) : null}
+        </div>
+
+        {/* Rating */}
+        {item.product.averageRating && item.product.averageRating > 0 ? (
+          <div className="flex items-center gap-1 text-xs text-amber-500 mt-1">
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+            <span className="font-medium">{item.product.averageRating.toFixed(1)}</span>
+            {item.product.totalReviews ? (
+              <span className="text-[10px] text-muted-foreground">({item.product.totalReviews})</span>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="mt-auto pt-3">
           <Button variant="outline" size="sm" className="w-full text-xs" asChild>
             <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
           </Button>
