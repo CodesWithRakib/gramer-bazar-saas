@@ -109,7 +109,7 @@ export function OrderCard({ order, lang }: OrderCardProps) {
         </div>
         
         <Button variant="ghost" className="w-full md:w-auto mt-2 md:mt-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors" asChild>
-          <Link href={`/${lang}/orders/${order.id}`}>
+          <Link href={`/${lang}/customer/orders/${order.id}`}>
             {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
             <ChevronRight className="w-4 h-4 ml-1" />
           </Link>

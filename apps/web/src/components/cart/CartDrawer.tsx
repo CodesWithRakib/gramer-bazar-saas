@@ -208,7 +208,7 @@ export function CartDrawer({ lang }: { lang: string }) {
                   </Link>
                 </Button>
                 <Button className="flex-1 font-medium shadow-md" size="lg" asChild onClick={() => dispatch(setCartOpen(false))}>
-                  <Link href={`/${lang}/checkout`}>
+                  <Link href={`/${lang}/customer/checkout`}>
                     {isBn ? 'চেকআউট' : 'Checkout'}
                   </Link>
                 </Button>

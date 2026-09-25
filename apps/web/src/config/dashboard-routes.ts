@@ -23,6 +23,8 @@ import {
   ShieldCheck,
   UserPlus,
   CreditCard,
+  MapPin,
+  Lock,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -63,11 +65,29 @@ export const superAdminRoutes: DashboardRoute[] = [
   { title: 'Overview', titleBn: 'সারসংক্ষেপ', href: '/super-admin', icon: LayoutDashboard },
   { title: 'Admin Roster', titleBn: 'অ্যাডমিন পরিচালনা', href: '/super-admin/admins', icon: ShieldCheck },
   { title: 'Create Staff', titleBn: 'নতুন স্টাফ তৈরি', href: '/super-admin/create-user', icon: UserPlus },
-  { title: 'All Users', titleBn: 'সকল ব্যবহারকারী', href: '/admin/users', icon: Users },
-  { title: 'Seller Applications', titleBn: 'সেলার আবেদন', href: '/admin/seller-applications', icon: ClipboardList },
-  { title: 'Rider Applications', titleBn: 'রাইডার আবেদন', href: '/admin/rider-applications', icon: Truck },
-  { title: 'Audit Logs', titleBn: 'অডিট লগ', href: '/admin/audit-logs', icon: ScrollText },
-  { title: 'System Settings', titleBn: 'সিস্টেম সেটিংস', href: '/admin/settings', icon: Settings },
+  // Mirrored operational features under /super-admin/*
+  { title: 'All Users', titleBn: 'সকল ব্যবহারকারী', href: '/super-admin/users', icon: Users },
+  { title: 'Seller Applications', titleBn: 'সেলার আবেদন', href: '/super-admin/seller-applications', icon: ClipboardList },
+  { title: 'Rider Applications', titleBn: 'রাইডার আবেদন', href: '/super-admin/rider-applications', icon: Truck },
+  { title: 'Sellers', titleBn: 'সেলার', href: '/super-admin/sellers', icon: Store },
+  { title: 'Products', titleBn: 'পণ্য', href: '/super-admin/products', icon: Package },
+  { title: 'Categories', titleBn: 'ক্যাটাগরি', href: '/super-admin/categories', icon: Tag },
+  { title: 'Brands', titleBn: 'ব্র্যান্ড', href: '/super-admin/brands', icon: Building2 },
+  { title: 'Orders', titleBn: 'অর্ডার', href: '/super-admin/orders', icon: ShoppingCart },
+  { title: 'Payments', titleBn: 'পেমেন্ট', href: '/super-admin/payments', icon: CreditCard },
+  { title: 'Deliveries', titleBn: 'ডেলিভারি', href: '/super-admin/deliveries', icon: Truck },
+  { title: 'Riders', titleBn: 'রাইডার', href: '/super-admin/riders', icon: Truck },
+  { title: 'Product Requests', titleBn: 'পণ্য অনুরোধ', href: '/super-admin/product-requests', icon: ClipboardList },
+  { title: 'Flash Sales', titleBn: 'ফ্ল্যাশ সেল', href: '/super-admin/flash-sales', icon: Zap },
+  { title: 'Coupons', titleBn: 'কুপন', href: '/super-admin/coupons', icon: Ticket },
+  { title: 'Banners', titleBn: 'ব্যানার', href: '/super-admin/banners', icon: ImageIcon },
+  { title: 'Reviews', titleBn: 'রিভিউ', href: '/super-admin/reviews', icon: Star },
+  { title: 'Disputes', titleBn: 'বিরোধ', href: '/super-admin/disputes', icon: AlertCircle },
+  { title: 'Payouts', titleBn: 'পেআউট', href: '/super-admin/payouts', icon: Wallet },
+  { title: 'Reports', titleBn: 'রিপোর্ট', href: '/super-admin/reports/demand', icon: BarChart3 },
+  { title: 'Audit Logs', titleBn: 'অডিট লগ', href: '/super-admin/audit-logs', icon: ScrollText },
+  { title: 'Messages', titleBn: 'বার্তা', href: '/super-admin/messages', icon: MessageSquare },
+  { title: 'System Settings', titleBn: 'সিস্টেম সেটিংস', href: '/super-admin/settings', icon: Settings },
 ];
 
 export const sellerRoutes: DashboardRoute[] = [
@@ -92,10 +112,11 @@ export const riderRoutes: DashboardRoute[] = [
 ];
 
 export const customerRoutes: DashboardRoute[] = [
-  { title: 'Dashboard', titleBn: 'ড্যাশবোর্ড', href: '/profile', icon: User },
-  { title: 'Orders', titleBn: 'আমার অর্ডার', href: '/orders', icon: ShoppingCart },
-  { title: 'Wishlist', titleBn: 'উইশলিস্ট', href: '/profile/wishlist', icon: Star },
-  { title: 'Messages', titleBn: 'বার্তা', href: '/messages', icon: MessageSquare },
-  { title: 'Disputes', titleBn: 'বিরোধ', href: '/disputes', icon: AlertCircle },
-  { title: 'Security', titleBn: 'নিরাপত্তা', href: '/profile/security', icon: Settings },
+  { title: 'Profile', titleBn: 'প্রোফাইল', href: '/customer/profile', icon: User },
+  { title: 'Orders', titleBn: 'আমার অর্ডার', href: '/customer/orders', icon: ShoppingCart },
+  { title: 'Wishlist', titleBn: 'উইশলিস্ট', href: '/customer/wishlist', icon: Star },
+  { title: 'Addresses', titleBn: 'ঠিকানাসমূহ', href: '/customer/addresses', icon: MapPin },
+  { title: 'Messages', titleBn: 'বার্তা', href: '/customer/messages', icon: MessageSquare },
+  { title: 'Disputes', titleBn: 'বিরোধ', href: '/customer/disputes', icon: AlertCircle },
+  { title: 'Security', titleBn: 'নিরাপত্তা', href: '/customer/settings', icon: Lock },
 ];

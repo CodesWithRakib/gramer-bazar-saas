@@ -99,10 +99,10 @@ export function MobileBottomNav() {
           badge={cartItemCount}
         />
         <MobileNavItem 
-          href={`/${lang}/profile`} 
+          href={`/${lang}/customer/profile`} 
           icon={User} 
           label={isBn ? 'অ্যাকাউন্ট' : 'Account'} 
-          isActive={getIsActive('/profile')} 
+          isActive={getIsActive('/customer/profile')} 
         />
       </nav>
       {/* Spacer to prevent content from hiding behind the absolute nav bar */}

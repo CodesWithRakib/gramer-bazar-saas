@@ -326,16 +326,38 @@ export class UsersService implements OnModuleInit {
     };
   }
 
-  async updateRoles(id: string, roleNames: string[]): Promise<User> {
-    const user = await this.findById(id);
+  async updateRoles(
+    caller: { id: string; roles?: Array<{ name: string } | string> },
+    id: string,
+    roleNames: string[]
+  ): Promise<User> {
+    const isSuperAdmin = caller.roles?.some(
+      (r) => (typeof r === 'string' ? r : r.name) === Role.SUPER_ADMIN
+    );
+
+    const targetUser = await this.findById(id);
+    const targetHasPrivilege = targetUser.roles?.some(
+      (r) => r.name === Role.ADMIN || r.name === Role.SUPER_ADMIN
+    );
+    const attemptingPrivilege = roleNames.some(
+      (r) => r === Role.ADMIN || r === Role.SUPER_ADMIN
+    );
+
+    if (!isSuperAdmin && (targetHasPrivilege || attemptingPrivilege)) {
+      throw new ForbiddenException(
+        'Only Super Admins can manage Admin or Super Admin roles'
+      );
+    }
+
     if (!roleNames || roleNames.length === 0) {
-      user.roles = [];
+      targetUser.roles = [];
     } else {
-      const roles = await this.roleRepository.createQueryBuilder('role')
+      const roles = await this.roleRepository
+        .createQueryBuilder('role')
         .where('role.name IN (:...roleNames)', { roleNames })
         .getMany();
-      user.roles = roles;
+      targetUser.roles = roles;
     }
-    return this.userRepository.save(user);
+    return this.userRepository.save(targetUser);
   }
 }

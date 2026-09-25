@@ -43,6 +43,8 @@ const isPublicPath = (pathname: string): boolean => {
     '/search',
     '/categories',
     '/products',
+    '/cart',
+    '/flash-sale',
     '/offers',
     '/shops',
   ];

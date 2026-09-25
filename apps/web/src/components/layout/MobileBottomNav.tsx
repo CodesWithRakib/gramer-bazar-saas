@@ -45,7 +45,7 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
     if (roles.includes("ADMIN")) return `/${lang}/admin`;
     if (roles.includes("SELLER")) return `/${lang}/seller`;
     if (roles.includes("RIDER")) return `/${lang}/rider`;
-    return `/${lang}/profile`;
+    return `/${lang}/customer/profile`;
   };
 
   return (
@@ -84,6 +84,7 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
           href={getProfileHref()}
           className={cn(
             "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
+            pathname.includes(`/${lang}/customer`) || 
             pathname.includes(`/${lang}/profile`) || 
             pathname.includes(`/${lang}/super-admin`) || 
             pathname.includes(`/${lang}/admin`) || 

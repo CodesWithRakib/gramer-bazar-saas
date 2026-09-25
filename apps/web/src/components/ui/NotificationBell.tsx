@@ -94,9 +94,9 @@ export function NotificationBell({ lang }: { lang: string }) {
                   // Determine redirect URL based on type
                   let href = '#';
                   if (notif.type === 'ORDER_UPDATE' && notif.data?.orderId) {
-                    href = `/${lang}/orders/${notif.data.orderId}`;
+                    href = `/${lang}/customer/orders/${notif.data.orderId}`;
                   } else if (notif.type === 'REQUEST' && notif.data?.requestId) {
-                    href = `/${lang}/product-requests/${notif.data.requestId}`;
+                    href = `/${lang}/customer/product-requests/${notif.data.requestId}`;
                   }
 
                   return (

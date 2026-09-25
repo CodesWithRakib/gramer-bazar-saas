@@ -89,7 +89,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body('roles') roles: string[],
   ) {
-    const updated = await this.usersService.updateRoles(id, roles);
+    const updated = await this.usersService.updateRoles(req.user, id, roles);
     await this.auditLogsService.record({
       actorId: req.user?.id,
       actorName: this.actorName(req.user),

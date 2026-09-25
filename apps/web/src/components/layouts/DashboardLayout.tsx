@@ -242,13 +242,13 @@ export function DashboardLayout({
                   <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                 </div>
                 <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2.5">
-                  <Link href={`/${lang}/profile`}>
+                  <Link href={routeType === 'seller' ? `/${lang}/seller/profile` : routeType === 'rider' ? `/${lang}/rider/profile` : `/${lang}/customer/profile`}>
                     <User className="mr-2 h-4 w-4 text-muted-foreground" />
                     <span>{isBn ? "প্রোফাইল" : "Profile"}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2.5 mb-1">
-                  <Link href={`/${lang}/settings`}>
+                  <Link href={routeType === 'admin' ? `/${lang}/admin/settings` : routeType === 'super-admin' ? `/${lang}/super-admin/settings` : `/${lang}/customer/settings`}>
                     <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
                     <span>{isBn ? "সেটিংস" : "Settings"}</span>
                   </Link>

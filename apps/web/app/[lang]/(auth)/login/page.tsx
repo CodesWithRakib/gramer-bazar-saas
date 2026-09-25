@@ -102,7 +102,7 @@ function LoginForm({ lang }: { lang: string }) {
     } else if (roles.includes('RIDER')) {
       router.push(`/${lang}/rider`);
     } else {
-      router.push(`/${lang}`);
+      router.push(`/${lang}/customer/profile`);
     }
   };
 

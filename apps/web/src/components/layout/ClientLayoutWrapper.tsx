@@ -11,7 +11,31 @@ export function ClientLayoutWrapper({ lang, children }: { lang: string; children
   const pathname = usePathname();
   
   // Dashboard routes where we don't want the global storefront header/footer
-  const dashboardPrefixes = ['/admin', '/seller', '/rider', '/profile', '/orders', '/messages', '/disputes', '/wishlist', '/product-requests', '/reviews'];
+  const dashboardPrefixes = [
+    '/admin',
+    '/super-admin',
+    '/seller',
+    '/rider',
+    '/customer/profile',
+    '/customer/orders',
+    '/customer/wishlist',
+    '/customer/addresses',
+    '/customer/settings',
+    '/customer/disputes',
+    '/customer/messages',
+    '/customer/reviews',
+    '/customer/product-requests',
+    '/customer/notifications',
+    // legacy prefixes
+    '/profile',
+    '/orders',
+    '/wishlist',
+    '/disputes',
+    '/messages',
+    '/reviews',
+    '/product-requests',
+    '/notifications',
+  ];
   const isDashboardRoute = dashboardPrefixes.some(prefix => 
     pathname === `/${lang}${prefix}` || pathname.startsWith(`/${lang}${prefix}/`)
   );

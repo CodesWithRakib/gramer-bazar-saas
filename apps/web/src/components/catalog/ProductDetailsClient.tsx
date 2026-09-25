@@ -190,7 +190,7 @@ export function ProductDetailsClient({
 
   const handleBuyNow = () => {
     handleAddToCart();
-    router.push(`/${lang}/checkout`);
+    router.push(`/${lang}/customer/checkout`);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

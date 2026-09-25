@@ -24,7 +24,7 @@ export class OrdersController {
     const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:3000';
     const baseUrl = originUrl.replace(/\/$/, ''); // Remove trailing slash if any
     const lang = checkoutDto.lang || 'en';
-    const redirectUrl = `${baseUrl}/${lang}/checkout`;
+    const redirectUrl = `${baseUrl}/${lang}/customer/checkout`;
     return this.ordersService.checkout(req.user.id, checkoutDto, redirectUrl);
   }
 

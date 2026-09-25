@@ -188,13 +188,13 @@ export default function SuperAdminOverviewPage({
           </CardHeader>
           <CardContent className="space-y-2">
             <Button variant="ghost" className="w-full justify-between group" asChild>
-              <Link href={`/${lang}/admin/seller-applications`}>
+              <Link href={`/${lang}/super-admin/seller-applications`}>
                 <span>{isBn ? 'সেলার আবেদনসমূহ' : 'Seller Applications'}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
             <Button variant="ghost" className="w-full justify-between group" asChild>
-              <Link href={`/${lang}/admin/rider-applications`}>
+              <Link href={`/${lang}/super-admin/rider-applications`}>
                 <span>{isBn ? 'রাইডার আবেদনসমূহ' : 'Rider Applications'}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
@@ -218,13 +218,13 @@ export default function SuperAdminOverviewPage({
           </CardHeader>
           <CardContent className="space-y-2">
             <Button variant="ghost" className="w-full justify-between group" asChild>
-              <Link href={`/${lang}/admin/audit-logs`}>
+              <Link href={`/${lang}/super-admin/audit-logs`}>
                 <span>{isBn ? 'অডিট লগ' : 'Security Audit Logs'}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
             <Button variant="ghost" className="w-full justify-between group" asChild>
-              <Link href={`/${lang}/admin/settings`}>
+              <Link href={`/${lang}/super-admin/settings`}>
                 <span>{isBn ? 'প্ল্যাটফর্ম কনফিগ' : 'Platform Settings'}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>

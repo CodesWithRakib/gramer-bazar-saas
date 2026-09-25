@@ -95,7 +95,7 @@ export function UserActions({ lang }: UserActionsProps) {
             className="relative h-10 w-10 hidden sm:inline-flex"
             asChild
           >
-            <Link href={`/${lang}/profile/wishlist`}>
+            <Link href={`/${lang}/customer/wishlist`}>
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-background">
@@ -170,12 +170,12 @@ export function UserActions({ lang }: UserActionsProps) {
               )}
 
               <DropdownMenuItem asChild>
-                <Link href={`/${lang}/profile`} className="cursor-pointer">
+                <Link href={`/${lang}/customer/profile`} className="cursor-pointer">
                   {isBn ? "আমার প্রোফাইল" : "My Profile"}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/${lang}/orders`} className="cursor-pointer">
+                <Link href={`/${lang}/customer/orders`} className="cursor-pointer">
                   {isBn ? "আমার অর্ডার" : "My Orders"}
                 </Link>
               </DropdownMenuItem>

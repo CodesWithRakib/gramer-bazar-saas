@@ -28,7 +28,7 @@ export default function UnauthorizedPage({ params }: { params: Promise<{ lang: s
     if (roles.includes('ADMIN')) return `/${lang}/admin`;
     if (roles.includes('SELLER')) return `/${lang}/seller`;
     if (roles.includes('RIDER')) return `/${lang}/rider`;
-    return `/${lang}`;
+    return `/${lang}/customer/profile`;
   };
 
   return (
