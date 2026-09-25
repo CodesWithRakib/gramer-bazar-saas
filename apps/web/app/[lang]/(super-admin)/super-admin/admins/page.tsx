@@ -13,7 +13,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, UserPlus, ArrowLeft } from "lucide-react";
+import { UserPlus, ArrowLeft } from "lucide-react";
 import { UserRoleDialog } from "../UserRoleDialog";
 
 export default function SuperAdminAdminsPage({

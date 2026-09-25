@@ -35,10 +35,9 @@ export default function BecomeASellerPage({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = use(params);
-  const router = useRouter();
   const isBn = lang === "bn";
 
-  const { user, isAuthenticated, isAuthInitialized } = useSelector(
+  const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth,
   );
 
@@ -46,7 +45,6 @@ export default function BecomeASellerPage({
 
   const {
     data: myApp,
-    isLoading: isAppLoading,
     refetch,
   } = useGetMySellerApplicationQuery(undefined, { skip: !isAuthenticated });
 

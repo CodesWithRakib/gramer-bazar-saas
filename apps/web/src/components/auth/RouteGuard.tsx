@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { userHasRole, getUserRoles } from '@/lib/roles';
-import { ShieldAlert, ArrowLeft, Home, Loader2 } from 'lucide-react';
+import { ShieldAlert, Home, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 

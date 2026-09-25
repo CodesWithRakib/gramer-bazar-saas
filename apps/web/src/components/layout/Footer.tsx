@@ -69,11 +69,11 @@ export function Footer({ lang }: FooterProps) {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary shrink-0" />
-                <span>support@gramerbazar.com</span>
+                <span>codeswithrakib@gmail.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary shrink-0" />
-                <span>+880 1700-000000</span>
+                <span>+880 1767-476724</span>
               </li>
             </ul>
           </div>

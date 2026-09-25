@@ -34,7 +34,8 @@ describe('SettingsService', () => {
 
     await expect(service.getSettings()).resolves.toEqual({
       platformName: 'Gramer Bazar',
-      supportEmail: 'support@gramerbazar.com',
+      supportEmail: 'codeswithrakib@gmail.com',
+      supportPhone: '8801767476724',
       allowSellerRegistration: true,
       isMaintenanceMode: false,
     });
@@ -48,7 +49,8 @@ describe('SettingsService', () => {
 
     await expect(service.getSettings()).resolves.toEqual({
       platformName: 'Gramer Bazar BD',
-      supportEmail: 'support@gramerbazar.com',
+      supportEmail: 'codeswithrakib@gmail.com',
+      supportPhone: '8801767476724',
       allowSellerRegistration: false,
       isMaintenanceMode: false,
     });

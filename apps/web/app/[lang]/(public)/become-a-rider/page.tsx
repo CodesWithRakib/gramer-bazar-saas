@@ -2,7 +2,6 @@
 
 import React, { useState, use } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { userHasRole } from '@/lib/roles';
@@ -12,12 +11,10 @@ import {
 } from '@/features/applications/applicationsApi';
 import { getApiErrorMessage } from '@/lib/apiError';
 import {
-  Truck,
   CheckCircle2,
   Clock,
   XCircle,
   Coins,
-  ShieldCheck,
   MapPin,
   ArrowRight,
   Sparkles,
@@ -42,7 +39,6 @@ export default function BecomeARiderPage({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = use(params);
-  const router = useRouter();
   const isBn = lang === 'bn';
 
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);

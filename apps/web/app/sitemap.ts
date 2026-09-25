@@ -20,8 +20,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const data = await prodRes.json();
       products = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
     }
-  } catch (error) {
-    console.warn('Failed to fetch products for sitemap', error);
+  } catch {
+    // API server is offline during build time; fallback to default static sitemap
   }
 
   try {
@@ -33,8 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const catData = await catRes.json();
       categories = Array.isArray(catData) ? catData : (Array.isArray(catData?.data) ? catData.data : []);
     }
-  } catch (error) {
-    console.warn('Failed to fetch categories for sitemap', error);
+  } catch {
+    // API server is offline during build time; fallback to default static sitemap
   }
 
   const basePaths = ['', '/login', '/register', '/search', '/categories', '/cart'];

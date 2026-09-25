@@ -101,7 +101,7 @@ describe('SeederService - seedUsersAndShops', () => {
     expect(userRepo.create).toHaveBeenCalledTimes(7);
     const created = userRepo.create.mock.calls.map((c) => c[0]) as Array<Record<string, unknown>>;
 
-    expect(created[0]).toMatchObject({ email: 'superadmin@gramerbazar.com' });
+    expect(created[0]).toMatchObject({ email: 'codeswithrakib@gmail.com' });
     expect(created[1]).toMatchObject({ email: 'admin@gramerbazar.com' });
     expect(created[4]).toMatchObject({ email: 'seller2@gramerbazar.com' });
     expect(created[5]).toMatchObject({

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MapPin, ShoppingCart, User, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RootState } from "@/store/store";
-import { setLoginModalOpen, logout, setUser } from "@/store/slices/authSlice";
+import { logout, setUser } from "@/store/slices/authSlice";
 import { setCartOpen } from "@/store/slices/cartSlice";
 import { useGetProfileQuery } from "@/features/auth/authApi";
 import { useGetUserWishlistQuery } from "@/features/wishlists/wishlistsApi";

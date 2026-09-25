@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { logout } from '@/store/slices/authSlice';
 import { Button } from '@/components/ui/button';
-import { ShieldAlert, ArrowLeft, LogOut, Home, LayoutDashboard } from 'lucide-react';
+import { ShieldAlert, LogOut, Home, LayoutDashboard } from 'lucide-react';
 
 export default function UnauthorizedPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);

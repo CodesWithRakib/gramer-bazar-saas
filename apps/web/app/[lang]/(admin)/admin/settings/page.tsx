@@ -27,6 +27,7 @@ import {
 const settingsSchema = z.object({
   platformName: z.string().min(2, 'Platform name is required').max(150),
   supportEmail: z.string().email('A valid support email is required'),
+  supportPhone: z.string().optional(),
   allowSellerRegistration: z.boolean(),
 });
 
@@ -42,6 +43,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ lang: 
     values: {
       platformName: settings?.platformName ?? '',
       supportEmail: settings?.supportEmail ?? '',
+      supportPhone: settings?.supportPhone ?? '',
       allowSellerRegistration: settings?.allowSellerRegistration ?? true,
     },
   });
@@ -111,6 +113,19 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ lang: 
                     <FormLabel>{isBn ? 'সাপোর্ট ইমেইল' : 'Support Email'}</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="supportPhone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isBn ? 'প্রধান যোগাযোগ নম্বর' : 'Primary Contact Phone'}</FormLabel>
+                    <FormControl>
+                      <Input type="tel" {...field} placeholder="+8801767476724" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

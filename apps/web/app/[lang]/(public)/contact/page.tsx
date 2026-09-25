@@ -12,8 +12,12 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
       </p>
       <div className="bg-card border shadow-sm p-6 rounded-xl space-y-4 text-left">
         <div>
+          <h3 className="font-semibold text-lg">{isBn ? "মোবাইল / হেল্পলাইন" : "Phone / Helpline"}</h3>
+          <p className="text-muted-foreground font-mono">+880 1767-476724</p>
+        </div>
+        <div>
           <h3 className="font-semibold text-lg">{isBn ? "ইমেইল" : "Email"}</h3>
-          <p className="text-muted-foreground">support@gramerbazar.com</p>
+          <p className="text-muted-foreground">codeswithrakib@gmail.com</p>
         </div>
         <div>
           <h3 className="font-semibold text-lg">{isBn ? "ঠিকানা" : "Address"}</h3>

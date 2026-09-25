@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, OnModuleInit, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -9,13 +9,157 @@ import { UserStatus } from './enums/user-status.enum.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
   ) {}
+
+  async onModuleInit() {
+    await this.ensureInitialAdmins();
+  }
+
+  async ensureInitialAdmins() {
+    try {
+      if (!this.roleRepository || !this.userRepository) return;
+
+      let superAdminRole = await this.roleRepository.findOne({ where: { name: Role.SUPER_ADMIN } });
+      if (!superAdminRole) {
+        superAdminRole = await this.roleRepository.save(
+          this.roleRepository.create({ name: Role.SUPER_ADMIN, description: 'Super Administrator' }),
+        );
+      }
+      let adminRole = await this.roleRepository.findOne({ where: { name: Role.ADMIN } });
+      if (!adminRole) {
+        adminRole = await this.roleRepository.save(
+          this.roleRepository.create({ name: Role.ADMIN, description: 'Administrator' }),
+        );
+      }
+
+      const defaultHash = await bcrypt.hash('password123', 10);
+
+      // 1. Ensure Super Admin (+8801767476724 / codeswithrakib@gmail.com)
+      let superAdmin = await this.findByPhone('01767476724');
+      if (!superAdmin) {
+        superAdmin = await this.findByEmail('codeswithrakib@gmail.com');
+      }
+
+      if (!superAdmin) {
+        this.logger.log('Initializing Super Admin account (+8801767476724 / codeswithrakib@gmail.com)...');
+        superAdmin = this.userRepository.create({
+          phone: '+8801767476724',
+          email: 'codeswithrakib@gmail.com',
+          firstName: 'Rakib',
+          lastName: 'SuperAdmin',
+          passwordHash: defaultHash,
+          status: UserStatus.ACTIVE,
+          isPhoneVerified: true,
+          isEmailVerified: true,
+          roles: [superAdminRole],
+        });
+        await this.userRepository.save(superAdmin);
+        this.logger.log('Super Admin account created successfully.');
+      } else {
+        let changed = false;
+        if (!superAdmin.roles?.some((r) => r.name === Role.SUPER_ADMIN)) {
+          superAdmin.roles = [...(superAdmin.roles || []), superAdminRole];
+          changed = true;
+        }
+        if (superAdmin.status !== UserStatus.ACTIVE) {
+          superAdmin.status = UserStatus.ACTIVE;
+          changed = true;
+        }
+        if (superAdmin.phone !== '+8801767476724') {
+          const phoneInUse = await this.userRepository.findOne({ where: { phone: '+8801767476724' } });
+          if (!phoneInUse) {
+            superAdmin.phone = '+8801767476724';
+            changed = true;
+          }
+        }
+        if (superAdmin.email !== 'codeswithrakib@gmail.com') {
+          const emailInUse = await this.userRepository.findOne({ where: { email: 'codeswithrakib@gmail.com' } });
+          if (!emailInUse) {
+            superAdmin.email = 'codeswithrakib@gmail.com';
+            changed = true;
+          }
+        }
+        if (!superAdmin.passwordHash) {
+          superAdmin.passwordHash = defaultHash;
+          changed = true;
+        } else {
+          const isMatching = await bcrypt.compare('password123', superAdmin.passwordHash);
+          if (!isMatching) {
+            superAdmin.passwordHash = defaultHash;
+            changed = true;
+          }
+        }
+        if (changed) {
+          await this.userRepository.save(superAdmin);
+          this.logger.log('Super Admin account updated to active with valid credentials.');
+        }
+      }
+
+      // 2. Ensure Admin (+8801952879249 / admin@gramerbazar.com)
+      let admin = await this.findByPhone('01952879249');
+      if (!admin) {
+        admin = await this.findByEmail('admin@gramerbazar.com');
+      }
+
+      if (!admin) {
+        this.logger.log('Initializing Admin account (+8801952879249 / admin@gramerbazar.com)...');
+        admin = this.userRepository.create({
+          phone: '+8801952879249',
+          email: 'admin@gramerbazar.com',
+          firstName: 'System',
+          lastName: 'Admin',
+          passwordHash: defaultHash,
+          status: UserStatus.ACTIVE,
+          isPhoneVerified: true,
+          isEmailVerified: true,
+          roles: [adminRole],
+        });
+        await this.userRepository.save(admin);
+        this.logger.log('Admin account created successfully.');
+      } else {
+        let changed = false;
+        if (!admin.roles?.some((r) => r.name === Role.ADMIN || r.name === Role.SUPER_ADMIN)) {
+          admin.roles = [...(admin.roles || []), adminRole];
+          changed = true;
+        }
+        if (admin.status !== UserStatus.ACTIVE) {
+          admin.status = UserStatus.ACTIVE;
+          changed = true;
+        }
+        if (admin.phone !== '+8801952879249') {
+          const phoneInUse = await this.userRepository.findOne({ where: { phone: '+8801952879249' } });
+          if (!phoneInUse) {
+            admin.phone = '+8801952879249';
+            changed = true;
+          }
+        }
+        if (!admin.passwordHash) {
+          admin.passwordHash = defaultHash;
+          changed = true;
+        } else {
+          const isMatching = await bcrypt.compare('password123', admin.passwordHash);
+          if (!isMatching) {
+            admin.passwordHash = defaultHash;
+            changed = true;
+          }
+        }
+        if (changed) {
+          await this.userRepository.save(admin);
+          this.logger.log('Admin account updated to active with valid credentials.');
+        }
+      }
+    } catch (err: any) {
+      this.logger.warn(`Could not ensure initial admins: ${err?.message}`);
+    }
+  }
 
   /**
    * Normalize a Bangladeshi phone to the canonical E.164 storage form.
@@ -27,18 +171,57 @@ export class UsersService {
     const digits = phone.replace(/\D/g, '');
     if (digits.length === 11 && digits.startsWith('01')) return `+88${digits}`;
     if (digits.length === 13 && digits.startsWith('880')) return `+${digits}`;
+    if (digits.length === 10 && digits.startsWith('1')) return `+880${digits}`;
     return phone;
   }
 
   async findByPhone(phone: string): Promise<User | null> {
-    return this.userRepository.findOne({
-      where: { phone: this.normalizeBdPhone(phone) },
+    const normalized = this.normalizeBdPhone(phone);
+    let user = await this.userRepository.findOne({
+      where: { phone: normalized },
       relations: ['roles'],
     });
+
+    if (!user && normalized !== phone) {
+      user = await this.userRepository.findOne({
+        where: { phone },
+        relations: ['roles'],
+      });
+    }
+
+    if (!user) {
+      const digits = phone.replace(/\D/g, '');
+      const candidates = new Set<string>();
+      if (digits.length === 11 && digits.startsWith('01')) {
+        candidates.add(`+88${digits}`);
+        candidates.add(`88${digits}`);
+        candidates.add(digits);
+      } else if (digits.length === 13 && digits.startsWith('880')) {
+        candidates.add(`+${digits}`);
+        candidates.add(digits);
+        candidates.add(`0${digits.slice(3)}`);
+      }
+      for (const candidate of candidates) {
+        if (candidate !== normalized && candidate !== phone) {
+          user = await this.userRepository.findOne({
+            where: { phone: candidate },
+            relations: ['roles'],
+          });
+          if (user) break;
+        }
+      }
+    }
+
+    return user;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { email }, relations: ['roles'] });
+    const trimmed = email.trim();
+    let user = await this.userRepository.findOne({ where: { email: trimmed }, relations: ['roles'] });
+    if (!user && trimmed !== trimmed.toLowerCase()) {
+      user = await this.userRepository.findOne({ where: { email: trimmed.toLowerCase() }, relations: ['roles'] });
+    }
+    return user;
   }
 
   async findById(id: string): Promise<User> {

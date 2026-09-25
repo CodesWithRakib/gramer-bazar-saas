@@ -3,6 +3,7 @@ import { api } from '@/store/api';
 export interface PlatformSettings {
   platformName: string;
   supportEmail: string;
+  supportPhone?: string;
   allowSellerRegistration: boolean;
 }
 

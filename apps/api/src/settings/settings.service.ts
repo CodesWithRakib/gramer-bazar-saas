@@ -7,6 +7,7 @@ import { UpdateSettingsDto } from './dto/update-settings.dto.js';
 export interface PlatformSettings {
   platformName: string;
   supportEmail: string;
+  supportPhone: string;
   allowSellerRegistration: boolean;
   isMaintenanceMode: boolean;
 }
@@ -14,13 +15,15 @@ export interface PlatformSettings {
 const KEYS = {
   platformName: 'platformName',
   supportEmail: 'supportEmail',
+  supportPhone: 'supportPhone',
   allowSellerRegistration: 'allowSellerRegistration',
   isMaintenanceMode: 'isMaintenanceMode',
 } as const;
 
 const DEFAULTS: PlatformSettings = {
   platformName: 'Gramer Bazar',
-  supportEmail: 'support@gramerbazar.com',
+  supportEmail: 'codeswithrakib@gmail.com',
+  supportPhone: '8801767476724',
   allowSellerRegistration: true,
   isMaintenanceMode: false,
 };
@@ -39,6 +42,7 @@ export class SettingsService {
     return {
       platformName: stored.get(KEYS.platformName) ?? DEFAULTS.platformName,
       supportEmail: stored.get(KEYS.supportEmail) ?? DEFAULTS.supportEmail,
+      supportPhone: stored.get(KEYS.supportPhone) ?? DEFAULTS.supportPhone,
       allowSellerRegistration:
         (stored.get(KEYS.allowSellerRegistration) ?? String(DEFAULTS.allowSellerRegistration)) ===
         'true',
@@ -53,6 +57,7 @@ export class SettingsService {
 
     if (dto.platformName !== undefined) entries.push([KEYS.platformName, dto.platformName]);
     if (dto.supportEmail !== undefined) entries.push([KEYS.supportEmail, dto.supportEmail]);
+    if (dto.supportPhone !== undefined) entries.push([KEYS.supportPhone, dto.supportPhone]);
     if (dto.allowSellerRegistration !== undefined) {
       entries.push([KEYS.allowSellerRegistration, String(dto.allowSellerRegistration)]);
     }

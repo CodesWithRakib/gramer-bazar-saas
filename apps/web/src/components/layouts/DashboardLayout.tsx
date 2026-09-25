@@ -15,7 +15,7 @@ import {
   customerRoutes,
 } from "@/config/dashboard-routes";
 import { api } from "@/store/api";
-import { Menu, LogOut, ChevronDown, Store, User, Settings, ShieldCheck } from "lucide-react";
+import { Menu, LogOut, ChevronDown, Store, User, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/NotificationBell";

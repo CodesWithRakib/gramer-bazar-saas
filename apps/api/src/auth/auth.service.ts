@@ -66,9 +66,10 @@ export class AuthService {
   }
 
   async loginWithPassword(emailOrPhone: string, pass: string) {
-    let user = await this.usersService.findByEmail(emailOrPhone);
+    const rawIdentifier = (emailOrPhone || '').trim();
+    let user = await this.usersService.findByEmail(rawIdentifier);
     if (!user) {
-      user = await this.usersService.findByPhone(emailOrPhone);
+      user = await this.usersService.findByPhone(rawIdentifier);
     }
 
     if (!user) {

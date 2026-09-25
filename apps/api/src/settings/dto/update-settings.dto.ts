@@ -14,6 +14,12 @@ export class UpdateSettingsDto {
   supportEmail?: string;
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  @MaxLength(30)
+  supportPhone?: string;
+
+  @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
   allowSellerRegistration?: boolean;

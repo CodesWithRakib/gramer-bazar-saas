@@ -8,7 +8,6 @@ import {
   Users,
   Store,
   Truck,
-  Settings,
   ArrowRight,
   ClipboardList,
   Activity,

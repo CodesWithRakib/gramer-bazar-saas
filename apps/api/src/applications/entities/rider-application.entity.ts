@@ -16,38 +16,38 @@ export class RiderApplication {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: Relation<User>;
 
-  @Column({ name: 'full_name', length: 150 })
+  @Column({ name: 'full_name', type: 'varchar', length: 150 })
   fullName: string;
 
-  @Column({ length: 20 })
+  @Column({ type: 'varchar', length: 20 })
   phone: string;
 
-  @Column({ length: 150, nullable: true })
+  @Column({ type: 'varchar', length: 150, nullable: true })
   email: string | null;
 
-  @Column({ name: 'nid_number', length: 50 })
+  @Column({ name: 'nid_number', type: 'varchar', length: 50 })
   nidNumber: string;
 
-  @Column({ name: 'vehicle_type', length: 50, default: 'BIKE' })
+  @Column({ name: 'vehicle_type', type: 'varchar', length: 50, default: 'BIKE' })
   vehicleType: string;
 
-  @Column({ name: 'vehicle_plate_number', length: 100, nullable: true })
+  @Column({ name: 'vehicle_plate_number', type: 'varchar', length: 100, nullable: true })
   vehiclePlateNumber: string | null;
 
-  @Column({ name: 'driving_license_number', length: 100, nullable: true })
+  @Column({ name: 'driving_license_number', type: 'varchar', length: 100, nullable: true })
   drivingLicenseNumber: string | null;
 
-  @Column({ name: 'preferred_zone', length: 150, nullable: true })
+  @Column({ name: 'preferred_zone', type: 'varchar', length: 150, nullable: true })
   preferredZone: string | null;
 
-  @Column({ name: 'emergency_contact', length: 50, nullable: true })
+  @Column({ name: 'emergency_contact', type: 'varchar', length: 50, nullable: true })
   emergencyContact: string | null;
 
   @Column({
@@ -60,7 +60,7 @@ export class RiderApplication {
   @Column({ name: 'admin_notes', type: 'text', nullable: true })
   adminNotes: string | null;
 
-  @Column({ name: 'reviewer_id', nullable: true })
+  @Column({ name: 'reviewer_id', type: 'uuid', nullable: true })
   reviewerId: string | null;
 
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })

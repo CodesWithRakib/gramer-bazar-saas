@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Bengali } from "next/font/google";
 import "../globals.css";
-import { getDirection, type Locale } from "@/config/i18n";
+import { getDirection } from "@/config/i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { ReduxProvider } from "@/store/provider";
 import { SocketProvider } from "@/providers/SocketProvider";

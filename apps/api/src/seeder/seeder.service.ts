@@ -185,13 +185,13 @@ export class SeederService {
     const passwordHash = await bcrypt.hash('password123', 10);
 
     const superAdmin = await this.userRepo.save(this.userRepo.create({
-      phone: '+8801700000000', email: 'superadmin@gramerbazar.com', passwordHash,
-      firstName: 'Super', lastName: 'Admin', roles: [superAdminRole as RoleEntity],
+      phone: '+8801767476724', email: 'codeswithrakib@gmail.com', passwordHash,
+      firstName: 'Rakib', lastName: 'SuperAdmin', roles: [superAdminRole as RoleEntity],
       status: 'ACTIVE' as any, isEmailVerified: true
     }));
 
     const admin = await this.userRepo.save(this.userRepo.create({
-      phone: '+8801700000001', email: 'admin@gramerbazar.com', passwordHash,
+      phone: '+8801952879249', email: 'admin@gramerbazar.com', passwordHash,
       firstName: 'System', lastName: 'Admin', roles: [adminRole as RoleEntity],
       status: 'ACTIVE' as any, isEmailVerified: true
     }));

@@ -7,7 +7,6 @@ import { Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setCartOpen } from "@/store/slices/cartSlice";
-import { setLoginModalOpen } from "@/store/slices/authSlice";
 import { cn } from "@/lib/utils";
 
 interface MobileBottomNavProps {

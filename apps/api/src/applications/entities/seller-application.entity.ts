@@ -16,26 +16,26 @@ export class SellerApplication {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: Relation<User>;
 
-  @Column({ name: 'shop_name_en', length: 150 })
+  @Column({ name: 'shop_name_en', type: 'varchar', length: 150 })
   shopNameEn: string;
 
-  @Column({ name: 'shop_name_bn', length: 200 })
+  @Column({ name: 'shop_name_bn', type: 'varchar', length: 200 })
   shopNameBn: string;
 
-  @Column({ name: 'shop_slug', length: 150 })
+  @Column({ name: 'shop_slug', type: 'varchar', length: 150 })
   shopSlug: string;
 
-  @Column({ length: 20 })
+  @Column({ type: 'varchar', length: 20 })
   phone: string;
 
-  @Column({ length: 150, nullable: true })
+  @Column({ type: 'varchar', length: 150, nullable: true })
   email: string | null;
 
   @Column({ type: 'text', nullable: true })
@@ -44,10 +44,10 @@ export class SellerApplication {
   @Column({ type: 'text', nullable: true })
   address: string | null;
 
-  @Column({ name: 'trade_license_number', length: 100, nullable: true })
+  @Column({ name: 'trade_license_number', type: 'varchar', length: 100, nullable: true })
   tradeLicenseNumber: string | null;
 
-  @Column({ name: 'nid_number', length: 50, nullable: true })
+  @Column({ name: 'nid_number', type: 'varchar', length: 50, nullable: true })
   nidNumber: string | null;
 
   @Column({
@@ -60,7 +60,7 @@ export class SellerApplication {
   @Column({ name: 'admin_notes', type: 'text', nullable: true })
   adminNotes: string | null;
 
-  @Column({ name: 'reviewer_id', nullable: true })
+  @Column({ name: 'reviewer_id', type: 'uuid', nullable: true })
   reviewerId: string | null;
 
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
