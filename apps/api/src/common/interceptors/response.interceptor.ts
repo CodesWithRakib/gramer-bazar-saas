@@ -23,13 +23,24 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, GlobalResponse
     const response = ctx.getResponse<ExpressResponse>();
 
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        statusCode: response.statusCode,
-        path: request.url,
-        timestamp: new Date().toISOString(),
-        data,
-      })),
+      map((data) => {
+        const contentType = response.getHeader('content-type');
+        if (
+          (typeof contentType === 'string' && contentType.includes('text/html')) ||
+          (typeof data === 'string' && data.trim().startsWith('<!DOCTYPE html'))
+        ) {
+          response.setHeader('content-type', 'text/html; charset=utf-8');
+          return data;
+        }
+
+        return {
+          success: true,
+          statusCode: response.statusCode,
+          path: request.url,
+          timestamp: new Date().toISOString(),
+          data,
+        };
+      }),
     );
   }
 }

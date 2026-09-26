@@ -22,6 +22,15 @@ async function bootstrap() {
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+          imgSrc: ["'self'", 'data:', 'https:'],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+        },
+      },
     }),
   );
 
@@ -52,6 +61,7 @@ async function bootstrap() {
     'http://127.0.0.1:3001',
     'http://127.0.0.1:3002',
     'https://gramer-bazar-saas.vercel.app',
+    'https://gramer-bazar-api.onrender.com',
   ];
 
   const allowedOrigins = Array.from(
@@ -116,7 +126,9 @@ async function bootstrap() {
   });
 
   // Global Prefix
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['/', 'health', 'docs', 'favicon.ico'],
+  });
 
   // Global Validation
   app.useGlobalPipes(
