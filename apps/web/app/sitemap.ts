@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
   // Use 127.0.0.1 instead of localhost for Node fetch to avoid IPv6 resolution issues (ECONNREFUSED)
   if (typeof window === 'undefined') {

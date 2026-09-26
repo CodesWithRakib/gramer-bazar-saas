@@ -71,8 +71,9 @@ export class PaymentsService {
     const rawPublicUrl =
       dynamicConfig?.publicUrl ||
       this.configService.get<string>('SSLCOMMERZ_PUBLIC_URL') ||
+      this.configService.get<string>('BACKEND_URL') ||
       this.configService.get<string>('API_URL') ||
-      'https://undone-unsure-twisting.ngrok-free.dev';
+      'http://localhost:4000';
     const baseUrl = rawPublicUrl.replace(/\/+$/, '');
     return {
       successUrl: `${baseUrl}/api/v1/payments/sslcommerz/success`,

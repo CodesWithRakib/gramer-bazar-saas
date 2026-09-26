@@ -33,12 +33,22 @@ import { Delivery } from '../deliveries/entities/delivery.entity.js';
 import { DeliveryHistory } from '../deliveries/entities/delivery-history.entity.js';
 import { WishlistItem } from '../wishlists/entities/wishlist-item.entity.js';
 import { Coupon } from '../coupons/entities/coupon.entity.js';
+import { CouponUsage } from '../coupons/entities/coupon-usage.entity.js';
 import { Notification } from '../notifications/entities/notification.entity.js';
 import { Conversation } from '../chat/entities/conversation.entity.js';
 import { Message } from '../chat/entities/message.entity.js';
 import { Wallet } from '../wallets/entities/wallet.entity.js';
 import { WalletTransaction } from '../wallets/entities/wallet-transaction.entity.js';
 import { DemandEvent } from '../analytics/entities/demand-event.entity.js';
+import { PermissionEntity } from '../permissions/entities/permission.entity.js';
+import { SellerApplication } from '../applications/entities/seller-application.entity.js';
+import { RiderApplication } from '../applications/entities/rider-application.entity.js';
+import { ProductRequest } from '../product-requests/entities/product-request.entity.js';
+import { ProductRequestHistory } from '../product-requests/entities/product-request-history.entity.js';
+import { Dispute } from '../disputes/entities/dispute.entity.js';
+import { DisputeMessage } from '../disputes/entities/dispute-message.entity.js';
+import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
+import { Otp } from '../otp/entities/otp.entity.js';
 import { SeederService } from './seeder.service.js';
 
 const makeRepo = () => ({
@@ -92,12 +102,22 @@ describe('SeederService - seedUsersAndShops', () => {
         { provide: getRepositoryToken(DeliveryHistory), useValue: makeRepo() },
         { provide: getRepositoryToken(WishlistItem), useValue: makeRepo() },
         { provide: getRepositoryToken(Coupon), useValue: makeRepo() },
+        { provide: getRepositoryToken(CouponUsage), useValue: makeRepo() },
         { provide: getRepositoryToken(Notification), useValue: makeRepo() },
         { provide: getRepositoryToken(Conversation), useValue: makeRepo() },
         { provide: getRepositoryToken(Message), useValue: makeRepo() },
         { provide: getRepositoryToken(Wallet), useValue: makeRepo() },
         { provide: getRepositoryToken(WalletTransaction), useValue: makeRepo() },
         { provide: getRepositoryToken(DemandEvent), useValue: makeRepo() },
+        { provide: getRepositoryToken(PermissionEntity), useValue: makeRepo() },
+        { provide: getRepositoryToken(SellerApplication), useValue: makeRepo() },
+        { provide: getRepositoryToken(RiderApplication), useValue: makeRepo() },
+        { provide: getRepositoryToken(ProductRequest), useValue: makeRepo() },
+        { provide: getRepositoryToken(ProductRequestHistory), useValue: makeRepo() },
+        { provide: getRepositoryToken(Dispute), useValue: makeRepo() },
+        { provide: getRepositoryToken(DisputeMessage), useValue: makeRepo() },
+        { provide: getRepositoryToken(PayoutRequest), useValue: makeRepo() },
+        { provide: getRepositoryToken(Otp), useValue: makeRepo() },
       ],
     }).compile();
 

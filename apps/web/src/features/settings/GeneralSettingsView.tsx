@@ -55,7 +55,7 @@ const settingsSchema = z.object({
     .string()
     .refine(
       (val) => !val || val.startsWith("http://") || val.startsWith("https://"),
-      "Must be a valid HTTP or HTTPS URL (e.g. https://undone-unsure-twisting.ngrok-free.dev)",
+      "Must be a valid HTTP or HTTPS URL (e.g. https://your-tunnel.ngrok-free.app or https://api.yourdomain.com)",
     )
     .optional(),
   sslczStoreId: z.string().optional(),
@@ -95,9 +95,12 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
     },
   });
 
+  const defaultPublicUrl =
+    (process.env.NEXT_PUBLIC_API_URL
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "")
+      : "") || "https://api.yourdomain.com";
   const watchedPublicUrl =
-    form.watch("sslczPublicUrl") ||
-    "https://undone-unsure-twisting.ngrok-free.dev";
+    form.watch("sslczPublicUrl") || defaultPublicUrl;
   const cleanPublicUrl = watchedPublicUrl.trim().replace(/\/+$/, "");
   const isLive = form.watch("sslczIsLive");
 
@@ -262,7 +265,7 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
                       <div className="relative">
                         <Input
                           {...field}
-                          placeholder="https://undone-unsure-twisting.ngrok-free.dev"
+                          placeholder="https://your-tunnel.ngrok-free.app"
                           className="font-mono text-sm pl-9"
                         />
                         <Globe className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
@@ -364,7 +367,7 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="ghore6ab014aca85d1"
+                          placeholder="your_store_id"
                           className="font-mono text-sm"
                         />
                       </FormControl>

@@ -91,7 +91,7 @@ export default async function Image({ params }: { params: { slug: string; lang: 
           <div style={{ display: 'flex', width: '40%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
-              src={image.startsWith('http') ? image : `http://localhost:3000${image}`} 
+              src={image.startsWith('http') ? image : `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${image.startsWith('/') ? image : `/${image}`}`} 
               alt={name}
               style={{
                 maxWidth: '100%',

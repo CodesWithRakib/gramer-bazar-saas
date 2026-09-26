@@ -28,7 +28,7 @@ async function bootstrap() {
       { name: 'product_variants', query: 'SELECT COUNT(*) as count FROM product_variants' },
       { name: 'product_images', query: 'SELECT COUNT(*) as count FROM product_images' },
       { name: 'seller_products', query: 'SELECT COUNT(*) as count FROM seller_products' },
-      { name: 'inventories', query: 'SELECT COUNT(*) as count FROM inventories' },
+      { name: 'inventory', query: 'SELECT COUNT(*) as count FROM inventory' },
       { name: 'addresses', query: 'SELECT COUNT(*) as count FROM addresses' },
       { name: 'orders', query: 'SELECT COUNT(*) as count FROM orders' },
       { name: 'order_items', query: 'SELECT COUNT(*) as count FROM order_items' },
@@ -47,6 +47,18 @@ async function bootstrap() {
       { name: 'demand_events', query: 'SELECT COUNT(*) as count FROM demand_events' },
       { name: 'banners', query: 'SELECT COUNT(*) as count FROM banners' },
       { name: 'flash_sales', query: 'SELECT COUNT(*) as count FROM flash_sales' },
+      { name: 'permissions', query: 'SELECT COUNT(*) as count FROM permissions' },
+      { name: 'role_permissions', query: 'SELECT COUNT(*) as count FROM role_permissions' },
+      { name: 'category_brands', query: 'SELECT COUNT(*) as count FROM category_brands' },
+      { name: 'seller_applications', query: 'SELECT COUNT(*) as count FROM seller_applications' },
+      { name: 'rider_applications', query: 'SELECT COUNT(*) as count FROM rider_applications' },
+      { name: 'product_requests', query: 'SELECT COUNT(*) as count FROM product_requests' },
+      { name: 'product_request_history', query: 'SELECT COUNT(*) as count FROM product_request_history' },
+      { name: 'disputes', query: 'SELECT COUNT(*) as count FROM disputes' },
+      { name: 'dispute_messages', query: 'SELECT COUNT(*) as count FROM dispute_messages' },
+      { name: 'coupon_usages', query: 'SELECT COUNT(*) as count FROM coupon_usages' },
+      { name: 'payout_requests', query: 'SELECT COUNT(*) as count FROM payout_requests' },
+      { name: 'otps', query: 'SELECT COUNT(*) as count FROM otps' },
     ];
 
     console.log('--- 1. TABLE RECORD COUNTS ---');
@@ -82,6 +94,36 @@ async function bootstrap() {
     );
     console.log(`  ✓ Orders with Inconsistent Totals: ${invalidTotals[0]?.count || 0}`);
 
+    // Check orphan disputes
+    const orphanDisputes = await dataSource.query(
+      'SELECT COUNT(*) as count FROM disputes d LEFT JOIN orders o ON d."orderId" = o.id WHERE o.id IS NULL',
+    );
+    console.log(`  ✓ Orphan Disputes without Order: ${orphanDisputes[0]?.count || 0}`);
+
+    // Check orphan dispute messages
+    const orphanDisputeMsgs = await dataSource.query(
+      'SELECT COUNT(*) as count FROM dispute_messages dm LEFT JOIN disputes d ON dm."disputeId" = d.id WHERE d.id IS NULL',
+    );
+    console.log(`  ✓ Orphan Dispute Messages: ${orphanDisputeMsgs[0]?.count || 0}`);
+
+    // Check orphan product request history
+    const orphanReqHistory = await dataSource.query(
+      'SELECT COUNT(*) as count FROM product_request_history prh LEFT JOIN product_requests pr ON prh.product_request_id = pr.id WHERE pr.id IS NULL',
+    );
+    console.log(`  ✓ Orphan Product Request History: ${orphanReqHistory[0]?.count || 0}`);
+
+    // Check orphan payout requests
+    const orphanPayouts = await dataSource.query(
+      'SELECT COUNT(*) as count FROM payout_requests pr LEFT JOIN users u ON pr.seller_id = u.id WHERE u.id IS NULL',
+    );
+    console.log(`  ✓ Orphan Payout Requests without User: ${orphanPayouts[0]?.count || 0}`);
+
+    // Check orphan coupon usages
+    const orphanCouponUsages = await dataSource.query(
+      'SELECT COUNT(*) as count FROM coupon_usages cu LEFT JOIN coupons c ON cu.coupon_id = c.id WHERE c.id IS NULL',
+    );
+    console.log(`  ✓ Orphan Coupon Usages without Coupon: ${orphanCouponUsages[0]?.count || 0}`);
+
     // 3. Real Authentication Flow Test
     console.log('\n--- 3. AUTHENTICATION FLOW VERIFICATION ---');
     const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'Admin@GramerBazar2026!';
@@ -91,7 +133,7 @@ async function bootstrap() {
 
     const accountsToTest = [
       { role: 'Admin', email: 'admin@gramerbazar.example', pass: adminPassword },
-      { role: 'Admin (System)', email: 'admin@gramerbazar.com', pass: adminPassword },
+      { role: 'Admin (System/E2E)', email: 'admin@gramerbazar.com', pass: 'password123' },
       { role: 'Shop Owner', email: 'shop1@gramerbazar.example', pass: shopPassword },
       { role: 'Shop Owner (Alt)', email: 'seller1@gramerbazar.com', pass: shopPassword },
       { role: 'Customer', email: 'customer1@gramerbazar.example', pass: customerPassword },

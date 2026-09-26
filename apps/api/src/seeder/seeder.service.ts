@@ -38,6 +38,7 @@ import { DeliveryHistory } from '../deliveries/entities/delivery-history.entity.
 import { DeliveryStatus } from '../deliveries/enums/delivery-status.enum.js';
 import { WishlistItem } from '../wishlists/entities/wishlist-item.entity.js';
 import { Coupon } from '../coupons/entities/coupon.entity.js';
+import { CouponUsage } from '../coupons/entities/coupon-usage.entity.js';
 import { DiscountType } from '../coupons/enums/discount-type.enum.js';
 import { Notification, NotificationType } from '../notifications/entities/notification.entity.js';
 import { Conversation } from '../chat/entities/conversation.entity.js';
@@ -46,11 +47,28 @@ import { Wallet } from '../wallets/entities/wallet.entity.js';
 import { WalletTransaction, TransactionType } from '../wallets/entities/wallet-transaction.entity.js';
 import { DemandEvent } from '../analytics/entities/demand-event.entity.js';
 import { DemandEventType } from '../analytics/enums/demand-event.enum.js';
+import { PermissionEntity } from '../permissions/entities/permission.entity.js';
+import { SellerApplication } from '../applications/entities/seller-application.entity.js';
+import { RiderApplication } from '../applications/entities/rider-application.entity.js';
+import { ApplicationStatus } from '../applications/enums/application-status.enum.js';
+import { ProductRequest } from '../product-requests/entities/product-request.entity.js';
+import { ProductRequestHistory } from '../product-requests/entities/product-request-history.entity.js';
+import { ProductRequestStatus } from '../product-requests/enums/product-request-status.enum.js';
+import { Dispute } from '../disputes/entities/dispute.entity.js';
+import { DisputeMessage } from '../disputes/entities/dispute-message.entity.js';
+import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
+import { Otp } from '../otp/entities/otp.entity.js';
 
 import { SEED_ADMINS, SEED_SELLERS, SEED_CUSTOMERS, SEED_RIDERS, SeedUserData } from './data/seed-users.data.js';
 import { SEED_SHOPS } from './data/seed-shops.data.js';
 import { SEED_PRODUCTS, SeedProductItem } from './data/seed-products.data.js';
 import { SEED_ADDRESSES } from './data/seed-addresses.data.js';
+import { SEED_PERMISSIONS, ROLE_PERMISSION_NAMES } from './data/seed-permissions.data.js';
+import { BRAND_CATEGORY_SLUG_MAP } from './data/seed-category-brands.data.js';
+import { SEED_SELLER_APPLICATIONS, SEED_RIDER_APPLICATIONS } from './data/seed-applications.data.js';
+import { SEED_PRODUCT_REQUESTS } from './data/seed-product-requests.data.js';
+import { SEED_DISPUTES } from './data/seed-disputes.data.js';
+import { SEED_PAYOUT_REQUESTS } from './data/seed-payouts.data.js';
 
 @Injectable()
 export class SeederService {
@@ -87,33 +105,50 @@ export class SeederService {
     @InjectRepository(DeliveryHistory) private deliveryHistoryRepo: Repository<DeliveryHistory>,
     @InjectRepository(WishlistItem) private wishlistRepo: Repository<WishlistItem>,
     @InjectRepository(Coupon) private couponRepo: Repository<Coupon>,
+    @InjectRepository(CouponUsage) private couponUsageRepo: Repository<CouponUsage>,
     @InjectRepository(Notification) private notificationRepo: Repository<Notification>,
     @InjectRepository(Conversation) private conversationRepo: Repository<Conversation>,
     @InjectRepository(Message) private messageRepo: Repository<Message>,
     @InjectRepository(Wallet) private walletRepo: Repository<Wallet>,
     @InjectRepository(WalletTransaction) private walletTxRepo: Repository<WalletTransaction>,
     @InjectRepository(DemandEvent) private demandEventRepo: Repository<DemandEvent>,
+    @InjectRepository(PermissionEntity) private permissionRepo: Repository<PermissionEntity>,
+    @InjectRepository(SellerApplication) private sellerAppRepo: Repository<SellerApplication>,
+    @InjectRepository(RiderApplication) private riderAppRepo: Repository<RiderApplication>,
+    @InjectRepository(ProductRequest) private productRequestRepo: Repository<ProductRequest>,
+    @InjectRepository(ProductRequestHistory) private productRequestHistoryRepo: Repository<ProductRequestHistory>,
+    @InjectRepository(Dispute) private disputeRepo: Repository<Dispute>,
+    @InjectRepository(DisputeMessage) private disputeMessageRepo: Repository<DisputeMessage>,
+    @InjectRepository(PayoutRequest) private payoutRequestRepo: Repository<PayoutRequest>,
+    @InjectRepository(Otp) private otpRepo: Repository<Otp>,
   ) {}
 
   async seed() {
     this.logger.log('--- Production-Ready Gramer Bazar Seed Starting (Preserving All Data) ---');
 
-    await this.seedRoles();
+    await this.seedPermissionsAndRolePermissions();
     await this.seedLocations();
-    const { sellers, riders, customers } = await this.seedUsers();
-    await this.seedAddresses(customers);
-    const shops = await this.seedShops(sellers);
+    const users = await this.seedUsers();
+    await this.seedAddresses(users.customers);
+    const shops = await this.seedShops(users.sellers);
     const catalog = await this.seedCatalog();
+    await this.seedCategoryBrands(catalog.categories);
     const sellerProducts = await this.seedInventory(shops, catalog.products, catalog.productVariants);
-    await this.seedCoupons();
-    const orders = await this.seedOrdersAndDeliveries(customers, riders, shops, sellerProducts);
-    await this.seedReviews(customers, orders);
-    await this.seedWishlists(customers, catalog.products);
-    await this.seedWallets(customers, sellers);
-    await this.seedNotifications(customers, sellers, orders);
-    await this.seedConversations(customers, sellers);
-    await this.seedDemandEvents(customers, catalog.products);
+    const coupons = await this.seedCoupons();
+    const orders = await this.seedOrdersAndDeliveries(users.customers, users.riders, shops, sellerProducts);
+    await this.seedCouponUsages(coupons, users.customers, orders);
+    await this.seedReviews(users.customers, orders);
+    await this.seedWishlists(users.customers, catalog.products);
+    await this.seedWallets(users.customers, users.sellers);
+    await this.seedPayoutRequests(users.sellers);
+    await this.seedApplications(users.superAdmin, users.admin, users.sellers, users.riders, users.customers);
+    await this.seedProductRequests(users.customers, users.admin, catalog.products);
+    await this.seedDisputes(orders, users.admin);
+    await this.seedNotifications(users.customers, users.sellers, orders);
+    await this.seedConversations(users.customers, users.sellers);
+    await this.seedDemandEvents(users.customers, catalog.products);
     await this.seedMarketing(sellerProducts);
+    await this.seedOtps();
 
     this.logger.log('--- Production-Ready Gramer Bazar Seed Completed Successfully ---');
     return {
@@ -122,12 +157,20 @@ export class SeederService {
         users: await this.userRepo.count(),
         shops: await this.shopRepo.count(),
         categories: await this.categoryRepo.count(),
+        brands: await this.brandRepo.count(),
         products: await this.productRepo.count(),
         sellerProducts: await this.sellerProductRepo.count(),
         addresses: await this.addressRepo.count(),
         orders: await this.orderRepo.count(),
         reviews: await this.reviewRepo.count(),
         notifications: await this.notificationRepo.count(),
+        permissions: await this.permissionRepo.count(),
+        sellerApplications: await this.sellerAppRepo.count(),
+        riderApplications: await this.riderAppRepo.count(),
+        productRequests: await this.productRequestRepo.count(),
+        disputes: await this.disputeRepo.count(),
+        payoutRequests: await this.payoutRequestRepo.count(),
+        couponUsages: await this.couponUsageRepo.count(),
       },
     };
   }
@@ -783,6 +826,7 @@ export class SeederService {
         );
       }
     }
+    return await this.couponRepo.find();
   }
 
   async seedOrdersAndDeliveries(
@@ -795,7 +839,7 @@ export class SeederService {
     const existingCount = await this.orderRepo.count();
     if (existingCount >= 40) {
       this.logger.log(`Orders already populated (${existingCount} orders found). Skipping to preserve data.`);
-      return await this.orderRepo.find({ relations: ['items', 'items.sellerProduct'] });
+      return await this.orderRepo.find({ relations: ['user', 'items', 'items.sellerProduct'] });
     }
 
     const savedOrders: Order[] = [];
@@ -1285,5 +1329,356 @@ export class SeederService {
         );
       }
     }
+  }
+
+  async seedPermissionsAndRolePermissions() {
+    this.logger.log('Seeding fine-grained RBAC permissions and role_permissions...');
+    const permMap = new Map<string, PermissionEntity>();
+
+    for (const p of SEED_PERMISSIONS) {
+      let perm = await this.permissionRepo.findOne({ where: { name: p.name } });
+      if (!perm) {
+        perm = await this.permissionRepo.save(
+          this.permissionRepo.create({
+            name: p.name,
+            description: p.description,
+          }),
+        );
+      }
+      permMap.set(p.name, perm);
+    }
+
+    // Attach to roles
+    for (const roleEnum of Object.values(Role)) {
+      const role = await this.roleRepo.findOne({
+        where: { name: roleEnum },
+        relations: ['permissions'],
+      });
+      if (role) {
+        const allowedNames = ROLE_PERMISSION_NAMES[roleEnum] || [];
+        const permsToAssign: PermissionEntity[] = [];
+        for (const name of allowedNames) {
+          const entity = permMap.get(name);
+          if (entity) permsToAssign.push(entity);
+        }
+        role.permissions = permsToAssign;
+        await this.roleRepo.save(role);
+      }
+    }
+    this.logger.log(`Permissions & Role_Permissions ready (${permMap.size} permissions assigned across roles).`);
+  }
+
+  async seedCategoryBrands(categories: Category[]) {
+    this.logger.log('Seeding category_brands many-to-many associations...');
+    const catMap = new Map<string, Category>();
+    for (const c of categories) {
+      catMap.set(c.slug, c);
+    }
+
+    const allBrands = await this.brandRepo.find({ relations: ['categories'] });
+    for (const brand of allBrands) {
+      const targetCatSlugs = BRAND_CATEGORY_SLUG_MAP[brand.slug];
+      if (targetCatSlugs && targetCatSlugs.length > 0) {
+        const matchedCats: Category[] = [];
+        for (const slug of targetCatSlugs) {
+          const cat = catMap.get(slug);
+          if (cat && !matchedCats.some((m) => m.id === cat.id)) {
+            matchedCats.push(cat);
+          }
+        }
+        if (matchedCats.length > 0) {
+          brand.categories = matchedCats;
+          await this.brandRepo.save(brand);
+        }
+      }
+    }
+    this.logger.log('Category_brands relationships established successfully.');
+  }
+
+  async seedApplications(
+    superAdmin: User,
+    admin: User,
+    sellers: User[],
+    riders: User[],
+    customers: User[],
+  ) {
+    this.logger.log('Seeding seller and rider KYC applications across all lifecycle states...');
+    const userMap = new Map<string, User>();
+    for (const u of [...sellers, ...riders, ...customers]) {
+      if (u.email) userMap.set(u.email, u);
+    }
+
+    // 1. Seller applications
+    for (const app of SEED_SELLER_APPLICATIONS) {
+      const user = userMap.get(app.userEmail);
+      if (!user) continue;
+
+      const existing = await this.sellerAppRepo.findOne({
+        where: [{ shopSlug: app.shopSlug }, { userId: user.id, shopNameEn: app.shopNameEn }],
+      });
+
+      if (!existing) {
+        const reviewer = app.status === ApplicationStatus.APPROVED ? superAdmin : app.status === ApplicationStatus.REJECTED ? admin : null;
+        const reviewedAt = app.reviewedDaysAgo ? new Date(Date.now() - app.reviewedDaysAgo * 24 * 60 * 60 * 1000) : null;
+
+        await this.sellerAppRepo.save(
+          this.sellerAppRepo.create({
+            userId: user.id,
+            user,
+            shopNameEn: app.shopNameEn,
+            shopNameBn: app.shopNameBn,
+            shopSlug: app.shopSlug,
+            phone: app.phone,
+            email: app.email,
+            description: app.description,
+            address: app.address,
+            tradeLicenseNumber: app.tradeLicenseNumber,
+            nidNumber: app.nidNumber,
+            status: app.status,
+            adminNotes: app.adminNotes,
+            reviewerId: reviewer ? reviewer.id : null,
+            reviewer,
+            reviewedAt,
+          }),
+        );
+      }
+    }
+
+    // 2. Rider applications
+    for (const app of SEED_RIDER_APPLICATIONS) {
+      const user = userMap.get(app.userEmail);
+      if (!user) continue;
+
+      const existing = await this.riderAppRepo.findOne({
+        where: [{ nidNumber: app.nidNumber }, { userId: user.id, phone: app.phone }],
+      });
+
+      if (!existing) {
+        const reviewer = app.status === ApplicationStatus.APPROVED ? superAdmin : app.status === ApplicationStatus.REJECTED ? admin : null;
+        const reviewedAt = app.reviewedDaysAgo ? new Date(Date.now() - app.reviewedDaysAgo * 24 * 60 * 60 * 1000) : null;
+
+        await this.riderAppRepo.save(
+          this.riderAppRepo.create({
+            userId: user.id,
+            user,
+            fullName: app.fullName,
+            phone: app.phone,
+            email: app.email,
+            nidNumber: app.nidNumber,
+            vehicleType: app.vehicleType,
+            vehiclePlateNumber: app.vehiclePlateNumber,
+            drivingLicenseNumber: app.drivingLicenseNumber,
+            preferredZone: app.preferredZone,
+            emergencyContact: app.emergencyContact,
+            status: app.status,
+            adminNotes: app.adminNotes,
+            reviewerId: reviewer ? reviewer.id : null,
+            reviewer,
+            reviewedAt,
+          }),
+        );
+      }
+    }
+
+    this.logger.log('Seller & Rider applications seeded successfully.');
+  }
+
+  async seedProductRequests(customers: User[], admin: User, products: Product[]) {
+    this.logger.log('Seeding customer product sourcing requests and history logs...');
+    const custMap = new Map<string, User>();
+    for (const c of customers) {
+      if (c.email) custMap.set(c.email, c);
+    }
+
+    for (const reqItem of SEED_PRODUCT_REQUESTS) {
+      const customer = custMap.get(reqItem.customerEmail) || customers[0];
+
+      let req = await this.productRequestRepo.findOne({
+        where: { userId: customer.id, requestedProductName: reqItem.requestedProductName },
+        relations: ['statusHistory'],
+      });
+
+      if (!req) {
+        const linkedProduct = reqItem.status === ProductRequestStatus.PRODUCT_ADDED && products.length > 0 ? products[0] : null;
+
+        req = await this.productRequestRepo.save(
+          this.productRequestRepo.create({
+            userId: customer.id,
+            user: customer,
+            requestedProductName: reqItem.requestedProductName,
+            description: reqItem.description,
+            preferredInformation: reqItem.preferredInformation,
+            status: reqItem.status,
+            linkedProductId: linkedProduct ? linkedProduct.id : null,
+            linkedProduct,
+            adminNotes: reqItem.adminNotes,
+          }),
+        );
+
+        // Seed chronologically ordered history events
+        for (const ev of reqItem.historyEvents) {
+          const actor = ev.actorRole === 'ADMIN' ? admin : customer;
+          const evDate = new Date(Date.now() - ev.daysAgo * 24 * 60 * 60 * 1000);
+
+          await this.productRequestHistoryRepo.save(
+            this.productRequestHistoryRepo.create({
+              productRequestId: req.id,
+              productRequest: req,
+              status: ev.status,
+              remark: ev.remark,
+              changedByUserId: actor.id,
+              changedByUser: actor,
+              createdAt: evDate,
+            }),
+          );
+        }
+      }
+    }
+    this.logger.log('Product requests and audit history seeded successfully.');
+  }
+
+  async seedDisputes(orders: Order[], admin: User) {
+    this.logger.log('Seeding realistic order disputes and communication logs...');
+    if (orders.length === 0) return;
+
+    for (const item of SEED_DISPUTES) {
+      const orderIndex = item.orderIndex % orders.length;
+      const order = orders[orderIndex];
+
+      const existing = await this.disputeRepo.findOne({ where: { orderId: order.id } });
+      if (!existing) {
+        // Find seller from order items
+        const orderItems = await this.orderItemRepo.find({
+          where: { order: { id: order.id } },
+          relations: ['sellerProduct', 'sellerProduct.shop', 'sellerProduct.shop.seller'],
+        });
+
+        const customer = order.user || (await this.userRepo.findOne({ where: { id: order.userId } })) || admin;
+        const seller = orderItems[0]?.sellerProduct?.shop?.seller || admin;
+
+        const dispute = await this.disputeRepo.save(
+          this.disputeRepo.create({
+            orderId: order.id,
+            order,
+            customerId: customer.id,
+            customer,
+            sellerId: seller.id,
+            seller,
+            reason: item.reason,
+            description: item.description,
+            evidenceImages: item.evidenceImages,
+            status: item.status,
+            adminDecision: item.adminDecision,
+          }),
+        );
+
+        // Seed dispute messages
+        const baseTime = new Date(order.createdAt).getTime();
+        for (const msg of item.messages) {
+          let sender = customer;
+          if (msg.senderRole === 'SELLER') sender = seller;
+          else if (msg.senderRole === 'ADMIN') sender = admin;
+
+          await this.disputeMessageRepo.save(
+            this.disputeMessageRepo.create({
+              disputeId: dispute.id,
+              dispute,
+              senderId: sender.id,
+              sender,
+              senderRole: msg.senderRole,
+              message: msg.message,
+              attachment: msg.attachment || null,
+              createdAt: new Date(baseTime + msg.minutesOffset * 60 * 1000),
+            }),
+          );
+        }
+      }
+    }
+    this.logger.log('Disputes and resolution dialogue seeded successfully.');
+  }
+
+  async seedCouponUsages(coupons: Coupon[], customers: User[], orders: Order[]) {
+    this.logger.log('Seeding coupon redemption usage records...');
+    if (coupons.length === 0 || orders.length === 0) return;
+
+    const discountedOrders = orders.filter((o) => Number(o.discount) > 0);
+    const primaryCoupon = coupons[0];
+
+    for (let i = 0; i < Math.min(discountedOrders.length, 10); i++) {
+      const order = discountedOrders[i];
+      const customer = order.user || (await this.userRepo.findOne({ where: { id: order.userId } })) || customers[i % customers.length];
+      const coupon = coupons[i % coupons.length] || primaryCoupon;
+
+      const existing = await this.couponUsageRepo.findOne({
+        where: { couponId: coupon.id, orderId: order.id },
+      });
+
+      if (!existing) {
+        await this.couponUsageRepo.save(
+          this.couponUsageRepo.create({
+            couponId: coupon.id,
+            coupon,
+            userId: customer.id,
+            user: customer,
+            orderId: order.id,
+            order,
+            discountAmount: Number(order.discount),
+            createdAt: order.createdAt,
+          }),
+        );
+      }
+    }
+    this.logger.log('Coupon usage history seeded successfully.');
+  }
+
+  async seedPayoutRequests(sellers: User[]) {
+    this.logger.log('Seeding merchant earnings payout requests...');
+    for (const item of SEED_PAYOUT_REQUESTS) {
+      const sellerIndex = item.sellerIndex % sellers.length;
+      const seller = sellers[sellerIndex];
+
+      const existing = await this.payoutRequestRepo.findOne({
+        where: { sellerId: seller.id, method: item.method, amount: item.amount },
+      });
+
+      if (!existing) {
+        await this.payoutRequestRepo.save(
+          this.payoutRequestRepo.create({
+            sellerId: seller.id,
+            seller,
+            amount: item.amount,
+            method: item.method,
+            accountDetails: item.accountDetails,
+            status: item.status,
+            adminNote: item.adminNote,
+          }),
+        );
+      }
+    }
+    this.logger.log('Seller payout requests seeded successfully.');
+  }
+
+  async seedOtps() {
+    this.logger.log('Seeding sample transient OTP tokens...');
+    const sampleOtps = [
+      { phone: '+8801700999881', code: '482910' },
+      { phone: '+8801700999882', code: '817263' },
+      { phone: '+8801700999883', code: '192837' },
+    ];
+
+    for (const o of sampleOtps) {
+      const existing = await this.otpRepo.findOne({ where: { phone: o.phone } });
+      if (!existing) {
+        await this.otpRepo.save(
+          this.otpRepo.create({
+            phone: o.phone,
+            code: o.code,
+            attempts: 0,
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+          }),
+        );
+      }
+    }
+    this.logger.log('Sample OTP records seeded successfully.');
   }
 }

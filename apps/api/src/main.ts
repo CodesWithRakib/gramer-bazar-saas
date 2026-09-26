@@ -35,13 +35,13 @@ async function bootstrap() {
     configuredOrigins.push(
       ...corsOriginsRaw
         .split(',')
-        .map((origin) => origin.trim())
+        .map((origin) => origin.trim().replace(/\/+$/, ''))
         .filter(Boolean),
     );
   }
 
   if (frontendUrl) {
-    configuredOrigins.push(frontendUrl.trim());
+    configuredOrigins.push(frontendUrl.trim().replace(/\/+$/, ''));
   }
 
   const defaultOrigins = [
@@ -51,6 +51,7 @@ async function bootstrap() {
     'http://127.0.0.1:3000',
     'http://127.0.0.1:3001',
     'http://127.0.0.1:3002',
+    'https://gramer-bazar-saas.vercel.app',
   ];
 
   const allowedOrigins = Array.from(
@@ -72,16 +73,27 @@ async function bootstrap() {
         return callback(null, true);
       }
 
+      const normalizedOrigin = origin.replace(/\/+$/, '');
+
       // In development, automatically allow any localhost or 127.0.0.1 on any port
       if (
         nodeEnv === 'development' &&
-        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin)
       ) {
         return callback(null, true);
       }
 
       // Allow configured origins
-      if (allowedOrigins.includes(origin)) {
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      // Support Vercel deployment preview and production URLs (e.g. gramer-bazar-saas-*.vercel.app)
+      if (
+        /^https:\/\/([a-zA-Z0-9-]+\.)?gramer-bazar-saas(-[a-zA-Z0-9-]+)?\.vercel\.app$/.test(
+          normalizedOrigin,
+        )
+      ) {
         return callback(null, true);
       }
 

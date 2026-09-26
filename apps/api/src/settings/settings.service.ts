@@ -56,7 +56,9 @@ export class SettingsService {
       this.configService.get<boolean>('SSLCOMMERZ_IS_LIVE') === true;
     const envPublicUrl =
       this.configService.get<string>('SSLCOMMERZ_PUBLIC_URL') ||
-      'https://undone-unsure-twisting.ngrok-free.dev';
+      this.configService.get<string>('BACKEND_URL') ||
+      this.configService.get<string>('API_URL') ||
+      'http://localhost:4000';
 
     return {
       platformName: stored.get(KEYS.platformName) ?? DEFAULTS.platformName,

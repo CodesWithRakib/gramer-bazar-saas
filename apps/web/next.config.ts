@@ -55,6 +55,10 @@ const nextConfig: NextConfig = {
         hostname: "127.0.0.1",
         port: "4000",
       },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+      },
     ],
   },
   async rewrites() {

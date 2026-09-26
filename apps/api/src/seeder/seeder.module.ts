@@ -38,6 +38,15 @@ import { Message } from '../chat/entities/message.entity.js';
 import { Wallet } from '../wallets/entities/wallet.entity.js';
 import { WalletTransaction } from '../wallets/entities/wallet-transaction.entity.js';
 import { DemandEvent } from '../analytics/entities/demand-event.entity.js';
+import { PermissionEntity } from '../permissions/entities/permission.entity.js';
+import { SellerApplication } from '../applications/entities/seller-application.entity.js';
+import { RiderApplication } from '../applications/entities/rider-application.entity.js';
+import { ProductRequest } from '../product-requests/entities/product-request.entity.js';
+import { ProductRequestHistory } from '../product-requests/entities/product-request-history.entity.js';
+import { Dispute } from '../disputes/entities/dispute.entity.js';
+import { DisputeMessage } from '../disputes/entities/dispute-message.entity.js';
+import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
+import { Otp } from '../otp/entities/otp.entity.js';
 import { SeederController } from './seeder.controller.js';
 import { SeederService } from './seeder.service.js';
 
@@ -80,6 +89,15 @@ import { SeederService } from './seeder.service.js';
       Wallet,
       WalletTransaction,
       DemandEvent,
+      PermissionEntity,
+      SellerApplication,
+      RiderApplication,
+      ProductRequest,
+      ProductRequestHistory,
+      Dispute,
+      DisputeMessage,
+      PayoutRequest,
+      Otp,
     ]),
   ],
   controllers: [SeederController],
