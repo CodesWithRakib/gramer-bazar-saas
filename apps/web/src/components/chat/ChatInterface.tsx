@@ -433,7 +433,7 @@ export function ChatInterface() {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="p-3 sm:p-4 border-t bg-card">
+            <div className="p-3 sm:p-4 pb-safe border-t bg-card shadow-xs">
               <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
                 <Input
                   placeholder="Type your message..."

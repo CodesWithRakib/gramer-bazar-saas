@@ -33,17 +33,17 @@ export function FlashSalesSection({ lang }: { lang: string }) {
 
   return (
     <section className="container mx-auto px-4 mt-8 md:mt-12 max-w-7xl">
-      <div className="bg-gradient-to-br from-rose-500/10 via-orange-500/5 to-background border border-rose-500/20 rounded-2xl p-4 md:p-6 shadow-xs">
+      <div className="bg-card border border-rose-500/25 dark:border-rose-500/30 rounded-2xl p-4 md:p-6 shadow-xs">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-rose-500/15 pb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-border/60 pb-4">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="bg-gradient-to-r from-red-600 to-orange-500 text-white p-2.5 rounded-xl shadow-xs">
+            <div className="bg-rose-500/10 text-rose-600 dark:text-rose-400 p-2.5 rounded-xl border border-rose-500/20">
               <Zap className="h-5 w-5 fill-current" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-1.5">
-                  <Flame className="w-5 h-5 text-red-500 fill-current" />
+                  <Flame className="w-5 h-5 text-rose-500 fill-current" />
                   {isBn ? 'ফ্ল্যাশ সেল' : 'Flash Sale'}
                 </h2>
                 <span className="text-muted-foreground text-sm font-medium">

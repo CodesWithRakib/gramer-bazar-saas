@@ -11,34 +11,25 @@ export function ClientLayoutWrapper({ lang, children }: { lang: string; children
   const pathname = usePathname();
   
   // Dashboard routes where we don't want the global storefront header/footer
-  const dashboardPrefixes = [
-    '/admin',
-    '/super-admin',
-    '/seller',
-    '/rider',
-    '/customer/profile',
-    '/customer/orders',
-    '/customer/wishlist',
-    '/customer/addresses',
-    '/customer/settings',
-    '/customer/disputes',
-    '/customer/messages',
-    '/customer/reviews',
-    '/customer/product-requests',
-    '/customer/notifications',
-    // legacy prefixes
-    '/profile',
-    '/orders',
-    '/wishlist',
-    '/disputes',
-    '/messages',
-    '/reviews',
-    '/product-requests',
-    '/notifications',
-  ];
-  const isDashboardRoute = dashboardPrefixes.some(prefix => 
-    pathname === `/${lang}${prefix}` || pathname.startsWith(`/${lang}${prefix}/`)
-  );
+  const isDashboardRoute =
+    pathname === `/${lang}/customer` ||
+    (pathname.startsWith(`/${lang}/customer/`) &&
+      !pathname.includes('/customer/checkout') &&
+      !pathname.includes('/customer/payment')) ||
+    pathname.startsWith(`/${lang}/admin`) ||
+    pathname.startsWith(`/${lang}/super-admin`) ||
+    pathname.startsWith(`/${lang}/seller`) ||
+    pathname.startsWith(`/${lang}/rider`) ||
+    [
+      '/profile',
+      '/orders',
+      '/wishlist',
+      '/disputes',
+      '/messages',
+      '/reviews',
+      '/product-requests',
+      '/notifications',
+    ].some((prefix) => pathname === `/${lang}${prefix}` || pathname.startsWith(`/${lang}${prefix}/`));
 
   if (isDashboardRoute) {
     return <main className="flex-grow flex flex-col">{children}</main>;

@@ -242,7 +242,7 @@ function SidebarContent({
       <div className="p-4 border-t border-muted/50 bg-background/40 relative z-10">
         <button
           onClick={onLogout}
-          className="group flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium rounded-2xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-300"
+          className="group flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium rounded-2xl text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
         >
           <LogOut className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" />
           {isBn ? "লগআউট" : "Logout"}
@@ -321,7 +321,7 @@ export function DashboardLayout({
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#FAFAFA] dark:bg-[#0A0A0A]">
+      <div className="flex-1 flex flex-col min-w-0 bg-background">
         {/* Header */}
         <header className="sticky top-0 z-30 h-[76px] bg-background/70 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 border-b border-muted/50 shadow-sm supports-[backdrop-filter]:bg-background/40">
           <div className="flex items-center gap-4">
@@ -389,7 +389,7 @@ export function DashboardLayout({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer rounded-xl py-2.5"
+                  className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer rounded-xl py-2.5"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>{isBn ? "লগআউট" : "Logout"}</span>

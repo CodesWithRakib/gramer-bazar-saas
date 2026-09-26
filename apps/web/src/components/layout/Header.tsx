@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { getUserRoles } from "@/lib/roles";
@@ -24,6 +25,8 @@ import {
   Package,
   HelpCircle,
   Ticket,
+  Search,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +36,10 @@ interface HeaderProps {
 }
 
 export function Header({ lang }: HeaderProps) {
+  const pathname = usePathname();
+  const isSearchPage = pathname?.includes("/search") ?? false;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(isSearchPage);
   const isBn = lang === "bn";
 
   const { isAuthenticated, user } = useSelector(
@@ -74,9 +80,9 @@ export function Header({ lang }: HeaderProps) {
               {isSuperAdmin && (
                 <Link
                   href={`/${lang}/super-admin`}
-                  className="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 transition-colors"
+                  className="inline-flex items-center gap-1 font-semibold text-warning hover:underline transition-colors"
                 >
-                  <ShieldAlert className="h-3.5 w-3.5" />
+                  <ShieldAlert className="h-3.5 w-3.5 text-warning" />
                   <span>{isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin"}</span>
                 </Link>
               )}
@@ -85,7 +91,7 @@ export function Header({ lang }: HeaderProps) {
               {isAdmin && !isSuperAdmin && (
                 <Link
                   href={`/${lang}/admin`}
-                  className="inline-flex items-center gap-1 font-semibold text-primary hover:text-primary/80 transition-colors"
+                  className="inline-flex items-center gap-1 font-semibold text-primary hover:underline transition-colors"
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" />
                   <span>{isBn ? "অ্যাডমিন প্যানেল" : "Admin Panel"}</span>
@@ -96,7 +102,7 @@ export function Header({ lang }: HeaderProps) {
               {isSeller && (
                 <Link
                   href={`/${lang}/seller`}
-                  className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-colors"
+                  className="inline-flex items-center gap-1 font-semibold text-success hover:underline transition-colors"
                 >
                   <Store className="h-3.5 w-3.5" />
                   <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
@@ -107,7 +113,7 @@ export function Header({ lang }: HeaderProps) {
               {isRider && (
                 <Link
                   href={`/${lang}/rider`}
-                  className="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors"
+                  className="inline-flex items-center gap-1 font-semibold text-info hover:underline transition-colors"
                 >
                   <Bike className="h-3.5 w-3.5" />
                   <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider App"}</span>
@@ -189,14 +195,39 @@ export function Header({ lang }: HeaderProps) {
             <SearchBar lang={lang} />
           </div>
 
-          {/* Right Section: User Actions & Cart */}
-          <UserActions lang={lang} />
+          {/* Right Section: Mobile Search Toggle & User Actions */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileSearchOpen((prev) => !prev)}
+              className="md:hidden text-muted-foreground hover:text-foreground hover:bg-muted"
+              aria-label={
+                isBn
+                  ? isMobileSearchOpen
+                    ? "অনুসন্ধান বন্ধ করুন"
+                    : "অনুসন্ধান খুলুন"
+                  : isMobileSearchOpen
+                    ? "Close search"
+                    : "Open search"
+              }
+            >
+              {isMobileSearchOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Search className="h-5 w-5" />
+              )}
+            </Button>
+            <UserActions lang={lang} />
+          </div>
         </div>
 
-        {/* Mobile Search Bar (Shown below md breakpoint) */}
-        <div className="md:hidden px-4 py-2.5 border-t border-border/40 bg-muted/20">
-          <SearchBar lang={lang} />
-        </div>
+        {/* Mobile Search Bar (Collapsible on mobile to save vertical viewport space) */}
+        {isMobileSearchOpen && (
+          <div className="md:hidden px-4 py-2.5 border-t border-border/40 bg-muted/20 animate-in slide-in-from-top-2 duration-150">
+            <SearchBar lang={lang} autoFocus />
+          </div>
+        )}
 
         {/* Desktop Category Navigation Sub-bar */}
         <div className="hidden md:block border-t border-border/50 bg-background/90 py-1.5 px-4 text-xs font-medium">
@@ -211,7 +242,7 @@ export function Header({ lang }: HeaderProps) {
                 href={`/${lang}/flash-sale`}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-bold transition-colors whitespace-nowrap"
               >
-                <Zap className="h-3.5 w-3.5 fill-rose-500 text-rose-500 animate-pulse" />
+                <Zap className="h-3.5 w-3.5 fill-rose-500 text-rose-500" />
                 <span>{isBn ? "ফ্ল্যাশ সেল" : "Flash Sale"}</span>
                 <Badge
                   variant="destructive"

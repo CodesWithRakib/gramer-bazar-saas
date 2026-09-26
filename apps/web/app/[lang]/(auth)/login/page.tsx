@@ -175,28 +175,30 @@ function LoginForm({ lang }: { lang: string }) {
       </div>
 
       {/* Auth Mode Toggle */}
-      <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-xl mb-6 text-sm font-medium">
+      <div className="grid grid-cols-2 gap-1.5 p-1.5 bg-muted/60 border border-border/50 rounded-xl mb-6 text-sm font-medium">
         <button
           type="button"
           onClick={() => { setAuthMode('password'); setErrorMsg(''); }}
-          className={`py-2 rounded-lg transition-all ${
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all ${
             authMode === 'password'
-              ? 'bg-card text-foreground shadow-sm font-semibold'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-background text-foreground shadow-xs font-semibold'
+              : 'text-muted-foreground hover:text-foreground hover:bg-background/40'
           }`}
         >
-          {isBn ? 'পাসওয়ার্ড দিয়ে' : 'With Password'}
+          <Lock className="w-4 h-4 text-primary" />
+          <span>{isBn ? 'পাসওয়ার্ড দিয়ে' : 'With Password'}</span>
         </button>
         <button
           type="button"
           onClick={() => { setAuthMode('otp'); setErrorMsg(''); }}
-          className={`py-2 rounded-lg transition-all ${
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all ${
             authMode === 'otp'
-              ? 'bg-card text-foreground shadow-sm font-semibold'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-background text-foreground shadow-xs font-semibold'
+              : 'text-muted-foreground hover:text-foreground hover:bg-background/40'
           }`}
         >
-          {isBn ? 'মোবাইল ওটিপি' : 'Mobile OTP'}
+          <Phone className="w-4 h-4 text-primary" />
+          <span>{isBn ? 'মোবাইল ওটিপি' : 'Mobile OTP'}</span>
         </button>
       </div>
 
@@ -361,7 +363,7 @@ function LoginForm({ lang }: { lang: string }) {
       </div>
 
       {/* Partner Links */}
-      <div className="mt-6 pt-4 border-t/60 grid grid-cols-2 gap-2 text-xs text-center text-muted-foreground">
+      <div className="mt-6 pt-4 border-t border-border/60 grid grid-cols-2 gap-2 text-xs text-center text-muted-foreground">
         <Link
           href={`/${lang}/become-a-seller`}
           className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors font-medium text-foreground/80"

@@ -54,16 +54,13 @@ function getCategoryTheme(
     combined.includes('মাছ') ||
     combined.includes('রুই') ||
     combined.includes('কাতল') ||
-    combined.includes('চিংড়ি') ||
-    combined.includes('ইলিশ') ||
-    combined.includes('পাঙ্গাস') ||
-    combined.includes('কৈ')
+    combined.includes('ইলিশ')
   ) {
     return {
       type: 'fish',
       label: isBn ? 'তাজা মাছ' : 'Fresh Fish',
-      badgeClass: 'bg-cyan-600 text-white',
-      accentBorder: 'hover:border-cyan-500/50',
+      badgeClass: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'fish',
     };
   }
@@ -73,19 +70,15 @@ function getCategoryTheme(
     combined.includes('meat') ||
     combined.includes('chicken') ||
     combined.includes('beef') ||
-    combined.includes('mutton') ||
     combined.includes('মাংস') ||
     combined.includes('মুরগি') ||
-    combined.includes('গরু') ||
-    combined.includes('খাসি') ||
-    combined.includes('হাঁস') ||
-    combined.includes('কলিজা')
+    combined.includes('গরু')
   ) {
     return {
       type: 'meat',
       label: isBn ? 'দেশি মাংস' : 'Fresh Meat',
-      badgeClass: 'bg-red-600 text-white',
-      accentBorder: 'hover:border-red-500/50',
+      badgeClass: 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'flame',
     };
   }
@@ -94,45 +87,31 @@ function getCategoryTheme(
   if (
     combined.includes('fruit') ||
     combined.includes('ফল') ||
-    combined.includes('পেয়ারা') ||
     combined.includes('আম') ||
     combined.includes('কলা') ||
-    combined.includes('আপেল') ||
-    combined.includes('কমলা') ||
-    combined.includes('আঙ্গুর') ||
-    combined.includes('লিচু') ||
-    combined.includes('লেবু') ||
-    combined.includes('মাল্টা')
+    combined.includes('আপেল')
   ) {
     return {
       type: 'fruits',
       label: isBn ? 'তাজা ফল' : 'Fresh Fruits',
-      badgeClass: 'bg-orange-500 text-white',
-      accentBorder: 'hover:border-orange-500/50',
+      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'sparkles',
     };
   }
 
-  // Spices & Condiments (e.g. Jeera, Haldi, Morich)
+  // Spices & Condiments
   if (
     combined.includes('spice') ||
     combined.includes('মসলা') ||
     combined.includes('জিরা') ||
-    combined.includes('হলুদ') ||
-    combined.includes('মরিচ গুঁড়া') ||
-    combined.includes('ধনিয়া') ||
-    combined.includes('দারুচিনি') ||
-    combined.includes('এলাচ') ||
-    combined.includes('লবঙ্গ') ||
-    combined.includes('আদা') ||
-    combined.includes('রসুন') ||
-    combined.includes('পেঁয়াজ')
+    combined.includes('হলুদ')
   ) {
     return {
       type: 'spices',
       label: isBn ? 'খাঁটি মসলা' : 'Pure Spices',
-      badgeClass: 'bg-amber-600 text-white',
-      accentBorder: 'hover:border-amber-500/50',
+      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'sparkles',
     };
   }
@@ -141,20 +120,15 @@ function getCategoryTheme(
   if (
     combined.includes('vegetable') ||
     combined.includes('সবজি') ||
-    combined.includes('shak') ||
     combined.includes('শাক') ||
-    combined.includes('কাঁচা মরিচ') ||
     combined.includes('আলু') ||
-    combined.includes('টমেটো') ||
-    combined.includes('বেগুন') ||
-    combined.includes('শসা') ||
-    combined.includes('লাউ')
+    combined.includes('টমেটো')
   ) {
     return {
       type: 'vegetables',
       label: isBn ? 'টাটকা সবজি' : 'Fresh Vegetables',
-      badgeClass: 'bg-emerald-600 text-white',
-      accentBorder: 'hover:border-emerald-500/50',
+      badgeClass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'leaf',
     };
   }
@@ -171,8 +145,8 @@ function getCategoryTheme(
     return {
       type: 'oil',
       label: isBn ? 'খাঁটি প্রাকৃতিক' : 'Pure Organic',
-      badgeClass: 'bg-amber-500 text-white',
-      accentBorder: 'hover:border-amber-500/50',
+      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'droplets',
     };
   }
@@ -183,16 +157,13 @@ function getCategoryTheme(
     combined.includes('dal') ||
     combined.includes('grain') ||
     combined.includes('চাল') ||
-    combined.includes('ডাল') ||
-    combined.includes('আটা') ||
-    combined.includes('ময়দা') ||
-    combined.includes('সুজি')
+    combined.includes('ডাল')
   ) {
     return {
       type: 'grains',
       label: isBn ? 'খাদ্যশস্য' : 'Grains & Rice',
-      badgeClass: 'bg-yellow-600 text-white',
-      accentBorder: 'hover:border-yellow-500/50',
+      badgeClass: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'wheat',
     };
   }
@@ -202,16 +173,13 @@ function getCategoryTheme(
     combined.includes('electron') ||
     combined.includes('mobile') ||
     combined.includes('gadget') ||
-    combined.includes('appliance') ||
-    combined.includes('computer') ||
-    combined.includes('ফোন') ||
-    combined.includes('ফ্যান')
+    combined.includes('ফোন')
   ) {
     return {
       type: 'electronics',
-      label: isBn ? 'অফিশিয়াল গ্যাজেট' : 'Official Device',
-      badgeClass: 'bg-blue-600 text-white',
-      accentBorder: 'hover:border-blue-500/50',
+      label: isBn ? 'অফিশিয়াল' : 'Official',
+      badgeClass: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'shieldCheck',
     };
   }
@@ -221,82 +189,21 @@ function getCategoryTheme(
     combined.includes('cloth') ||
     combined.includes('fashion') ||
     combined.includes('wear') ||
-    combined.includes('পোশাক') ||
-    combined.includes('শাড়ি') ||
-    combined.includes('পাঞ্জাবি') ||
-    combined.includes('লুঙ্গি')
+    combined.includes('পোশাক')
   ) {
     return {
       type: 'fashion',
-      label: isBn ? 'ফ্যাশন ও পোশাক' : 'Fashion Wear',
-      badgeClass: 'bg-purple-600 text-white',
-      accentBorder: 'hover:border-purple-500/50',
+      label: isBn ? 'ফ্যাশন' : 'Fashion',
+      badgeClass: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20',
+      accentBorder: 'hover:border-primary/50',
       icon: 'shirt',
-    };
-  }
-
-  // Cosmetics & Beauty
-  if (
-    combined.includes('cosmetic') ||
-    combined.includes('beauty') ||
-    combined.includes('skincare') ||
-    combined.includes('প্রসাধন') ||
-    combined.includes('সাবান') ||
-    combined.includes('শ্যাম্পু') ||
-    combined.includes('ক্রিম')
-  ) {
-    return {
-      type: 'cosmetics',
-      label: isBn ? '১০০% আসল' : '100% Authentic',
-      badgeClass: 'bg-rose-500 text-white',
-      accentBorder: 'hover:border-rose-500/50',
-      icon: 'zap',
-    };
-  }
-
-  // Medicine & Healthcare
-  if (
-    combined.includes('medicine') ||
-    combined.includes('health') ||
-    combined.includes('pharmacy') ||
-    combined.includes('ওষুধ') ||
-    combined.includes('ব্যান্ডেজ') ||
-    combined.includes('প্লাস্টার') ||
-    combined.includes('স্যালাইন')
-  ) {
-    return {
-      type: 'medicine',
-      label: isBn ? 'স্বাস্থ্যসেবা' : 'Healthcare',
-      badgeClass: 'bg-teal-600 text-white',
-      accentBorder: 'hover:border-teal-500/50',
-      icon: 'shieldCheck',
-    };
-  }
-
-  // Food & Bakery
-  if (
-    combined.includes('food') ||
-    combined.includes('bakery') ||
-    combined.includes('sweet') ||
-    combined.includes('খাবার') ||
-    combined.includes('মিষ্টি') ||
-    combined.includes('বিস্কুট') ||
-    combined.includes('কেক') ||
-    combined.includes('পাউরুটি')
-  ) {
-    return {
-      type: 'food',
-      label: isBn ? 'খাবার ও মিষ্টি' : 'Food & Bakery',
-      badgeClass: 'bg-amber-600 text-white',
-      accentBorder: 'hover:border-amber-500/50',
-      icon: 'utensils',
     };
   }
 
   return {
     type: 'general',
     label: '',
-    badgeClass: 'bg-zinc-700/90 text-white',
+    badgeClass: 'bg-muted text-muted-foreground border-border/60',
     accentBorder: 'hover:border-primary/50',
     icon: 'sparkles',
   };
@@ -630,17 +537,7 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
       {/* Footer Add to Cart Button */}
       <CardFooter className="p-3.5 pt-0">
         <Button
-          className={`w-full h-9 text-xs font-semibold rounded-xl shadow-xs transition-colors ${
-            categoryTheme.type === 'vegetables' || categoryTheme.type === 'fruits'
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-              : categoryTheme.type === 'spices' || categoryTheme.type === 'grains'
-              ? 'bg-amber-600 hover:bg-amber-700 text-white'
-              : categoryTheme.type === 'fish'
-              ? 'bg-cyan-700 hover:bg-cyan-800 text-white'
-              : categoryTheme.type === 'meat'
-              ? 'bg-red-600 hover:bg-red-700 text-white'
-              : ''
-          }`}
+          className="w-full h-9 text-xs font-semibold rounded-xl shadow-xs"
           disabled={isOutOfStock}
           onClick={handleAddToCart}
         >

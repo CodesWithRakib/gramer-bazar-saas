@@ -90,7 +90,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   };
 
   return (
-    <div className="container max-w-6xl py-8 space-y-8">
+    <div className="container max-w-6xl pt-8 pb-24 lg:pb-8 space-y-8">
       <h1 className="text-3xl font-bold">{isBn ? 'চেকআউট' : 'Checkout'}</h1>
 
       {errorMsg && (
@@ -303,6 +303,30 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Mobile Sticky Bottom Floating Checkout Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur-md border-t border-border shadow-lg z-40 flex items-center justify-between gap-3">
+        <div className="flex flex-col pl-1">
+          <span className="text-[10px] text-muted-foreground font-semibold">
+            {isBn ? 'মোট প্রদেয়' : 'Total Payable'}
+          </span>
+          <span className="text-lg font-black text-primary">৳{total.toFixed(2)}</span>
+        </div>
+        <Button
+          size="sm"
+          className="h-11 px-5 rounded-xl text-xs sm:text-sm font-bold shadow-md"
+          disabled={isCheckingOut || isRedirecting || !selectedAddressId || isAddressesLoading}
+          onClick={handleCheckout}
+        >
+          {isRedirecting
+            ? (isBn ? ' SSLCOMMERZ...' : 'Redirecting...')
+            : isCheckingOut
+            ? (isBn ? 'প্রক্রিয়াধীন...' : 'Processing...')
+            : paymentMethod === 'ONLINE'
+            ? (isBn ? 'পে করুন' : 'Pay Now')
+            : (isBn ? 'অর্ডার নিশ্চিত করুন' : 'Confirm Order')}
+        </Button>
       </div>
     </div>
   );

@@ -193,7 +193,7 @@ export function Footer({ lang }: FooterProps) {
               {isSeller ? (
                 <>
                   <li>
-                    <Link href={`/${lang}/seller`} className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline flex items-center gap-1.5">
+                    <Link href={`/${lang}/seller`} className="text-success font-semibold hover:underline flex items-center gap-1.5">
                       <Store className="w-3.5 h-3.5" />
                       <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
                     </Link>
@@ -218,7 +218,7 @@ export function Footer({ lang }: FooterProps) {
                 /* If NOT a seller and NOT admin, show Become a Seller */
                 !isAdmin && (
                   <li>
-                    <Link href={`/${lang}/become-a-seller`} className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline flex items-center gap-1.5">
+                    <Link href={`/${lang}/become-a-seller`} className="text-success font-semibold hover:underline flex items-center gap-1.5">
                       <Store className="w-3.5 h-3.5" />
                       <span>{isBn ? "সেলার হতে আবেদন" : "Become a Seller"}</span>
                     </Link>
@@ -230,7 +230,7 @@ export function Footer({ lang }: FooterProps) {
               {isRider ? (
                 <>
                   <li>
-                    <Link href={`/${lang}/rider`} className="text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1.5">
+                    <Link href={`/${lang}/rider`} className="text-info font-semibold hover:underline flex items-center gap-1.5">
                       <Bike className="w-3.5 h-3.5" />
                       <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider App"}</span>
                     </Link>
@@ -245,7 +245,7 @@ export function Footer({ lang }: FooterProps) {
                 /* If NOT a rider and NOT admin, show Become a Rider */
                 !isAdmin && (
                   <li>
-                    <Link href={`/${lang}/become-a-rider`} className="text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1.5">
+                    <Link href={`/${lang}/become-a-rider`} className="text-info font-semibold hover:underline flex items-center gap-1.5">
                       <Bike className="w-3.5 h-3.5" />
                       <span>{isBn ? "রাইডার হতে আবেদন" : "Become a Rider"}</span>
                     </Link>
@@ -266,8 +266,8 @@ export function Footer({ lang }: FooterProps) {
               {/* If user is Super Admin, show Super Admin Console */}
               {isSuperAdmin && (
                 <li>
-                  <Link href={`/${lang}/super-admin`} className="text-amber-600 dark:text-amber-400 font-semibold hover:underline flex items-center gap-1.5">
-                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                  <Link href={`/${lang}/super-admin`} className="text-warning font-semibold hover:underline flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5 text-warning" />
                     <span>{isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin"}</span>
                   </Link>
                 </li>
@@ -350,7 +350,7 @@ export function Footer({ lang }: FooterProps) {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-muted-foreground">
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <ShieldCheck className="w-4 h-4 text-success" />
               <span className="text-xs font-semibold uppercase">{isBn ? "নিরাপদ পেমেন্ট" : "Secure Payment"}</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -358,7 +358,7 @@ export function Footer({ lang }: FooterProps) {
               <span className="text-xs font-semibold uppercase">{isBn ? "SSLCommerz প্রস্তুত" : "SSLCommerz Ready"}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Store className="w-4 h-4 text-amber-500" />
+              <Store className="w-4 h-4 text-warning" />
               <span className="text-xs font-semibold uppercase">{isBn ? "১০০% খাঁটি পণ্য" : "100% Authentic"}</span>
             </div>
           </div>

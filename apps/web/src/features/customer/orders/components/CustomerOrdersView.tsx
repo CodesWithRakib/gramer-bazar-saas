@@ -78,8 +78,9 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
       </h1>
 
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="w-full overflow-x-auto hide-scrollbar border-b pb-[1px] mb-6">
-          <TabsList className="w-max sm:w-full justify-start sm:justify-between bg-transparent h-auto p-0 rounded-none border-b-0 space-x-2 md:space-x-0">
+        <div className="relative w-full mb-6">
+          <div className="w-full overflow-x-auto hide-scrollbar border-b pb-[1px] scroll-smooth">
+            <TabsList className="w-max sm:w-full justify-start sm:justify-between bg-transparent h-auto p-0 rounded-none border-b-0 space-x-2 md:space-x-0">
             <TabsTrigger 
               value="all" 
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
@@ -117,6 +118,7 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
               {isBn ? 'বাতিল' : 'Cancelled'}
             </TabsTrigger>
           </TabsList>
+          </div>
         </div>
 
         <TabsContent value={activeTab} className="mt-0 focus-visible:outline-none focus-visible:ring-0">

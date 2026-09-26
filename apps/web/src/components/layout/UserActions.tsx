@@ -98,18 +98,7 @@ export function UserActions({ lang }: UserActionsProps) {
 
   return (
     <div className="flex items-center gap-1 sm:gap-2">
-      {/* Location Badge - Hidden on small mobile */}
-      <Button
-        variant="outline"
-        className="hidden lg:flex items-center gap-2 rounded-full h-10 border-border/80"
-      >
-        <MapPin className="h-4 w-4 text-primary" />
-        <span className="text-sm truncate max-w-[120px]">
-          {isBn ? "খানসামা, দিনাজপুর" : "Khansama, Dinajpur"}
-        </span>
-      </Button>
-
-      <div className="flex items-center gap-1 sm:gap-2 ml-1">
+      <div className="flex items-center gap-1 sm:gap-2">
         {/* Language Switcher Dropdown */}
         <LanguageSwitcher currentLocale={lang} className="h-10" />
 
@@ -176,19 +165,19 @@ export function UserActions({ lang }: UserActionsProps) {
                     {currentUser?.firstName} {currentUser?.lastName}
                   </p>
                   {isSuperAdmin ? (
-                    <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-300/40 text-[10px] px-1.5 py-0 h-4">
+                    <Badge variant="warning" className="text-[10px] px-1.5 py-0 h-4">
                       Super Admin
                     </Badge>
                   ) : isAdmin ? (
-                    <Badge className="bg-primary/15 text-primary border-primary/30 text-[10px] px-1.5 py-0 h-4">
+                    <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4">
                       Admin
                     </Badge>
                   ) : isSeller ? (
-                    <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-300/40 text-[10px] px-1.5 py-0 h-4">
+                    <Badge variant="success" className="text-[10px] px-1.5 py-0 h-4">
                       Seller
                     </Badge>
                   ) : isRider ? (
-                    <Badge className="bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-300/40 text-[10px] px-1.5 py-0 h-4">
+                    <Badge variant="info" className="text-[10px] px-1.5 py-0 h-4">
                       Rider
                     </Badge>
                   ) : (
@@ -204,9 +193,9 @@ export function UserActions({ lang }: UserActionsProps) {
 
               {/* Role Portals */}
               {isSuperAdmin && (
-                <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-amber-600 dark:text-amber-400">
+                <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-warning">
                   <Link href={`/${lang}/super-admin`} className="flex items-center gap-2.5">
-                    <ShieldAlert className="h-4 w-4 text-amber-500" />
+                    <ShieldAlert className="h-4 w-4 text-warning" />
                     <span>{isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin Console"}</span>
                   </Link>
                 </DropdownMenuItem>
@@ -223,9 +212,9 @@ export function UserActions({ lang }: UserActionsProps) {
 
               {isSeller && (
                 <>
-                  <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-emerald-600 dark:text-emerald-400">
+                  <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-success">
                     <Link href={`/${lang}/seller`} className="flex items-center gap-2.5">
-                      <Store className="h-4 w-4 text-emerald-600" />
+                      <Store className="h-4 w-4 text-success" />
                       <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
                     </Link>
                   </DropdownMenuItem>
@@ -246,9 +235,9 @@ export function UserActions({ lang }: UserActionsProps) {
 
               {isRider && (
                 <>
-                  <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-blue-600 dark:text-blue-400">
+                  <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-info">
                     <Link href={`/${lang}/rider`} className="flex items-center gap-2.5">
-                      <Bike className="h-4 w-4 text-blue-600" />
+                      <Bike className="h-4 w-4 text-info" />
                       <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider Dashboard"}</span>
                     </Link>
                   </DropdownMenuItem>

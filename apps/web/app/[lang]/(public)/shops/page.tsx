@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Store, CheckCircle, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ShopCard } from '@/components/catalog/ShopCard';
 
 export default function ShopsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -85,59 +85,7 @@ export default function ShopsPage({ params }: { params: Promise<{ lang: string }
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredShops?.map((shop) => (
-            <Card key={shop.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300">
-              <div className="h-32 relative bg-primary/10 overflow-hidden">
-                {shop.banner ? (
-                  <Image 
-                    src={shop.banner} 
-                    alt={isBn ? shop.nameBn : shop.nameEn}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500/20 to-emerald-500/20">
-                    <Store className="h-12 w-12 text-primary/40" />
-                  </div>
-                )}
-              </div>
-              
-              <CardContent className="p-4 pt-10 relative">
-                <div className="absolute -top-10 left-4 w-16 h-16 bg-background rounded-full border-4 border-background overflow-hidden flex items-center justify-center shadow-sm">
-                  {shop.logo ? (
-                    <Image 
-                      src={shop.logo} 
-                      alt="Logo"
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold">
-                      {shop.nameEn.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-lg leading-tight line-clamp-1 flex items-center gap-1">
-                    {isBn ? shop.nameBn : shop.nameEn}
-                    {shop.isVerified && (
-                      <CheckCircle className="h-4 w-4 text-blue-500 shrink-0" />
-                    )}
-                  </h3>
-                </div>
-                
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[40px]">
-                  {shop.description || (isBn ? 'কোন বিবরণ নেই' : 'No description available')}
-                </p>
-                
-                <Button asChild className="w-full group-hover:bg-primary" variant="outline">
-                  <Link href={`/${lang}/shops/${shop.id}`}>
-                    {isBn ? 'দোকান দেখুন' : 'Visit Shop'}
-                    <ChevronRight className="h-4 w-4 ml-2" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <ShopCard key={shop.id} shop={shop} lang={lang} />
           ))}
         </div>
       )}

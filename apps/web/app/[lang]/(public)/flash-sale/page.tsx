@@ -58,26 +58,26 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
       {flashSales.map((sale) => (
         <div key={sale.id} className="space-y-6">
           {/* Flash Sale Hero Banner */}
-          <div className="relative rounded-2xl overflow-hidden shadow-md bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 text-white p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative rounded-2xl overflow-hidden shadow-md bg-gradient-to-r from-primary via-primary/95 to-primary/85 text-primary-foreground p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
             {sale.bannerImage && (
-              <div className="absolute inset-0 opacity-25 pointer-events-none">
+              <div className="absolute inset-0 opacity-20 pointer-events-none">
                 <CustomImage src={sale.bannerImage} alt={sale.name} fill className="object-cover" />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
 
             <div className="relative z-10 flex items-center gap-4 text-center md:text-left">
-              <div className="bg-white/20 p-3.5 rounded-2xl backdrop-blur-md shrink-0 shadow-xs">
-                <Zap className="w-8 h-8 text-yellow-300 fill-current" />
+              <div className="bg-primary-foreground/15 p-3.5 rounded-2xl backdrop-blur-md shrink-0 shadow-xs">
+                <Zap className="w-8 h-8 text-primary-foreground fill-current" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl md:text-3xl font-extrabold">{sale.name}</h1>
-                  <Badge variant="secondary" className="bg-yellow-400 text-black font-bold text-xs">
+                  <Badge variant="secondary" className="bg-primary-foreground text-primary font-bold text-xs">
                     {isBn ? 'লাইভ অফার' : 'LIVE DEAL'}
                   </Badge>
                 </div>
-                <p className="text-white/90 text-sm mt-1 max-w-xl">
+                <p className="text-primary-foreground/90 text-sm mt-1 max-w-xl">
                   {isBn
                     ? 'দারুণ ডিসকাউন্টে সংগ্রহ করুন আপনার প্রয়োজনীয় সেরা পণ্যগুলো!'
                     : 'Exclusive heavy discounts on top products. Available while stocks last!'}
