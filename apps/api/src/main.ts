@@ -1,20 +1,21 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  ValidationPipe,
+  Logger,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor.js';
 import { ConfigService } from '@nestjs/config';
-
 import cookieParser from 'cookie-parser';
-
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
-
   app.use(cookieParser());
 
   // Security headers
@@ -28,8 +29,8 @@ async function bootstrap() {
   const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
   const corsOriginsRaw = configService.get<string>('CORS_ORIGINS');
   const frontendUrl = configService.get<string>('FRONTEND_URL');
-
   const configuredOrigins: string[] = [];
+
   if (corsOriginsRaw) {
     configuredOrigins.push(
       ...corsOriginsRaw
@@ -38,6 +39,7 @@ async function bootstrap() {
         .filter(Boolean),
     );
   }
+
   if (frontendUrl) {
     configuredOrigins.push(frontendUrl.trim());
   }
@@ -114,9 +116,7 @@ async function bootstrap() {
   );
 
   // Global Exception Filter
-  app.useGlobalFilters(
-    new AllExceptionsFilter(),
-  );
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Global Interceptors
   app.useGlobalInterceptors(
@@ -131,19 +131,23 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port =
-    configService.get<number>('port') ||
-    configService.get<number>('PORT') ||
-    configService.get<number>('API_PORT') ||
-    4000;
-  logger.log(`Resolved port from configService: ${port}`);
-  await app.listen(port, '0.0.0.0');
-  logger.log(`Application is running on: http://localhost:${port}/api/v1`);
-  logger.log(
-    `Swagger docs are available on: http://localhost:${port}/api/docs`,
+  const port = Number(
+    configService.get<string>('PORT') ??
+      configService.get<string>('API_PORT') ??
+      configService.get<string>('port') ??
+      '4000',
   );
+
+  logger.log(`Resolved port from configService: ${port}`);
+
+  await app.listen(port, '0.0.0.0');
+
+  logger.log(`Application is running on port ${port}`);
+  logger.log(`Swagger docs are available at /api/docs`);
 }
+
 void bootstrap();

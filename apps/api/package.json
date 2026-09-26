@@ -21,7 +21,9 @@
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed": "node dist/seeder/seed-cli.js",
+    "verify:seed": "node dist/seeder/verify-seed.js"
   },
   "dependencies": {
     "@gramer-bazar/types": "workspace:*",
