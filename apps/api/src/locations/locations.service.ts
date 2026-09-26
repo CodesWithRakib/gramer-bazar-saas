@@ -26,47 +26,56 @@ export class LocationsService implements OnModuleInit {
   }
 
   private async seedLocations() {
-    const count = await this.countryRepo.count();
-    if (count > 0) {
-      return; // Already seeded
-    }
+    try {
+      const count = await this.countryRepo.count();
+      if (count > 0) {
+        return; // Already seeded
+      }
 
-    this.logger.log('Seeding initial location data for Gramer Bazar...');
+      this.logger.log('Seeding initial location data for Gramer Bazar...');
 
-    const country = this.countryRepo.create({ nameEn: 'Bangladesh', nameBn: 'বাংলাদেশ' });
-    await this.countryRepo.save(country);
+      const country = this.countryRepo.create({ nameEn: 'Bangladesh', nameBn: 'বাংলাদেশ' });
+      await this.countryRepo.save(country);
 
-    const division = this.divisionRepo.create({ countryId: country.id, nameEn: 'Rangpur', nameBn: 'রংপুর' });
-    await this.divisionRepo.save(division);
+      const division = this.divisionRepo.create({ countryId: country.id, nameEn: 'Rangpur', nameBn: 'রংপুর' });
+      await this.divisionRepo.save(division);
 
-    const district = this.districtRepo.create({ divisionId: division.id, nameEn: 'Dinajpur', nameBn: 'দিনাজপুর' });
-    await this.districtRepo.save(district);
+      const district = this.districtRepo.create({ divisionId: division.id, nameEn: 'Dinajpur', nameBn: 'দিনাজপুর' });
+      await this.districtRepo.save(district);
 
-    const upazila = this.upazilaRepo.create({ districtId: district.id, nameEn: 'Khansama', nameBn: 'খানসামা' });
-    await this.upazilaRepo.save(upazila);
+      const upazila = this.upazilaRepo.create({ districtId: district.id, nameEn: 'Khansama', nameBn: 'খানসামা' });
+      await this.upazilaRepo.save(upazila);
 
-    const unionsData = [
-      { nameEn: 'Alokjhari', nameBn: 'আলোকঝাড়ী' },
-      { nameEn: 'Bherveri', nameBn: 'ভেরভেরী' },
-      { nameEn: 'Angarpara', nameBn: 'আঙ্গারপাড়া' },
-      { nameEn: 'Khamarpara', nameBn: 'খামারপাড়া' },
-      { nameEn: 'Bhabki', nameBn: 'ভাবকী' },
-      { nameEn: 'Goaldihi', nameBn: 'গোয়ালডিহি' },
-    ];
-
-    for (const u of unionsData) {
-      const union = this.unionRepo.create({ upazilaId: upazila.id, nameEn: u.nameEn, nameBn: u.nameBn });
-      await this.unionRepo.save(union);
-
-      // Add a couple of dummy areas per union for completeness
-      const areas = [
-        this.areaRepo.create({ unionId: union.id, nameEn: `${u.nameEn} Center`, nameBn: `${u.nameBn} কেন্দ্র`, deliveryFee: 30 }),
-        this.areaRepo.create({ unionId: union.id, nameEn: `${u.nameEn} North`, nameBn: `${u.nameBn} উত্তর`, deliveryFee: 40 }),
+      const unionsData = [
+        { nameEn: 'Alokjhari', nameBn: 'আলোকঝাড়ী' },
+        { nameEn: 'Bherveri', nameBn: 'ভেরভেরী' },
+        { nameEn: 'Angarpara', nameBn: 'আঙ্গারপাড়া' },
+        { nameEn: 'Khamarpara', nameBn: 'খামারপাড়া' },
+        { nameEn: 'Bhabki', nameBn: 'ভাবকী' },
+        { nameEn: 'Goaldihi', nameBn: 'গোয়ালডিহি' },
       ];
-      await this.areaRepo.save(areas);
-    }
 
-    this.logger.log('Location seeding complete.');
+      for (const u of unionsData) {
+        const union = this.unionRepo.create({ upazilaId: upazila.id, nameEn: u.nameEn, nameBn: u.nameBn });
+        await this.unionRepo.save(union);
+
+        // Add a couple of dummy areas per union for completeness
+        const areas = [
+          this.areaRepo.create({ unionId: union.id, nameEn: `${u.nameEn} Center`, nameBn: `${u.nameBn} কেন্দ্র`, deliveryFee: 30 }),
+          this.areaRepo.create({ unionId: union.id, nameEn: `${u.nameEn} North`, nameBn: `${u.nameBn} উত্তর`, deliveryFee: 40 }),
+        ];
+        await this.areaRepo.save(areas);
+      }
+
+      this.logger.log('Location seeding complete.');
+    } catch (err: unknown) {
+      const message = (err as Error)?.message || '';
+      if (message.includes('relation "countries" does not exist') || (message.includes('countries') && message.includes('does not exist'))) {
+        this.logger.warn('Skipping initial location seed: "countries" table does not exist in database yet. Please run migrations first.');
+        return;
+      }
+      throw err;
+    }
   }
 
   async getCountries() {

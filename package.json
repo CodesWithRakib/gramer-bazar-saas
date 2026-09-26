@@ -10,7 +10,9 @@
     "test:e2e:api": "pnpm -C apps/api run test:e2e",
     "test:e2e:web": "pnpm -C apps/e2e exec playwright test",
     "seed": "pnpm -C apps/api run build && pnpm -C apps/api run seed",
-    "verify:seed": "pnpm -C apps/api run verify:seed"
+    "verify:seed": "pnpm -C apps/api run verify:seed",
+    "migration:show": "pnpm -C apps/api run build && pnpm -C apps/api run migration:show",
+    "migration:run": "pnpm -C apps/api run build && pnpm -C apps/api run migration:run"
   },
   "dependencies": {
     "@types/multer": "^2.2.0",

@@ -46,6 +46,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
 import { StorageModule } from './storage/storage.module.js';
+import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSchema.js';
 
 @Module({
   imports: [
@@ -68,12 +69,15 @@ import { StorageModule } from './storage/storage.module.js';
         const syncEnabled =
           configService.get<string>('DB_SYNCHRONIZE') === 'true' ||
           (nodeEnv !== 'production' && configService.get<string>('DB_SYNCHRONIZE') !== 'false');
+        const migrationsRun = configService.get<string>('MIGRATIONS_RUN') === 'true';
 
         return {
           type: 'postgres',
           url: dbUrl,
           autoLoadEntities: true,
           synchronize: syncEnabled,
+          migrations: [InitialSchema1790406745498],
+          migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,
           logging: nodeEnv === 'development',
         };

@@ -54,6 +54,7 @@ export const envValidationSchema = z
     SUPABASE_SECRET_KEY: z.string().optional(),
     SUPABASE_BUCKET: z.string().default('gramer-bazar'),
     DB_SYNCHRONIZE: z.string().optional(),
+    MIGRATIONS_RUN: z.string().optional(),
     SEED_ADMIN_PASSWORD: z.string().optional(),
     SEED_SHOP_OWNER_PASSWORD: z.string().optional(),
     SEED_CUSTOMER_PASSWORD: z.string().optional(),
