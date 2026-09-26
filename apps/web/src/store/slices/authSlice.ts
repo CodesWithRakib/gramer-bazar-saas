@@ -45,11 +45,20 @@ export interface AuthState {
 
 const getInitialState = (): AuthState => {
   let initialToken: string | null = null;
+  let initialUser: UserProfile | null = null;
   if (typeof window !== 'undefined') {
     initialToken = localStorage.getItem('access_token') || null;
+    try {
+      const storedUser = localStorage.getItem('auth_user');
+      if (storedUser) {
+        initialUser = normalizeUser(JSON.parse(storedUser));
+      }
+    } catch {
+      // ignore corrupted localStorage JSON
+    }
   }
   return {
-    user: null,
+    user: initialUser,
     accessToken: initialToken,
     isAuthenticated: !!initialToken,
     isAuthInitialized: false,
@@ -65,7 +74,7 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: unknown; accessToken?: string }>
+      action: PayloadAction<{ user: unknown; accessToken?: string; refreshToken?: string }>
     ) => {
       state.user = normalizeUser(action.payload.user);
       if (action.payload.accessToken) {
@@ -74,6 +83,14 @@ const authSlice = createSlice({
           localStorage.setItem('access_token', action.payload.accessToken);
         }
       }
+      if (action.payload.refreshToken) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('refresh_token', action.payload.refreshToken);
+        }
+      }
+      if (typeof window !== 'undefined' && state.user) {
+        localStorage.setItem('auth_user', JSON.stringify(state.user));
+      }
       state.isAuthenticated = true;
       state.isAuthInitialized = true;
     },
@@ -81,6 +98,13 @@ const authSlice = createSlice({
       state.user = normalizeUser(action.payload);
       state.isAuthenticated = !!state.user;
       state.isAuthInitialized = true;
+      if (typeof window !== 'undefined') {
+        if (state.user) {
+          localStorage.setItem('auth_user', JSON.stringify(state.user));
+        } else {
+          localStorage.removeItem('auth_user');
+        }
+      }
     },
     setAuthInitialized: (state, action: PayloadAction<boolean>) => {
       state.isAuthInitialized = action.payload;
@@ -92,6 +116,8 @@ const authSlice = createSlice({
       state.isAuthInitialized = true;
       if (typeof window !== 'undefined') {
         localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('auth_user');
       }
     },
     setLoginModalOpen: (state, action: PayloadAction<boolean>) => {

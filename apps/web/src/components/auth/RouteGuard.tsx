@@ -39,8 +39,8 @@ export function RouteGuard({
     }
   }, [isAuthInitialized, isAuthenticated, requireAuth, router, lang, pathname]);
 
-  // 1. While auth state is initializing from token/cookies, show a premium loading screen
-  if (!isAuthInitialized) {
+  // 1. While auth state is initializing from token/cookies or profile is loading, show loading screen
+  if (!isAuthInitialized || (isAuthenticated && !user)) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary opacity-80" />
@@ -67,9 +67,9 @@ export function RouteGuard({
   if (allowedRoles && allowedRoles.length > 0) {
     const hasPermission = userHasRole(user, ...allowedRoles);
     
-    // Super Admin has access to Admin routes as well
+    // Super Admin has master access across all protected dashboards
     const isSuperAdmin = userHasRole(user, 'SUPER_ADMIN');
-    const isAllowed = hasPermission || (isSuperAdmin && allowedRoles.includes('ADMIN'));
+    const isAllowed = hasPermission || isSuperAdmin;
 
     if (!isAllowed) {
       const userRoles = getUserRoles(user);

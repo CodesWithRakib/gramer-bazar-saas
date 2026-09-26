@@ -102,7 +102,7 @@ function LoginForm({ lang }: { lang: string }) {
     } else if (roles.includes('RIDER')) {
       router.push(`/${lang}/rider`);
     } else {
-      router.push(`/${lang}/customer/profile`);
+      router.push(`/${lang}/customer`);
     }
   };
 
@@ -112,7 +112,7 @@ function LoginForm({ lang }: { lang: string }) {
 
     try {
       const res = await loginWithPassword({ emailOrPhone, password }).unwrap();
-      dispatch(setCredentials({ user: res.user, accessToken: res.accessToken }));
+      dispatch(setCredentials({ user: res.user, accessToken: res.accessToken, refreshToken: res.refreshToken }));
       handleRoleRedirect(res.user.roles || []);
     } catch (err) {
       setErrorMsg(getApiErrorMessage(err) || (isBn ? 'লগইন ব্যর্থ হয়েছে। তথ্য যাচাই করুন।' : 'Login failed. Please check your credentials.'));
@@ -147,7 +147,7 @@ function LoginForm({ lang }: { lang: string }) {
 
     try {
       const res = await verifyOtp({ phone: otpPhone, otp: otpCode }).unwrap();
-      dispatch(setCredentials({ user: res.user, accessToken: res.accessToken }));
+      dispatch(setCredentials({ user: res.user, accessToken: res.accessToken, refreshToken: res.refreshToken }));
       handleRoleRedirect(res.user.roles || []);
     } catch (err) {
       setErrorMsg(getApiErrorMessage(err) || (isBn ? 'ভুল ওটিপি কোড' : 'Invalid OTP code'));

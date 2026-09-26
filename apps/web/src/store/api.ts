@@ -5,7 +5,10 @@ const rawBaseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as { auth?: { accessToken?: string } }).auth?.accessToken;
+    let token = (getState() as { auth?: { accessToken?: string } }).auth?.accessToken;
+    if (!token && typeof window !== 'undefined') {
+      token = localStorage.getItem('access_token') || undefined;
+    }
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
@@ -79,8 +82,16 @@ const customBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryEr
         isRefreshing = true;
 
         try {
+          const storedRefreshToken =
+            typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+
           const refreshResult = await rawBaseQuery(
-            { url: '/auth/refresh', method: 'POST' },
+            {
+              url: '/auth/refresh',
+              method: 'POST',
+              body: storedRefreshToken ? { refreshToken: storedRefreshToken } : undefined,
+              headers: storedRefreshToken ? { 'x-refresh-token': storedRefreshToken } : undefined,
+            },
             api,
             extraOptions
           );
@@ -92,10 +103,14 @@ const customBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryEr
             }
 
             const newAccessToken = (data.accessToken as string) || null;
+            const newRefreshToken = (data.refreshToken as string) || null;
             const user = data.user;
 
             if (newAccessToken && user) {
-              api.dispatch(setCredentials({ accessToken: newAccessToken, user }));
+              if (newRefreshToken && typeof window !== 'undefined') {
+                localStorage.setItem('refresh_token', newRefreshToken);
+              }
+              api.dispatch(setCredentials({ accessToken: newAccessToken, refreshToken: newRefreshToken || undefined, user }));
               isRefreshing = false;
               onRefreshed(newAccessToken);
 

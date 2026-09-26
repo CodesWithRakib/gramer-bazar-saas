@@ -3,8 +3,6 @@
 import { useEffect } from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { store, RootState } from "./store";
-import { useLazyGetProfileQuery } from "@/features/auth/authApi";
-import { setUser, logout } from "./slices/authSlice";
 import {
   hydrateCart,
   loadCartFromStorage,
@@ -14,7 +12,6 @@ import {
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
   const cart = useSelector((state: RootState) => state.cart);
-  const [getProfile] = useLazyGetProfileQuery();
 
   // Mark hydration completion once mounted (used by E2E tests to avoid
   // interacting with the SSR page before React state is live).
@@ -34,25 +31,6 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     saveCartToStorage({ items: cart.items, appliedCoupon: cart.appliedCoupon });
   }, [cart.items, cart.appliedCoupon]);
-
-  const { user, isAuthenticated, accessToken } = useSelector(
-    (state: RootState) => state.auth,
-  );
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (!user && (isAuthenticated || !!accessToken)) {
-        try {
-          const userData = await getProfile().unwrap();
-          dispatch(setUser(userData));
-        } catch {
-          // Token expired or invalid
-        }
-      }
-    };
-
-    fetchUser();
-  }, [user, isAuthenticated, accessToken, dispatch, getProfile]);
 
   return <>{children}</>;
 }

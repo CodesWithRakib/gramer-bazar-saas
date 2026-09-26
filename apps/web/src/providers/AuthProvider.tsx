@@ -17,13 +17,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initAuth = async () => {
       const storedToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
-      // If we already have a user in state, we are initialized
+      // If we already have a user in state (hydrated from localStorage), mark initialized immediately
       if (user) {
         if (isMounted) dispatch(setAuthInitialized(true));
+        // Background verify to sync latest profile data
+        if (storedToken) {
+          getProfile().unwrap().then((profile) => {
+            if (isMounted && profile) dispatch(setUser(profile));
+          }).catch(() => {
+            // Don't log out prematurely on network hiccup; api.ts 401 handler handles true expiration
+          });
+        }
         return;
       }
 
-      // If a token exists in localStorage (or browser might have session cookies), attempt to load profile
+      // If a token exists in localStorage, attempt to load profile
       if (storedToken) {
         try {
           const profile = await getProfile().unwrap();
@@ -31,8 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             dispatch(setUser(profile));
           }
         } catch {
-          // If profile fetch fails and cannot be refreshed, user is unauthenticated
-          if (isMounted) {
+          // If profile fetch fails with 401, customBaseQuery in api.ts will have attempted refresh
+          if (isMounted && !localStorage.getItem('access_token')) {
             dispatch(logout());
           }
         } finally {
@@ -60,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           getProfile().unwrap().then((profile) => {
             if (profile) dispatch(setUser(profile));
           }).catch(() => {
-            dispatch(logout());
+            // Let api.ts 401 handler manage logout
           });
         }
       }

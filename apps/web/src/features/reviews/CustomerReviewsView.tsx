@@ -18,16 +18,17 @@ export function CustomerReviewsView({ lang = 'en' }: CustomerReviewsViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
   
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated, isAuthInitialized } = useSelector((state: RootState) => state.auth);
   const { data: reviews, isLoading } = useGetUserReviewsQuery(undefined, {
     skip: !isAuthenticated,
   });
 
   useEffect(() => {
+    if (!isAuthInitialized) return;
     if (!isAuthenticated) {
-      router.push(`/${lang}/login?redirect=/${lang}/reviews`);
+      router.push(`/${lang}/login?redirect=/${lang}/customer/reviews`);
     }
-  }, [isAuthenticated, router, lang]);
+  }, [isAuthInitialized, isAuthenticated, router, lang]);
 
   if (!isAuthenticated || !user) return null;
 

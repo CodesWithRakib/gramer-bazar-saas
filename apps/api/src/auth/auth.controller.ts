@@ -25,6 +25,7 @@ import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { RefreshDto } from './dto/refresh.dto.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdatePasswordDto } from './dto/update-password.dto.js';
 import {
@@ -172,8 +173,8 @@ export class AuthController {
   @Post('refresh')
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({
-    summary: 'Refresh access token using HTTP-only cookie',
-    description: 'Reads refresh token from secure cookie, validates signature and database hash, and issues a fresh access token.',
+    summary: 'Refresh access token using HTTP-only cookie, body, or header',
+    description: 'Reads refresh token from secure cookie, body, or x-refresh-token header, validates signature and database hash, and issues a fresh access token.',
   })
   @ApiStandardResponse({
     type: AuthResponseDto,
@@ -182,10 +183,17 @@ export class AuthController {
   })
   @ApiCommonErrors([400, 401, 500])
   @HttpCode(HttpStatus.OK)
-  async refresh(@Request() req: any, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies?.['refresh_token'];
+  async refresh(
+    @Request() req: any,
+    @Body() body: RefreshDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken =
+      req.cookies?.['refresh_token'] ||
+      body?.refreshToken ||
+      req.headers?.['x-refresh-token'];
     if (!refreshToken) {
-      throw new BadRequestException('Refresh token is missing from cookies');
+      throw new BadRequestException('Refresh token is missing from cookies, body, or headers');
     }
     const data = await this.authService.refreshTokens(refreshToken);
     this.setCookies(res, data.accessToken, data.refreshToken);
