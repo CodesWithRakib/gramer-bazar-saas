@@ -60,7 +60,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
           ? `${activeOrders.length} ${isBn ? 'সক্রিয়' : 'Active'}`
           : undefined,
       badgeVariant: 'default' as const,
-      color: 'from-blue-500/20 to-blue-500/5 text-blue-600',
     },
     {
       id: 'wishlist',
@@ -75,7 +74,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
           ? `${wishlist.length} ${isBn ? 'পণ্য' : 'Items'}`
           : undefined,
       badgeVariant: 'secondary' as const,
-      color: 'from-rose-500/20 to-rose-500/5 text-rose-600',
     },
     {
       id: 'addresses',
@@ -90,7 +88,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
           ? `${addresses.length} ${isBn ? 'ঠিকানা' : 'Saved'}`
           : undefined,
       badgeVariant: 'secondary' as const,
-      color: 'from-emerald-500/20 to-emerald-500/5 text-emerald-600',
     },
     {
       id: 'product-requests',
@@ -100,7 +97,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'গ্রামের দুষ্প্রাপ্য বা বিশেষ কৃষিপণ্যের জন্য আবেদন',
       icon: ClipboardList,
       href: `/${lang}/customer/product-requests`,
-      color: 'from-amber-500/20 to-amber-500/5 text-amber-600',
     },
     {
       id: 'reviews',
@@ -110,7 +106,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'আপনার কেনা পণ্য ও সেলারদের দেওয়া রিভিউ ও রেটিং',
       icon: Star,
       href: `/${lang}/customer/reviews`,
-      color: 'from-yellow-500/20 to-yellow-500/5 text-yellow-600',
     },
     {
       id: 'messages',
@@ -120,7 +115,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'সেলার এবং ডেলিভারি রাইডারের সাথে সরাসরি চ্যাট',
       icon: MessageSquare,
       href: `/${lang}/customer/messages`,
-      color: 'from-indigo-500/20 to-indigo-500/5 text-indigo-600',
     },
     {
       id: 'disputes',
@@ -135,7 +129,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
           ? `${disputes.filter((d) => d.status === 'OPEN').length} ${isBn ? 'খোলা' : 'Open'}`
           : undefined,
       badgeVariant: 'destructive' as const,
-      color: 'from-red-500/20 to-red-500/5 text-red-600',
     },
     {
       id: 'notifications',
@@ -145,7 +138,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'অর্ডারের অগ্রগতি ও বিশেষ ছাড় সম্পর্কিত বার্তা',
       icon: Bell,
       href: `/${lang}/customer/notifications`,
-      color: 'from-purple-500/20 to-purple-500/5 text-purple-600',
     },
     {
       id: 'profile',
@@ -155,7 +147,6 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'নাম, মোবাইল নম্বর ও ব্যক্তিগত তথ্য পরিবর্তন করুন',
       icon: User,
       href: `/${lang}/customer/profile`,
-      color: 'from-cyan-500/20 to-cyan-500/5 text-cyan-600',
     },
     {
       id: 'settings',
@@ -165,78 +156,73 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'পাসওয়ার্ড পরিবর্তন ও অ্যাকাউন্ট নিরাপত্তা সেটিংস',
       icon: Settings,
       href: `/${lang}/customer/settings`,
-      color: 'from-slate-500/20 to-slate-500/5 text-slate-600',
     },
   ];
 
   return (
-    <div className="space-y-8 pb-12">
-      {/* Welcome Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-primary/5 to-background border border-primary/20 p-6 md:p-8 shadow-sm">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              {isBn ? 'গ্রাহক ড্যাশবোর্ড' : 'Customer Dashboard'}
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+    <div className="space-y-6 pb-12">
+      {/* Welcome Header */}
+      <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-none">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
               {isBn
                 ? `স্বাগতম, ${user?.firstName || 'সম্মানিত গ্রাহক'}!`
                 : `Welcome back, ${user?.firstName || 'Valued Customer'}!`}
             </h1>
-            <p className="text-muted-foreground text-sm max-w-xl">
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
               {isBn
                 ? 'আপনার অর্ডার, ডেলিভারি ঠিকানা ও পছন্দের পণ্য সহজে এক জায়গা থেকে পরিচালনা করুন।'
                 : 'Manage your active orders, wishlist, delivery addresses, and account security all in one place.'}
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild className="rounded-xl shadow-sm">
+          <div className="flex flex-wrap gap-2.5">
+            <Button size="sm" asChild className="rounded-lg font-medium">
               <Link href={`/${lang}/customer/orders`}>
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                {isBn ? 'আমার অর্ডার দেখুন' : 'View Orders'}
+                <ShoppingCart className="w-4 h-4 mr-1.5" />
+                {isBn ? 'আমার অর্ডার' : 'My Orders'}
               </Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-xl bg-background/80">
+            <Button size="sm" asChild variant="outline" className="rounded-lg">
               <Link href={`/${lang}/search`}>
-                <Package className="w-4 h-4 mr-2" />
-                {isBn ? 'পণ্য খুঁজুন' : 'Browse Marketplace'}
+                <Package className="w-4 h-4 mr-1.5" />
+                {isBn ? 'পণ্য খুঁজুন' : 'Browse Products'}
               </Link>
             </Button>
           </div>
         </div>
 
         {/* Quick Stat Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-primary/10">
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground font-medium">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-border/60">
+          <div className="space-y-0.5">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               {isBn ? 'মোট অর্ডার' : 'Total Orders'}
             </p>
-            <p className="text-2xl font-bold">
+            <p className="text-2xl font-bold text-foreground">
               {isOrdersLoading ? '...' : orders.length}
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground font-medium">
+          <div className="space-y-0.5">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               {isBn ? 'চলতি অর্ডার' : 'Active Orders'}
             </p>
             <p className="text-2xl font-bold text-primary">
               {isOrdersLoading ? '...' : activeOrders.length}
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground font-medium">
+          <div className="space-y-0.5">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               {isBn ? 'পছন্দের পণ্য' : 'Wishlist Items'}
             </p>
-            <p className="text-2xl font-bold text-rose-600">
+            <p className="text-2xl font-bold text-foreground">
               {isWishlistLoading ? '...' : wishlist.length}
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground font-medium">
+          <div className="space-y-0.5">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               {isBn ? 'সংরক্ষিত ঠিকানা' : 'Saved Addresses'}
             </p>
-            <p className="text-2xl font-bold text-emerald-600">
+            <p className="text-2xl font-bold text-foreground">
               {isAddressesLoading ? '...' : addresses.length}
             </p>
           </div>
@@ -246,7 +232,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       {/* Hub Cards Grid */}
       <div>
         <div className="mb-4">
-          <h2 className="text-lg font-bold tracking-tight">
+          <h2 className="text-base font-semibold tracking-tight text-foreground">
             {isBn ? 'অ্যাকাউন্ট ও সেবা হাব' : 'Account & Service Modules'}
           </h2>
           <p className="text-xs text-muted-foreground">
@@ -261,28 +247,26 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
             const Icon = card.icon;
             return (
               <Link key={card.id} href={card.href} className="group">
-                <Card className="h-full rounded-2xl border-muted/60 transition-all duration-300 hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 relative overflow-hidden bg-card/60 backdrop-blur-sm">
-                  <CardHeader className="p-5 pb-3">
+                <Card className="h-full rounded-xl border border-border shadow-none transition-colors hover:border-primary/40 bg-card">
+                  <CardHeader className="p-4 pb-2">
                     <div className="flex items-start justify-between gap-3">
-                      <div
-                        className={`w-11 h-11 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center shrink-0 shadow-xs transition-transform duration-300 group-hover:scale-110`}
-                      >
-                        <Icon className="w-5 h-5" />
+                      <div className="w-9 h-9 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                        <Icon className="w-4 h-4" />
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         {card.badge && (
-                          <Badge variant={card.badgeVariant} className="text-xs font-semibold">
+                          <Badge variant={card.badgeVariant} className="text-[10px] h-4 px-1.5 font-medium">
                             {card.badge}
                           </Badge>
                         )}
-                        <ArrowRight className="w-4 h-4 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                       </div>
                     </div>
-                    <CardTitle className="text-base font-semibold mt-3 group-hover:text-primary transition-colors">
+                    <CardTitle className="text-sm font-semibold mt-2 group-hover:text-primary transition-colors">
                       {isBn ? card.titleBn : card.title}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-5 pb-5 pt-0">
+                  <CardContent className="px-4 pb-4 pt-0">
                     <CardDescription className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                       {isBn ? card.descriptionBn : card.description}
                     </CardDescription>

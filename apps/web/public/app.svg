@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <rect width="512" height="512" rx="120" fill="#16a34a"/>
+  <!-- Basket -->
+  <path d="M140 310 C140 310, 160 410, 256 410 C352 410, 372 310, 372 310 Z" fill="#ffffff" fill-opacity="0.95"/>
+  <ellipse cx="256" cy="310" rx="116" ry="24" fill="#f59e0b"/>
+  <path d="M190 326 L230 402 M256 332 L256 410 M322 326 L282 402" stroke="#15803d" stroke-width="6" stroke-linecap="round"/>
+  <!-- Stem -->
+  <path d="M256 310 Q254 210 256 120" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+  <!-- Leaves -->
+  <path d="M256 115 C275 80, 256 50, 256 50 C256 50, 237 80, 256 115 Z" fill="#f59e0b"/>
+  <path d="M254 215 C200 200, 170 145, 170 145 C170 145, 225 140, 254 185 Z" fill="#ffffff"/>
+  <path d="M258 190 C312 175, 342 120, 342 120 C342 120, 287 115, 258 160 Z" fill="#f59e0b"/>
+</svg>

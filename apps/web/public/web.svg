@@ -1,46 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="1200" height="340" fill="none">
-  <!-- Brand Emblem (Squircle + Village Sprout Motif) -->
   <g transform="translate(40, 30)">
     <rect width="280" height="280" rx="64" fill="#16a34a"/>
     <rect x="10" y="10" width="260" height="260" rx="54" stroke="#ffffff" stroke-opacity="0.15" stroke-width="3"/>
-
-    <!-- Basket / Basin -->
     <path d="M75 170 C75 170, 88 225, 140 225 C192 225, 205 170, 205 170 Z" fill="#ffffff" fill-opacity="0.95"/>
     <ellipse cx="140" cy="170" rx="65" ry="14" fill="#f59e0b"/>
     <path d="M105 180 L125 220 M140 184 L140 225 M175 180 L155 220" stroke="#15803d" stroke-width="3.5" stroke-linecap="round"/>
-    
-    <!-- Central Sprout Stem -->
     <path d="M140 170 Q139 115 140 68" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
-
-    <!-- Top Sprout Leaf -->
     <path d="M140 65 C150 45, 140 30, 140 30 C140 30, 130 45, 140 65 Z" fill="#f59e0b"/>
-
-    <!-- Left Main Leaf -->
     <path d="M139 120 C110 112, 92 82, 92 82 C92 82, 122 79, 139 104 Z" fill="#ffffff"/>
-    <!-- Right Main Leaf -->
     <path d="M141 106 C170 98, 188 68, 188 68 C188 68, 158 65, 141 90 Z" fill="#f59e0b"/>
-
-    <!-- Lower Leaves -->
-    <path d="M139 144 C117 138, 105 116, 105 116 C105 116, 127 113, 139 133 Z" fill="#fef08a"/>
-    <path d="M141 136 C163 130, 175 108, 175 108 C175 108, 153 105, 141 125 Z" fill="#ffffff"/>
   </g>
-
-  <!-- Typography: Master Brand English & Bengali Lockup -->
-  <g transform="translate(360, 40)">
-    <!-- Primary Brand Name (Bold, Modern Geometric) -->
+  <g transform="translate(360, 50)">
     <text x="0" y="125" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="104" font-weight="900" fill="#0f172a" letter-spacing="-2">
       Gramer<tspan fill="#16a34a">Bazar</tspan>
     </text>
-
-    <!-- Secondary Bengali Name & Tagline -->
-    <text x="4" y="195" font-family="'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif" font-size="44" font-weight="700" fill="#15803d" letter-spacing="0">
-      গ্রামের বাজার
-      <tspan font-family="system-ui, sans-serif" font-size="28" font-weight="500" fill="#64748b" dx="18" dy="-4">• DIRECT FROM VILLAGE</tspan>
-    </text>
-
-    <!-- Value Statement Subtitle -->
-    <text x="4" y="240" font-family="system-ui, sans-serif" font-size="20" font-weight="600" fill="#94a3b8" letter-spacing="4">
-      AUTHENTIC • FRESH • EMPOWERING RURAL FARMERS
+    <text x="4" y="195" font-family="'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif" font-size="42" font-weight="700" fill="#15803d">
+      গ্রামের বাজার <tspan font-family="system-ui, sans-serif" font-size="28" font-weight="500" fill="#64748b" dx="15" dy="-3">• DIRECT FROM VILLAGE</tspan>
     </text>
   </g>
 </svg>

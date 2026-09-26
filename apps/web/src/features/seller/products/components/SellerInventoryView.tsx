@@ -16,7 +16,8 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, X, Package } from 'lucide-react';
+import { Search, X, Package, Boxes } from 'lucide-react';
+import Link from 'next/link';
 import AdminPagination from '@/components/AdminPagination';
 
 export interface SellerInventoryViewProps {
@@ -94,12 +95,30 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
           {isBn ? 'ইনভেন্টরি ম্যানেজমেন্ট' : 'Inventory Management'}
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-1 text-sm">
           {isBn ? 'আপনার স্টকের পরিমাণ দ্রুত আপডেট করুন' : 'Quickly update your stock levels.'}
         </p>
+      </div>
+
+      {/* Sub-Navigation Tabs */}
+      <div className="flex flex-wrap items-center gap-2 pb-2 border-b">
+        <Link
+          href={`/${lang}/seller/products`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          <Package className="w-3.5 h-3.5" />
+          <span>{isBn ? 'সকল প্রোডাক্ট' : 'All Products'}</span>
+        </Link>
+        <Link
+          href={`/${lang}/seller/products/inventory`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground"
+        >
+          <Boxes className="w-3.5 h-3.5" />
+          <span>{isBn ? 'স্টক ইনভেন্টরি' : 'Stock Inventory'}</span>
+        </Link>
       </div>
 
       {/* Main Table Card */}

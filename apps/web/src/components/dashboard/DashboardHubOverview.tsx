@@ -73,13 +73,13 @@ export function DashboardHubOverview({
 
           return (
             <Link key={card.id} href={fullHref} className="group block focus:outline-none">
-              <Card className="h-full cursor-pointer rounded-2xl border border-border/80 bg-card p-5 md:p-6 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-primary/40">
+              <Card className="h-full cursor-pointer rounded-xl border bg-card p-5 md:p-6 transition-colors duration-150 hover:border-primary/50">
                 <CardContent className="flex h-full flex-col p-0 justify-between">
                   <div>
                     {/* Top Row: Icon & Chevron & Optional Badge */}
                     <div className="mb-4 flex w-full items-start justify-between">
-                      <div className="bg-primary/10 shrink-0 rounded-2xl p-3 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                        <Icon className="h-5 w-5" strokeWidth={2.2} />
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                        <Icon className="h-5 w-5" strokeWidth={2} />
                       </div>
 
                       <div className="flex items-center gap-2">

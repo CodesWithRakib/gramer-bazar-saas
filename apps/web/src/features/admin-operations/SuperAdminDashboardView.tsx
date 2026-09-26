@@ -35,109 +35,102 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
 
   return (
     <div className="space-y-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-primary p-8 md:p-10 text-white shadow-lg">
-        <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
-            <ShieldCheck className="w-4 h-4 text-emerald-200" />
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-semibold">
+            <ShieldCheck className="w-3.5 h-3.5" />
             <span>{isBn ? 'সুপার অ্যাডমিন সিকিউর পোর্টাল' : 'Super Admin Master Console'}</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             {isBn ? 'সিস্টেম ওভারভিউ ও ব্যবস্থাপনা' : 'System Overview & Governance'}
           </h1>
-          <p className="text-white/80 text-sm md:text-base leading-relaxed">
+          <p className="text-muted-foreground text-sm max-w-2xl">
             {isBn
               ? 'গ্রামের বাজার প্ল্যাটফর্মের সর্বোচ্চ প্রশাসনিক নিয়ন্ত্রণ। অ্যাডমিন তৈরি, পারমিশন ম্যানেজমেন্ট এবং নিরাপত্তা পর্যবেক্ষণ করুন।'
               : 'Privileged administration control of the Gramer Bazar platform. Manage administrative staff, permissions, and security.'}
           </p>
-          <div className="pt-2 flex flex-wrap gap-3">
-            <Button
-              className="bg-white text-emerald-800 hover:bg-white/90 font-semibold rounded-xl shadow-md"
-              asChild
-            >
-              <Link href={`/${lang}/super-admin/create-user`}>
-                <UserPlus className="w-4 h-4 mr-2" />
-                {isBn ? 'নতুন স্টাফ/অ্যাডমিন তৈরি' : 'Create Staff / Admin'}
-              </Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="border-white/40 text-white hover:bg-white/10 rounded-xl"
-              asChild
-            >
-              <Link href={`/${lang}/super-admin/admins`}>
-                <ShieldCheck className="w-4 h-4 mr-2" />
-                {isBn ? 'অ্যাডমিন রোস্টার' : 'View Admin Roster'}
-              </Link>
-            </Button>
-          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button asChild size="sm" className="gap-2">
+            <Link href={`/${lang}/super-admin/create-user`}>
+              <UserPlus className="w-4 h-4" />
+              <span>{isBn ? 'নতুন স্টাফ তৈরি' : 'Create Staff'}</span>
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild className="gap-2">
+            <Link href={`/${lang}/super-admin/admins`}>
+              <ShieldCheck className="w-4 h-4" />
+              <span>{isBn ? 'অ্যাডমিন রোস্টার' : 'Admin Roster'}</span>
+            </Link>
+          </Button>
         </div>
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <Card className="rounded-2xl border-muted/50 shadow-sm hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="rounded-xl border">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">
               {isBn ? 'নিবন্ধিত অ্যাডমিন' : 'Active Admins'}
             </CardTitle>
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <ShieldCheck className="w-4 h-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalAdmins}</div>
+            <div className="text-2xl font-bold tracking-tight">{totalAdmins}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'প্ল্যাটফর্ম নিয়ন্ত্রক' : 'Platform operators'}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-muted/50 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-xl border">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">
               {isBn ? 'অনুমোদিত সেলার' : 'Approved Sellers'}
             </CardTitle>
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
-              <Store className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-muted text-foreground flex items-center justify-center">
+              <Store className="w-4 h-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalSellers}</div>
+            <div className="text-2xl font-bold tracking-tight">{totalSellers}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'সক্রিয় দোকানদার' : 'Active village merchants'}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-muted/50 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-xl border">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">
               {isBn ? 'সক্রিয় রাইডার' : 'Active Riders'}
             </CardTitle>
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center">
-              <Truck className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-muted text-foreground flex items-center justify-center">
+              <Truck className="w-4 h-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalRiders}</div>
+            <div className="text-2xl font-bold tracking-tight">{totalRiders}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'ডেলিভারি নেটওয়ার্ক' : 'Delivery force'}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-muted/50 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="rounded-xl border">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">
               {isBn ? 'মোট ব্যবহারকারী' : 'Total Users'}
             </CardTitle>
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-              <Users className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-muted text-foreground flex items-center justify-center">
+              <Users className="w-4 h-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalUsers}</div>
+            <div className="text-2xl font-bold tracking-tight">{totalUsers}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'সকল অ্যাকাউন্ট' : 'All accounts combined'}
             </p>
@@ -147,15 +140,15 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
 
       {/* Quick Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="rounded-2xl border-muted/50 shadow-sm hover:border-primary/30 transition-all">
+        <Card className="rounded-xl border">
           <CardHeader>
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3">
-              <ShieldCheck className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-3">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-            <CardTitle className="text-lg">
+            <CardTitle className="text-base">
               {isBn ? 'অ্যাডমিন পরিচালনা' : 'Admin Management'}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs">
               {isBn
                 ? 'সিস্টেম অ্যাডমিনদের তালিকা দেখুন, তাদের রোল এবং অ্যাক্সেস স্ট্যাটাস আপডেট করুন।'
                 : 'Inspect administrative personnel, update operational privileges and manage account statuses.'}
@@ -171,21 +164,21 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-muted/50 shadow-sm hover:border-primary/30 transition-all">
+        <Card className="rounded-xl border">
           <CardHeader>
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
-              <ClipboardList className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-lg bg-muted text-foreground flex items-center justify-center mb-3">
+              <ClipboardList className="w-5 h-5" />
             </div>
-            <CardTitle className="text-lg">
+            <CardTitle className="text-base">
               {isBn ? 'আবেদন পর্যালোচনা' : 'Partner Applications'}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs">
               {isBn
                 ? 'নতুন সেলার এবং রাইডার আবেদনগুলো পর্যালোচনা করুন এবং অনুমোদন দিন।'
                 : 'Review pending vendor and rider partner submissions for vetting and authorization.'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-1">
             <Button variant="ghost" className="w-full justify-between group" asChild>
               <Link href={`/${lang}/super-admin/seller-applications`}>
                 <span>{isBn ? 'সেলার আবেদনসমূহ' : 'Seller Applications'}</span>
@@ -201,21 +194,21 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-muted/50 shadow-sm hover:border-primary/30 transition-all">
+        <Card className="rounded-xl border">
           <CardHeader>
-            <div className="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center mb-3">
-              <Activity className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-lg bg-muted text-foreground flex items-center justify-center mb-3">
+              <Activity className="w-5 h-5" />
             </div>
-            <CardTitle className="text-lg">
+            <CardTitle className="text-base">
               {isBn ? 'নিরাপত্তা ও সেটিংস' : 'Security & Policies'}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs">
               {isBn
                 ? 'প্ল্যাটফর্মের গ্লোবাল সেটিংস এবং নিরাপত্তা অডিট লগ যাচাই করুন।'
                 : 'Monitor sensitive security audit records and manage global platform rules.'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-1">
             <Button variant="ghost" className="w-full justify-between group" asChild>
               <Link href={`/${lang}/super-admin/audit-logs`}>
                 <span>{isBn ? 'অডিট লগ' : 'Security Audit Logs'}</span>

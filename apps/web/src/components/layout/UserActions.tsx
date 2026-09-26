@@ -201,7 +201,7 @@ export function UserActions({ lang }: UserActionsProps) {
                 </DropdownMenuItem>
               )}
 
-              {isAdmin && (
+              {isAdmin && !isSuperAdmin && (
                 <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-primary">
                   <Link href={`/${lang}/admin`} className="flex items-center gap-2.5">
                     <LayoutDashboard className="h-4 w-4" />
@@ -211,43 +211,21 @@ export function UserActions({ lang }: UserActionsProps) {
               )}
 
               {isSeller && (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-success">
-                    <Link href={`/${lang}/seller`} className="flex items-center gap-2.5">
-                      <Store className="h-4 w-4 text-success" />
-                      <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="cursor-pointer py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground">
-                    <Link href={`/${lang}/seller/products`} className="flex items-center gap-2.5 pl-6">
-                      <Package className="h-3.5 w-3.5" />
-                      <span>{isBn ? "পণ্য পরিচালনা" : "Manage Products"}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="cursor-pointer py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground">
-                    <Link href={`/${lang}/seller/orders`} className="flex items-center gap-2.5 pl-6">
-                      <ShoppingBag className="h-3.5 w-3.5" />
-                      <span>{isBn ? "সেলার অর্ডার" : "Seller Orders"}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                </>
+                <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-emerald-600 dark:text-emerald-400">
+                  <Link href={`/${lang}/seller`} className="flex items-center gap-2.5">
+                    <Store className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
+                  </Link>
+                </DropdownMenuItem>
               )}
 
               {isRider && (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-info">
-                    <Link href={`/${lang}/rider`} className="flex items-center gap-2.5">
-                      <Bike className="h-4 w-4 text-info" />
-                      <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider Dashboard"}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="cursor-pointer py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground">
-                    <Link href={`/${lang}/rider/deliveries`} className="flex items-center gap-2.5 pl-6">
-                      <Package className="h-3.5 w-3.5" />
-                      <span>{isBn ? "ডেলিভারি লিস্ট" : "Deliveries List"}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                </>
+                <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg font-semibold text-blue-600 dark:text-blue-400">
+                  <Link href={`/${lang}/rider`} className="flex items-center gap-2.5">
+                    <Bike className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider Dashboard"}</span>
+                  </Link>
+                </DropdownMenuItem>
               )}
 
               {(isAdmin || isSeller || isRider) && <DropdownMenuSeparator className="my-1.5" />}

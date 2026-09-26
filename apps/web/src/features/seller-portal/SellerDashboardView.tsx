@@ -37,61 +37,58 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 border-primary/10">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+        <Card className="rounded-xl border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">
               {isBn ? 'মোট বিক্রি' : 'Total Sales'}
             </CardTitle>
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-primary" />
+            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <DollarSign className="h-4.5 w-4.5 text-primary" />
             </div>
           </CardHeader>
-          <CardContent className="relative z-10">
+          <CardContent>
             {isLoading ? (
               <Skeleton className="h-8 w-24" />
             ) : (
-              <div className="text-3xl font-bold tracking-tight">
+              <div className="text-2xl font-bold tracking-tight">
                 ৳ {metrics?.totalSales.toLocaleString()}
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+        <Card className="rounded-xl border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-semibold text-muted-foreground">
               {isBn ? 'পেন্ডিং / সক্রিয় অর্ডার' : 'Active Orders'}
             </CardTitle>
-            <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-              <ShoppingCart className="h-5 w-5 text-blue-500" />
+            <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center">
+              <ShoppingCart className="h-4.5 w-4.5 text-foreground" />
             </div>
           </CardHeader>
-          <CardContent className="relative z-10">
+          <CardContent>
             {isLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <div className="text-3xl font-bold tracking-tight">{metrics?.activeOrdersCount}</div>
+              <div className="text-2xl font-bold tracking-tight">{metrics?.activeOrdersCount}</div>
             )}
           </CardContent>
         </Card>
 
-        <Card className={`relative overflow-hidden group hover:shadow-lg transition-all duration-300 ${metrics?.lowStockCount ? 'border-red-500/50' : ''}`}>
-          <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${metrics?.lowStockCount ? 'from-red-500/10 via-red-500/5 to-transparent' : 'from-amber-500/10 via-amber-500/5 to-transparent'}`} />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className={`text-sm font-semibold text-muted-foreground ${metrics?.lowStockCount ? 'text-red-500' : ''}`}>
+        <Card className={`rounded-xl border ${metrics?.lowStockCount ? 'border-destructive/30' : ''}`}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className={`text-sm font-semibold text-muted-foreground ${metrics?.lowStockCount ? 'text-destructive' : ''}`}>
               {isBn ? 'লো স্টক প্রোডাক্ট' : 'Low Stock Products'}
             </CardTitle>
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center ${metrics?.lowStockCount ? 'bg-red-500/10' : 'bg-amber-500/10'}`}>
-              <PackageX className={`h-5 w-5 ${metrics?.lowStockCount ? 'text-red-500' : 'text-amber-500'}`} />
+            <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${metrics?.lowStockCount ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
+              <PackageX className="h-4.5 w-4.5" />
             </div>
           </CardHeader>
-          <CardContent className="relative z-10">
+          <CardContent>
             {isLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <div className={`text-3xl font-bold tracking-tight ${metrics?.lowStockCount ? 'text-red-500' : ''}`}>
+              <div className={`text-2xl font-bold tracking-tight ${metrics?.lowStockCount ? 'text-destructive' : ''}`}>
                 {metrics?.lowStockCount}
               </div>
             )}
@@ -101,21 +98,15 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
 
       {metrics && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mt-6">
-          <Card className="col-span-4 shadow-sm border-muted/50 rounded-2xl overflow-hidden">
-            <CardHeader className="bg-muted/10 pb-6 border-b border-muted/30">
-              <CardTitle className="text-lg">{isBn ? 'রাজস্ব ওভারভিউ' : 'Revenue Overview'}</CardTitle>
+          <Card className="col-span-4 rounded-xl border">
+            <CardHeader className="pb-4 border-b">
+              <CardTitle className="text-base">{isBn ? 'রাজস্ব ওভারভিউ' : 'Revenue Overview'}</CardTitle>
               <CardDescription>{isBn ? 'গত ৭ দিনের বিক্রয়' : 'Sales over the last 7 days'}</CardDescription>
             </CardHeader>
             <CardContent className="pl-0 pt-6 pr-6">
               <div className="h-[320px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={metrics.revenueData || []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                     <XAxis 
                       dataKey="name" 
@@ -134,10 +125,10 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                       dx={-10}
                     />
                     <Tooltip 
-                      cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
-                      contentStyle={{ borderRadius: '12px', border: '1px solid hsl(var(--border))', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }}
+                      cursor={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
+                      contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
                     />
-                    <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                    <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={0.1} fill="hsl(var(--primary))" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>

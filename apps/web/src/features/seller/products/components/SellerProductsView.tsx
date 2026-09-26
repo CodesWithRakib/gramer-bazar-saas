@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { AddProductDialog, EditProductDialog } from './SellerProductDialogs';
+import Link from 'next/link';
+import { Package, Boxes } from 'lucide-react';
 
 export interface SellerProductsViewProps {
   lang?: string;
@@ -146,6 +148,24 @@ export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
               : 'Manage products, prices, and stock inventory for your store.'}
           </p>
         </div>
+      </div>
+
+      {/* Sub-Navigation Tabs */}
+      <div className="flex flex-wrap items-center gap-2 pb-2 border-b">
+        <Link
+          href={`/${lang}/seller/products`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground"
+        >
+          <Package className="w-3.5 h-3.5" />
+          <span>{isBn ? 'সকল প্রোডাক্ট' : 'All Products'}</span>
+        </Link>
+        <Link
+          href={`/${lang}/seller/products/inventory`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          <Boxes className="w-3.5 h-3.5" />
+          <span>{isBn ? 'স্টক ইনভেন্টরি' : 'Stock Inventory'}</span>
+        </Link>
       </div>
 
       <DataTable

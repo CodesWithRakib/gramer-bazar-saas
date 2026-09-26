@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 320" width="1100" height="320" fill="none">
+  <!-- Brand Emblem -->
+  <g transform="translate(30, 25)">
+    <rect width="270" height="270" rx="60" fill="#16a34a"/>
+    <rect x="10" y="10" width="250" height="250" rx="50" stroke="#ffffff" stroke-opacity="0.15" stroke-width="3"/>
+
+    <!-- Basket / Basin -->
+    <path d="M72 165 C72 165, 85 218, 135 218 C185 218, 198 165, 198 165 Z" fill="#ffffff" fill-opacity="0.95"/>
+    <ellipse cx="135" cy="165" rx="63" ry="14" fill="#f59e0b"/>
+    <path d="M102 175 L121 213 M135 178 L135 218 M168 175 L149 213" stroke="#15803d" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Sprout Stem -->
+    <path d="M135 165 Q134 110 135 65" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- Leaves -->
+    <path d="M135 62 C145 42, 135 28, 135 28 C135 28, 125 42, 135 62 Z" fill="#f59e0b"/>
+    <path d="M134 115 C106 107, 88 78, 88 78 C88 78, 118 75, 134 100 Z" fill="#ffffff"/>
+    <path d="M136 102 C164 94, 182 65, 182 65 C182 65, 152 62, 136 87 Z" fill="#f59e0b"/>
+    <path d="M134 140 C112 134, 101 112, 101 112 C101 112, 123 109, 134 129 Z" fill="#fef08a"/>
+    <path d="M136 132 C158 126, 169 104, 169 104 C169 104, 147 101, 136 121 Z" fill="#ffffff"/>
+  </g>
+
+  <!-- Typography: English Primary Lockup -->
+  <g transform="translate(340, 45)">
+    <text x="0" y="115" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="94" font-weight="900" fill="#0f172a" letter-spacing="-2">
+      Gramer <tspan fill="#16a34a">Bazar</tspan>
+    </text>
+
+    <text x="4" y="180" font-family="system-ui, sans-serif" font-size="30" font-weight="700" fill="#15803d" letter-spacing="1">
+      DIRECT VILLAGE MARKETPLACE
+    </text>
+
+    <text x="4" y="222" font-family="'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif" font-size="22" font-weight="600" fill="#94a3b8" letter-spacing="2">
+      গ্রামের বাজার • খাঁটি পণ্য কৃষকের থেকে
+    </text>
+  </g>
+</svg>

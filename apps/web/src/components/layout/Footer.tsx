@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { BrandLogo } from "@/components/common/BrandLogo";
 import {
   Facebook,
   Instagram,
@@ -14,15 +15,6 @@ import {
   CreditCard,
   ShieldCheck,
   Store,
-  Bike,
-  User,
-  Package,
-  Heart,
-  HelpCircle,
-  AlertCircle,
-  FileQuestion,
-  Lock,
-  Sparkles,
 } from "lucide-react";
 
 interface FooterProps {
@@ -41,9 +33,9 @@ export function Footer({ lang }: FooterProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
           {/* Col 1: Brand & Contact Info */}
           <div className="lg:col-span-1 space-y-4">
-            <h3 className="font-extrabold text-2xl text-primary tracking-tight">
-              {isBn ? "গ্রামের বাজার" : "Gramer Bazar"}
-            </h3>
+            <div className="pb-1">
+              <BrandLogo href={`/${lang}`} lang={lang} variant="full" width={160} height={44} />
+            </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               {isBn
                 ? "আপনার স্থানীয় হাইপার-লোকাল মার্কেটপ্লেস। সম্পূর্ণ তাজা এবং খাঁটি পণ্য সরাসরি আপনার দরজায়।"
@@ -107,8 +99,8 @@ export function Footer({ lang }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href={`/${lang}/flash-sale`} className="hover:text-rose-500 transition-colors flex items-center gap-1.5">
-                  <span className="text-rose-500 font-bold">{isBn ? "ফ্ল্যাশ সেল (ছাড়)" : "Flash Sale"}</span>
+                <Link href={`/${lang}/flash-sale`} className="hover:text-rose-600 transition-colors">
+                  <span className="text-rose-600 dark:text-rose-400 font-semibold">{isBn ? "ফ্ল্যাশ সেল (ছাড়)" : "Flash Sale"}</span>
                 </Link>
               </li>
               <li>
@@ -117,8 +109,8 @@ export function Footer({ lang }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href={`/${lang}/categories/fresh-vegetables`} className="hover:text-primary transition-colors">
-                  {isBn ? "শাকসবজি ও ফল" : "Fresh & Vegetables"}
+                <Link href={`/${lang}/products`} className="hover:text-primary transition-colors">
+                  {isBn ? "সকল পণ্যসম্ভার" : "All Products"}
                 </Link>
               </li>
             </ul>
@@ -131,79 +123,64 @@ export function Footer({ lang }: FooterProps) {
             </h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground font-medium">
               <li>
-                <Link href={`/${lang}/contact`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                  <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "যোগাযোগ ও হেল্প" : "Contact Us"}</span>
+                <Link href={`/${lang}/contact`} className="hover:text-primary transition-colors">
+                  {isBn ? "যোগাযোগ ও হেল্প" : "Contact Us"}
                 </Link>
               </li>
               <li>
-                <Link href={`/${lang}/faq`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                  <FileQuestion className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "সাধারণ প্রশ্ন (FAQ)" : "FAQs"}</span>
+                <Link href={`/${lang}/faq`} className="hover:text-primary transition-colors">
+                  {isBn ? "সাধারণ প্রশ্ন (FAQ)" : "FAQs"}
                 </Link>
               </li>
               <li>
-                <Link href={`/${lang}/customer/disputes`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "অভিযোগ ও সমাধান" : "Disputes & Support"}</span>
+                <Link href={`/${lang}/customer/disputes`} className="hover:text-primary transition-colors">
+                  {isBn ? "অভিযোগ ও সমাধান" : "Disputes & Support"}
                 </Link>
               </li>
               <li>
-                <Link href={`/${lang}/customer/product-requests`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                  <Package className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "পণ্য অনুরোধ" : "Product Requests"}</span>
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${lang}/privacy`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "প্রাইভেসি পলিসি" : "Privacy Policy"}</span>
+                <Link href={`/${lang}/privacy`} className="hover:text-primary transition-colors">
+                  {isBn ? "প্রাইভেসি পলিসি" : "Privacy Policy"}
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Earn with Us / Partnership (Public for all users) */}
+          {/* Col 4: Earn with Us / Partnership */}
           <div>
-            <h4 className="font-bold text-sm mb-4 text-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>{isBn ? "অংশীদারিত্ব" : "Earn with Us"}</span>
+            <h4 className="font-bold text-sm mb-4 text-foreground uppercase tracking-wider">
+              {isBn ? "অংশীদারিত্ব" : "Earn with Us"}
             </h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground font-medium">
               <li>
                 <Link
                   href={`/${lang}/become-a-seller`}
-                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                  className="hover:text-primary transition-colors"
                 >
-                  <Store className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "সেলার হতে আবেদন" : "Become a Seller"}</span>
+                  {isBn ? "সেলার হতে আবেদন" : "Become a Seller"}
                 </Link>
               </li>
               <li>
                 <Link
                   href={`/${lang}/become-a-rider`}
-                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                  className="hover:text-primary transition-colors"
                 >
-                  <Bike className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "রাইডার হতে আবেদন" : "Become a Rider"}</span>
+                  {isBn ? "রাইডার হতে আবেদন" : "Become a Rider"}
                 </Link>
               </li>
               <li>
                 <Link
-                  href={`/${lang}/shops`}
-                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                  href={`/${lang}/customer/product-requests`}
+                  className="hover:text-primary transition-colors"
                 >
-                  <Store className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "দোকান ও বিক্রেতা তালিকা" : "Verified Shops"}</span>
+                  {isBn ? "পণ্য অনুরোধ ও পাইকারি" : "Product Requests"}
                 </Link>
               </li>
               <li>
                 <Link
-                  href={`/${lang}/offers`}
-                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                  href={`/${lang}/contact`}
+                  className="hover:text-primary transition-colors"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? "কুপন ও বিশেষ অফার" : "Offers & Deals"}</span>
+                  {isBn ? "অংশীদারিত্ব সহায়তা" : "Partner Inquiries"}
                 </Link>
               </li>
             </ul>
@@ -218,27 +195,23 @@ export function Footer({ lang }: FooterProps) {
               {isAuthenticated ? (
                 <>
                   <li>
-                    <Link href={`/${lang}/customer/orders`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                      <Package className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{isBn ? "আমার অর্ডারসমূহ" : "My Orders"}</span>
+                    <Link href={`/${lang}/customer/orders`} className="hover:text-primary transition-colors">
+                      {isBn ? "আমার অর্ডারসমূহ" : "My Orders"}
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/${lang}/customer/profile`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{isBn ? "আমার প্রোফাইল" : "My Profile"}</span>
+                    <Link href={`/${lang}/customer/profile`} className="hover:text-primary transition-colors">
+                      {isBn ? "আমার প্রোফাইল" : "My Profile"}
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/${lang}/customer/wishlist`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                      <Heart className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{isBn ? "উইশলিস্ট" : "Wishlist"}</span>
+                    <Link href={`/${lang}/customer/wishlist`} className="hover:text-primary transition-colors">
+                      {isBn ? "পছন্দের তালিকা" : "Wishlist"}
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/${lang}/customer/addresses`} className="hover:text-primary transition-colors flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{isBn ? "ঠিকানা তালিকা" : "Saved Addresses"}</span>
+                    <Link href={`/${lang}/customer/addresses`} className="hover:text-primary transition-colors">
+                      {isBn ? "সংরক্ষিত ঠিকানা" : "Saved Addresses"}
                     </Link>
                   </li>
                   <li>
@@ -284,7 +257,7 @@ export function Footer({ lang }: FooterProps) {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-muted-foreground">
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-success" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span className="text-xs font-semibold uppercase">{isBn ? "নিরাপদ পেমেন্ট" : "Secure Payment"}</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -292,7 +265,7 @@ export function Footer({ lang }: FooterProps) {
               <span className="text-xs font-semibold uppercase">{isBn ? "SSLCommerz প্রস্তুত" : "SSLCommerz Ready"}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Store className="w-4 h-4 text-warning" />
+              <Store className="w-4 h-4 text-amber-500" />
               <span className="text-xs font-semibold uppercase">{isBn ? "১০০% খাঁটি পণ্য" : "100% Authentic"}</span>
             </div>
           </div>

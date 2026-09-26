@@ -13,20 +13,10 @@ import {
   User,
   Wallet,
   BarChart3,
-  ScrollText,
-  Boxes,
-  ClipboardList,
-  Zap,
-  Image as ImageIcon,
-  Star,
-  Building2,
-  ShieldCheck,
-  UserPlus,
   CreditCard,
   MapPin,
-  Lock,
-  FileCheck,
-  Bell,
+  Star,
+  ClipboardList,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -35,660 +25,435 @@ export interface DashboardRoute {
   titleBn: string;
   href: string;
   icon: ElementType;
+  section?: string;
+  sectionBn?: string;
   matchPrefixes?: string[];
   children?: DashboardRoute[];
 }
 
+/**
+ * Clean, Grouped Admin Primary Routes
+ * Detailed sub-sections are accessed through each hub page via interactive navigation cards & tabs.
+ */
 export const adminRoutes: DashboardRoute[] = [
+  // Section: Core Operations
   {
     title: 'Dashboard',
     titleBn: 'ড্যাশবোর্ড',
     href: '/admin',
     icon: LayoutDashboard,
+    section: 'Overview',
+    sectionBn: 'ওভারভিউ',
+  },
+  {
+    title: 'Orders',
+    titleBn: 'অর্ডার ব্যবস্থাপনা',
+    href: '/admin/orders',
+    icon: ShoppingCart,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/orders'],
+  },
+  {
+    title: 'Products',
+    titleBn: 'পণ্য ক্যাটালগ',
+    href: '/admin/products',
+    icon: Package,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/products', '/admin/categories', '/admin/brands'],
+  },
+
+  // Section: Management & Commerce
+  {
+    title: 'Promotions',
+    titleBn: 'প্রমোশন ও অফার',
+    href: '/admin/promotions',
+    icon: Tag,
+    section: 'Management',
+    sectionBn: 'ব্যবস্থাপনা',
+    matchPrefixes: ['/admin/promotions', '/admin/coupons', '/admin/flash-sales', '/admin/banners'],
   },
   {
     title: 'Users & Partners',
     titleBn: 'ব্যবহারকারী ও অংশীদার',
     href: '/admin/users-management',
     icon: Users,
-    matchPrefixes: [
-      '/admin/users-management',
-      '/admin/users',
-      '/admin/sellers',
-      '/admin/seller-applications',
-      '/admin/riders',
-      '/admin/rider-applications',
-    ],
-    children: [
-      {
-        title: 'All Users',
-        titleBn: 'সকল ব্যবহারকারী',
-        href: '/admin/users-management/users',
-        icon: Users,
-      },
-      {
-        title: 'Sellers Directory',
-        titleBn: 'অনুমোদিত সেলার',
-        href: '/admin/users-management/sellers',
-        icon: Store,
-      },
-      {
-        title: 'Seller Applications',
-        titleBn: 'সেলার আবেদন',
-        href: '/admin/users-management/seller-applications',
-        icon: ClipboardList,
-      },
-      {
-        title: 'Delivery Riders',
-        titleBn: 'ডেলিভারি রাইডার',
-        href: '/admin/users-management/riders',
-        icon: Truck,
-      },
-      {
-        title: 'Rider Applications',
-        titleBn: 'রাইডার আবেদন',
-        href: '/admin/users-management/rider-applications',
-        icon: FileCheck,
-      },
-    ],
+    section: 'Management',
+    sectionBn: 'ব্যবস্থাপনা',
+    matchPrefixes: ['/admin/users-management', '/admin/users', '/admin/sellers', '/admin/riders'],
   },
   {
-    title: 'Products & Catalog',
-    titleBn: 'পণ্য ও ক্যাটালগ',
-    href: '/admin/products',
-    icon: Package,
-    matchPrefixes: [
-      '/admin/products',
-      '/admin/categories',
-      '/admin/brands',
-      '/admin/product-requests',
-    ],
-    children: [
-      {
-        title: 'All Products',
-        titleBn: 'সকল পণ্য',
-        href: '/admin/products',
-        icon: Package,
-      },
-      {
-        title: 'Categories',
-        titleBn: 'ক্যাটাগরি',
-        href: '/admin/products/categories',
-        icon: Tag,
-      },
-      {
-        title: 'Brands',
-        titleBn: 'ব্র্যান্ড',
-        href: '/admin/products/brands',
-        icon: Building2,
-      },
-      {
-        title: 'Product Requests',
-        titleBn: 'পণ্য অনুরোধ',
-        href: '/admin/products/product-requests',
-        icon: ClipboardList,
-      },
-    ],
-  },
-  {
-    title: 'Orders & Deliveries',
-    titleBn: 'অর্ডার ও ডেলিভারি',
-    href: '/admin/orders',
-    icon: ShoppingCart,
-    matchPrefixes: ['/admin/orders', '/admin/deliveries'],
-    children: [
-      {
-        title: 'All Orders',
-        titleBn: 'সকল অর্ডার',
-        href: '/admin/orders',
-        icon: ShoppingCart,
-      },
-      {
-        title: 'Live Deliveries',
-        titleBn: 'লাইভ ডেলিভারি',
-        href: '/admin/orders/deliveries',
-        icon: Truck,
-      },
-    ],
-  },
-  {
-    title: 'Finance & Payouts',
-    titleBn: 'আর্থিক লেনদেন ও পেআউট',
+    title: 'Finance',
+    titleBn: 'অর্থ ও পেমেন্ট',
     href: '/admin/finance',
     icon: CreditCard,
-    matchPrefixes: ['/admin/finance', '/admin/payments', '/admin/payouts'],
-    children: [
-      {
-        title: 'Customer Payments',
-        titleBn: 'গ্রাহক পেমেন্ট',
-        href: '/admin/finance/payments',
-        icon: CreditCard,
-      },
-      {
-        title: 'Seller Payouts',
-        titleBn: 'সেলার পেআউট',
-        href: '/admin/finance/payouts',
-        icon: Wallet,
-      },
-    ],
+    section: 'Management',
+    sectionBn: 'ব্যবস্থাপনা',
+    matchPrefixes: ['/admin/finance'],
   },
-  {
-    title: 'Marketing & Offers',
-    titleBn: 'মার্কেটিং ও অফার',
-    href: '/admin/promotions',
-    icon: Zap,
-    matchPrefixes: [
-      '/admin/promotions',
-      '/admin/flash-sales',
-      '/admin/coupons',
-      '/admin/banners',
-    ],
-    children: [
-      {
-        title: 'Flash Sales',
-        titleBn: 'ফ্ল্যাশ সেল',
-        href: '/admin/promotions/flash-sales',
-        icon: Zap,
-      },
-      {
-        title: 'Discount Coupons',
-        titleBn: 'ডিসকাউন্ট কুপন',
-        href: '/admin/promotions/coupons',
-        icon: Ticket,
-      },
-      {
-        title: 'Hero Banners',
-        titleBn: 'হোমপেজ ব্যানার',
-        href: '/admin/promotions/banners',
-        icon: ImageIcon,
-      },
-    ],
-  },
-  {
-    title: 'Disputes & Reviews',
-    titleBn: 'বিরোধ ও রিভিউ',
-    href: '/admin/disputes',
-    icon: AlertCircle,
-    matchPrefixes: ['/admin/disputes', '/admin/reviews'],
-    children: [
-      {
-        title: 'Customer Disputes',
-        titleBn: 'অর্ডার বিরোধ',
-        href: '/admin/disputes',
-        icon: AlertCircle,
-      },
-      {
-        title: 'Product Reviews',
-        titleBn: 'পণ্য রিভিউ',
-        href: '/admin/disputes/reviews',
-        icon: Star,
-      },
-    ],
-  },
+
+  // Section: Communication & Governance
   {
     title: 'Messages',
-    titleBn: 'বার্তা',
+    titleBn: 'বার্তা আদান-প্রদান',
     href: '/admin/messages',
     icon: MessageSquare,
+    section: 'System',
+    sectionBn: 'সিস্টেম',
+    matchPrefixes: ['/admin/messages'],
   },
   {
-    title: 'Settings & System',
-    titleBn: 'সেটিংস ও সিস্টেম',
+    title: 'Disputes',
+    titleBn: 'বিরোধ ও অভিযোগ',
+    href: '/admin/disputes',
+    icon: AlertCircle,
+    section: 'System',
+    sectionBn: 'সিস্টেম',
+    matchPrefixes: ['/admin/disputes'],
+  },
+  {
+    title: 'Settings',
+    titleBn: 'সিস্টেম সেটিংস',
     href: '/admin/settings',
     icon: Settings,
-    matchPrefixes: [
-      '/admin/settings',
-      '/admin/audit-logs',
-      '/admin/reports',
-    ],
-    children: [
-      {
-        title: 'Platform & Gateway',
-        titleBn: 'প্ল্যাটফর্ম ও গেটওয়ে',
-        href: '/admin/settings/general',
-        icon: Settings,
-      },
-      {
-        title: 'Audit Logs',
-        titleBn: 'অডিট লগ',
-        href: '/admin/settings/audit-logs',
-        icon: ScrollText,
-      },
-      {
-        title: 'Demand Reports',
-        titleBn: 'চাহিদা রিপোর্ট',
-        href: '/admin/settings/reports/demand',
-        icon: BarChart3,
-      },
-    ],
+    section: 'System',
+    sectionBn: 'সিস্টেম',
+    matchPrefixes: ['/admin/settings'],
   },
 ];
 
+/**
+ * Super Admin Grouped Primary Routes
+ */
 export const superAdminRoutes: DashboardRoute[] = [
+  // Section: Overview
   {
-    title: 'Overview',
-    titleBn: 'সারসংক্ষেপ',
+    title: 'Master Console',
+    titleBn: 'মাস্টার কনসোল',
     href: '/super-admin',
     icon: LayoutDashboard,
+    section: 'Overview',
+    sectionBn: 'ওভারভিউ',
   },
   {
-    title: 'User Management',
-    titleBn: 'ব্যবহারকারী ব্যবস্থাপনা',
-    href: '/super-admin/users-management',
-    icon: Users,
-    matchPrefixes: [
-      '/super-admin/users-management',
-      '/super-admin/admins',
-      '/super-admin/create-user',
-      '/super-admin/users',
-      '/super-admin/sellers',
-      '/super-admin/seller-applications',
-      '/super-admin/riders',
-      '/super-admin/rider-applications',
-    ],
-    children: [
-      {
-        title: 'Admin Roster',
-        titleBn: 'অ্যাডমিন পরিচালনা',
-        href: '/super-admin/users-management/admins',
-        icon: ShieldCheck,
-      },
-      {
-        title: 'Create Staff',
-        titleBn: 'নতুন স্টাফ তৈরি',
-        href: '/super-admin/users-management/create-user',
-        icon: UserPlus,
-      },
-      {
-        title: 'All Users',
-        titleBn: 'সকল ব্যবহারকারী',
-        href: '/super-admin/users-management/users',
-        icon: Users,
-      },
-      {
-        title: 'Sellers Directory',
-        titleBn: 'অনুমোদিত সেলার',
-        href: '/super-admin/users-management/sellers',
-        icon: Store,
-      },
-      {
-        title: 'Seller Applications',
-        titleBn: 'সেলার আবেদন',
-        href: '/super-admin/users-management/seller-applications',
-        icon: ClipboardList,
-      },
-      {
-        title: 'Delivery Riders',
-        titleBn: 'ডেলিভারি রাইডার',
-        href: '/super-admin/users-management/riders',
-        icon: Truck,
-      },
-      {
-        title: 'Rider Applications',
-        titleBn: 'রাইডার আবেদন',
-        href: '/super-admin/users-management/rider-applications',
-        icon: FileCheck,
-      },
-    ],
-  },
-  {
-    title: 'Products & Catalog',
-    titleBn: 'পণ্য ও ক্যাটালগ',
-    href: '/super-admin/products',
-    icon: Package,
-    matchPrefixes: [
-      '/super-admin/products',
-      '/super-admin/categories',
-      '/super-admin/brands',
-      '/super-admin/product-requests',
-    ],
-    children: [
-      {
-        title: 'All Products',
-        titleBn: 'সকল পণ্য',
-        href: '/super-admin/products',
-        icon: Package,
-      },
-      {
-        title: 'Categories',
-        titleBn: 'ক্যাটাগরি',
-        href: '/super-admin/products/categories',
-        icon: Tag,
-      },
-      {
-        title: 'Brands',
-        titleBn: 'ব্র্যান্ড',
-        href: '/super-admin/products/brands',
-        icon: Building2,
-      },
-      {
-        title: 'Product Requests',
-        titleBn: 'পণ্য অনুরোধ',
-        href: '/super-admin/products/product-requests',
-        icon: ClipboardList,
-      },
-    ],
-  },
-  {
-    title: 'Orders & Deliveries',
-    titleBn: 'অর্ডার ও ডেলিভারি',
+    title: 'Orders',
+    titleBn: 'সকল অর্ডার',
     href: '/super-admin/orders',
     icon: ShoppingCart,
-    matchPrefixes: ['/super-admin/orders', '/super-admin/deliveries'],
-    children: [
-      {
-        title: 'All Orders',
-        titleBn: 'সকল অর্ডার',
-        href: '/super-admin/orders',
-        icon: ShoppingCart,
-      },
-      {
-        title: 'Live Deliveries',
-        titleBn: 'লাইভ ডেলিভারি',
-        href: '/super-admin/orders/deliveries',
-        icon: Truck,
-      },
-    ],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/orders'],
+  },
+  {
+    title: 'Products',
+    titleBn: 'মাস্টার ক্যাটালগ',
+    href: '/super-admin/products',
+    icon: Package,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/products', '/super-admin/categories', '/super-admin/brands'],
+  },
+
+  // Section: Platform Governance
+  {
+    title: 'Promotions',
+    titleBn: 'প্রমোশন হাব',
+    href: '/super-admin/promotions',
+    icon: Tag,
+    section: 'Governance',
+    sectionBn: 'প্রশাসন',
+    matchPrefixes: ['/super-admin/promotions', '/super-admin/coupons', '/super-admin/flash-sales', '/super-admin/banners'],
+  },
+  {
+    title: 'Users & Staff',
+    titleBn: 'ব্যবহারকারী ও স্টাফ',
+    href: '/super-admin/users-management',
+    icon: Users,
+    section: 'Governance',
+    sectionBn: 'প্রশাসন',
+    matchPrefixes: ['/super-admin/users-management', '/super-admin/users', '/super-admin/sellers', '/super-admin/riders', '/super-admin/admins'],
   },
   {
     title: 'Finance & Payouts',
-    titleBn: 'আর্থিক লেনদেন ও পেআউট',
+    titleBn: 'অর্থ ও পে-আউট',
     href: '/super-admin/finance',
     icon: CreditCard,
-    matchPrefixes: [
-      '/super-admin/finance',
-      '/super-admin/payments',
-      '/super-admin/payouts',
-    ],
-    children: [
-      {
-        title: 'Customer Payments',
-        titleBn: 'গ্রাহক পেমেন্ট',
-        href: '/super-admin/finance/payments',
-        icon: CreditCard,
-      },
-      {
-        title: 'Seller Payouts',
-        titleBn: 'সেলার পেআউট',
-        href: '/super-admin/finance/payouts',
-        icon: Wallet,
-      },
-    ],
+    section: 'Governance',
+    sectionBn: 'প্রশাসন',
+    matchPrefixes: ['/super-admin/finance'],
   },
+
+  // Section: System & Policies
   {
-    title: 'Marketing & Offers',
-    titleBn: 'মার্কেটিং ও অফার',
-    href: '/super-admin/promotions',
-    icon: Zap,
-    matchPrefixes: [
-      '/super-admin/promotions',
-      '/super-admin/flash-sales',
-      '/super-admin/coupons',
-      '/super-admin/banners',
-    ],
-    children: [
-      {
-        title: 'Flash Sales',
-        titleBn: 'ফ্ল্যাশ সেল',
-        href: '/super-admin/promotions/flash-sales',
-        icon: Zap,
-      },
-      {
-        title: 'Discount Coupons',
-        titleBn: 'ডিসকাউন্ট কুপন',
-        href: '/super-admin/promotions/coupons',
-        icon: Ticket,
-      },
-      {
-        title: 'Hero Banners',
-        titleBn: 'হোমপেজ ব্যানার',
-        href: '/super-admin/promotions/banners',
-        icon: ImageIcon,
-      },
-    ],
+    title: 'Messages',
+    titleBn: 'কমিউনিকেশন',
+    href: '/super-admin/messages',
+    icon: MessageSquare,
+    section: 'System',
+    sectionBn: 'সিস্টেম',
+    matchPrefixes: ['/super-admin/messages'],
   },
   {
     title: 'Disputes & Reviews',
-    titleBn: 'বিরোধ ও রিভিউ',
+    titleBn: 'বিরোধ ও পর্যালোচনা',
     href: '/super-admin/disputes',
     icon: AlertCircle,
-    matchPrefixes: ['/super-admin/disputes', '/super-admin/reviews'],
-    children: [
-      {
-        title: 'Customer Disputes',
-        titleBn: 'অর্ডার বিরোধ',
-        href: '/super-admin/disputes',
-        icon: AlertCircle,
-      },
-      {
-        title: 'Product Reviews',
-        titleBn: 'পণ্য রিভিউ',
-        href: '/super-admin/disputes/reviews',
-        icon: Star,
-      },
-    ],
-  },
-  {
-    title: 'Messages',
-    titleBn: 'বার্তা',
-    href: '/super-admin/messages',
-    icon: MessageSquare,
+    section: 'System',
+    sectionBn: 'সিস্টেম',
+    matchPrefixes: ['/super-admin/disputes'],
   },
   {
     title: 'System Settings',
-    titleBn: 'সিস্টেম সেটিংস',
+    titleBn: 'প্ল্যাটফর্ম সেটিংস',
     href: '/super-admin/settings',
     icon: Settings,
-    matchPrefixes: [
-      '/super-admin/settings',
-      '/super-admin/audit-logs',
-      '/super-admin/reports',
-    ],
-    children: [
-      {
-        title: 'Platform & Gateway',
-        titleBn: 'প্ল্যাটফর্ম ও গেটওয়ে',
-        href: '/super-admin/settings/general',
-        icon: Settings,
-      },
-      {
-        title: 'Audit Logs',
-        titleBn: 'অডিট লগ',
-        href: '/super-admin/settings/audit-logs',
-        icon: ScrollText,
-      },
-      {
-        title: 'Demand Reports',
-        titleBn: 'চাহিদা রিপোর্ট',
-        href: '/super-admin/settings/reports/demand',
-        icon: BarChart3,
-      },
-    ],
+    section: 'System',
+    sectionBn: 'সিস্টেম',
+    matchPrefixes: ['/super-admin/settings'],
   },
 ];
 
+/**
+ * Seller Grouped Primary Routes
+ */
 export const sellerRoutes: DashboardRoute[] = [
+  // Section: Shop Operations
   {
     title: 'Dashboard',
     titleBn: 'ড্যাশবোর্ড',
     href: '/seller',
     icon: LayoutDashboard,
+    section: 'Shop Operations',
+    sectionBn: 'দোকান অপারেশন',
   },
   {
-    title: 'My Shop',
-    titleBn: 'আমার দোকান',
+    title: 'Shop Profile',
+    titleBn: 'দোকান প্রোফাইল',
     href: '/seller/shop',
     icon: Store,
+    section: 'Shop Operations',
+    sectionBn: 'দোকান অপারেশন',
+    matchPrefixes: ['/seller/shop'],
   },
   {
     title: 'Products & Stock',
-    titleBn: 'পণ্য ও স্টক',
+    titleBn: 'পণ্য ও ইনভেন্টরি',
     href: '/seller/products',
     icon: Package,
-    matchPrefixes: ['/seller/products', '/seller/inventory'],
-    children: [
-      {
-        title: 'My Products',
-        titleBn: 'আমার পণ্যসমূহ',
-        href: '/seller/products',
-        icon: Package,
-      },
-      {
-        title: 'Inventory Stock',
-        titleBn: 'ইনভেন্টরি স্টক',
-        href: '/seller/products/inventory',
-        icon: Boxes,
-      },
-    ],
+    section: 'Shop Operations',
+    sectionBn: 'দোকান অপারেশন',
+    matchPrefixes: ['/seller/products'],
   },
   {
     title: 'Orders',
-    titleBn: 'অর্ডারসমূহ',
+    titleBn: 'গ্রাহক অর্ডার',
     href: '/seller/orders',
     icon: ShoppingCart,
+    section: 'Shop Operations',
+    sectionBn: 'দোকান অপারেশন',
+    matchPrefixes: ['/seller/orders'],
   },
+
+  // Section: Business & Financials
   {
-    title: 'Shop Coupons',
-    titleBn: 'দোকানের কুপন',
+    title: 'Coupons',
+    titleBn: 'কুপন ও ছাড়',
     href: '/seller/coupons',
     icon: Ticket,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/coupons'],
   },
   {
     title: 'Wallet & Payouts',
-    titleBn: 'ওয়ালেট ও পেআউট',
+    titleBn: 'ওয়ালেট ও পে-আউট',
     href: '/seller/wallet',
     icon: Wallet,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/wallet'],
   },
   {
     title: 'Sales Reports',
     titleBn: 'বিক্রয় রিপোর্ট',
     href: '/seller/reports',
     icon: BarChart3,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/reports'],
   },
-  {
-    title: 'Disputes',
-    titleBn: 'অর্ডার বিরোধ',
-    href: '/seller/disputes',
-    icon: AlertCircle,
-  },
+
+  // Section: Support & Settings
   {
     title: 'Messages',
     titleBn: 'বার্তা',
     href: '/seller/messages',
     icon: MessageSquare,
+    section: 'Support',
+    sectionBn: 'সহায়তা ও সেটিংস',
+    matchPrefixes: ['/seller/messages'],
   },
   {
-    title: 'Seller Profile',
-    titleBn: 'সেলার প্রোফাইল',
-    href: '/seller/profile',
-    icon: User,
+    title: 'Disputes',
+    titleBn: 'অভিযোগ',
+    href: '/seller/disputes',
+    icon: AlertCircle,
+    section: 'Support',
+    sectionBn: 'সহায়তা ও সেটিংস',
+    matchPrefixes: ['/seller/disputes'],
   },
   {
-    title: 'Store Settings',
-    titleBn: 'দোকান সেটিংস',
+    title: 'Settings',
+    titleBn: 'সেটিংস',
     href: '/seller/settings',
     icon: Settings,
+    section: 'Support',
+    sectionBn: 'সহায়তা ও সেটিংস',
+    matchPrefixes: ['/seller/settings'],
   },
 ];
 
+/**
+ * Rider Grouped Primary Routes
+ */
 export const riderRoutes: DashboardRoute[] = [
+  // Section: Delivery Tasks
   {
     title: 'Dashboard',
     titleBn: 'ড্যাশবোর্ড',
     href: '/rider',
     icon: LayoutDashboard,
+    section: 'Operations',
+    sectionBn: 'ডেলিভারি কাজ',
   },
   {
     title: 'Deliveries',
-    titleBn: 'ডেলিভারিসমূহ',
+    titleBn: 'ডেলিভারি কার্যতালিকা',
     href: '/rider/deliveries',
     icon: Truck,
+    section: 'Operations',
+    sectionBn: 'ডেলিভারি কাজ',
+    matchPrefixes: ['/rider/deliveries'],
   },
+
+  // Section: Account & Support
   {
     title: 'Messages',
     titleBn: 'বার্তা',
     href: '/rider/messages',
     icon: MessageSquare,
+    section: 'Account',
+    sectionBn: 'অ্যাকাউন্ট',
+    matchPrefixes: ['/rider/messages'],
   },
   {
     title: 'Rider Profile',
     titleBn: 'রাইডার প্রোফাইল',
     href: '/rider/profile',
     icon: User,
+    section: 'Account',
+    sectionBn: 'অ্যাকাউন্ট',
+    matchPrefixes: ['/rider/profile'],
   },
   {
-    title: 'Rider Settings',
-    titleBn: 'রাইডার সেটিংস',
+    title: 'Settings',
+    titleBn: 'সেটিংস',
     href: '/rider/settings',
     icon: Settings,
+    section: 'Account',
+    sectionBn: 'অ্যাকাউন্ট',
+    matchPrefixes: ['/rider/settings'],
   },
 ];
 
+/**
+ * Customer Grouped Primary Routes
+ */
 export const customerRoutes: DashboardRoute[] = [
+  // Section: Overview
   {
     title: 'Dashboard',
     titleBn: 'ড্যাশবোর্ড',
     href: '/customer',
     icon: LayoutDashboard,
-  },
-  {
-    title: 'My Profile',
-    titleBn: 'আমার প্রোফাইল',
-    href: '/customer/profile',
-    icon: User,
+    section: 'Overview',
+    sectionBn: 'ওভারভিউ',
   },
   {
     title: 'My Orders',
     titleBn: 'আমার অর্ডার',
     href: '/customer/orders',
     icon: ShoppingCart,
+    section: 'Overview',
+    sectionBn: 'ওভারভিউ',
+    matchPrefixes: ['/customer/orders'],
   },
   {
-    title: 'Saved Wishlist',
+    title: 'Wishlist',
     titleBn: 'পছন্দের তালিকা',
     href: '/customer/wishlist',
     icon: Star,
+    section: 'Overview',
+    sectionBn: 'ওভারভিউ',
+    matchPrefixes: ['/customer/wishlist'],
   },
+
+  // Section: Engagement
   {
-    title: 'Delivery Addresses',
-    titleBn: 'ডেলিভারি ঠিকানা',
-    href: '/customer/addresses',
-    icon: MapPin,
+    title: 'Reviews',
+    titleBn: 'মতামত ও রিভিউ',
+    href: '/customer/reviews',
+    icon: Star,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/reviews'],
   },
   {
     title: 'Product Requests',
     titleBn: 'পণ্য অনুরোধ',
     href: '/customer/product-requests',
     icon: ClipboardList,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/product-requests'],
   },
   {
-    title: 'My Reviews',
-    titleBn: 'আমার রিভিউ',
-    href: '/customer/reviews',
-    icon: Star,
+    title: 'Disputes',
+    titleBn: 'অভিযোগ',
+    href: '/customer/disputes',
+    icon: AlertCircle,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/disputes'],
   },
   {
     title: 'Messages',
     titleBn: 'বার্তা',
     href: '/customer/messages',
     icon: MessageSquare,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/messages'],
+  },
+
+  // Section: Account
+  {
+    title: 'Addresses',
+    titleBn: 'ডেলিভারি ঠিকানা',
+    href: '/customer/addresses',
+    icon: MapPin,
+    section: 'Account',
+    sectionBn: 'অ্যাকাউন্ট',
+    matchPrefixes: ['/customer/addresses'],
   },
   {
-    title: 'Disputes & Help',
-    titleBn: 'বিরোধ ও সাহায্য',
-    href: '/customer/disputes',
-    icon: AlertCircle,
-  },
-  {
-    title: 'Notifications',
-    titleBn: 'নোটিফিকেশন',
-    href: '/customer/notifications',
-    icon: Bell,
-  },
-  {
-    title: 'Account Settings',
-    titleBn: 'অ্যাকাউন্ট সেটিংস',
-    href: '/customer/settings',
-    icon: Settings,
+    title: 'Profile & Settings',
+    titleBn: 'প্রোফাইল ও সেটিংস',
+    href: '/customer/profile',
+    icon: User,
+    section: 'Account',
+    sectionBn: 'অ্যাকাউন্ট',
+    matchPrefixes: ['/customer/profile', '/customer/settings'],
   },
 ];

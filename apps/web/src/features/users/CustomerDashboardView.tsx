@@ -172,7 +172,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
   return (
     <div className="space-y-8 pb-12">
       {/* Welcome Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-primary/5 to-background border border-primary/20 p-6 md:p-8 shadow-sm">
+      <div className="relative overflow-hidden rounded-xl bg-card border p-6 md:p-8">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
@@ -265,7 +265,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
                   <CardHeader className="p-5 pb-3">
                     <div className="flex items-start justify-between gap-3">
                       <div
-                        className={`w-11 h-11 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center shrink-0 shadow-xs transition-transform duration-300 group-hover:scale-110`}
+                        className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
                       >
                         <Icon className="w-5 h-5" />
                       </div>

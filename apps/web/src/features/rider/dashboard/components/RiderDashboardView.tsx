@@ -47,29 +47,27 @@ export function RiderDashboardView({ lang = 'en' }: RiderDashboardViewProps) {
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
-        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 border-primary/10">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <CardContent className="p-6 flex items-center gap-4 relative z-10">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
-              <Banknote className="h-6 w-6" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <Card className="rounded-xl border border-border bg-card shadow-none">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Banknote className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-muted-foreground">{isBn ? 'নতুন অ্যাসাইনমেন্ট' : 'New Assignments'}</p>
-              <h3 className="text-3xl font-bold tracking-tight">{pendingDeliveries.length} <span className="text-xl font-normal text-muted-foreground">{isBn ? 'টি' : ''}</span></h3>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{isBn ? 'নতুন অ্যাসাইনমেন্ট' : 'New Assignments'}</p>
+              <h3 className="text-2xl font-bold tracking-tight text-foreground mt-0.5">{pendingDeliveries.length} <span className="text-sm font-normal text-muted-foreground">{isBn ? 'টি' : ''}</span></h3>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <CardContent className="p-6 flex items-center gap-4 relative z-10">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-500/80 text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
-              <Navigation className="h-6 w-6" />
+        <Card className="rounded-xl border border-border bg-card shadow-none">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+              <Navigation className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-muted-foreground">{isBn ? 'সম্পন্ন' : 'Completed'}</p>
-              <h3 className="text-3xl font-bold tracking-tight">{completedDeliveries.length} <span className="text-xl font-normal text-muted-foreground">{isBn ? 'টি' : ''}</span></h3>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{isBn ? 'সম্পন্ন' : 'Completed'}</p>
+              <h3 className="text-2xl font-bold tracking-tight text-foreground mt-0.5">{completedDeliveries.length} <span className="text-sm font-normal text-muted-foreground">{isBn ? 'টি' : ''}</span></h3>
             </div>
           </CardContent>
         </Card>

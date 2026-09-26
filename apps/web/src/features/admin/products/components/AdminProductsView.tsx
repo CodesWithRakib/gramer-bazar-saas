@@ -21,7 +21,8 @@ import {
   ProductImagesDialog,
 } from './ProductDialogs';
 import { ProductImporterModal } from './ProductImporterModal';
-import { Images, Edit, Trash2 } from 'lucide-react';
+import { Images, Edit, Trash2, Package, Tag, Building2, ClipboardList } from 'lucide-react';
+import Link from 'next/link';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 export interface AdminProductsViewProps {
@@ -29,7 +30,7 @@ export interface AdminProductsViewProps {
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminProductsView({ lang = 'en' }: AdminProductsViewProps) {
+export function AdminProductsView({ lang = 'en', namespace = 'admin' }: AdminProductsViewProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [search, setSearch] = useState('');
@@ -250,11 +251,45 @@ export function AdminProductsView({ lang = 'en' }: AdminProductsViewProps) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Master Product Catalog</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            {lang === 'bn' ? 'মাস্টার প্রোডাক্ট ক্যাটালগ' : 'Master Product Catalog'}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Global catalog items, categories, local images, pricing, and bulk import.
+            {lang === 'bn' ? 'সকল পণ্য তালিকা, ক্যাটাগরি, ব্র্যান্ড ও পণ্য অনুরোধ ব্যবস্থাপনা।' : 'Global catalog items, categories, brands, and product requests.'}
           </p>
         </div>
+      </div>
+
+      {/* Sub-Navigation Tabs */}
+      <div className="flex flex-wrap items-center gap-2 pb-2 border-b">
+        <Link
+          href={`/${lang}/${namespace}/products`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground"
+        >
+          <Package className="w-3.5 h-3.5" />
+          <span>{lang === 'bn' ? 'সকল পণ্য' : 'All Products'}</span>
+        </Link>
+        <Link
+          href={`/${lang}/${namespace}/products/categories`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          <Tag className="w-3.5 h-3.5" />
+          <span>{lang === 'bn' ? 'ক্যাটাগরি' : 'Categories'}</span>
+        </Link>
+        <Link
+          href={`/${lang}/${namespace}/products/brands`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span>{lang === 'bn' ? 'ব্র্যান্ডসমূহ' : 'Brands'}</span>
+        </Link>
+        <Link
+          href={`/${lang}/${namespace}/products/product-requests`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          <ClipboardList className="w-3.5 h-3.5" />
+          <span>{lang === 'bn' ? 'পণ্য অনুরোধ' : 'Product Requests'}</span>
+        </Link>
       </div>
 
       <DataTable

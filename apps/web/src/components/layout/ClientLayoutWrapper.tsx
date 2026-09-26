@@ -31,7 +31,16 @@ export function ClientLayoutWrapper({ lang, children }: { lang: string; children
       '/notifications',
     ].some((prefix) => pathname === `/${lang}${prefix}` || pathname.startsWith(`/${lang}${prefix}/`));
 
-  if (isDashboardRoute) {
+  // Authentication routes where the storefront header/footer must NOT be displayed
+  const isAuthRoute = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/unauthorized',
+  ].some((prefix) => pathname === `/${lang}${prefix}` || pathname.startsWith(`/${lang}${prefix}/`));
+
+  if (isDashboardRoute || isAuthRoute) {
     return <main className="flex-grow flex flex-col">{children}</main>;
   }
 

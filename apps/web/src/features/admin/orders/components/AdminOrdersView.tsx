@@ -38,7 +38,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, ShoppingCart, Truck } from 'lucide-react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 
 export interface AdminOrdersViewProps {
@@ -242,6 +243,24 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
               : 'Track, fulfill, and assign riders for customer orders.'}
           </p>
         </div>
+      </div>
+
+      {/* Sub-Navigation Tabs */}
+      <div className="flex flex-wrap items-center gap-2 pb-2 border-b">
+        <Link
+          href={`/${lang}/${namespace}/orders`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground"
+        >
+          <ShoppingCart className="w-3.5 h-3.5" />
+          <span>{lang === 'bn' ? 'সকল অর্ডার' : 'All Orders'}</span>
+        </Link>
+        <Link
+          href={`/${lang}/${namespace}/orders/deliveries`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          <Truck className="w-3.5 h-3.5" />
+          <span>{lang === 'bn' ? 'লাইভ ডেলিভারি' : 'Live Deliveries'}</span>
+        </Link>
       </div>
 
       <DataTable

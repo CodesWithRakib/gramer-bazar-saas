@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { SearchBar } from "./SearchBar";
 import { UserActions } from "./UserActions";
+import { BrandLogo } from "@/components/common/BrandLogo";
 import { CategoryMegaMenu } from "./CategoryMegaMenu";
 import { MobileCategoryDrawer } from "./MobileCategoryDrawer";
 import {
@@ -113,15 +114,8 @@ export function Header({ lang }: HeaderProps) {
               <Menu className="h-6 w-6" />
               <span className="sr-only">{isBn ? "মেনু" : "Menu"}</span>
             </Button>
-            <Link href={`/${lang}`} className="flex items-center flex-shrink-0">
-              <Image
-                src="/logo.jpg"
-                alt={isBn ? "গ্রামের বাজার" : "Gramer Bazar"}
-                width={256}
-                height={80}
-                className="w-32 sm:w-44 h-10 sm:h-12 object-cover object-left mix-blend-multiply"
-                priority
-              />
+            <Link href={`/${lang}`} className="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity">
+              <BrandLogo lang={lang} variant="full" width={160} height={44} />
             </Link>
           </div>
 

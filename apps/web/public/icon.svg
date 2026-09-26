@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <!-- Rounded Brand Squircle Container -->
+  <rect width="512" height="512" rx="112" fill="#16a34a"/>
+  
+  <!-- Subtle Inner Border -->
+  <rect x="16" y="16" width="480" height="480" rx="96" stroke="#ffffff" stroke-opacity="0.15" stroke-width="4"/>
+
+  <!-- Stylized Village Woven Basket / Basin -->
+  <path d="M140 310 C140 310, 160 410, 256 410 C352 410, 372 310, 372 310 Z" fill="#ffffff" fill-opacity="0.95"/>
+  <ellipse cx="256" cy="310" rx="116" ry="24" fill="#f59e0b"/>
+  
+  <!-- Basket Woven Accent Pattern -->
+  <path d="M190 326 L230 402 M256 332 L256 410 M322 326 L282 402" stroke="#15803d" stroke-width="6" stroke-linecap="round"/>
+  <path d="M165 350 Q256 385 347 350" stroke="#15803d" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+  <!-- Organic Central Sprout Stem -->
+  <path d="M256 310 Q254 210 256 120" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Top Center Sprout Leaf -->
+  <path d="M256 115 C275 80, 256 50, 256 50 C256 50, 237 80, 256 115 Z" fill="#f59e0b"/>
+
+  <!-- Left Main Leaf -->
+  <path d="M254 215 C200 200, 170 145, 170 145 C170 145, 225 140, 254 185 Z" fill="#ffffff"/>
+  <!-- Left Leaf Vein -->
+  <path d="M254 185 Q212 170 185 152" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Right Main Leaf -->
+  <path d="M258 190 C312 175, 342 120, 342 120 C342 120, 287 115, 258 160 Z" fill="#f59e0b"/>
+  <!-- Right Leaf Vein -->
+  <path d="M258 160 Q300 145 327 127" stroke="#b45309" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Left Lower Sprout Leaf -->
+  <path d="M255 260 C215 250, 195 210, 195 210 C195 210, 235 205, 255 240 Z" fill="#fef08a"/>
+
+  <!-- Right Lower Sprout Leaf -->
+  <path d="M257 245 C297 235, 317 195, 317 195 C317 195, 277 190, 257 225 Z" fill="#ffffff"/>
+</svg>

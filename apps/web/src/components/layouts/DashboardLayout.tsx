@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,18 +15,29 @@ import {
   customerRoutes,
 } from "@/config/dashboard-routes";
 import { api } from "@/store/api";
-import { Menu, LogOut, ChevronDown, Store, User, Settings } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, LogOut, Store, User, Settings, ChevronDown } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { BrandLogo } from "@/components/common/BrandLogo";
 import { getUserRoles } from "@/lib/roles";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -34,220 +45,116 @@ interface DashboardLayoutProps {
   lang: string;
 }
 
-const NavItem = ({
-  href,
-  icon: Icon,
-  title,
-  isActive,
-  onClick,
-}: {
+interface NavItemProps {
   href: string;
   icon: React.ElementType;
   title: string;
   isActive: boolean;
   onClick?: () => void;
-}) => {
+}
+
+function NavItem({ href, icon: Icon, title, isActive, onClick }: NavItemProps) {
   return (
     <Link
-      onClick={onClick}
       href={href}
-      className={`group flex items-center gap-3 px-3.5 py-3 text-sm font-medium rounded-2xl transition-all duration-300 ${
+      onClick={onClick}
+      className={`group flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors font-medium ${
         isActive
-          ? "bg-gradient-to-r from-primary/20 to-primary/5 text-primary shadow-sm border border-primary/15 relative font-semibold"
-          : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+          ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary pl-2.5"
+          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
       }`}
     >
-      {isActive && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
-      )}
       <Icon
-        className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${
-          isActive ? "text-primary" : "text-muted-foreground"
+        className={`w-4 h-4 shrink-0 transition-colors ${
+          isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
         }`}
       />
       <span className="truncate">{title}</span>
     </Link>
   );
-};
-
-const NavGroup = ({
-  route,
-  lang,
-  isBn,
-  pathname,
-  onClick,
-}: {
-  route: DashboardRoute;
-  lang: string;
-  isBn: boolean;
-  pathname: string;
-  onClick?: () => void;
-}) => {
-  const isChildActive = (childHref: string) => {
-    const fullHref = `/${lang}${childHref}`;
-    return pathname === fullHref || pathname.startsWith(`${fullHref}/`);
-  };
-
-  const isParentExactActive = pathname === `/${lang}${route.href}`;
-  const isAnyChildActive = route.children?.some((c) => isChildActive(c.href)) ?? false;
-  const isPrefixActive =
-    route.matchPrefixes?.some(
-      (p) => pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`)
-    ) ?? false;
-
-  const isGroupActive = isParentExactActive || isAnyChildActive || isPrefixActive;
-
-  // Auto-expand if active, and allow manual toggle
-  const [isOpen, setIsOpen] = React.useState<boolean>(isGroupActive);
-
-  React.useEffect(() => {
-    if (isGroupActive) {
-      setIsOpen(true);
-    }
-  }, [isGroupActive]);
-
-  const Icon = route.icon;
-
-  return (
-    <div className="space-y-1">
-      <div
-        className={`group flex items-center justify-between px-3.5 py-2.5 text-sm font-medium rounded-2xl transition-all duration-300 ${
-          isGroupActive
-            ? "bg-gradient-to-r from-primary/15 to-primary/5 text-primary border border-primary/10 font-semibold"
-            : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-        }`}
-      >
-        <Link
-          href={`/${lang}${route.href}`}
-          onClick={onClick}
-          className="flex items-center gap-3 flex-1 min-w-0"
-        >
-          <Icon
-            className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${
-              isGroupActive ? "text-primary" : "text-muted-foreground"
-            }`}
-          />
-          <span className="truncate">{isBn ? route.titleBn : route.title}</span>
-        </Link>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsOpen((prev) => !prev);
-          }}
-          className="p-1 rounded-lg hover:bg-background/80 transition-colors ml-1 text-muted-foreground hover:text-foreground"
-          aria-label={isOpen ? "Collapse submenu" : "Expand submenu"}
-        >
-          <ChevronDown
-            className={`w-4 h-4 transition-transform duration-300 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-      </div>
-
-      {/* Expanded Child Routes */}
-      {isOpen && route.children && route.children.length > 0 && (
-        <div className="pl-3 pr-1 py-1 space-y-1 border-l-2 border-primary/20 ml-5 animate-in slide-in-from-top-1 duration-200">
-          {route.children.map((child) => {
-            const ChildIcon = child.icon;
-            const active = isChildActive(child.href);
-            return (
-              <Link
-                key={child.href}
-                href={`/${lang}${child.href}`}
-                onClick={onClick}
-                className={`group flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all duration-200 ${
-                  active
-                    ? "bg-primary/15 text-primary font-semibold shadow-xs"
-                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
-                }`}
-              >
-                <ChildIcon
-                  className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                    active ? "text-primary" : "text-muted-foreground/80"
-                  }`}
-                />
-                <span className="truncate">{isBn ? child.titleBn : child.title}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-};
+}
 
 function SidebarContent({
   routes,
   lang,
   isBn,
   pathname,
-  onLogout,
   onItemClick,
 }: {
   routes: DashboardRoute[];
   lang: string;
   isBn: boolean;
   pathname: string;
-  onLogout: () => void;
   onItemClick?: () => void;
 }) {
+  // Group routes by section for clean visual non-interactive section labels
+  const sections: { title: string; titleBn: string; items: DashboardRoute[] }[] = [];
+  routes.forEach((route) => {
+    const secTitle = route.section || "Main";
+    const secTitleBn = route.sectionBn || "মূল";
+    let existing = sections.find((s) => s.title === secTitle);
+    if (!existing) {
+      existing = { title: secTitle, titleBn: secTitleBn, items: [] };
+      sections.push(existing);
+    }
+    existing.items.push(route);
+  });
+
   return (
-    <div className="flex flex-col h-full bg-background/60 backdrop-blur-3xl border-r shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)] relative overflow-hidden">
-      {/* Decorative background blob */}
-      <div className="absolute top-0 -left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      
-      <div className="p-6 relative z-10">
-        <Link href={`/${lang}`} onClick={onItemClick} className="flex items-center gap-3 group">
-          <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-2.5 rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-primary/30">
-            <Store className="w-6 h-6" />
-          </div>
-          <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-            Gramer Bazar
-          </span>
+    <div className="flex flex-col h-full bg-card border-r border-border">
+      {/* Brand Header */}
+      <div className="h-16 flex items-center px-5 border-b border-border shrink-0">
+        <Link
+          href={`/${lang}`}
+          onClick={onItemClick}
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+        >
+          <BrandLogo lang={lang} variant="full" width={138} height={38} />
         </Link>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1.5 overflow-y-auto relative z-10 custom-scrollbar">
-        {routes.map((route) => {
-          if (route.children && route.children.length > 0) {
-            return (
-              <NavGroup
-                key={route.href}
-                route={route}
-                lang={lang}
-                isBn={isBn}
-                pathname={pathname}
-                onClick={onItemClick}
-              />
-            );
-          }
-          const fullHref = `/${lang}${route.href}`;
-          const isActive = pathname === fullHref || pathname.startsWith(`${fullHref}/`);
-          return (
-            <NavItem
-              key={route.href}
-              href={fullHref}
-              icon={route.icon}
-              title={isBn ? route.titleBn : route.title}
-              isActive={isActive}
-              onClick={onItemClick}
-            />
-          );
-        })}
+      {/* Flat Navigation with non-interactive section headers */}
+      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        {sections.map((section) => (
+          <div key={section.title} className="space-y-1">
+            <div className="px-3 pb-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider select-none">
+              {isBn ? section.titleBn : section.title}
+            </div>
+            <div className="space-y-0.5">
+              {section.items.map((route) => {
+                const fullHref = `/${lang}${route.href}`;
+                const isExactActive = pathname === fullHref;
+                const isPrefixActive =
+                  route.matchPrefixes?.some(
+                    (p) => pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`)
+                  ) ?? false;
+                const isSubActive =
+                  route.href !== "/admin" &&
+                  route.href !== "/super-admin" &&
+                  route.href !== "/seller" &&
+                  route.href !== "/rider" &&
+                  route.href !== "/customer" &&
+                  pathname.startsWith(`${fullHref}/`);
+
+                const isActive = isExactActive || isPrefixActive || isSubActive;
+
+                return (
+                  <NavItem
+                    key={route.href}
+                    href={fullHref}
+                    icon={route.icon}
+                    title={isBn ? route.titleBn : route.title}
+                    isActive={isActive}
+                    onClick={onItemClick}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      <div className="p-4 border-t border-muted/50 bg-background/40 relative z-10">
-        <button
-          onClick={onLogout}
-          className="group flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium rounded-2xl text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
-        >
-          <LogOut className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" />
-          {isBn ? "লগআউট" : "Logout"}
-        </button>
-      </div>
+      {/* Note: Sidebar contains pure navigation. Logout is located exclusively in the Dashboard Header account menu. */}
     </div>
   );
 }
@@ -259,7 +166,7 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const routesMap: Record<DashboardLayoutProps["routeType"], DashboardRoute[]> = {
     admin: adminRoutes,
-    'super-admin': superAdminRoutes,
+    "super-admin": superAdminRoutes,
     seller: sellerRoutes,
     rider: riderRoutes,
     customer: customerRoutes,
@@ -270,128 +177,177 @@ export function DashboardLayout({
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
-        },
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+          },
+        }
+      );
     } catch {
       // Ignore network error on logout
+    } finally {
+      dispatch(logout());
+      dispatch(api.util.resetApiState());
+      setIsLoggingOut(false);
+      setIsLogoutModalOpen(false);
+      router.push(`/${lang}/login`);
     }
-    dispatch(logout());
-    dispatch(api.util.resetApiState());
-    router.push(`/${lang}/login`);
   };
 
-  // Determine the active title by inspecting specific children first, then parent routes
+  // Determine the active title
   let activeTitle = isBn ? "ড্যাশবোর্ড" : "Dashboard";
   for (const route of routes) {
-    if (route.children) {
-      const matchedChild = route.children.find(
-        (c) => pathname === `/${lang}${c.href}` || pathname.startsWith(`/${lang}${c.href}/`)
-      );
-      if (matchedChild) {
-        activeTitle = isBn ? matchedChild.titleBn : matchedChild.title;
-        break;
-      }
-    }
-    if (pathname === `/${lang}${route.href}` || pathname.startsWith(`/${lang}${route.href}/`)) {
+    const fullHref = `/${lang}${route.href}`;
+    if (
+      pathname === fullHref ||
+      pathname.startsWith(`${fullHref}/`) ||
+      route.matchPrefixes?.some(
+        (p) => pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`)
+      )
+    ) {
       activeTitle = isBn ? route.titleBn : route.title;
       break;
     }
   }
 
+  const userRoles = getUserRoles(user);
+  const primaryRole = userRoles[0] || "User";
+
   return (
-    <div className="flex min-h-screen bg-muted/20">
+    <div className="flex min-h-screen bg-background text-foreground">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen">
+      <aside className="hidden md:flex flex-col w-64 flex-shrink-0 sticky top-0 h-screen">
         <SidebarContent
           routes={routes}
           lang={lang}
           isBn={isBn}
           pathname={pathname}
-          onLogout={handleLogout}
         />
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-background">
-        {/* Header */}
-        <header className="sticky top-0 z-30 h-[76px] bg-background/70 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 border-b border-muted/50 shadow-sm supports-[backdrop-filter]:bg-background/40">
-          <div className="flex items-center gap-4">
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Dashboard Header */}
+        <header className="sticky top-0 z-30 h-16 bg-background border-b border-border flex items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            {/* Mobile Sidebar Trigger */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
+                <Button variant="ghost" size="icon" className="md:hidden -ml-2">
                   <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle Menu</span>
+                  <span className="sr-only">Toggle Navigation Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-72 p-0">
+              <SheetContent side="left" className="w-64 p-0">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>{isBn ? "ন্যাভিগেশন মেনু" : "Navigation Menu"}</SheetTitle>
+                </SheetHeader>
                 <SidebarContent
                   routes={routes}
                   lang={lang}
                   isBn={isBn}
                   pathname={pathname}
-                  onLogout={handleLogout}
                   onItemClick={() => setMobileMenuOpen(false)}
                 />
               </SheetContent>
             </Sheet>
 
-            <h1 className="text-xl font-bold hidden sm:block">
+            <h1 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">
               {activeTitle}
             </h1>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          {/* Right Header Controls */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher currentLocale={lang} />
             <NotificationBell lang={lang} />
 
+            {/* User Profile & Logout Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 hover:bg-muted/80 p-1.5 rounded-full transition-all duration-300 hover:shadow-sm">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary font-bold shadow-sm ring-1 ring-primary/20">
-                    {user?.firstName?.[0] || "U"}
+                <button
+                  type="button"
+                  className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/60 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs ring-1 ring-primary/20 shrink-0">
+                    {user?.firstName?.[0]?.toUpperCase() || <User className="h-4 w-4" />}
                   </div>
-                  <div className="hidden md:block text-left text-sm mr-1">
-                    <p className="font-semibold leading-none text-foreground">
+                  <div className="hidden sm:block text-left text-xs">
+                    <p className="font-semibold text-foreground leading-tight truncate max-w-[120px]">
                       {user?.firstName} {user?.lastName}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1 capitalize font-medium">
-                      {getUserRoles(user)[0]?.toLowerCase() || "User"}
+                    <p className="text-[10px] text-muted-foreground capitalize leading-tight">
+                      {primaryRole.toLowerCase().replace("_", " ")}
                     </p>
                   </div>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block opacity-70" />
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground hidden sm:block opacity-60" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-muted/50">
-                <div className="px-2 py-2 mb-2 border-b">
-                  <p className="font-medium">{user?.firstName} {user?.lastName}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                </div>
-                <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2.5">
-                  <Link href={routeType === 'seller' ? `/${lang}/seller/profile` : routeType === 'rider' ? `/${lang}/rider/profile` : `/${lang}/customer/profile`}>
-                    <User className="mr-2 h-4 w-4 text-muted-foreground" />
+              <DropdownMenuContent align="end" className="w-56 p-1.5 rounded-xl shadow-lg border-border">
+                <DropdownMenuLabel className="px-2 py-1.5 font-normal">
+                  <p className="text-xs font-semibold text-foreground truncate">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {user?.email || user?.phone}
+                  </p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="my-1" />
+
+                <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
+                  <Link
+                    href={
+                      routeType === "seller"
+                        ? `/${lang}/seller/profile`
+                        : routeType === "rider"
+                        ? `/${lang}/rider/profile`
+                        : `/${lang}/customer/profile`
+                    }
+                    className="flex items-center gap-2 w-full"
+                  >
+                    <User className="h-3.5 w-3.5 text-muted-foreground" />
                     <span>{isBn ? "প্রোফাইল" : "Profile"}</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2.5 mb-1">
-                  <Link href={routeType === 'admin' ? `/${lang}/admin/settings` : routeType === 'super-admin' ? `/${lang}/super-admin/settings` : `/${lang}/customer/settings`}>
-                    <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
+
+                <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
+                  <Link
+                    href={
+                      routeType === "admin"
+                        ? `/${lang}/admin/settings`
+                        : routeType === "super-admin"
+                        ? `/${lang}/super-admin/settings`
+                        : `/${lang}/customer/settings`
+                    }
+                    className="flex items-center gap-2 w-full"
+                  >
+                    <Settings className="h-3.5 w-3.5 text-muted-foreground" />
                     <span>{isBn ? "সেটিংস" : "Settings"}</span>
                   </Link>
                 </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="my-1" />
+
                 <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer rounded-xl py-2.5"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setIsLogoutModalOpen(true);
+                  }}
+                  className="rounded-lg cursor-pointer py-2 text-xs text-destructive focus:text-destructive focus:bg-destructive/10 flex items-center gap-2"
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="h-3.5 w-3.5 text-destructive" />
                   <span>{isBn ? "লগআউট" : "Logout"}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -399,11 +355,50 @@ export function DashboardLayout({
           </div>
         </header>
 
-        {/* Page Content - Full Width on large screens without artificial max-width constraints */}
-        <main className="flex-1 p-4 md:p-8">
+        {/* Page Content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full">
           <div className="w-full">{children}</div>
         </main>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={isLogoutModalOpen} onOpenChange={setIsLogoutModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {isBn ? "লগআউট নিশ্চিত করুন" : "Confirm Logout"}
+            </DialogTitle>
+            <DialogDescription>
+              {isBn
+                ? "আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?"
+                : "Are you sure you want to log out of your dashboard?"}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-end mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsLogoutModalOpen(false)}
+              disabled={isLoggingOut}
+            >
+              {isBn ? "বাতিল" : "Cancel"}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut
+                ? isBn
+                  ? "লগআউট হচ্ছে..."
+                  : "Logging out..."
+                : isBn
+                ? "লগআউট"
+                : "Logout"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+export default DashboardLayout;

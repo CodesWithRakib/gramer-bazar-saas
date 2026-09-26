@@ -71,44 +71,42 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
       />
 
       {metrics && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 border-primary/20 rounded-2xl bg-card">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="rounded-xl border border-border bg-card shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {isBn ? 'সর্বমোট বিক্রয়' : 'Total Sales'}
               </CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-primary" />
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <DollarSign className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+            <CardContent>
+              <div className="text-2xl font-bold tracking-tight text-foreground">
                 ৳{metrics.totalSales.toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground flex items-center mt-2 font-medium">
+              <p className="text-xs text-muted-foreground flex items-center mt-1.5 font-medium">
                 <TrendingUp className="h-3.5 w-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold mr-1">+20.1%</span>{' '}
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold mr-1">+20.1%</span>{' '}
                 {isBn ? 'গত মাস থেকে' : 'from last month'}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 rounded-2xl border-border/70 bg-card">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="rounded-xl border border-border bg-card shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {isBn ? 'সর্বমোট অর্ডার' : 'Total Orders'}
               </CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                <ShoppingCart className="h-5 w-5 text-blue-500" />
+              <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+            <CardContent>
+              <div className="text-2xl font-bold tracking-tight text-foreground">
                 {metrics.totalOrders}
               </div>
-              <p className="text-xs text-muted-foreground flex items-center mt-2">
+              <p className="text-xs text-muted-foreground flex items-center mt-1.5">
                 <span className="font-semibold text-amber-600 dark:text-amber-400 mr-1">
                   {metrics.pendingOrders}
                 </span>{' '}
@@ -117,41 +115,39 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 rounded-2xl border-border/70 bg-card">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="rounded-xl border border-border bg-card shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {isBn ? 'গ্রাহক' : 'Customers'}
               </CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                <Users className="h-5 w-5 text-indigo-500" />
+              <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                <Users className="h-4 w-4 text-muted-foreground" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+            <CardContent>
+              <div className="text-2xl font-bold tracking-tight text-foreground">
                 {metrics.totalCustomers}
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground mt-1.5">
                 {isBn ? 'মোট সক্রিয় গ্রাহক' : 'Registered shoppers'}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 rounded-2xl border-border/70 bg-card">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="rounded-xl border border-border bg-card shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {isBn ? 'বিক্রেতা' : 'Sellers'}
               </CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <UserCheck className="h-5 w-5 text-purple-500" />
+              <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                <UserCheck className="h-4 w-4 text-muted-foreground" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+            <CardContent>
+              <div className="text-2xl font-bold tracking-tight text-foreground">
                 {metrics.totalSellers}
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground mt-1.5">
                 {isBn ? 'ভেরিফাইড মার্চেন্ট' : 'Verified merchants'}
               </p>
             </CardContent>
@@ -160,9 +156,9 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
       )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4 rounded-3xl border-border/70 shadow-xs bg-card overflow-hidden">
-          <CardHeader className="bg-muted/15 pb-4 border-b border-border/40">
-            <CardTitle className="text-base font-bold text-foreground">
+        <Card className="lg:col-span-4 rounded-xl border border-border shadow-none bg-card overflow-hidden">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-sm font-semibold text-foreground">
               {isBn ? 'রাজস্ব বিশ্লেষণ' : 'Revenue Analytics'}
             </CardTitle>
             <CardDescription className="text-xs">
@@ -170,15 +166,9 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-0 pt-6 pr-6">
-            <div className="h-[300px] w-full">
+            <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorAdminRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                   <XAxis
                     dataKey="name"
@@ -203,19 +193,19 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                       strokeDasharray: '3 3',
                     }}
                     contentStyle={{
-                      borderRadius: '16px',
+                      borderRadius: '8px',
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
-                      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                      boxShadow: 'none',
                     }}
                   />
                   <Area
                     type="monotone"
                     dataKey="revenue"
                     stroke="hsl(var(--primary))"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#colorAdminRevenue)"
+                    strokeWidth={2}
+                    fillOpacity={0.1}
+                    fill="hsl(var(--primary))"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -223,9 +213,9 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3 rounded-3xl border-border/70 shadow-xs bg-card overflow-hidden">
-          <CardHeader className="bg-muted/15 pb-4 border-b border-border/40">
-            <CardTitle className="text-base font-bold text-foreground">
+        <Card className="lg:col-span-3 rounded-xl border border-border shadow-none bg-card overflow-hidden">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-sm font-semibold text-foreground">
               {isBn ? 'সাম্প্রতিক অর্ডারসমূহ' : 'Recent Orders'}
             </CardTitle>
             <CardDescription className="text-xs">

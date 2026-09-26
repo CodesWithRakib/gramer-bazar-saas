@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { Eye, EyeOff, Lock, CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { BrandLogo } from '@/components/common/BrandLogo';
 
 function ResetPasswordForm({ lang }: { lang: string }) {
   const router = useRouter();
@@ -67,9 +69,9 @@ function ResetPasswordForm({ lang }: { lang: string }) {
   };
 
   return (
-    <div className="w-full max-w-md bg-card border rounded-2xl shadow-lg p-6 sm:p-8">
+    <div className="w-full max-w-md bg-card border rounded-xl p-6 sm:p-8">
       <div className="mb-6 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary mx-auto flex items-center justify-center mb-4">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary mx-auto flex items-center justify-center mb-4">
           <Lock className="w-6 h-6" />
         </div>
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
@@ -81,13 +83,13 @@ function ResetPasswordForm({ lang }: { lang: string }) {
       </div>
 
       {errorMsg && (
-        <div className="mb-5 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
+        <div className="mb-5 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
           {errorMsg}
         </div>
       )}
 
       {successMsg && (
-        <div className="mb-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-medium flex items-center gap-2">
+        <div className="mb-5 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-medium flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -190,16 +192,28 @@ function ResetPasswordForm({ lang }: { lang: string }) {
 
 export default function ResetPasswordPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
+  const isBn = lang === 'bn';
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center bg-muted/20 px-4 py-12">
-      <Suspense fallback={
-        <div className="w-full max-w-md bg-card border rounded-2xl p-8 text-center text-muted-foreground">
-          Loading...
-        </div>
-      }>
-        <ResetPasswordForm lang={lang} />
-      </Suspense>
+    <div className="min-h-screen flex flex-col bg-muted/20">
+      {/* Brand Top Bar */}
+      <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card">
+        <Link href={`/${lang}`} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <BrandLogo lang={lang} variant="full" width={140} height={38} />
+        </Link>
+        <LanguageSwitcher currentLocale={lang} />
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <Suspense fallback={
+          <div className="w-full max-w-md bg-card border rounded-xl p-8 text-center text-muted-foreground">
+            Loading...
+          </div>
+        }>
+          <ResetPasswordForm lang={lang} />
+        </Suspense>
+      </main>
     </div>
   );
 }
