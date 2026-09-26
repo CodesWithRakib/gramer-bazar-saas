@@ -81,7 +81,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${notoSansBengali.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <CSPostHogProvider>
           <ReduxProvider>
             <AuthProvider>

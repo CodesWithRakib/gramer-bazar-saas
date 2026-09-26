@@ -10,21 +10,27 @@ import { MapPin, Plus, Trash2, Edit2 } from 'lucide-react';
 import { AddressForm } from './AddressForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 export function AddressList() {
   const { data: addresses, isLoading, isError } = useGetAddressesQuery();
   const [deleteAddress] = useDeleteAddressMutation();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this address?')) {
-      try {
-        await deleteAddress(id).unwrap();
-        toast.success('Address deleted successfully');
-      } catch {
-        toast.error('Failed to delete address');
-      }
+  const handleConfirmDelete = async () => {
+    if (!addressToDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteAddress(addressToDelete).unwrap();
+      toast.success('Address deleted successfully');
+      setAddressToDelete(null);
+    } catch {
+      toast.error('Failed to delete address');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -117,7 +123,7 @@ export function AddressList() {
                     )}
                   </DialogContent>
                 </Dialog>
-                <Button variant="destructive" size="sm" className="w-full" onClick={() => handleDelete(address.id)}>
+                <Button variant="destructive" size="sm" className="w-full" onClick={() => setAddressToDelete(address.id)}>
                   <Trash2 className="mr-2 h-3 w-3" /> Delete
                 </Button>
               </CardFooter>
@@ -125,6 +131,18 @@ export function AddressList() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!addressToDelete}
+        onClose={() => setAddressToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Address?"
+        description="Are you sure you want to delete this delivery address? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="destructive"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

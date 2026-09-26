@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useCreateDisputeMutation, DisputeReason } from '@/features/disputes/disputesApi';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -40,10 +41,10 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
       // Reset form
       setReason('');
       setDescription('');
-      alert(isBn ? 'অভিযোগ সফলভাবে দায়ের করা হয়েছে।' : 'Dispute opened successfully.');
+      toast.success(isBn ? 'অভিযোগ সফলভাবে দায়ের করা হয়েছে।' : 'Dispute opened successfully.');
     } catch (error) {
       console.error('Failed to create dispute:', error);
-      alert(isBn ? 'অভিযোগ দায়ের করতে সমস্যা হয়েছে।' : 'Failed to open dispute. You may already have an active dispute for this order.');
+      toast.error(isBn ? 'অভিযোগ দায়ের করতে সমস্যা হয়েছে।' : 'Failed to open dispute. You may already have an active dispute for this order.');
     }
   };
 

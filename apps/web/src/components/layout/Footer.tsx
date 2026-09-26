@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useSyncExternalStore } from "react";
+import React from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { getUserRoles } from "@/lib/roles";
-import { useGetProfileQuery } from "@/features/auth/authApi";
 import {
   Facebook,
   Instagram,
@@ -17,8 +15,6 @@ import {
   ShieldCheck,
   Store,
   Bike,
-  LayoutDashboard,
-  ShieldAlert,
   User,
   Package,
   Heart,
@@ -36,23 +32,8 @@ interface FooterProps {
 export function Footer({ lang }: FooterProps) {
   const isBn = lang === "bn";
   const year = new Date().getFullYear();
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
 
-  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
-  const { data: profile } = useGetProfileQuery(undefined, {
-    skip: !isAuthenticated || !!user,
-  });
-
-  const currentUser = user || profile;
-  const userRoles = mounted ? getUserRoles(currentUser) : [];
-  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
-  const isAdmin = userRoles.includes("ADMIN") || isSuperAdmin;
-  const isSeller = userRoles.includes("SELLER");
-  const isRider = userRoles.includes("RIDER");
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   return (
     <footer className="bg-background border-t mt-auto pt-16">
@@ -182,96 +163,49 @@ export function Footer({ lang }: FooterProps) {
             </ul>
           </div>
 
-          {/* Col 4: Earn with Us & Portals (Role & Auth aware) */}
+          {/* Col 4: Earn with Us / Partnership (Public for all users) */}
           <div>
             <h4 className="font-bold text-sm mb-4 text-foreground uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>{isBn ? "অংশীদারিত্ব ও পোর্টাল" : "Earn & Portals"}</span>
+              <span>{isBn ? "অংশীদারিত্ব" : "Earn with Us"}</span>
             </h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground font-medium">
-              {/* If user is ALREADY a Seller, show portal links */}
-              {isSeller ? (
-                <>
-                  <li>
-                    <Link href={`/${lang}/seller`} className="text-success font-semibold hover:underline flex items-center gap-1.5">
-                      <Store className="w-3.5 h-3.5" />
-                      <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={`/${lang}/seller/products`} className="hover:text-primary transition-colors">
-                      {isBn ? "পণ্য পরিচালনা" : "Manage Products"}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={`/${lang}/seller/orders`} className="hover:text-primary transition-colors">
-                      {isBn ? "সেলার অর্ডার" : "Seller Orders"}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={`/${lang}/seller/wallet/payout`} className="hover:text-primary transition-colors">
-                      {isBn ? "উত্তোলন হিস্ট্রি" : "Payout Requests"}
-                    </Link>
-                  </li>
-                </>
-              ) : (
-                /* If NOT a seller and NOT admin, show Become a Seller */
-                !isAdmin && (
-                  <li>
-                    <Link href={`/${lang}/become-a-seller`} className="text-success font-semibold hover:underline flex items-center gap-1.5">
-                      <Store className="w-3.5 h-3.5" />
-                      <span>{isBn ? "সেলার হতে আবেদন" : "Become a Seller"}</span>
-                    </Link>
-                  </li>
-                )
-              )}
-
-              {/* If user is ALREADY a Rider, show rider portal links */}
-              {isRider ? (
-                <>
-                  <li>
-                    <Link href={`/${lang}/rider`} className="text-info font-semibold hover:underline flex items-center gap-1.5">
-                      <Bike className="w-3.5 h-3.5" />
-                      <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider App"}</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={`/${lang}/rider/deliveries`} className="hover:text-primary transition-colors">
-                      {isBn ? "ডেলিভারি সমূহ" : "My Deliveries"}
-                    </Link>
-                  </li>
-                </>
-              ) : (
-                /* If NOT a rider and NOT admin, show Become a Rider */
-                !isAdmin && (
-                  <li>
-                    <Link href={`/${lang}/become-a-rider`} className="text-info font-semibold hover:underline flex items-center gap-1.5">
-                      <Bike className="w-3.5 h-3.5" />
-                      <span>{isBn ? "রাইডার হতে আবেদন" : "Become a Rider"}</span>
-                    </Link>
-                  </li>
-                )
-              )}
-
-              {/* If user is Admin, show Admin Panel */}
-              {isAdmin && (
-                <li>
-                  <Link href={`/${lang}/admin`} className="text-primary font-semibold hover:underline flex items-center gap-1.5">
-                    <LayoutDashboard className="w-3.5 h-3.5" />
-                    <span>{isBn ? "অ্যাডমিন প্যানেল" : "Admin Panel"}</span>
-                  </Link>
-                </li>
-              )}
-
-              {/* If user is Super Admin, show Super Admin Console */}
-              {isSuperAdmin && (
-                <li>
-                  <Link href={`/${lang}/super-admin`} className="text-warning font-semibold hover:underline flex items-center gap-1.5">
-                    <ShieldAlert className="w-3.5 h-3.5 text-warning" />
-                    <span>{isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin"}</span>
-                  </Link>
-                </li>
-              )}
+              <li>
+                <Link
+                  href={`/${lang}/become-a-seller`}
+                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                >
+                  <Store className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>{isBn ? "সেলার হতে আবেদন" : "Become a Seller"}</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={`/${lang}/become-a-rider`}
+                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                >
+                  <Bike className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>{isBn ? "রাইডার হতে আবেদন" : "Become a Rider"}</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={`/${lang}/shops`}
+                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                >
+                  <Store className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>{isBn ? "দোকান ও বিক্রেতা তালিকা" : "Verified Shops"}</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={`/${lang}/offers`}
+                  className="hover:text-primary transition-colors flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>{isBn ? "কুপন ও বিশেষ অফার" : "Offers & Deals"}</span>
+                </Link>
+              </li>
             </ul>
           </div>
 

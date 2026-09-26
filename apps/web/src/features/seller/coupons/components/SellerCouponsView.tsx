@@ -22,7 +22,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Switch } from '@/components/ui/switch';
 import { Ticket, Plus, Trash2, Calendar, Users, Edit, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
-import AdminPagination from '@/components/AdminPagination';
+import { AdminPagination } from '@/components/ui/AdminPagination';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 export interface SellerCouponsViewProps {
   lang?: string;
@@ -32,6 +33,7 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
   
   const isBn = lang === 'bn';
   const router = useRouter();
+  const [couponToDelete, setCouponToDelete] = useState<string | null>(null);
   
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   
@@ -50,7 +52,7 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
 
   const [createCoupon] = useCreateSellerCouponMutation();
   const [updateCoupon] = useUpdateSellerCouponMutation();
-  const [deleteCoupon] = useDeleteSellerCouponMutation();
+  const [deleteCoupon, { isLoading: isDeleting }] = useDeleteSellerCouponMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -128,13 +130,15 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(isBn ? 'আপনি কি নিশ্চিত?' : 'Are you sure?')) return;
+  const handleConfirmDelete = async () => {
+    if (!couponToDelete) return;
     try {
-      await deleteCoupon(id).unwrap();
+      await deleteCoupon(couponToDelete).unwrap();
       toast.success(isBn ? 'কুপন মুছে ফেলা হয়েছে' : 'Coupon deleted');
     } catch {
       toast.error(isBn ? 'মুছতে ব্যর্থ হয়েছে' : 'Deletion failed');
+    } finally {
+      setCouponToDelete(null);
     }
   };
 
@@ -438,7 +442,7 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
                           <Button variant="ghost" size="icon" onClick={() => handleOpenEditModal(coupon)} className="h-8 w-8 rounded-full">
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(coupon.id)} className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Button variant="ghost" size="icon" onClick={() => setCouponToDelete(coupon.id)} className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10" aria-label={isBn ? 'মুছে ফেলুন' : 'Delete'}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -468,6 +472,25 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
           }}
         />
       </div>
+
+      <ConfirmDialog
+        open={!!couponToDelete}
+        onOpenChange={(open) => {
+          if (!open) setCouponToDelete(null);
+        }}
+        title={isBn ? 'কুপন মুছে ফেলতে চান?' : 'Delete Coupon?'}
+        description={
+          isBn
+            ? 'আপনি কি নিশ্চিত যে আপনি এই ডিসকাউন্ট কুপনটি মুছে ফেলতে চান? গ্রাহকরা আর এই কোডটি ব্যবহার করতে পারবেন না।'
+            : 'Are you sure you want to delete this coupon? Customers will no longer be able to apply this promo code.'
+        }
+        confirmLabel={isBn ? 'মুছে ফেলুন' : 'Delete Coupon'}
+        cancelLabel={isBn ? 'বাতিল' : 'Cancel'}
+        variant="destructive"
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        isBn={isBn}
+      />
     </div>
   );
 }

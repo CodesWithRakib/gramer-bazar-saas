@@ -15,6 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { getApiErrorMessage } from '@/lib/apiError';
 import { AddCategoryDialog, EditCategoryDialog } from './CategoryDialogs';
+import { PageHeader } from '@/components/common/PageHeader';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 export interface AdminCategoriesViewProps {
   lang?: string;
@@ -26,6 +28,7 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
   const [limit, setLimit] = useState(15);
   const [search, setSearch] = useState('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   const { data, isLoading, isError, refetch } = useGetAdminCategoriesQuery({
     page,
@@ -35,20 +38,18 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
 
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteAdminCategoryMutation();
 
-  const handleDelete = async (category: Category) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete category "${category.nameEn}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
-
+  const handleConfirmDelete = async () => {
+    if (!categoryToDelete) return;
     try {
-      await deleteCategory(category.id).unwrap();
-      toast.success(`Category "${category.nameEn}" deleted successfully`);
+      await deleteCategory(categoryToDelete.id).unwrap();
+      toast.success(
+        lang === 'bn'
+          ? `"${categoryToDelete.nameBn || categoryToDelete.nameEn}" ক্যাটাগরি মুছে ফেলা হয়েছে`
+          : `Category "${categoryToDelete.nameEn}" deleted successfully`
+      );
+      setCategoryToDelete(null);
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || 'Failed to delete category');
+      toast.error(getApiErrorMessage(error) || (lang === 'bn' ? 'ক্যাটাগরি মুছতে ব্যর্থ হয়েছে' : 'Failed to delete category'));
     }
   };
 
@@ -119,7 +120,7 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
             variant="destructive"
             size="sm"
             disabled={isDeleting}
-            onClick={() => handleDelete(row.original)}
+            onClick={() => setCategoryToDelete(row.original)}
           >
             Delete
           </Button>
@@ -128,18 +129,16 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
     },
   ];
 
-  
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Categories & Subcategories</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage root categories, subcategories, sort orders, and translations.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={lang === 'bn' ? 'ক্যাটাগরি ও সাব-ক্যাটাগরি' : 'Categories & Subcategories'}
+        description={
+          lang === 'bn'
+            ? 'রুট ক্যাটাগরি, সাব-ক্যাটাগরি, ক্রম এবং অনুবাদসমূহ পরিচালনা করুন।'
+            : 'Manage root categories, subcategories, sort orders, and translations.'
+        }
+      />
 
       <DataTable
         columns={columns}
@@ -190,6 +189,26 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={!!categoryToDelete}
+        onClose={() => setCategoryToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title={
+          lang === 'bn'
+            ? `"${categoryToDelete?.nameBn || categoryToDelete?.nameEn}" ক্যাটাগরি মুছে ফেলতে চান?`
+            : `Delete category "${categoryToDelete?.nameEn}"?`
+        }
+        description={
+          lang === 'bn'
+            ? 'এই অ্যাকশনটি বাতিল করা যাবে না।'
+            : 'This action cannot be undone.'
+        }
+        confirmLabel={lang === 'bn' ? 'মুছে ফেলুন' : 'Delete'}
+        cancelLabel={lang === 'bn' ? 'বাতিল' : 'Cancel'}
+        variant="destructive"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

@@ -333,22 +333,11 @@ export function UserActions({ lang }: UserActionsProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <div className="flex items-center gap-1.5">
-            <Button asChild className="h-10 rounded-full px-5 font-semibold shadow-xs">
-              <Link href={`/${lang}/login`}>
-                {isBn ? "লগইন" : "Login"}
-              </Link>
-            </Button>
-            <Button
-              variant="outline"
-              asChild
-              className="h-10 rounded-full px-4 font-medium hidden md:inline-flex"
-            >
-              <Link href={`/${lang}/register`}>
-                {isBn ? "রেজিস্টার" : "Register"}
-              </Link>
-            </Button>
-          </div>
+          <Button asChild className="h-10 rounded-full px-5 font-semibold shadow-xs">
+            <Link href={`/${lang}/login`}>
+              {isBn ? "লগইন" : "Login"}
+            </Link>
+          </Button>
         )}
       </div>
 

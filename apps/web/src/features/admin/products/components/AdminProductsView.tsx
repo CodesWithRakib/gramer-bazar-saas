@@ -22,6 +22,7 @@ import {
 } from './ProductDialogs';
 import { ProductImporterModal } from './ProductImporterModal';
 import { Images, Edit, Trash2 } from 'lucide-react';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 export interface AdminProductsViewProps {
   lang?: string;
@@ -34,6 +35,7 @@ export function AdminProductsView({ lang = 'en' }: AdminProductsViewProps) {
   const [search, setSearch] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [managingImagesProduct, setManagingImagesProduct] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   const { data, isLoading, isError, refetch } = useGetAdminProductsQuery({
     page,
@@ -43,20 +45,18 @@ export function AdminProductsView({ lang = 'en' }: AdminProductsViewProps) {
 
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteAdminProductMutation();
 
-  const handleDelete = async (prod: Product) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete "${prod.nameEn}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
-
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
     try {
-      await deleteProduct(prod.id).unwrap();
-      toast.success(`Product "${prod.nameEn}" deleted`);
+      await deleteProduct(productToDelete.id).unwrap();
+      toast.success(
+        lang === 'bn'
+          ? `"${productToDelete.nameBn || productToDelete.nameEn}" মুছে ফেলা হয়েছে`
+          : `Product "${productToDelete.nameEn}" deleted`
+      );
+      setProductToDelete(null);
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || 'Failed to delete product');
+      toast.error(getApiErrorMessage(error) || (lang === 'bn' ? 'পণ্য মুছতে ব্যর্থ হয়েছে' : 'Failed to delete product'));
     }
   };
 
@@ -233,7 +233,7 @@ export function AdminProductsView({ lang = 'en' }: AdminProductsViewProps) {
               size="sm"
               className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
               disabled={isDeleting}
-              onClick={() => handleDelete(prod)}
+              onClick={() => setProductToDelete(prod)}
               title="Delete Product"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -321,6 +321,26 @@ export function AdminProductsView({ lang = 'en' }: AdminProductsViewProps) {
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title={
+          lang === 'bn'
+            ? `"${productToDelete?.nameBn || productToDelete?.nameEn}" পণ্যটি মুছে ফেলতে চান?`
+            : `Delete "${productToDelete?.nameEn}"?`
+        }
+        description={
+          lang === 'bn'
+            ? 'এই অ্যাকশনটি বাতিল করা যাবে না এবং পণ্যের সমস্ত ডেটা মুছে যাবে।'
+            : 'This action cannot be undone and will permanently remove this product.'
+        }
+        confirmLabel={lang === 'bn' ? 'মুছে ফেলুন' : 'Delete'}
+        cancelLabel={lang === 'bn' ? 'বাতিল' : 'Cancel'}
+        variant="destructive"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

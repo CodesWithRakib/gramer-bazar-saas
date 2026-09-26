@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
   useCreateAdminProductMutation,
   useUpdateAdminProductMutation,
@@ -1026,6 +1027,7 @@ export function ProductImagesDialog({
   const [uploadImages, { isLoading: isUploading }] = useUploadProductImagesMutation();
   const [setPrimary, { isLoading: isSettingPrimary }] = useSetPrimaryProductImageMutation();
   const [deleteImage, { isLoading: isDeleting }] = useDeleteProductImageMutation();
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -1054,11 +1056,12 @@ export function ProductImagesDialog({
     }
   };
 
-  const handleDeleteImage = async (imageId: string) => {
-    if (!window.confirm('Are you sure you want to delete this image?')) return;
+  const handleConfirmDeleteImage = async () => {
+    if (!imageToDelete) return;
     try {
-      await deleteImage({ productId: product.id, imageId }).unwrap();
+      await deleteImage({ productId: product.id, imageId: imageToDelete }).unwrap();
       toast.success('Image deleted');
+      setImageToDelete(null);
     } catch (error) {
       toast.error(getApiErrorMessage(error) || 'Failed to delete image');
     }
@@ -1159,7 +1162,7 @@ export function ProductImagesDialog({
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDeleteImage(img.id)}
+                        onClick={() => setImageToDelete(img.id)}
                         disabled={isDeleting}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1171,6 +1174,18 @@ export function ProductImagesDialog({
             )}
           </div>
         </div>
+
+        <ConfirmDialog
+          isOpen={!!imageToDelete}
+          onClose={() => setImageToDelete(null)}
+          onConfirm={handleConfirmDeleteImage}
+          title="Delete Product Image?"
+          description="Are you sure you want to delete this image? This action cannot be undone."
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          variant="destructive"
+          isLoading={isDeleting}
+        />
       </DialogContent>
     </Dialog>
   );

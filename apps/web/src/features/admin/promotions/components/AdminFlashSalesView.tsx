@@ -22,7 +22,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Switch } from '@/components/ui/switch';
 import { Flame, Plus, Trash2, Calendar, Edit, Image as ImageIcon, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
-import AdminPagination from '@/components/AdminPagination';
+import AdminPagination from '@/components/ui/AdminPagination';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 export interface AdminFlashSalesViewProps {
   lang?: string;
@@ -50,6 +51,8 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [flashSaleToDelete, setFlashSaleToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -112,13 +115,17 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(isBn ? 'আপনি কি নিশ্চিত?' : 'Are you sure?')) return;
+  const handleConfirmDelete = async () => {
+    if (!flashSaleToDelete) return;
+    setIsDeleting(true);
     try {
-      await deleteFlashSale(id).unwrap();
+      await deleteFlashSale(flashSaleToDelete).unwrap();
       toast.success(isBn ? 'ফ্ল্যাশ সেল মুছে ফেলা হয়েছে' : 'Flash Sale deleted');
+      setFlashSaleToDelete(null);
     } catch {
       toast.error(isBn ? 'মুছতে ব্যর্থ হয়েছে' : 'Deletion failed');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -350,7 +357,7 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                           <Button variant="ghost" size="icon" onClick={() => handleOpenEditModal(sale)} className="h-8 w-8 rounded-full">
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(sale.id)} className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Button variant="ghost" size="icon" onClick={() => setFlashSaleToDelete(sale.id)} className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -378,6 +385,18 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
             singular: isBn ? 'ফ্ল্যাশ সেল' : 'flash sale',
             plural: isBn ? 'ফ্ল্যাশ সেল' : 'flash sales',
           }}
+        />
+
+        <ConfirmDialog
+          isOpen={!!flashSaleToDelete}
+          onClose={() => setFlashSaleToDelete(null)}
+          onConfirm={handleConfirmDelete}
+          title={isBn ? 'ফ্ল্যাশ সেল মুছে ফেলতে চান?' : 'Delete Flash Sale?'}
+          description={isBn ? 'এই অ্যাকশনটি বাতিল করা যাবে না।' : 'This action cannot be undone.'}
+          confirmLabel={isBn ? 'মুছে ফেলুন' : 'Delete'}
+          cancelLabel={isBn ? 'বাতিল' : 'Cancel'}
+          variant="destructive"
+          isLoading={isDeleting}
         />
       </div>
     </div>

@@ -212,7 +212,7 @@ export function ProductDetailsClient({
   };
 
   return (
-    <div className="bg-muted/10 min-h-screen pb-16">
+    <div className="bg-muted/10 min-h-screen pb-24 md:pb-16">
       <div className="container mx-auto px-4 py-5 max-w-7xl">
         {/* Breadcrumb Navigation */}
         <nav

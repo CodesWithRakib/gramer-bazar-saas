@@ -15,6 +15,10 @@ import { toast } from 'sonner';
 import { AddReviewModal } from '@/components/reviews/AddReviewModal';
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { ErrorState } from '@/components/common/ErrorState';
+import { OrderSkeleton } from '@/components/ui/Skeletons';
+
 export interface CustomerOrderDetailsViewProps {
   lang?: string;
   orderId: string;
@@ -24,10 +28,11 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
   const isBn = lang === 'bn';
   const router = useRouter();
 
-  const { data: order, isLoading, error } = useGetOrderByIdQuery(orderId);
+  const { data: order, isLoading, error, refetch } = useGetOrderByIdQuery(orderId);
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation();
   const [retryPayment, { isLoading: isRetrying }] = useRetryPaymentMutation();
   const [reviewProductId, setReviewProductId] = useState<string | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const handlePayOnline = async () => {
     if (!order) return;
@@ -36,9 +41,10 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
       if (res.paymentUrl) {
         window.location.href = res.paymentUrl;
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = (err as { data?: { message?: string } })?.data?.message;
       toast.error(
-        err?.data?.message || (isBn ? 'পেমেন্ট গেটওয়েতে যেতে ব্যর্থ হয়েছে' : 'Failed to redirect to payment gateway'),
+        msg || (isBn ? 'পেমেন্ট গেটওয়েতে যেতে ব্যর্থ হয়েছে' : 'Failed to redirect to payment gateway'),
       );
     }
   };
@@ -46,40 +52,42 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
   if (isLoading) {
     return (
       <div className="w-full space-y-6">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-6">
-            <Skeleton className="h-64 w-full rounded-2xl" />
-            <Skeleton className="h-64 w-full rounded-2xl" />
-          </div>
-          <Skeleton className="h-96 w-full rounded-2xl" />
-        </div>
+        <Button variant="ghost" size="sm" onClick={() => router.back()} className="rounded-xl">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {isBn ? 'ফিরে যান' : 'Back'}
+        </Button>
+        <OrderSkeleton />
       </div>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="w-full py-16 text-center">
-        <AlertCircle className="w-16 h-16 mx-auto text-destructive mb-4" />
-        <h2 className="text-2xl font-bold mb-2">{isBn ? 'অর্ডারটি পাওয়া যায়নি' : 'Order not found'}</h2>
-        <Button variant="outline" onClick={() => router.back()} className="mt-4">
+      <div className="w-full space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => router.back()} className="rounded-xl">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          {isBn ? 'ফিরে যান' : 'Go Back'}
+          {isBn ? 'ফিরে যান' : 'Back'}
         </Button>
+        <ErrorState
+          isBn={isBn}
+          title={isBn ? 'অর্ডারটি পাওয়া যায়নি' : 'Order not found'}
+          message={
+            isBn
+              ? 'অর্ডারের তথ্য সংগ্রহ করা সম্ভব হয়নি অথবা অর্ডারটি বিদ্যমান নেই।'
+              : 'Unable to load order details or the order does not exist.'
+          }
+          onRetry={() => refetch()}
+        />
       </div>
     );
   }
 
-  const handleCancelOrder = async () => {
-    if (confirm(isBn ? 'আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি বাতিল করতে চান?' : 'Are you sure you want to cancel this order?')) {
-      try {
-        await cancelOrder(order.id).unwrap();
-        toast.success(isBn ? 'অর্ডারটি সফলভাবে বাতিল করা হয়েছে' : 'Order cancelled successfully');
-      } catch {
-        toast.error(isBn ? 'অর্ডার বাতিল করতে সমস্যা হয়েছে' : 'Failed to cancel order');
-      }
+  const handleConfirmCancel = async () => {
+    try {
+      await cancelOrder(order.id).unwrap();
+      toast.success(isBn ? 'অর্ডারটি সফলভাবে বাতিল করা হয়েছে' : 'Order cancelled successfully');
+    } catch {
+      toast.error(isBn ? 'অর্ডার বাতিল করতে সমস্যা হয়েছে' : 'Failed to cancel order');
     }
   };
 
@@ -114,7 +122,7 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
         
         <div className="flex gap-2">
           {canCancel && (
-            <Button variant="destructive" onClick={handleCancelOrder} disabled={isCancelling}>
+            <Button variant="destructive" onClick={() => setShowCancelDialog(true)} disabled={isCancelling}>
               <Ban className="w-4 h-4 mr-2" />
               {isBn ? 'অর্ডার বাতিল করুন' : 'Cancel Order'}
             </Button>
@@ -299,6 +307,23 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
           isBn={isBn}
         />
       )}
+
+      <ConfirmDialog
+        open={showCancelDialog}
+        onOpenChange={setShowCancelDialog}
+        title={isBn ? 'অর্ডার বাতিল করতে চান?' : 'Cancel Order?'}
+        description={
+          isBn
+            ? 'আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি বাতিল করতে চান? এই প্রক্রিয়াটি পূর্বাবস্থায় ফিরিয়ে আনা যাবে না।'
+            : 'Are you sure you want to cancel this order? This action cannot be undone.'
+        }
+        confirmLabel={isBn ? 'হ্যাঁ, বাতিল করুন' : 'Yes, Cancel Order'}
+        cancelLabel={isBn ? 'না, রাখুন' : 'Keep Order'}
+        variant="destructive"
+        isLoading={isCancelling}
+        onConfirm={handleConfirmCancel}
+        isBn={isBn}
+      />
     </div>
   );
 }

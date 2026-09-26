@@ -30,7 +30,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Plus, Image as ImageIcon, Trash2, Edit, Search, X } from "lucide-react";
 import Image from "next/image";
-import AdminPagination from "@/components/AdminPagination";
+import { AdminPagination } from "@/components/ui/AdminPagination";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { toast } from "sonner";
 
 export interface AdminBannersViewProps {
   lang?: string;
@@ -43,7 +45,8 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
   const { data: banners = [], isLoading } = useGetAdminBannersQuery();
   const [createBanner] = useCreateBannerMutation();
   const [updateBanner] = useUpdateBannerMutation();
-  const [deleteBanner] = useDeleteBannerMutation();
+  const [deleteBanner, { isLoading: isDeleting }] = useDeleteBannerMutation();
+  const [bannerToDelete, setBannerToDelete] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -133,13 +136,15 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this banner?")) {
-      try {
-        await deleteBanner(id).unwrap();
-      } catch (err) {
-        console.error("Failed to delete banner:", err);
-      }
+  const handleConfirmDelete = async () => {
+    if (!bannerToDelete) return;
+    try {
+      await deleteBanner(bannerToDelete).unwrap();
+      toast.success(isBn ? "ব্যানার মুছে ফেলা হয়েছে" : "Banner deleted successfully");
+    } catch {
+      toast.error(isBn ? "ব্যানার মুছতে সমস্যা হয়েছে" : "Failed to delete banner");
+    } finally {
+      setBannerToDelete(null);
     }
   };
 
@@ -398,8 +403,9 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(banner.id)}
+                            onClick={() => setBannerToDelete(banner.id)}
                             className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                            aria-label={isBn ? "মুছে ফেলুন" : "Delete"}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -430,6 +436,25 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
           }}
         />
       </div>
+
+      <ConfirmDialog
+        open={!!bannerToDelete}
+        onOpenChange={(open) => {
+          if (!open) setBannerToDelete(null);
+        }}
+        title={isBn ? "ব্যানার মুছে ফেলতে চান?" : "Delete Banner?"}
+        description={
+          isBn
+            ? "আপনি কি নিশ্চিত যে আপনি এই ব্যানারটি মুছে ফেলতে চান? এটি আর হোমপেজ বা ক্যাম্পেইনে প্রদর্শিত হবে না।"
+            : "Are you sure you want to delete this promotional banner? It will immediately disappear from live storefronts."
+        }
+        confirmLabel={isBn ? "মুছে ফেলুন" : "Delete Banner"}
+        cancelLabel={isBn ? "বাতিল" : "Cancel"}
+        variant="destructive"
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        isBn={isBn}
+      />
     </div>
   );
 }

@@ -6,8 +6,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { getUserRoles } from "@/lib/roles";
-import { useGetProfileQuery } from "@/features/auth/authApi";
 import { SearchBar } from "./SearchBar";
 import { UserActions } from "./UserActions";
 import { CategoryMegaMenu } from "./CategoryMegaMenu";
@@ -20,11 +18,8 @@ import {
   Mail,
   Store,
   Bike,
-  LayoutDashboard,
-  ShieldAlert,
   Package,
   HelpCircle,
-  Ticket,
   Search,
   X,
 } from "lucide-react";
@@ -42,19 +37,9 @@ export function Header({ lang }: HeaderProps) {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(isSearchPage);
   const isBn = lang === "bn";
 
-  const { isAuthenticated, user } = useSelector(
+  const { isAuthenticated } = useSelector(
     (state: RootState) => state.auth,
   );
-  const { data: profile } = useGetProfileQuery(undefined, {
-    skip: !isAuthenticated || !!user,
-  });
-
-  const currentUser = user || profile;
-  const userRoles = getUserRoles(currentUser);
-  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
-  const isAdmin = userRoles.includes("ADMIN") || isSuperAdmin;
-  const isSeller = userRoles.includes("SELLER");
-  const isRider = userRoles.includes("RIDER");
 
   return (
     <>
@@ -74,73 +59,23 @@ export function Header({ lang }: HeaderProps) {
               </span>
             </div>
 
-            {/* Right: Dynamic Role & Auth Route Links */}
+            {/* Right: Public & Customer Links (Role actions reside exclusively in User Dropdown) */}
             <div className="flex items-center gap-3 lg:gap-5">
-              {/* Super Admin Quick Jump */}
-              {isSuperAdmin && (
-                <Link
-                  href={`/${lang}/super-admin`}
-                  className="inline-flex items-center gap-1 font-semibold text-warning hover:underline transition-colors"
-                >
-                  <ShieldAlert className="h-3.5 w-3.5 text-warning" />
-                  <span>{isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin"}</span>
-                </Link>
-              )}
+              <Link
+                href={`/${lang}/become-a-seller`}
+                className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
+              >
+                <Store className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>{isBn ? "সেলার হন" : "Become a Seller"}</span>
+              </Link>
 
-              {/* Admin Quick Jump */}
-              {isAdmin && !isSuperAdmin && (
-                <Link
-                  href={`/${lang}/admin`}
-                  className="inline-flex items-center gap-1 font-semibold text-primary hover:underline transition-colors"
-                >
-                  <LayoutDashboard className="h-3.5 w-3.5" />
-                  <span>{isBn ? "অ্যাডমিন প্যানেল" : "Admin Panel"}</span>
-                </Link>
-              )}
-
-              {/* Seller Portal Quick Jump (Only if user IS a seller) */}
-              {isSeller && (
-                <Link
-                  href={`/${lang}/seller`}
-                  className="inline-flex items-center gap-1 font-semibold text-success hover:underline transition-colors"
-                >
-                  <Store className="h-3.5 w-3.5" />
-                  <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
-                </Link>
-              )}
-
-              {/* Rider Portal Quick Jump (Only if user IS a rider) */}
-              {isRider && (
-                <Link
-                  href={`/${lang}/rider`}
-                  className="inline-flex items-center gap-1 font-semibold text-info hover:underline transition-colors"
-                >
-                  <Bike className="h-3.5 w-3.5" />
-                  <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider App"}</span>
-                </Link>
-              )}
-
-              {/* Become a Seller link (Hidden if user IS already a seller or admin) */}
-              {!isSeller && !isAdmin && (
-                <Link
-                  href={`/${lang}/become-a-seller`}
-                  className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
-                >
-                  <Store className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span>{isBn ? "সেলার হন" : "Become a Seller"}</span>
-                </Link>
-              )}
-
-              {/* Become a Rider link (Hidden if user IS already a rider or admin) */}
-              {!isRider && !isAdmin && (
-                <Link
-                  href={`/${lang}/become-a-rider`}
-                  className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
-                >
-                  <Bike className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span>{isBn ? "ডেলিভারি রাইডার হন" : "Become a Rider"}</span>
-                </Link>
-              )}
+              <Link
+                href={`/${lang}/become-a-rider`}
+                className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
+              >
+                <Bike className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>{isBn ? "ডেলিভারি রাইডার হন" : "Become a Rider"}</span>
+              </Link>
 
               {/* Track Orders (Shown if authenticated) */}
               {isAuthenticated && (
@@ -251,16 +186,7 @@ export function Header({ lang }: HeaderProps) {
                   {isBn ? "ছাড়" : "Sale"}
                 </Badge>
               </Link>
-              {/* Super Admin Coupons Link */}
-              {isSuperAdmin && (
-                <Link
-                  href={`/${lang}/super-admin/coupons`}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 font-medium transition-colors whitespace-nowrap"
-                >
-                  <Ticket className="h-3.5 w-3.5" />
-                  <span>{isBn ? "কুপন" : "Coupons"}</span>
-                </Link>
-              )}
+
               <Link
                 href={`/${lang}/categories/fresh-vegetables`}
                 className="hover:text-primary transition-colors whitespace-nowrap text-foreground/80 hover:font-semibold"

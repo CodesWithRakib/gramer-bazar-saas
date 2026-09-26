@@ -5,11 +5,13 @@ import { useGetActiveFlashSalesQuery } from '@/features/flash-sales/flashSalesAp
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { CountdownTimer } from '@/components/common/CountdownTimer';
-import { Flame, Clock, Zap, ArrowLeft, PackageX } from 'lucide-react';
+import { Flame, Clock, Zap, PackageX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import Link from 'next/link';
+
+import { ProductCardSkeleton } from '@/components/ui/Skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
 
 export default function FlashSalePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -18,11 +20,11 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
 
   if (isLoading) {
     return (
-      <div className="container max-w-7xl mx-auto px-4 py-8 space-y-6 animate-pulse">
-        <div className="h-44 bg-muted rounded-2xl" />
+      <div className="container max-w-7xl mx-auto px-4 py-8 space-y-6">
+        <div className="h-44 bg-muted/40 rounded-3xl animate-pulse" />
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <Card key={i} className="h-80 bg-muted rounded-2xl" />
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
       </div>
@@ -31,24 +33,20 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
 
   if (!flashSales || flashSales.length === 0) {
     return (
-      <div className="container max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto text-muted-foreground">
-          <Flame className="w-8 h-8" />
-        </div>
-        <h1 className="text-2xl font-bold">
-          {isBn ? 'এই মুহূর্তে কোনো ফ্ল্যাশ সেল সক্রিয় নেই' : 'No Active Flash Sales Right Now'}
-        </h1>
-        <p className="text-muted-foreground text-sm max-w-md mx-auto">
-          {isBn
-            ? 'আমাদের পরবর্তী ফ্ল্যাশ সেল শুরু হলে দেখতে পাবেন। অন্যান্য ডিসকাউন্ট ও অফার দেখতে শপ ব্রাউজ করুন।'
-            : 'Check back soon for upcoming flash sales and limited-time discount campaigns.'}
-        </p>
-        <Button asChild className="mt-4">
-          <Link href={`/${lang}/products`}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {isBn ? 'সকল পণ্য দেখুন' : 'Explore All Products'}
-          </Link>
-        </Button>
+      <div className="container max-w-7xl mx-auto px-4 py-16">
+        <EmptyState
+          icon={<Flame className="w-8 h-8 text-primary" />}
+          title={isBn ? 'এই মুহূর্তে কোনো ফ্ল্যাশ সেল সক্রিয় নেই' : 'No Active Flash Sales Right Now'}
+          description={
+            isBn
+              ? 'আমাদের পরবর্তী ফ্ল্যাশ সেল শুরু হলে দেখতে পাবেন। অন্যান্য ডিসকাউন্ট ও অফার দেখতে শপ ব্রাউজ করুন।'
+              : 'Check back soon for upcoming flash sales and limited-time discount campaigns.'
+          }
+          action={{
+            label: isBn ? 'সকল পণ্য দেখুন' : 'Explore All Products',
+            href: `/${lang}/search`,
+          }}
+        />
       </div>
     );
   }

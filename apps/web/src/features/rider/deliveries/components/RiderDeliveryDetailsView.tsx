@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { StartChatButton } from '@/components/chat/StartChatButton';
 import dynamic from 'next/dynamic';
 import { useUpdateRiderLocationMutation } from '@/features/deliveries/deliveriesApi';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 const LiveTrackingMap = dynamic(
   () => import('@/components/map/LiveTrackingMap'),
@@ -28,6 +29,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
 
   const { data: delivery, isLoading, refetch } = useGetRiderDeliveryDetailsQuery(id);
   const [updateStatus, { isLoading: isUpdating }] = useUpdateDeliveryStatusMutation();
+  const [showFailedConfirm, setShowFailedConfirm] = useState(false);
   const [updateLocation] = useUpdateRiderLocationMutation();
 
   const [currentLat, setCurrentLat] = useState<number | undefined>(undefined);
@@ -268,7 +270,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
         {delivery.status === DeliveryStatus.OUT_FOR_DELIVERY && (
           <div className="space-y-3">
             <Button 
-              className="w-full h-14 text-lg bg-green-600 hover:bg-green-700 text-white" 
+              className="w-full h-14 text-lg rounded-xl shadow-xs" 
               onClick={() => handleUpdateStatus(DeliveryStatus.DELIVERED)}
               disabled={isUpdating}
             >
@@ -276,13 +278,9 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
               {isBn ? 'ডেলিভারি সম্পন্ন' : 'Mark as Delivered'}
             </Button>
             <Button 
-              className="w-full" 
+              className="w-full rounded-xl" 
               variant="destructive"
-              onClick={() => {
-                if (window.confirm(isBn ? 'আপনি কি নিশ্চিত?' : 'Are you sure?')) {
-                  handleUpdateStatus(DeliveryStatus.FAILED);
-                }
-              }}
+              onClick={() => setShowFailedConfirm(true)}
               disabled={isUpdating}
             >
               <AlertTriangle className="mr-2 h-4 w-4" />
@@ -291,6 +289,23 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={showFailedConfirm}
+        onOpenChange={setShowFailedConfirm}
+        title={isBn ? 'ডেলিভারি ব্যর্থ হিসেবে চিহ্নিত করবেন?' : 'Mark Delivery as Failed?'}
+        description={
+          isBn
+            ? 'আপনি কি নিশ্চিত যে এই অর্ডারটির ডেলিভারি সম্পন্ন করা সম্ভব হয়নি? এটি সিস্টেম ও কাস্টমারকে জানানো হবে।'
+            : 'Are you sure you want to mark this delivery as failed? This will be reported to the platform and customer.'
+        }
+        confirmLabel={isBn ? 'হ্যাঁ, ব্যর্থ চিহ্নিত করুন' : 'Yes, Mark Failed'}
+        cancelLabel={isBn ? 'বাতিল' : 'Cancel'}
+        variant="destructive"
+        isLoading={isUpdating}
+        onConfirm={() => handleUpdateStatus(DeliveryStatus.FAILED)}
+        isBn={isBn}
+      />
     </div>
   );
 }

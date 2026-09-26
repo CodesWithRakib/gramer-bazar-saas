@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2, ArrowRight, Tag, Layers } from "lucide-react";
+import { Search, Loader2, ArrowRight, Tag, Layers, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGetSearchSuggestionsQuery } from "@/features/catalog/catalogApi";
 
@@ -47,15 +47,24 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
     { skip: debouncedTerm.length < 2 }
   );
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -85,7 +94,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
             placeholder ||
             (isBn ? "পণ্য, ক্যাটাগরি বা ব্র্যান্ড খুঁজুন..." : "Search for products, categories or brands...")
           }
-          className="w-full pr-12 pl-4 py-2 text-sm rounded-full bg-muted/60 border-muted focus-visible:ring-2 focus-visible:ring-primary shadow-sm transition-all"
+          className="w-full pr-20 pl-4 py-2 text-sm rounded-full bg-muted/60 border-muted focus-visible:ring-2 focus-visible:ring-primary shadow-xs transition-all"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -97,6 +106,20 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
             }
           }}
         />
+        {searchTerm.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchTerm("");
+              setDebouncedTerm("");
+              setIsOpen(false);
+            }}
+            className="absolute right-12 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors"
+            aria-label={isBn ? "অনুসন্ধান মুছুন" : "Clear search"}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
         <Button
           type="submit"
           variant="ghost"

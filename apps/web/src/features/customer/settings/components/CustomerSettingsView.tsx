@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 export interface CustomerSettingsViewProps {
   lang?: string;
@@ -87,6 +88,7 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
 
   const [updatePassword, { isLoading: isUpdating }] = useUpdatePasswordMutation();
   const [deleteAccount, { isLoading: isDeleting }] = useDeleteAccountMutation();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -134,28 +136,22 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (
-      confirm(
+  const handleConfirmDeleteAccount = async () => {
+    try {
+      await deleteAccount().unwrap();
+      toast.success(
         isBn
-          ? 'আপনি কি নিশ্চিত? এই কাজটি পূর্বাবস্থায় ফিরিয়ে আনা যাবে না।'
-          : 'Are you sure? This action cannot be undone.',
-      )
-    ) {
-      try {
-        await deleteAccount().unwrap();
-        toast.success(
-          isBn
-            ? 'একাউন্ট মুছে ফেলার অনুরোধ গ্রহণ করা হয়েছে'
-            : 'Account deletion requested successfully',
-        );
-        dispatch(logout());
-        router.push(`/${lang}`);
-      } catch (err) {
-        toast.error(
-          getApiErrorMessage(err) || (isBn ? 'সমস্যা হয়েছে' : 'Failed to request deletion'),
-        );
-      }
+          ? 'একাউন্ট মুছে ফেলার অনুরোধ গ্রহণ করা হয়েছে'
+          : 'Account deletion requested successfully',
+      );
+      dispatch(logout());
+      router.push(`/${lang}`);
+    } catch (err) {
+      toast.error(
+        getApiErrorMessage(err) || (isBn ? 'সমস্যা হয়েছে' : 'Failed to request deletion'),
+      );
+    } finally {
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -288,12 +284,28 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
           <Button variant="outline" onClick={handleExportData}>
             {isBn ? 'ডেটা এক্সপোর্ট রিকোয়েস্ট' : 'Request Data Export'}
           </Button>
-          <Button variant="destructive" onClick={handleDeleteAccount} disabled={isDeleting}>
+          <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={isDeleting}>
             {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isBn ? 'একাউন্ট মুছে ফেলুন' : 'Delete Account'}
           </Button>
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDeleteAccount}
+        title={isBn ? 'একাউন্ট মুছে ফেলতে চান?' : 'Delete Account?'}
+        description={
+          isBn
+            ? 'আপনি কি নিশ্চিত? এই কাজটি পূর্বাবস্থায় ফিরিয়ে আনা যাবে না এবং আপনার একাউন্টের সমস্ত তথ্য স্থায়ীভাবে মুছে যাবে।'
+            : 'Are you sure? This action cannot be undone and will permanently remove your account data.'
+        }
+        confirmLabel={isBn ? 'একাউন্ট মুছুন' : 'Delete Account'}
+        cancelLabel={isBn ? 'বাতিল' : 'Cancel'}
+        variant="destructive"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

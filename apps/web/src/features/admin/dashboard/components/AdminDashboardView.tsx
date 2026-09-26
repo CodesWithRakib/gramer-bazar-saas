@@ -1,16 +1,20 @@
 'use client';
 
-import React, { use } from 'react';
+import React from 'react';
 import { useGetDashboardMetricsQuery } from '@/features/analytics/analyticsApi';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ShoppingCart, Users, DollarSign,  UserCheck,  TrendingUp } from 'lucide-react';
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import { ShoppingCart, Users, DollarSign, UserCheck, TrendingUp } from 'lucide-react';
+import { DashboardSkeleton } from '@/components/ui/Skeletons';
+import { PageHeader } from '@/components/common/PageHeader';
+import { ErrorState } from '@/components/common/ErrorState';
+import { Badge } from '@/components/ui/badge';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
 } from 'recharts';
 
@@ -20,9 +24,36 @@ export interface AdminDashboardViewProps {
 
 export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
   const isBn = lang === 'bn';
-  const { data, isLoading } = useGetDashboardMetricsQuery();
+  const { data, isLoading, isError, refetch } = useGetDashboardMetricsQuery();
 
-  if (isLoading) return <div className="p-8">{isBn ? 'ড্যাশবোর্ড মেট্রিক্স লোড হচ্ছে...' : 'Loading dashboard metrics...'}</div>;
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title={isBn ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Dashboard'}
+          description={
+            isBn
+              ? 'প্ল্যাটফর্মের বিক্রয় ও পরিচালনা কার্যক্রম'
+              : 'Platform operations, sales and metrics'
+          }
+        />
+        <ErrorState
+          isBn={isBn}
+          title={isBn ? 'মেট্রিক্স লোড করতে সমস্যা হয়েছে' : 'Failed to load metrics'}
+          message={
+            isBn
+              ? 'প্ল্যাটফর্মের পরিসংখ্যান সংগ্রহ করা যায়নি।'
+              : 'Unable to retrieve dashboard metrics from the server.'
+          }
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
 
   const metrics = data?.metrics;
   const recentOrders = data?.recentOrders || [];
@@ -30,92 +61,127 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">{isBn ? 'ড্যাশবোর্ড' : 'Dashboard'}</h1>
-      
+      <PageHeader
+        title={isBn ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Dashboard'}
+        description={
+          isBn
+            ? 'গ্রামের বাজার মার্কেটপ্লেসের সার্বিক কার্যসম্পাদন, আর্থিক মেট্রিক্স ও অর্ডার পর্যবেক্ষণ করুন।'
+            : 'Monitor marketplace performance, operational metrics, and platform telemetry.'
+        }
+      />
+
       {metrics && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 border-primary/10">
+          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 border-primary/20 rounded-2xl bg-card">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">{isBn ? 'সর্বমোট বিক্রয়' : 'Total Sales'}</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                {isBn ? 'সর্বমোট বিক্রয়' : 'Total Sales'}
+              </CardTitle>
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <DollarSign className="h-5 w-5 text-primary" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold tracking-tight">৳{metrics.totalSales.toLocaleString()}</div>
-              <p className="text-sm text-muted-foreground flex items-center mt-2">
-                <TrendingUp className="h-4 w-4 mr-1 text-emerald-500" />
-                <span className="text-emerald-500 font-semibold mr-1">+20.1%</span> {isBn ? 'গত মাস থেকে' : 'from last month'}
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+                ৳{metrics.totalSales.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground flex items-center mt-2 font-medium">
+                <TrendingUp className="h-3.5 w-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold mr-1">+20.1%</span>{' '}
+                {isBn ? 'গত মাস থেকে' : 'from last month'}
               </p>
             </CardContent>
           </Card>
-          
-          <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+
+          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 rounded-2xl border-border/70 bg-card">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">{isBn ? 'সর্বমোট অর্ডার' : 'Total Orders'}</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                {isBn ? 'সর্বমোট অর্ডার' : 'Total Orders'}
+              </CardTitle>
+              <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
                 <ShoppingCart className="h-5 w-5 text-blue-500" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold tracking-tight">{metrics.totalOrders}</div>
-              <p className="text-sm text-muted-foreground flex items-center mt-2">
-                <span className="font-medium text-amber-500 mr-1">{metrics.pendingOrders}</span> {isBn ? 'অপেক্ষমাণ' : 'pending'}
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+                {metrics.totalOrders}
+              </div>
+              <p className="text-xs text-muted-foreground flex items-center mt-2">
+                <span className="font-semibold text-amber-600 dark:text-amber-400 mr-1">
+                  {metrics.pendingOrders}
+                </span>{' '}
+                {isBn ? 'অপেক্ষমাণ' : 'pending'}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 rounded-2xl border-border/70 bg-card">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">{isBn ? 'গ্রাহক' : 'Customers'}</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-indigo-500/10 flex items-center justify-center">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                {isBn ? 'গ্রাহক' : 'Customers'}
+              </CardTitle>
+              <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
                 <Users className="h-5 w-5 text-indigo-500" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold tracking-tight">{metrics.totalCustomers}</div>
-              <p className="text-sm text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">{isBn ? 'মোট নিবন্ধিত' : 'Total registered'}</p>
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+                {metrics.totalCustomers}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                {isBn ? 'মোট সক্রিয় গ্রাহক' : 'Registered shoppers'}
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <Card className="relative overflow-hidden group hover:shadow-md transition-all duration-300 rounded-2xl border-border/70 bg-card">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">{isBn ? 'বিক্রেতা' : 'Sellers'}</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                {isBn ? 'বিক্রেতা' : 'Sellers'}
+              </CardTitle>
+              <div className="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
                 <UserCheck className="h-5 w-5 text-purple-500" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold tracking-tight">{metrics.totalSellers}</div>
-              <p className="text-sm text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">{isBn ? 'মোট নিবন্ধিত' : 'Total registered'}</p>
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
+                {metrics.totalSellers}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                {isBn ? 'ভেরিফাইড মার্চেন্ট' : 'Verified merchants'}
+              </p>
             </CardContent>
           </Card>
         </div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 shadow-sm border-muted/50 rounded-2xl overflow-hidden">
-          <CardHeader className="bg-muted/10 pb-6 border-b border-muted/30">
-            <CardTitle className="text-lg">{isBn ? 'রাজস্ব ওভারভিউ' : 'Revenue Overview'}</CardTitle>
-            <CardDescription>{isBn ? 'গত ৭ দিনের বিক্রয়' : 'Sales over the last 7 days'}</CardDescription>
+        <Card className="lg:col-span-4 rounded-3xl border-border/70 shadow-xs bg-card overflow-hidden">
+          <CardHeader className="bg-muted/15 pb-4 border-b border-border/40">
+            <CardTitle className="text-base font-bold text-foreground">
+              {isBn ? 'রাজস্ব বিশ্লেষণ' : 'Revenue Analytics'}
+            </CardTitle>
+            <CardDescription className="text-xs">
+              {isBn ? 'গত ৭ দিনের প্ল্যাটফর্ম জিএমভি' : 'Platform GMV performance'}
+            </CardDescription>
           </CardHeader>
           <CardContent className="pl-0 pt-6 pr-6">
-            <div className="h-[320px] w-full">
+            <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    <linearGradient id="colorAdminRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="name" 
+                  <XAxis
+                    dataKey="name"
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
                     tickLine={false}
@@ -130,48 +196,97 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                     tickFormatter={(value) => `৳${value}`}
                     dx={-10}
                   />
-                  <Tooltip 
-                    cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid hsl(var(--border))', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }}
+                  <Tooltip
+                    cursor={{
+                      stroke: 'hsl(var(--primary))',
+                      strokeWidth: 1,
+                      strokeDasharray: '3 3',
+                    }}
+                    contentStyle={{
+                      borderRadius: '16px',
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                    }}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2.5}
+                    fillOpacity={1}
+                    fill="url(#colorAdminRevenue)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 shadow-sm border-muted/50 rounded-2xl overflow-hidden">
-          <CardHeader className="bg-muted/10 pb-6 border-b border-muted/30">
-            <CardTitle className="text-lg">{isBn ? 'সাম্প্রতিক অর্ডার' : 'Recent Orders'}</CardTitle>
-            <CardDescription>{isBn ? 'আপনার স্টোরের সর্বশেষ অর্ডারসমূহ' : 'Latest orders in your store'}</CardDescription>
+        <Card className="lg:col-span-3 rounded-3xl border-border/70 shadow-xs bg-card overflow-hidden">
+          <CardHeader className="bg-muted/15 pb-4 border-b border-border/40">
+            <CardTitle className="text-base font-bold text-foreground">
+              {isBn ? 'সাম্প্রতিক অর্ডারসমূহ' : 'Recent Orders'}
+            </CardTitle>
+            <CardDescription className="text-xs">
+              {isBn ? 'প্ল্যাটফর্মের সাম্প্রতিক কার্যক্রম' : 'Latest order updates'}
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {recentOrders.slice(0, 5).map((order: {
-                id: string;
-                customerName: string;
-                totalAmount: string | number;
-                status: string;
-              }) => (
-                <div key={order.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                      {order.customerName.charAt(0)}
+          <CardContent className="pt-4">
+            <div className="space-y-4">
+              {recentOrders.map(
+                (order: {
+                  id: string;
+                  customerName: string;
+                  totalAmount: number | string;
+                  status: string;
+                }) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between p-2 rounded-xl hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 ring-1 ring-primary/20">
+                        {order.customerName.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold leading-tight text-foreground truncate">
+                          {order.customerName}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                          Order #{order.id.split('-')[0]}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium leading-none">{order.customerName}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Order #{order.id.split('-')[0]}</p>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-foreground">
+                        ৳{Number(order.totalAmount).toLocaleString()}
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className={`text-[10px] mt-0.5 ${
+                          order.status === 'PENDING'
+                            ? 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                            : order.status === 'DELIVERED'
+                            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        {order.status}
+                      </Badge>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">৳{Number(order.totalAmount).toLocaleString()}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-semibold mt-1">{order.status}</p>
-                  </div>
-                </div>
-              ))}
+                )
+              )}
               {recentOrders.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">{isBn ? 'কোন সাম্প্রতিক অর্ডার নেই।' : 'No recent orders found.'}</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="bg-muted/40 p-3.5 rounded-full mb-2">
+                    <ShoppingCart className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {isBn ? 'কোন সাম্প্রতিক অর্ডার নেই।' : 'No recent orders found.'}
+                  </p>
+                </div>
               )}
             </div>
           </CardContent>

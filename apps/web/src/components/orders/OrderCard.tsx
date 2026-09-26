@@ -51,6 +51,30 @@ const getStatusLabel = (status: string, lang: string) => {
   return statusMap[lowerStatus] ? (isBn ? statusMap[lowerStatus].bn : statusMap[lowerStatus].en) : status;
 };
 
+const getPaymentStatusBadge = (status: string | undefined, lang: string) => {
+  const isBn = lang === 'bn';
+  const s = (status || '').toLowerCase();
+  if (s === 'paid') {
+    return (
+      <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium text-xs">
+        {isBn ? 'পরিশোধিত' : 'Paid'}
+      </Badge>
+    );
+  }
+  if (s === 'refunded') {
+    return (
+      <Badge variant="outline" className="border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-400 font-medium text-xs">
+        {isBn ? 'রিফান্ড করা হয়েছে' : 'Refunded'}
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline" className="border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium text-xs">
+      {isBn ? 'বকেয়া' : 'Unpaid'}
+    </Badge>
+  );
+};
+
 export function OrderCard({ order, lang }: OrderCardProps) {
   const isBn = lang === 'bn';
   const dateLocale = isBn ? bn : enUS;
@@ -64,16 +88,17 @@ export function OrderCard({ order, lang }: OrderCardProps) {
   const remainingCount = Math.max(0, items.length - 4);
 
   return (
-    <Card className="w-full overflow-hidden hover:shadow-md transition-all duration-200 border-border group">
+    <Card className="w-full overflow-hidden hover:shadow-md transition-all duration-200 border-border group rounded-2xl">
       <CardHeader className="bg-muted/30 border-b px-4 py-3 md:px-6 flex flex-row items-center justify-between">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-sm md:text-base">
               {isBn ? 'অর্ডার আইডি:' : 'Order ID:'} #{order.id.slice(0, 8).toUpperCase()}
             </span>
             <Badge variant="outline" className={`border-0 ${getStatusColor(order.status)}`}>
               {getStatusLabel(order.status, lang)}
             </Badge>
+            {getPaymentStatusBadge(order.paymentStatus, lang)}
           </div>
           <span className="text-xs md:text-sm text-muted-foreground">{formattedDate}</span>
         </div>

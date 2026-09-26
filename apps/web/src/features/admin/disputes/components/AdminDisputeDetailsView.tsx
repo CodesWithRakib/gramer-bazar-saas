@@ -12,6 +12,7 @@ import { Send, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { toast } from 'sonner';
 
 export interface AdminDisputeDetailsViewProps {
   lang?: string;
@@ -40,14 +41,14 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
       setMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
-      alert('Failed to send message. Please try again.');
+      toast.error(lang === 'bn' ? 'বার্তা পাঠাতে সমস্যা হয়েছে' : 'Failed to send message. Please try again.');
     }
   };
 
   const handleResolve = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminDecision.trim()) {
-      alert('Please provide a decision explanation.');
+      toast.error(lang === 'bn' ? 'সিদ্ধান্তের বিস্তারিত ব্যাখ্যা দিন।' : 'Please provide a decision explanation.');
       return;
     }
 
@@ -56,7 +57,7 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
       setShowResolutionForm(false);
     } catch (error) {
       console.error('Failed to resolve dispute:', error);
-      alert('Failed to resolve dispute. Please try again.');
+      toast.error(lang === 'bn' ? 'বিরোধ মীমাংসা ব্যর্থ হয়েছে। আবার চেষ্টা করুন।' : 'Failed to resolve dispute. Please try again.');
     }
   };
 

@@ -67,6 +67,8 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
         ))}
 
         <button
+          type="button"
+          aria-label={isBn ? "কার্ট খুলুন" : "Open shopping cart"}
           onClick={() => dispatch(setCartOpen(true))}
           className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground hover:text-primary relative"
         >

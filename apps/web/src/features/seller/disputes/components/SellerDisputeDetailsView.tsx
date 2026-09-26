@@ -10,6 +10,7 @@ import { Send, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { toast } from 'sonner';
 
 export interface SellerDisputeDetailsViewProps {
   lang?: string;
@@ -33,7 +34,7 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
       setMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
-      alert('Failed to send message. Please try again.');
+      toast.error(lang === 'bn' ? 'বার্তা পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Failed to send message. Please try again.');
     }
   };
 
