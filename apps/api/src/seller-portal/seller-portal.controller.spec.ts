@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SellerPortalController } from './seller-portal.controller.js';
 import { SellerPortalService } from './seller-portal.service.js';
+import { SupabaseStorageService } from '../storage/supabase-storage.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 
@@ -10,7 +11,10 @@ describe('SellerPortalController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SellerPortalController],
-      providers: [{ provide: SellerPortalService, useValue: {} }],
+      providers: [
+        { provide: SellerPortalService, useValue: {} },
+        { provide: SupabaseStorageService, useValue: {} },
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })

@@ -2,7 +2,7 @@ const { Client } = require('pg');
 const bcrypt = require('bcryptjs');
 
 async function run() {
-  const client = new Client('postgresql://postgres:password@localhost:5432/gramer_bazar');
+  const client = new Client(process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/gramer_bazar');
   await client.connect();
   
   const hash = await bcrypt.hash('123456', 10);

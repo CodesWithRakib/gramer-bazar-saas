@@ -31,5 +31,19 @@ export const envValidationSchema = z.object({
   SSLCOMMERZ_VALIDATION_URL: z.string().optional(),
   SSLCOMMERZ_PUBLIC_URL: z.string().optional(),
   API_URL: z.string().optional(),
-});
+  API_PORT: z.coerce.number().optional(),
+  REDIS_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().optional(),
+  RESEND_FROM_NAME: z.string().optional(),
+  UPLOAD_DIR: z.string().optional(),
+  MAX_IMAGE_SIZE_BYTES: z.coerce.number().optional(),
+  PRODUCT_IMAGE_BASE_URL: z.string().optional(),
+  SUPABASE_URL: z.string().optional(),
+  SUPABASE_SECRET_KEY: z.string().optional(),
+  SUPABASE_BUCKET: z.string().default('gramer-bazar'),
+  DB_SYNCHRONIZE: z.string().optional(),
+}).passthrough();
 

@@ -5,6 +5,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
 import { SellerPortalService } from './seller-portal.service.js';
+import { SupabaseStorageService } from '../storage/supabase-storage.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
@@ -19,7 +20,10 @@ import { UpdateSellerProductDto } from './dto/update-seller-product.dto.js';
 @Roles(Role.SELLER)
 @ApiBearerAuth()
 export class SellerPortalController {
-  constructor(private readonly sellerPortalService: SellerPortalService) {}
+  constructor(
+    private readonly sellerPortalService: SellerPortalService,
+    private readonly storageService: SupabaseStorageService,
+  ) {}
 
   @Get('dashboard')
   @ApiOperation({ summary: 'Get seller dashboard metrics' })
@@ -43,58 +47,30 @@ export class SellerPortalController {
   @ApiOperation({ summary: 'Upload shop logo' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: (req, file, cb) => {
-        const uploadDir = './uploads/shops';
-        fs.mkdirSync(uploadDir, { recursive: true });
-        cb(null, uploadDir);
-      },
-      filename: (req: any, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, `logo-${uniqueSuffix}${extname(file.originalname)}`);
-      },
-    }),
-    fileFilter: (req: any, file, cb) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
-        return cb(new BadRequestException('Only image files (jpg, jpeg, png, webp) are allowed!'), false);
-      }
-      cb(null, true);
-    },
     limits: { fileSize: 5 * 1024 * 1024 },
   }))
   async uploadShopLogo(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
     if (!file) throw new BadRequestException('File is required');
-    const logoUrl = `/uploads/shops/${file.filename}`;
-    return this.sellerPortalService.updateShopProfile(req.user.id, { logo: logoUrl });
+    const shop = await this.sellerPortalService.getShopProfile(req.user.id);
+    const validation = this.storageService.validateImage(file.buffer, file.mimetype);
+    const storagePath = this.storageService.getShopImagePath(shop.id, 'profile', validation.ext);
+    const result = await this.storageService.replaceImage(shop.logo, storagePath, file.buffer, validation.mimeType);
+    return this.sellerPortalService.updateShopProfile(req.user.id, { logo: result.publicUrl });
   }
 
   @Post('shop/banner')
   @ApiOperation({ summary: 'Upload shop cover banner' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: (req, file, cb) => {
-        const uploadDir = './uploads/shops';
-        fs.mkdirSync(uploadDir, { recursive: true });
-        cb(null, uploadDir);
-      },
-      filename: (req: any, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, `banner-${uniqueSuffix}${extname(file.originalname)}`);
-      },
-    }),
-    fileFilter: (req: any, file, cb) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
-        return cb(new BadRequestException('Only image files (jpg, jpeg, png, webp) are allowed!'), false);
-      }
-      cb(null, true);
-    },
-    limits: { fileSize: 8 * 1024 * 1024 },
+    limits: { fileSize: 5 * 1024 * 1024 },
   }))
   async uploadShopBanner(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
     if (!file) throw new BadRequestException('File is required');
-    const bannerUrl = `/uploads/shops/${file.filename}`;
-    return this.sellerPortalService.updateShopProfile(req.user.id, { banner: bannerUrl });
+    const shop = await this.sellerPortalService.getShopProfile(req.user.id);
+    const validation = this.storageService.validateImage(file.buffer, file.mimetype);
+    const storagePath = this.storageService.getShopImagePath(shop.id, 'cover', validation.ext);
+    const result = await this.storageService.replaceImage(shop.banner, storagePath, file.buffer, validation.mimeType);
+    return this.sellerPortalService.updateShopProfile(req.user.id, { banner: result.publicUrl });
   }
 
   @Get('products')

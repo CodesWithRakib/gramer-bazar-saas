@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -45,9 +45,11 @@ import { ApplicationsModule } from './applications/applications.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
+import { StorageModule } from './storage/storage.module.js';
 
 @Module({
   imports: [
+    StorageModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
@@ -59,13 +61,23 @@ import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.get<string>('database.url'),
-        autoLoadEntities: true,
-        synchronize: true,
-        logging: configService.get<string>('NODE_ENV') === 'development',
-      }),
+      useFactory: (configService: ConfigService) => {
+        const dbUrl = configService.get<string>('database.url');
+        const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
+        const isSsl = dbUrl?.includes('sslmode=require') || nodeEnv === 'production';
+        const syncEnabled =
+          configService.get<string>('DB_SYNCHRONIZE') === 'true' ||
+          (nodeEnv !== 'production' && configService.get<string>('DB_SYNCHRONIZE') !== 'false');
+
+        return {
+          type: 'postgres',
+          url: dbUrl,
+          autoLoadEntities: true,
+          synchronize: syncEnabled,
+          ssl: isSsl ? { rejectUnauthorized: false } : false,
+          logging: nodeEnv === 'development',
+        };
+      },
       inject: [ConfigService],
     }),
     CacheModule.registerAsync({
@@ -73,14 +85,37 @@ import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const env = configService.get<string>('NODE_ENV');
-        if (env === 'production') {
-          const store = await redisStore({
-            url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-            ttl: 60 * 1000, // 1 minute default TTL
-          });
-          return { store };
+        let redisUrl = configService.get<string>('REDIS_URL');
+
+        // Automatically synthesize standard Redis TLS URL if Upstash REST URL and token are provided
+        if (!redisUrl) {
+          const upstashUrl = configService.get<string>('UPSTASH_REDIS_REST_URL');
+          const upstashToken = configService.get<string>('UPSTASH_REDIS_REST_TOKEN');
+          if (upstashUrl && upstashToken) {
+            try {
+              const host = new URL(upstashUrl).hostname;
+              redisUrl = `rediss://default:${upstashToken}@${host}:6379`;
+            } catch {
+              // Ignore malformed URL
+            }
+          }
         }
-        return { ttl: 60 * 1000 }; // In-memory fallback for dev
+
+        if (env === 'production' && redisUrl) {
+          try {
+            const store = await redisStore({
+              url: redisUrl,
+              ttl: 60 * 1000, // 1 minute default TTL
+            });
+            return { store };
+          } catch (err: unknown) {
+            new Logger('CacheModule').error(
+              `Failed to connect to Redis at ${redisUrl}, falling back to in-memory: ${(err as Error).message}`,
+            );
+            return { ttl: 60 * 1000 };
+          }
+        }
+        return { ttl: 60 * 1000 }; // In-memory fallback for dev or when redis is not configured
       },
       inject: [ConfigService],
     }),

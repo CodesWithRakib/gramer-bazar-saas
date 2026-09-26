@@ -2,7 +2,7 @@ import { Client } from 'pg';
 
 async function checkAndCreateAccounts() {
   const client = new Client({
-    connectionString: 'postgresql://postgres:password@localhost:5432/gramer_bazar',
+    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/gramer_bazar',
   });
   await client.connect();
   

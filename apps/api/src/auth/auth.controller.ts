@@ -2,10 +2,9 @@ import { Controller, Post, Body, Get, Patch, Delete, UseGuards, Request, HttpCod
 import type { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service.js';
+import { SupabaseStorageService } from '../storage/supabase-storage.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { LoginDto } from './dto/login.dto.js';
@@ -36,7 +35,10 @@ const LOGIN_LIMIT = authThrottle('AUTH_LOGIN_THROTTLE_LIMIT', 5);
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly storageService: SupabaseStorageService,
+  ) {}
 
   private setCookies(res: Response, accessToken: string, refreshToken: string) {
     const isProd = process.env.NODE_ENV === 'production';
@@ -196,26 +198,25 @@ export class AuthController {
     },
   })
   @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploads/avatars',
-      filename: (req: any, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, `${req.user.id}-${uniqueSuffix}${extname(file.originalname)}`);
-      }
-    }),
-    fileFilter: (req: any, file, cb) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
-        return cb(new BadRequestException('Only image files are allowed!'), false);
-      }
-      cb(null, true);
-    }
+    limits: { fileSize: 5 * 1024 * 1024 },
   }))
   async uploadAvatar(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('File is required');
     }
-    const avatarUrl = `/uploads/avatars/${file.filename}`;
-    return this.authService.updateAvatar(req.user.id, avatarUrl);
+    const validation = this.storageService.validateImageBuffer(file.buffer);
+    if (!validation.isValid) {
+      throw new BadRequestException('Only JPEG, PNG, and WebP images are allowed');
+    }
+    const targetPath = this.storageService.getUserProfilePath(req.user.id, validation.ext);
+    const existingAvatarUrl = req.user?.avatar;
+    const { publicUrl } = await this.storageService.replaceImage(
+      existingAvatarUrl,
+      targetPath,
+      file.buffer,
+      validation.mimeType,
+    );
+    return this.authService.updateAvatar(req.user.id, publicUrl);
   }
 
   @Delete('me')

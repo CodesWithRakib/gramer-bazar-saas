@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load .env file
+// Load .env file from app or root
+config({ path: join(__dirname, '../../../.env') }); // apps/api/.env
 config({ path: join(__dirname, '../../../../.env') }); // Root .env
 
 export const dataSourceOptions: DataSourceOptions = {

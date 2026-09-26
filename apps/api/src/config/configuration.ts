@@ -33,4 +33,9 @@ export default () => ({
         : 'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php'),
     publicUrl: process.env.SSLCOMMERZ_PUBLIC_URL || 'http://localhost:4000',
   },
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    secretKey: process.env.SUPABASE_SECRET_KEY,
+    bucket: process.env.SUPABASE_BUCKET || 'gramer-bazar',
+  },
 });

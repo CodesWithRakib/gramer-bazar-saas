@@ -10,6 +10,7 @@ export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
   private resend: Resend;
   private defaultFromEmail: string;
+  private fromName: string;
 
   constructor(
     private configService: ConfigService,
@@ -18,6 +19,7 @@ export class NotificationsService {
   ) {
     const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
     this.defaultFromEmail = this.configService.get<string>('RESEND_FROM_EMAIL') || 'onboarding@resend.dev';
+    this.fromName = this.configService.get<string>('RESEND_FROM_NAME') || 'Gramer Bazar';
     
     if (resendApiKey) {
       this.resend = new Resend(resendApiKey);
@@ -72,7 +74,7 @@ export class NotificationsService {
 
     try {
       const { data, error } = await this.resend.emails.send({
-        from: `Gramer Bazar <${this.defaultFromEmail}>`,
+        from: `${this.fromName} <${this.defaultFromEmail}>`,
         to: [to],
         subject: `Order Confirmation - #${orderDetails.id.substring(0, 8)}`,
         html: `
@@ -103,7 +105,7 @@ export class NotificationsService {
 
     try {
       await this.resend.emails.send({
-        from: `Gramer Bazar <${this.defaultFromEmail}>`,
+        from: `${this.fromName} <${this.defaultFromEmail}>`,
         to: [to],
         subject: `Welcome to Gramer Bazar!`,
         html: `
