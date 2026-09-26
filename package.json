@@ -12,7 +12,9 @@
     "seed": "pnpm -C apps/api run build && pnpm -C apps/api run seed",
     "verify:seed": "pnpm -C apps/api run verify:seed",
     "migration:show": "pnpm -C apps/api run build && pnpm -C apps/api run migration:show",
-    "migration:run": "pnpm -C apps/api run build && pnpm -C apps/api run migration:run"
+    "migration:run": "pnpm -C apps/api run build && pnpm -C apps/api run migration:run",
+    "swagger:generate": "pnpm -C apps/api run swagger:generate",
+    "api:generate": "pnpm run swagger:generate && pnpm dlx openapi-typescript apps/api/swagger-spec.json -o apps/web/src/types/api/generated.ts"
   },
   "dependencies": {
     "@types/multer": "^2.2.0",

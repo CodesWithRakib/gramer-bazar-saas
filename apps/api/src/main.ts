@@ -6,7 +6,8 @@ import {
   ClassSerializerInterceptor,
 } from '@nestjs/common';
 import helmet from 'helmet';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
+import { createSwaggerDocument } from './swagger/swagger.config.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor.js';
 import { ConfigService } from '@nestjs/config';
@@ -149,14 +150,7 @@ async function bootstrap() {
   );
 
   // Swagger Setup
-  const config = new DocumentBuilder()
-    .setTitle('Gramer Bazar API')
-    .setDescription('The Gramer Bazar hyperlocal marketplace API description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
+  const document = createSwaggerDocument(app);
   SwaggerModule.setup('api/docs', app, document);
 
   const port = Number(

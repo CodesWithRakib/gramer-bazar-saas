@@ -6,9 +6,14 @@ import {
   Logger,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { SeederService } from './seeder.service.js';
+import { ApiStandardResponse, ApiCommonErrors } from '../common/decorators/api-standard-response.decorator.js';
+import { SeederResponseDto } from './dto/seeder-response.dto.js';
 
+@ApiTags('System')
 @Controller('dev/seed')
+@ApiCommonErrors()
 export class SeederController {
   private readonly logger = new Logger(SeederController.name);
 
@@ -16,6 +21,8 @@ export class SeederController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Seed database with sample data (Development only)', description: 'Populates database with sample users, categories, products, shops, and inventory in non-production environments.' })
+  @ApiStandardResponse({ type: SeederResponseDto, description: 'Seeder completed successfully' })
   async seedDatabase() {
     if (process.env.NODE_ENV === 'production') {
       throw new InternalServerErrorException(
