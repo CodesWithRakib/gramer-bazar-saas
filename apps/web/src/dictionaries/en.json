@@ -226,5 +226,132 @@
     "notFound": "Requested resource was not found.",
     "unauthorized": "Please log in to continue.",
     "failedToSave": "Failed to save changes"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllAsRead": "Mark all as read",
+    "markAsRead": "Mark as read",
+    "viewAll": "View all notifications",
+    "noNotifications": "No notifications yet",
+    "emptyDescription": "When you receive order updates or activity alerts, they will appear here.",
+    "soundEnabled": "Notification sound enabled",
+    "soundMuted": "Notification sound muted",
+    "filterAll": "All",
+    "filterUnread": "Unread",
+    "filterOrders": "Orders",
+    "filterApplications": "Applications",
+    "actions": {
+      "viewOrder": "View Order",
+      "viewApplication": "View Application",
+      "viewDelivery": "View Delivery",
+      "viewPayout": "View Payout",
+      "viewDetails": "View Details"
+    },
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    },
+    "order_created": {
+      "title": "Order Placed Successfully",
+      "message": "Your order #{{orderNumber}} has been placed and is being reviewed."
+    },
+    "new_order_seller": {
+      "title": "New Order Received",
+      "message": "You received a new order #{{orderNumber}} for {{itemCount}} item(s)."
+    },
+    "admin_order_created": {
+      "title": "New Order Placed",
+      "message": "Order #{{orderNumber}} placed by {{customerName}} for {{amount}}."
+    },
+    "order_status_changed": {
+      "title": "Order Status Updated",
+      "message": "Order #{{orderNumber}} status updated to {{status}}."
+    },
+    "order_cancelled_seller": {
+      "title": "Order Cancelled",
+      "message": "Order #{{orderNumber}} containing your items was cancelled."
+    },
+    "order_delivered_seller": {
+      "title": "Order Delivered",
+      "message": "Order #{{orderNumber}} containing your items has been delivered."
+    },
+    "delivery_assigned_rider": {
+      "title": "New Delivery Task Assigned",
+      "message": "You have been assigned to deliver order #{{orderNumber}}."
+    },
+    "delivery_assigned_customer": {
+      "title": "Delivery Rider Assigned",
+      "message": "Rider {{riderName}} has been assigned to deliver your order."
+    },
+    "delivery_started": {
+      "title": "Order Out for Delivery",
+      "message": "Your order #{{orderNumber}} has been picked up and is on its way."
+    },
+    "delivery_failed": {
+      "title": "Delivery Update",
+      "message": "Delivery attempt for order #{{orderNumber}} was unsuccessful."
+    },
+    "seller_application_submitted": {
+      "title": "Seller Application Received",
+      "message": "Your seller application has been received and is under review."
+    },
+    "admin_seller_application": {
+      "title": "New Seller Application",
+      "message": "A new seller application was submitted by {{shopName}}."
+    },
+    "seller_application_approved": {
+      "title": "Seller Application Approved!",
+      "message": "Congratulations! Your seller application for {{shopName}} has been approved."
+    },
+    "seller_application_rejected": {
+      "title": "Seller Application Update",
+      "message": "Your seller application for {{shopName}} could not be approved at this time."
+    },
+    "rider_application_submitted": {
+      "title": "Rider Application Received",
+      "message": "Your delivery rider application has been received and is under review."
+    },
+    "admin_rider_application": {
+      "title": "New Rider Application",
+      "message": "A new delivery rider application was submitted by {{applicantName}}."
+    },
+    "rider_application_approved": {
+      "title": "Rider Application Approved!",
+      "message": "Congratulations! Your delivery rider application has been approved."
+    },
+    "rider_application_rejected": {
+      "title": "Rider Application Update",
+      "message": "Your rider application could not be approved at this time."
+    },
+    "payment_success": {
+      "title": "Payment Confirmed",
+      "message": "Your payment of {{amount}} for order #{{orderNumber}} was successful."
+    },
+    "payment_failed": {
+      "title": "Payment Failed",
+      "message": "Payment for order #{{orderNumber}} could not be completed."
+    },
+    "payment_cancelled": {
+      "title": "Payment Cancelled",
+      "message": "Payment for order #{{orderNumber}} was cancelled."
+    },
+    "payout_requested": {
+      "title": "Payout Request Submitted",
+      "message": "Your payout request for {{amount}} has been submitted."
+    },
+    "admin_payout_requested": {
+      "title": "New Payout Request",
+      "message": "Seller {{sellerName}} requested a payout of {{amount}}."
+    },
+    "payout_approved": {
+      "title": "Payout Processed",
+      "message": "Your payout request for {{amount}} has been approved and processed."
+    },
+    "payout_rejected": {
+      "title": "Payout Request Rejected",
+      "message": "Your payout request for {{amount}} was declined."
+    }
   }
 }

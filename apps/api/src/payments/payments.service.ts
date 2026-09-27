@@ -19,7 +19,9 @@ import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
 import { SettingsService } from '../settings/settings.service.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 export interface InitiatePaymentResult {
   paymentUrl: string;
@@ -43,6 +45,8 @@ export class PaymentsService {
     private notificationsService: NotificationsService,
     @Optional()
     private settingsService?: SettingsService,
+    @Optional()
+    private eventEmitter?: EventEmitter2,
   ) {}
 
   /**
@@ -483,6 +487,37 @@ export class PaymentsService {
             this.logger.warn(`Failed to send order email for order ${order.id}: ${e}`);
           }
         }
+
+        // In-app notification for Customer
+        const orderShortId = (order?.id || '').slice(0, 8).toUpperCase() || 'ORD';
+        if (order?.userId) {
+          void this.notificationsService?.notifyUser?.(order.userId, {
+            type: NotificationType.PAYMENT_SUCCESS,
+            title: 'Payment Successful',
+            message: `Payment of ৳${payment.amount} for order #${orderShortId} has been confirmed.`,
+            titleKey: 'notifications.payment_success.title',
+            messageKey: 'notifications.payment_success.message',
+            priority: NotificationPriority.HIGH,
+            data: {
+              paymentId: payment.id,
+              orderId: order.id,
+              orderNumber: orderShortId,
+              amount: payment.amount,
+              transactionId: payment.transactionId,
+            },
+          });
+        }
+
+        // Emit real-time order update event so customer and admin views update immediately
+        if (this.eventEmitter) {
+          this.eventEmitter.emit('order.status.updated', {
+            orderId: order.id,
+            previousStatus: OrderStatus.PENDING,
+            currentStatus: order.status,
+            userId: order.userId,
+            updatedAt: new Date().toISOString(),
+          });
+        }
       }
 
       await this.auditLogsService.record({
@@ -527,6 +562,19 @@ export class PaymentsService {
         await manager.save(Order, payment.order);
       }
 
+      if (payment.order && payment.userId) {
+        const orderShortId = (payment.order.id || '').slice(0, 8).toUpperCase() || 'ORD';
+        void this.notificationsService?.notifyUser?.(payment.userId, {
+          type: NotificationType.PAYMENT_FAILED,
+          title: 'Payment Failed',
+          message: `Online payment for order #${orderShortId} failed. Please try again or choose Cash on Delivery.`,
+          titleKey: 'notifications.payment_failed.title',
+          messageKey: 'notifications.payment_failed.message',
+          priority: NotificationPriority.HIGH,
+          data: { paymentId: payment.id, orderId: payment.order.id, orderNumber: orderShortId },
+        });
+      }
+
       return { success: false, payment };
     });
   }
@@ -555,8 +603,21 @@ export class PaymentsService {
       await manager.save(Payment, payment);
 
       if (payment.order && payment.order.paymentStatus !== (PaymentStatus.PAID as any)) {
-        payment.order.paymentStatus = PaymentStatus.FAILED as any;
+        payment.order.paymentStatus = PaymentStatus.CANCELLED as any;
         await manager.save(Order, payment.order);
+      }
+
+      if (payment.order && payment.userId) {
+        const orderShortId = (payment.order.id || '').slice(0, 8).toUpperCase() || 'ORD';
+        void this.notificationsService?.notifyUser?.(payment.userId, {
+          type: NotificationType.PAYMENT_FAILED,
+          title: 'Payment Cancelled',
+          message: `Online payment for order #${orderShortId} was cancelled.`,
+          titleKey: 'notifications.payment_cancelled.title',
+          messageKey: 'notifications.payment_cancelled.message',
+          priority: NotificationPriority.NORMAL,
+          data: { paymentId: payment.id, orderId: payment.order.id, orderNumber: orderShortId },
+        });
       }
 
       return { success: false, payment };

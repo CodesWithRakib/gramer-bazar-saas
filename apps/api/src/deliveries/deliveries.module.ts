@@ -7,6 +7,7 @@ import { DeliveryHistory } from './entities/delivery-history.entity.js';
 import { Order } from '../orders/entities/order.entity.js';
 import { OrderStatusHistory } from '../orders/entities/order-status-history.entity.js';
 import { User } from '../users/entities/user.entity.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { User } from '../users/entities/user.entity.js';
       OrderStatusHistory,
       User,
     ]),
+    NotificationsModule,
   ],
   controllers: [DeliveriesController],
   providers: [DeliveriesService],

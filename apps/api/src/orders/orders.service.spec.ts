@@ -31,7 +31,12 @@ describe('OrdersService', () => {
     })),
   };
   const paymentsService = { initPayment: vi.fn() };
-  const notificationsService = { sendOrderConfirmationEmail: vi.fn() };
+  const notificationsService = {
+    sendOrderConfirmationEmail: vi.fn(),
+    notifyUser: vi.fn().mockResolvedValue(null),
+    notifyUsers: vi.fn().mockResolvedValue([]),
+    notifyRole: vi.fn().mockResolvedValue([]),
+  };
 
   const address = { id: 'addr-1', userId: 'user-1', streetAddress: 'Road 5' } as Address;
   const sellerProduct = (overrides: Record<string, unknown> = {}) => ({

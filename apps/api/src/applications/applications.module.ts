@@ -7,11 +7,13 @@ import { RoleEntity } from '../roles/entities/role.entity.js';
 import { ApplicationsService } from './applications.service.js';
 import { ApplicationsController } from './applications.controller.js';
 import { UsersModule } from '../users/users.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SellerApplication, RiderApplication, Shop, RoleEntity]),
     UsersModule,
+    NotificationsModule,
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService],

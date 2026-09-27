@@ -12,8 +12,9 @@ import { OrderItem } from './entities/order-item.entity.js';
 import { OrderStatusHistory } from './entities/order-status-history.entity.js';
 import { PaymentsService } from '../payments/payments.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
-import { Notification, NotificationType } from '../notifications/entities/notification.entity.js';
+import { Notification, NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
 import { User } from '../users/entities/user.entity.js';
+import { Role } from '../roles/enums/role.enum.js';
 
 import { OrderStatus, PaymentMethod, PaymentStatus } from './enums/order-status.enum.js';
 import { Address } from '../addresses/entities/address.entity.js';
@@ -235,6 +236,73 @@ export class OrdersService {
         this.logger.warn(`Failed to send order confirmation email: ${err.message}`);
       }
     }
+
+    // Dispatch in-app notifications
+    const shortOrderId = (savedOrder?.id || '').slice(0, 8).toUpperCase() || 'NEW';
+    if (savedOrder?.userId) {
+      void this.notificationsService?.notifyUser?.(savedOrder.userId, {
+        type: NotificationType.ORDER_CREATED,
+        title: 'Order Placed',
+        message: `Your order #${shortOrderId} has been successfully placed.`,
+        titleKey: 'notifications.order_created.title',
+        messageKey: 'notifications.order_created.message',
+        priority: NotificationPriority.NORMAL,
+        data: { orderId: savedOrder.id, orderNumber: shortOrderId, total: savedOrder.total },
+      });
+    }
+
+    // Notify sellers whose products are in this order
+    const sellerProductIds = Array.from(
+      new Set((checkoutDto.items || []).map((i) => i.sellerProductId)),
+    );
+    if (sellerProductIds.length > 0 && this.dataSource) {
+      const repo = this.dataSource.getRepository(SellerProduct);
+      const findResult = repo?.find
+        ? repo.find({
+            where: { id: In(sellerProductIds) },
+            relations: ['shop'],
+          })
+        : null;
+
+      if (findResult && typeof (findResult as Promise<unknown>).then === 'function') {
+        void (findResult as Promise<SellerProduct[]>)
+          .then((sellerProducts) => {
+            if (!sellerProducts || !Array.isArray(sellerProducts)) return;
+            const sellerUserIds = Array.from(
+              new Set(
+                sellerProducts
+                  .map((sp) => sp.shop?.sellerId)
+                  .filter((id): id is string => Boolean(id)),
+              ),
+            );
+            if (sellerUserIds.length > 0) {
+              void this.notificationsService?.notifyUsers?.(sellerUserIds, {
+                type: NotificationType.ORDER_CREATED,
+                title: 'New Order Received',
+                message: `You have received a new order #${shortOrderId}.`,
+                titleKey: 'notifications.new_order_seller.title',
+                messageKey: 'notifications.new_order_seller.message',
+                priority: NotificationPriority.HIGH,
+                data: { orderId: savedOrder.id, orderNumber: shortOrderId, total: savedOrder.total },
+              });
+            }
+          })
+          .catch((err) => {
+            this.logger.warn(`Failed to notify sellers for order ${savedOrder?.id}: ${err?.message}`);
+          });
+      }
+    }
+
+    // Notify Admins
+    void this.notificationsService?.notifyRole?.(Role.ADMIN, {
+      type: NotificationType.ORDER_CREATED,
+      title: 'New Order Placed',
+      message: `Order #${shortOrderId} placed for ৳${savedOrder?.total || 0}.`,
+      titleKey: 'notifications.new_order_admin.title',
+      messageKey: 'notifications.new_order_admin.message',
+      priority: NotificationPriority.NORMAL,
+      data: { orderId: savedOrder?.id, orderNumber: shortOrderId, total: savedOrder?.total },
+    });
 
     return { order: savedOrder, paymentUrl };
   }
@@ -466,21 +534,12 @@ export class OrdersService {
       // 7. Save Order
       const savedOrder = await manager.save(Order, order);
 
-      // 8. Create In-App Notification for Customer
-      const customerNotification = new Notification();
-      customerNotification.userId = order.userId;
-      customerNotification.title = 'Order Status Update';
-      customerNotification.message = `Your order #${order.id.slice(0, 8).toUpperCase()} is now ${targetStatus.replace(/_/g, ' ').toLowerCase()}.`;
-      customerNotification.type = NotificationType.ORDER_UPDATE;
-      customerNotification.data = { orderId: order.id, status: targetStatus, reason };
-      await manager.save(Notification, customerNotification);
-
       return { order: savedOrder, previousStatus, delivery };
     });
 
     const { order, previousStatus, delivery } = transitionResult;
 
-    // 9. Collect relevant seller user IDs for realtime notification
+    // 8. Collect relevant seller user IDs for realtime notification
     const sellerUserIds = Array.from(
       new Set(
         (order.items || [])
@@ -488,6 +547,48 @@ export class OrdersService {
           .filter((id): id is string => Boolean(id)),
       ),
     );
+
+    // 9. Dispatch in-app notifications
+    const shortId = (order?.id || '').slice(0, 8).toUpperCase() || 'ORD';
+    const formattedStatus = targetStatus.replace(/_/g, ' ').toLowerCase();
+    const isUrgent = targetStatus === OrderStatus.CANCELLED || targetStatus === OrderStatus.DELIVERED;
+
+    if (order?.userId) {
+      void this.notificationsService?.notifyUser?.(order.userId, {
+        type: NotificationType.ORDER_STATUS_CHANGED,
+        title: `Order ${formattedStatus}`,
+        message: `Your order #${shortId} is now ${formattedStatus}.`,
+        titleKey: `notifications.order_${targetStatus.toLowerCase()}.title`,
+        messageKey: `notifications.order_${targetStatus.toLowerCase()}.message`,
+        priority: isUrgent ? NotificationPriority.HIGH : NotificationPriority.NORMAL,
+        data: { orderId: order.id, orderNumber: shortId, status: targetStatus, reason },
+      });
+    }
+
+    // If cancelled or delivered, also notify the sellers
+    if (sellerUserIds.length > 0) {
+      if (targetStatus === OrderStatus.CANCELLED) {
+        void this.notificationsService?.notifyUsers?.(sellerUserIds, {
+          type: NotificationType.ORDER_CANCELLED,
+          title: 'Order Cancelled',
+          message: `Order #${shortId} has been cancelled.`,
+          titleKey: 'notifications.order_cancelled_seller.title',
+          messageKey: 'notifications.order_cancelled_seller.message',
+          priority: NotificationPriority.HIGH,
+          data: { orderId: order.id, orderNumber: shortId, status: targetStatus },
+        });
+      } else if (targetStatus === OrderStatus.DELIVERED) {
+        void this.notificationsService?.notifyUsers?.(sellerUserIds, {
+          type: NotificationType.ORDER_STATUS_CHANGED,
+          title: 'Order Delivered',
+          message: `Order #${shortId} has been delivered to customer.`,
+          titleKey: 'notifications.order_delivered_seller.title',
+          messageKey: 'notifications.order_delivered_seller.message',
+          priority: NotificationPriority.NORMAL,
+          data: { orderId: order.id, orderNumber: shortId, status: targetStatus },
+        });
+      }
+    }
 
     // 10. Emit non-blocking event for WebSockets and external listeners
     this.eventEmitter.emit('order.status.updated', {

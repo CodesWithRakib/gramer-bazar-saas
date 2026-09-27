@@ -4,11 +4,13 @@ import { PayoutsService } from './payouts.service.js';
 import { PayoutsController } from './payouts.controller.js';
 import { PayoutRequest } from './entities/payout-request.entity.js';
 import { WalletsModule } from '../wallets/wallets.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PayoutRequest]),
     WalletsModule,
+    NotificationsModule,
   ],
   controllers: [PayoutsController],
   providers: [PayoutsService],

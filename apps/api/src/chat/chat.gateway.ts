@@ -45,14 +45,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('join_user')
   async handleJoinUser(@ConnectedSocket() client: Socket & { user: any }) {
-    const userId = client.user?.userId ?? client.user?.sub;
+    const userId = client.user?.userId ?? client.user?.sub ?? client.user?.id;
     if (!userId) return;
 
     void client.join(`user_${userId}`);
 
     const user = await this.usersService.findById(userId).catch(() => null);
-    if (user && isUserAdmin(user)) {
-      void client.join('admin_room');
+    if (user) {
+      if (isUserAdmin(user)) {
+        void client.join('admin_room');
+      }
+      const roleNames = (user.roles || []).map((r: any) => typeof r === 'string' ? r : r?.name);
+      if (roleNames.includes('SELLER')) {
+        void client.join('seller_room');
+      }
+      if (roleNames.includes('RIDER')) {
+        void client.join('rider_room');
+      }
     }
 
     return { event: 'joined_user', userId };
@@ -211,6 +220,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(`user_${sellerId}`).emit('order.status.updated', eventPayload);
       }
     }
+  }
+
+  @OnEvent('notification.created')
+  handleNotificationCreated(payload: {
+    id: string;
+    userId: string;
+    type: string;
+    title: string;
+    message: string;
+    titleKey?: string | null;
+    messageKey?: string | null;
+    priority?: string;
+    data?: Record<string, unknown> | null;
+    createdAt: string;
+  }) {
+    if (!this.server) return;
+    this.server.to(`user_${payload.userId}`).emit('notification:new', payload);
+  }
+
+  @OnEvent('notification.read')
+  handleNotificationRead(payload: { id: string; userId: string }) {
+    if (!this.server) return;
+    this.server.to(`user_${payload.userId}`).emit('notification:read', payload);
+  }
+
+  @OnEvent('notification.all_read')
+  handleNotificationAllRead(payload: { userId: string }) {
+    if (!this.server) return;
+    this.server.to(`user_${payload.userId}`).emit('notification:all_read', payload);
   }
 }
 

@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { NotificationBell } from "@/components/ui/NotificationBell";
 import { api } from "@/store/api";
 
 interface UserActionsProps {
@@ -101,6 +102,9 @@ export function UserActions({ lang }: UserActionsProps) {
       <div className="flex items-center gap-1 sm:gap-2">
         {/* Language Switcher Dropdown */}
         <LanguageSwitcher currentLocale={lang} className="h-10" />
+
+        {/* Notifications */}
+        {isAuthenticated && <NotificationBell lang={lang} />}
 
         {/* Wishlist Button */}
         {isAuthenticated && (

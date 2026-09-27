@@ -1,33 +1,67 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Check } from 'lucide-react';
+import { Bell, Check, Volume2, VolumeX, ArrowRight, Package, Truck, FileText, CreditCard, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useGetUserNotificationsQuery, useGetUnreadCountQuery, useMarkAsReadMutation, useMarkAllAsReadMutation } from '@/features/notifications/notificationsApi';
-import { useSelector } from 'react-redux';
+import {
+  useGetUserNotificationsQuery,
+  useGetUnreadCountQuery,
+  useMarkAsReadMutation,
+  useMarkAllAsReadMutation,
+} from '@/features/notifications/notificationsApi';
+import { useAppSelector } from '@/store/hooks';
 import Link from 'next/link';
+import {
+  formatNotificationText,
+  formatNotificationTime,
+  getNotificationActionUrl,
+} from '@/lib/notification-format';
+import { isNotificationSoundEnabled, setNotificationSoundEnabled } from '@/lib/notification-sound';
+import { AppNotification, NotificationType } from '@/types/notifications';
 
-export function NotificationBell({ lang }: { lang: string }) {
+export function NotificationBell({ lang = 'bn' }: { lang?: string }) {
   const isBn = lang === 'bn';
-  const { isAuthenticated } = useSelector((state: any) => state.auth);
-  
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+
   const [isOpen, setIsOpen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: unreadData } = useGetUnreadCountQuery(undefined, { 
-    skip: !isAuthenticated,
-    pollingInterval: 30000, // poll every 30s
-  });
-  
-  const { data: notifications } = useGetUserNotificationsQuery(undefined, { 
-    skip: !isAuthenticated || !isOpen, 
-  });
-  
-  const [markAsRead] = useMarkAsReadMutation();
-  const [markAllAsRead] = useMarkAllAsReadMutation();
+  useEffect(() => {
+    setSoundEnabled(isNotificationSoundEnabled());
+  }, []);
 
-  const unreadCount = unreadData?.count || 0;
+  const { data: unreadData } = useGetUnreadCountQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+
+  const { data: notifData, isLoading } = useGetUserNotificationsQuery(
+    { page: 1, limit: 15 },
+    {
+      skip: !isAuthenticated || !isOpen,
+    }
+  );
+
+  const [markAsRead] = useMarkAsReadMutation();
+  const [markAllAsRead, { isLoading: isMarkingAll }] = useMarkAllAsReadMutation();
+
+  const unreadCount = unreadData?.count ?? 0;
+  const notifications: AppNotification[] = notifData?.items ?? [];
+  const roles = Array.isArray(user?.roles) ? user.roles : [];
+
+  // Determine Notification Center Link based on primary role
+  const getNotificationCenterUrl = () => {
+    if (roles.includes('admin') || roles.includes('super-admin')) {
+      return `/${lang}/admin/notifications`;
+    }
+    if (roles.includes('seller')) {
+      return `/${lang}/seller/notifications`;
+    }
+    if (roles.includes('rider')) {
+      return `/${lang}/rider/notifications`;
+    }
+    return `/${lang}/customer/notifications`;
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -42,9 +76,9 @@ export function NotificationBell({ lang }: { lang: string }) {
 
   if (!isAuthenticated) return null;
 
-  const handleNotificationClick = async (id: string, isRead: boolean) => {
-    if (!isRead) {
-      await markAsRead(id);
+  const handleNotificationClick = async (notif: AppNotification) => {
+    if (!notif.isRead) {
+      await markAsRead(notif.id);
     }
     setIsOpen(false);
   };
@@ -54,77 +88,194 @@ export function NotificationBell({ lang }: { lang: string }) {
     await markAllAsRead();
   };
 
+  const toggleSound = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next = !soundEnabled;
+    setSoundEnabled(next);
+    setNotificationSoundEnabled(next);
+  };
+
+  const getNotificationIcon = (type: NotificationType) => {
+    if (type.includes('ORDER')) {
+      return <Package className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />;
+    }
+    if (type.includes('DELIVERY')) {
+      return <Truck className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />;
+    }
+    if (type.includes('APPLICATION')) {
+      return <FileText className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />;
+    }
+    if (type.includes('PAYMENT') || type.includes('PAYOUT')) {
+      return <CreditCard className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />;
+    }
+    return <AlertCircle className="w-3.5 h-3.5 text-muted-foreground" />;
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="relative rounded-full" 
+      <Button
+        variant="ghost"
+        size="icon"
+        className="relative rounded-full hover:bg-muted text-foreground/80 hover:text-foreground"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isBn ? 'নোটিফিকেশন দেখুন' : 'View notifications'}
+        aria-expanded={isOpen}
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+          <span className="absolute top-1 right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-background">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </Button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-card border rounded-lg shadow-lg overflow-hidden z-50">
-          <div className="flex justify-between items-center p-4 border-b">
-            <h3 className="font-semibold text-lg">{isBn ? 'নোটিফিকেশন' : 'Notifications'}</h3>
-            {unreadCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead} className="h-8 text-xs text-primary hover:text-primary/80">
-                <Check className="w-4 h-4 mr-1" />
-                {isBn ? 'সব পড়া হয়েছে' : 'Mark all as read'}
-              </Button>
-            )}
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in-50 zoom-in-95 duration-100">
+          {/* Header */}
+          <div className="flex justify-between items-center p-3.5 border-b border-border bg-muted/30">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-sm text-foreground">
+                {isBn ? 'নোটিফিকেশন' : 'Notifications'}
+              </h3>
+              {unreadCount > 0 && (
+                <span className="text-[11px] font-medium bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1">
+              {/* Sound Mute Toggle */}
+              <button
+                type="button"
+                onClick={toggleSound}
+                title={
+                  soundEnabled
+                    ? isBn
+                      ? 'সাউন্ড বন্ধ করুন'
+                      : 'Mute chime'
+                    : isBn
+                    ? 'সাউন্ড চালু করুন'
+                    : 'Unmute chime'
+                }
+                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                {soundEnabled ? (
+                  <Volume2 className="w-4 h-4 text-primary" />
+                ) : (
+                  <VolumeX className="w-4 h-4 text-muted-foreground" />
+                )}
+              </button>
+
+              {/* Mark All Read */}
+              {unreadCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={isMarkingAll}
+                  onClick={handleMarkAllAsRead}
+                  className="h-7 text-xs px-2 text-primary hover:text-primary/80"
+                >
+                  <Check className="w-3.5 h-3.5 mr-1" />
+                  {isBn ? 'সব পড়া হয়েছে' : 'Mark all read'}
+                </Button>
+              )}
+            </div>
           </div>
-          
-          <div className="max-h-[400px] overflow-y-auto">
-            {!notifications || notifications.length === 0 ? (
+
+          {/* List Content */}
+          <div className="max-h-[380px] overflow-y-auto divide-y divide-border/60">
+            {isLoading ? (
+              <div className="p-8 text-center text-xs text-muted-foreground">
+                {isBn ? 'লোড হচ্ছে...' : 'Loading notifications...'}
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
-                <Bell className="w-8 h-8 mx-auto mb-3 opacity-20" />
-                <p>{isBn ? 'কোন নোটিফিকেশন নেই' : 'No notifications yet'}</p>
+                <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                <p className="text-sm font-medium">{isBn ? 'কোন নোটিফিকেশন নেই' : 'No notifications yet'}</p>
+                <p className="text-xs text-muted-foreground/80 mt-1">
+                  {isBn
+                    ? 'নতুন কোনো আপডেট আসলে এখানে দেখতে পাবেন।'
+                    : 'Activity alerts will appear here.'}
+                </p>
               </div>
             ) : (
-              <div className="flex flex-col">
-                {notifications.map((notif: any) => {
-                  // Determine redirect URL based on type
-                  let href = '#';
-                  if (notif.type === 'ORDER_UPDATE' && notif.data?.orderId) {
-                    href = `/${lang}/customer/orders/${notif.data.orderId}`;
-                  } else if (notif.type === 'REQUEST' && notif.data?.requestId) {
-                    href = `/${lang}/customer/product-requests/${notif.data.requestId}`;
-                  }
+              notifications.map((notif) => {
+                const { title, message } = formatNotificationText(notif, lang);
+                const targetUrl = getNotificationActionUrl(notif, roles, lang);
+                const relativeTime = formatNotificationTime(notif.createdAt, lang);
 
-                  return (
-                    <Link
-                      key={notif.id}
-                      href={href}
-                      onClick={() => handleNotificationClick(notif.id, notif.isRead)}
-                      className={`block p-4 border-b last:border-0 hover:bg-muted/50 transition-colors ${!notif.isRead ? 'bg-primary/5' : ''}`}
-                    >
-                      <div className="flex gap-3">
-                        <div className={`mt-1 h-2 w-2 rounded-full flex-shrink-0 ${!notif.isRead ? 'bg-primary' : 'bg-transparent'}`} />
-                        <div>
-                          <p className={`text-sm ${!notif.isRead ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}>
-                            {notif.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                            {notif.message}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-2 opacity-75">
-                            {new Date(notif.createdAt).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
+                const itemContent = (
+                  <div className="flex items-start gap-2.5">
+                    {/* Read status dot */}
+                    <span
+                      className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                        !notif.isRead ? 'bg-primary' : 'bg-transparent'
+                      }`}
+                    />
+
+                    {/* Icon badge */}
+                    <div className="mt-0.5 p-1 rounded bg-muted/80 flex-shrink-0">
+                      {getNotificationIcon(notif.type)}
+                    </div>
+
+                    {/* Body */}
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-xs leading-snug truncate ${
+                          !notif.isRead
+                            ? 'font-semibold text-foreground'
+                            : 'font-medium text-foreground/80'
+                        }`}
+                      >
+                        {title}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
+                        {message}
+                      </p>
+                      <span className="text-[10px] text-muted-foreground/75 mt-1 block">
+                        {relativeTime}
+                      </span>
+                    </div>
+                  </div>
+                );
+
+                const itemClassName = `block p-3.5 hover:bg-muted/50 transition-colors cursor-pointer ${
+                  !notif.isRead ? 'bg-primary/[0.04]' : ''
+                }`;
+
+                return targetUrl ? (
+                  <Link
+                    key={notif.id}
+                    href={targetUrl}
+                    onClick={() => handleNotificationClick(notif)}
+                    className={itemClassName}
+                  >
+                    {itemContent}
+                  </Link>
+                ) : (
+                  <div
+                    key={notif.id}
+                    onClick={() => handleNotificationClick(notif)}
+                    className={itemClassName}
+                  >
+                    {itemContent}
+                  </div>
+                );
+              })
             )}
+          </div>
+
+          {/* Footer: View All Notifications */}
+          <div className="p-2 border-t border-border bg-muted/20 text-center">
+            <Link
+              href={getNotificationCenterUrl()}
+              onClick={() => setIsOpen(false)}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 py-1 px-3 transition-colors"
+            >
+              <span>{isBn ? 'সব নোটিফিকেশন দেখুন' : 'View all notifications'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       )}

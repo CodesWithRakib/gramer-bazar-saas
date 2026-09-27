@@ -8,7 +8,8 @@ import { OrderStatusHistory } from '../orders/entities/order-status-history.enti
 import { User } from '../users/entities/user.entity.js';
 import { DeliveryStatus } from './enums/delivery-status.enum.js';
 import { OrderStatus, PaymentStatus, PaymentMethod } from '../orders/enums/order-status.enum.js';
-import { Notification, NotificationType } from '../notifications/entities/notification.entity.js';
+import { Notification, NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
 import { Role } from '../roles/enums/role.enum.js';
@@ -26,6 +27,7 @@ export class DeliveriesService {
     private readonly userRepository: Repository<User>,
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   // --- ADMIN ACTIONS ---
@@ -112,15 +114,34 @@ export class DeliveriesService {
         notes: `Assigned to rider ${rider.firstName} ${rider.lastName}`,
       });
 
-      // In-app notification for the rider (best-effort inside the same tx)
-      const riderNotification = manager.create(Notification, {
-        userId: rider.id,
-        title: 'New delivery assigned',
-        message: `Order #${order.id.slice(0, 8)} has been assigned to you for delivery.`,
-        type: NotificationType.ORDER_UPDATE,
-        data: { orderId: order.id, deliveryId: delivery.id },
+      // Notifications for the rider and customer
+      const orderShortId = order.id.slice(0, 8).toUpperCase();
+      const riderFullName = `${rider.firstName || ''} ${rider.lastName || ''}`.trim() || 'Delivery Rider';
+
+      void this.notificationsService.notifyUser(rider.id, {
+        type: NotificationType.DELIVERY_ASSIGNED,
+        title: 'New Delivery Assigned',
+        message: `Order #${orderShortId} has been assigned to you for delivery.`,
+        titleKey: 'notifications.delivery_assigned_rider.title',
+        messageKey: 'notifications.delivery_assigned_rider.message',
+        priority: NotificationPriority.HIGH,
+        data: { orderId: order.id, deliveryId: delivery.id, orderNumber: orderShortId },
       });
-      await manager.save(riderNotification);
+
+      void this.notificationsService.notifyUser(order.userId, {
+        type: NotificationType.DELIVERY_ASSIGNED,
+        title: 'Rider Assigned',
+        message: `${riderFullName} has been assigned to deliver order #${orderShortId}.`,
+        titleKey: 'notifications.delivery_assigned_customer.title',
+        messageKey: 'notifications.delivery_assigned_customer.message',
+        priority: NotificationPriority.NORMAL,
+        data: {
+          orderId: order.id,
+          deliveryId: delivery.id,
+          orderNumber: orderShortId,
+          riderName: riderFullName,
+        },
+      });
 
       return delivery;
     });
@@ -231,6 +252,30 @@ export class DeliveriesService {
           userId: order.userId,
           riderUserId: delivery.riderId,
         });
+
+        // In-app notifications for customer based on delivery tracking
+        const orderShortId = order.id.slice(0, 8).toUpperCase();
+        if (dto.status === DeliveryStatus.PICKED_UP) {
+          void this.notificationsService.notifyUser(order.userId, {
+            type: NotificationType.DELIVERY_STARTED,
+            title: 'Order Picked Up',
+            message: `Your order #${orderShortId} has been picked up and is out for delivery.`,
+            titleKey: 'notifications.delivery_started.title',
+            messageKey: 'notifications.delivery_started.message',
+            priority: NotificationPriority.NORMAL,
+            data: { orderId: order.id, deliveryId: delivery.id, orderNumber: orderShortId },
+          });
+        } else if (dto.status === DeliveryStatus.FAILED) {
+          void this.notificationsService.notifyUser(order.userId, {
+            type: NotificationType.DELIVERY_FAILED,
+            title: 'Delivery Failed',
+            message: `Delivery attempt for order #${orderShortId} failed. Our team will contact you.`,
+            titleKey: 'notifications.delivery_failed.title',
+            messageKey: 'notifications.delivery_failed.message',
+            priority: NotificationPriority.HIGH,
+            data: { orderId: order.id, deliveryId: delivery.id, orderNumber: orderShortId },
+          });
+        }
 
         // Backwards compatibility event
         this.eventEmitter.emit('order.status.changed', {

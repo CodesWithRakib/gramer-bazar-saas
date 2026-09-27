@@ -1,36 +1,57 @@
-import { api } from "../../store/api";
-
-export interface SystemNotification {
-  id: string;
-  title: string;
-  message: string;
-  isRead: boolean;
-  createdAt: string;
-}
+import { api } from '../../store/api';
+import {
+  AppNotification,
+  PaginatedNotifications,
+  QueryNotificationsParams,
+} from '../../types/notifications';
 
 export const notificationsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getUserNotifications: builder.query<SystemNotification[], void>({
-      query: () => "/notifications",
-      providesTags: ["Notification"],
+    getUserNotifications: builder.query<PaginatedNotifications, QueryNotificationsParams | void>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.page) queryParams.set('page', String(params.page));
+        if (params?.limit) queryParams.set('limit', String(params.limit));
+        if (params?.unreadOnly !== undefined) {
+          queryParams.set('unreadOnly', String(params.unreadOnly));
+        }
+        const qs = queryParams.toString();
+        return `/notifications${qs ? `?${qs}` : ''}`;
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.items.map(({ id }) => ({ type: 'Notification' as const, id })),
+              { type: 'Notification' as const, id: 'LIST' },
+            ]
+          : [{ type: 'Notification' as const, id: 'LIST' }],
     }),
+
     getUnreadCount: builder.query<{ count: number }, void>({
-      query: () => "/notifications/unread-count",
-      providesTags: ["Notification"],
+      query: () => '/notifications/unread-count',
+      providesTags: [{ type: 'Notification', id: 'COUNT' }],
     }),
-    markAsRead: builder.mutation<{ success: boolean }, string>({
+
+    markAsRead: builder.mutation<AppNotification, string>({
       query: (id) => ({
         url: `/notifications/${id}/read`,
-        method: "PATCH",
+        method: 'PATCH',
       }),
-      invalidatesTags: ["Notification"],
+      invalidatesTags: (_result, _error, id) => [
+        { type: 'Notification', id },
+        { type: 'Notification', id: 'COUNT' },
+      ],
     }),
-    markAllAsRead: builder.mutation<{ success: boolean }, void>({
+
+    markAllAsRead: builder.mutation<{ message: string }, void>({
       query: () => ({
-        url: "/notifications/read-all",
-        method: "PATCH",
+        url: '/notifications/read-all',
+        method: 'PATCH',
       }),
-      invalidatesTags: ["Notification"],
+      invalidatesTags: [
+        { type: 'Notification', id: 'LIST' },
+        { type: 'Notification', id: 'COUNT' },
+      ],
     }),
   }),
 });

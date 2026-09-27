@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/store';
 import { getSocket } from '@/lib/socket';
 import { ordersApi, OrderStatusHistoryItem } from '@/features/orders/ordersApi';
-import { toast } from 'sonner';
 
 export interface OrderStatusUpdatedPayload {
   orderId: string;
@@ -85,11 +84,6 @@ export const useOrderRealtimeSync = () => {
           'Order',
         ]),
       );
-
-      // 3. User feedback
-      const shortId = payload.orderId.slice(0, 8).toUpperCase();
-      const formattedStatus = payload.currentStatus.replace(/_/g, ' ');
-      toast.info(`Order #${shortId} status: ${formattedStatus}`);
     };
 
     socket.on('order.status.updated', handleOrderStatusUpdated);

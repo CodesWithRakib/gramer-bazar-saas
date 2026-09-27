@@ -1,10 +1,10 @@
-import { CustomerNotificationsView } from "@/features/customer/notifications";
+import { CustomerNotificationsView } from '@/features/customer/notifications';
 
-export default async function CustomerNotificationsPage({
-  params,
-}: {
-  params: Promise<{ lang: "ar" | "en" }>;
-}) {
+interface PageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export default async function CustomerNotificationsPage({ params }: PageProps) {
   const { lang } = await params;
   return <CustomerNotificationsView lang={lang} />;
 }

@@ -10,6 +10,8 @@ import { UsersService } from '../users/users.service.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
 import { Shop } from '../shops/entities/shop.entity.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
+import { NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
 
 @Injectable()
 export class ApplicationsService {
@@ -24,6 +26,7 @@ export class ApplicationsService {
     private readonly roleRepo: Repository<RoleEntity>,
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   // ==================== SELLER APPLICATION ====================
@@ -66,7 +69,32 @@ export class ApplicationsService {
       status: ApplicationStatus.PENDING,
     });
 
-    return this.sellerAppRepo.save(application);
+    const saved = await this.sellerAppRepo.save(application);
+
+    // Notify applicant
+    const shopName = dto.shopNameEn || dto.shopNameBn || 'Shop';
+    void this.notificationsService.notifyUser(userId, {
+      type: NotificationType.SELLER_APPLICATION_SUBMITTED,
+      title: 'Application Submitted',
+      message: `Your seller application for "${shopName}" has been submitted and is under review.`,
+      titleKey: 'notifications.seller_application_submitted.title',
+      messageKey: 'notifications.seller_application_submitted.message',
+      priority: NotificationPriority.NORMAL,
+      data: { applicationId: saved.id, shopName },
+    });
+
+    // Notify admins
+    void this.notificationsService.notifyRole(Role.ADMIN, {
+      type: NotificationType.SELLER_APPLICATION_SUBMITTED,
+      title: 'New Seller Application',
+      message: `New seller application submitted for "${shopName}".`,
+      titleKey: 'notifications.seller_application_admin.title',
+      messageKey: 'notifications.seller_application_admin.message',
+      priority: NotificationPriority.HIGH,
+      data: { applicationId: saved.id, shopName, userId },
+    });
+
+    return saved;
   }
 
   async getSellerApplicationStatus(userId: string): Promise<SellerApplication | null> {
@@ -162,6 +190,18 @@ export class ApplicationsService {
       }
 
       await queryRunner.commitTransaction();
+
+      // Notify applicant
+      void this.notificationsService.notifyUser(app.userId, {
+        type: NotificationType.SELLER_APPLICATION_APPROVED,
+        title: 'Application Approved',
+        message: `Congratulations! Your seller application for "${app.shopNameEn || 'Shop'}" has been approved.`,
+        titleKey: 'notifications.seller_application_approved.title',
+        messageKey: 'notifications.seller_application_approved.message',
+        priority: NotificationPriority.HIGH,
+        data: { applicationId: app.id, shopName: app.shopNameEn },
+      });
+
       return app;
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -182,7 +222,20 @@ export class ApplicationsService {
     app.reviewerId = reviewerId;
     app.reviewedAt = new Date();
 
-    return this.sellerAppRepo.save(app);
+    const saved = await this.sellerAppRepo.save(app);
+
+    // Notify applicant
+    void this.notificationsService.notifyUser(app.userId, {
+      type: NotificationType.SELLER_APPLICATION_REJECTED,
+      title: 'Application Rejected',
+      message: `Your seller application for "${app.shopNameEn || 'Shop'}" was not approved.`,
+      titleKey: 'notifications.seller_application_rejected.title',
+      messageKey: 'notifications.seller_application_rejected.message',
+      priority: NotificationPriority.HIGH,
+      data: { applicationId: app.id, shopName: app.shopNameEn, reason: app.adminNotes },
+    });
+
+    return saved;
   }
 
   // ==================== RIDER APPLICATION ====================
@@ -219,7 +272,32 @@ export class ApplicationsService {
       status: ApplicationStatus.PENDING,
     });
 
-    return this.riderAppRepo.save(application);
+    const saved = await this.riderAppRepo.save(application);
+
+    // Notify applicant
+    void this.notificationsService.notifyUser(userId, {
+      type: NotificationType.RIDER_APPLICATION_SUBMITTED,
+      title: 'Application Submitted',
+      message: 'Your rider application has been submitted and is under review.',
+      titleKey: 'notifications.rider_application_submitted.title',
+      messageKey: 'notifications.rider_application_submitted.message',
+      priority: NotificationPriority.NORMAL,
+      data: { applicationId: saved.id },
+    });
+
+    // Notify admins
+    const riderName = dto.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Applicant';
+    void this.notificationsService.notifyRole(Role.ADMIN, {
+      type: NotificationType.RIDER_APPLICATION_SUBMITTED,
+      title: 'New Rider Application',
+      message: `New rider application received from ${riderName}.`,
+      titleKey: 'notifications.rider_application_admin.title',
+      messageKey: 'notifications.rider_application_admin.message',
+      priority: NotificationPriority.HIGH,
+      data: { applicationId: saved.id, riderName, userId },
+    });
+
+    return saved;
   }
 
   async getRiderApplicationStatus(userId: string): Promise<RiderApplication | null> {
@@ -296,6 +374,18 @@ export class ApplicationsService {
       }
 
       await queryRunner.commitTransaction();
+
+      // Notify applicant
+      void this.notificationsService.notifyUser(app.userId, {
+        type: NotificationType.RIDER_APPLICATION_APPROVED,
+        title: 'Application Approved',
+        message: 'Congratulations! Your rider application has been approved. You can now accept deliveries.',
+        titleKey: 'notifications.rider_application_approved.title',
+        messageKey: 'notifications.rider_application_approved.message',
+        priority: NotificationPriority.HIGH,
+        data: { applicationId: app.id },
+      });
+
       return app;
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -316,6 +406,19 @@ export class ApplicationsService {
     app.reviewerId = reviewerId;
     app.reviewedAt = new Date();
 
-    return this.riderAppRepo.save(app);
+    const saved = await this.riderAppRepo.save(app);
+
+    // Notify applicant
+    void this.notificationsService.notifyUser(app.userId, {
+      type: NotificationType.RIDER_APPLICATION_REJECTED,
+      title: 'Application Rejected',
+      message: 'Your rider application was not approved.',
+      titleKey: 'notifications.rider_application_rejected.title',
+      messageKey: 'notifications.rider_application_rejected.message',
+      priority: NotificationPriority.HIGH,
+      data: { applicationId: app.id, reason: app.adminNotes },
+    });
+
+    return saved;
   }
 }

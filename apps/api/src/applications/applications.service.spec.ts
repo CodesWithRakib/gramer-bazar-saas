@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { ApplicationStatus } from './enums/application-status.enum.js';
 import { BadRequestException } from '@nestjs/common';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 const makeRepo = () => ({
   findOne: vi.fn(),
@@ -59,6 +60,14 @@ describe('ApplicationsService', () => {
         { provide: getRepositoryToken(RoleEntity), useValue: roleRepo },
         { provide: UsersService, useValue: usersService },
         { provide: DataSource, useValue: mockDataSource },
+        {
+          provide: NotificationsService,
+          useValue: {
+            notifyUser: vi.fn().mockResolvedValue(null),
+            notifyUsers: vi.fn().mockResolvedValue([]),
+            notifyRole: vi.fn().mockResolvedValue([]),
+          },
+        },
       ],
     }).compile();
 

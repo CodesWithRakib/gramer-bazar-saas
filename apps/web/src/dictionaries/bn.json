@@ -226,5 +226,132 @@
     "notFound": "অনুরোধকৃত তথ্য খুঁজে পাওয়া যায়নি।",
     "unauthorized": "এগিয়ে যেতে অনুগ্রহ করে লগইন করুন।",
     "failedToSave": "তথ্য সংরক্ষণে ব্যর্থ হয়েছে"
+  },
+  "notifications": {
+    "title": "নোটিফিকেশন",
+    "markAllAsRead": "সব পড়া হিসেবে চিহ্নিত করুন",
+    "markAsRead": "পড়া হিসেবে চিহ্নিত করুন",
+    "viewAll": "সব নোটিফিকেশন দেখুন",
+    "noNotifications": "কোন নোটিফিকেশন নেই",
+    "emptyDescription": "নতুন কোনো অর্ডার আপডেট বা সিস্টেম বার্তা আসলে তা এখানে দেখতে পাবেন।",
+    "soundEnabled": "নোটিফিকেশন সাউন্ড চালু আছে",
+    "soundMuted": "নোটিফিকেশন সাউন্ড বন্ধ আছে",
+    "filterAll": "সকল",
+    "filterUnread": "অপঠিত",
+    "filterOrders": "অর্ডার",
+    "filterApplications": "আবেদন",
+    "actions": {
+      "viewOrder": "অর্ডার দেখুন",
+      "viewApplication": "আবেদন দেখুন",
+      "viewDelivery": "ডেলিভারি দেখুন",
+      "viewPayout": "উত্তোলন দেখুন",
+      "viewDetails": "বিস্তারিত দেখুন"
+    },
+    "time": {
+      "justNow": "এইমাত্র",
+      "minutesAgo": "{{count}} মিনিট আগে",
+      "hoursAgo": "{{count}} ঘণ্টা আগে",
+      "daysAgo": "{{count}} দিন আগে"
+    },
+    "order_created": {
+      "title": "অর্ডার সফলভাবে সম্পন্ন হয়েছে",
+      "message": "আপনার অর্ডার #{{orderNumber}} সফলভাবে গ্রহণ করা হয়েছে এবং প্রক্রিয়াধীন রয়েছে।"
+    },
+    "new_order_seller": {
+      "title": "নতুন অর্ডার এসেছে",
+      "message": "আপনার দোকানে {{itemCount}}টি পণ্যের একটি নতুন অর্ডার #{{orderNumber}} এসেছে।"
+    },
+    "admin_order_created": {
+      "title": "নতুন অর্ডার গ্রহণ",
+      "message": "{{customerName}} কর্তৃক {{amount}} টাকার নতুন অর্ডার #{{orderNumber}} সম্পন্ন হয়েছে।"
+    },
+    "order_status_changed": {
+      "title": "অর্ডারের অবস্থা পরিবর্তিত হয়েছে",
+      "message": "অর্ডার #{{orderNumber}}-এর বর্তমান অবস্থা: {{status}}।"
+    },
+    "order_cancelled_seller": {
+      "title": "অর্ডার বাতিল হয়েছে",
+      "message": "আপনার দোকানের পণ্য সম্বলিত অর্ডার #{{orderNumber}} বাতিল করা হয়েছে।"
+    },
+    "order_delivered_seller": {
+      "title": "অর্ডার সফলভাবে ডেলিভারি হয়েছে",
+      "message": "আপনার দোকানের পণ্য সম্বলিত অর্ডার #{{orderNumber}} সফলভাবে ক্রেতার কাছে পৌঁছানো হয়েছে।"
+    },
+    "delivery_assigned_rider": {
+      "title": "নতুন ডেলিভারি দায়িত্ব বরাদ্দ",
+      "message": "অর্ডার #{{orderNumber}} ডেলিভারির জন্য আপনাকে দায়িত্ব প্রদান করা হয়েছে।"
+    },
+    "delivery_assigned_customer": {
+      "title": "ডেলিভারি রাইডার নির্ধারিত হয়েছে",
+      "message": "আপনার অর্ডার পৌঁছে দিতে রাইডার {{riderName}}-কে দায়িত্ব দেওয়া হয়েছে।"
+    },
+    "delivery_started": {
+      "title": "অর্ডার ডেলিভারির জন্য বের হয়েছে",
+      "message": "আপনার অর্ডার #{{orderNumber}} পিকআপ সম্পন্ন হয়েছে এবং আপনার ঠিকানায় আসছে।"
+    },
+    "delivery_failed": {
+      "title": "ডেলিভারি প্রচেষ্টা ব্যর্থ",
+      "message": "অর্ডার #{{orderNumber}} ডেলিভারির প্রচেষ্টা সফল হয়নি।"
+    },
+    "seller_application_submitted": {
+      "title": "সেলার আবেদন গৃহীত হয়েছে",
+      "message": "আপনার বিক্রেতা হওয়ার আবেদন গৃহীত হয়েছে এবং পর্যালোচনায় রয়েছে।"
+    },
+    "admin_seller_application": {
+      "title": "নতুন সেলার আবেদন জমা হয়েছে",
+      "message": "{{shopName}} নামের একটি নতুন বিক্রেতা আবেদন জমা পড়েছে।"
+    },
+    "seller_application_approved": {
+      "title": "সেলার আবেদন অনুমোদিত হয়েছে!",
+      "message": "অভিনন্দন! আপনার দোকান {{shopName}}-এর সেলার আবেদন সফলভাবে অনুমোদিত হয়েছে।"
+    },
+    "seller_application_rejected": {
+      "title": "সেলার আবেদনের আপডেট",
+      "message": "আপনার দোকান {{shopName}}-এর সেলার আবেদনটি এই মুহূর্তে অনুমোদন করা সম্ভব হয়নি।"
+    },
+    "rider_application_submitted": {
+      "title": "রাইডার আবেদন গৃহীত হয়েছে",
+      "message": "আপনার ডেলিভারি রাইডার আবেদন সফলভাবে গৃহীত হয়েছে এবং পর্যালোচনাধীন রয়েছে।"
+    },
+    "admin_rider_application": {
+      "title": "নতুন রাইডার আবেদন",
+      "message": "{{applicantName}} ডেলিভারি রাইডার হওয়ার জন্য নতুন আবেদন জমা দিয়েছেন।"
+    },
+    "rider_application_approved": {
+      "title": "রাইডার আবেদন অনুমোদিত হয়েছে!",
+      "message": "অভিনন্দন! আপনার ডেলিভারি রাইডার আবেদন সফলভাবে অনুমোদিত হয়েছে।"
+    },
+    "rider_application_rejected": {
+      "title": "রাইডার আবেদনের আপডেট",
+      "message": "আপনার ডেলিভারি রাইডার আবেদনটি এই মুহূর্তে অনুমোদন করা সম্ভব হয়নি।"
+    },
+    "payment_success": {
+      "title": "পেমেন্ট সফল হয়েছে",
+      "message": "অর্ডার #{{orderNumber}}-এর জন্য {{amount}} টাকার পেমেন্ট সফলভাবে গৃহীত হয়েছে।"
+    },
+    "payment_failed": {
+      "title": "পেমেন্ট ব্যর্থ হয়েছে",
+      "message": "অর্ডার #{{orderNumber}}-এর পেমেন্ট সম্পন্ন করা সম্ভব হয়নি।"
+    },
+    "payment_cancelled": {
+      "title": "পেমেন্ট বাতিল করা হয়েছে",
+      "message": "অর্ডার #{{orderNumber}}-এর পেমেন্ট প্রক্রিয়া বাতিল করা হয়েছে।"
+    },
+    "payout_requested": {
+      "title": "উত্তোলন অনুরোধ জমা হয়েছে",
+      "message": "{{amount}} টাকা উত্তোলনের অনুরোধ সফলভাবে জমা দেওয়া হয়েছে।"
+    },
+    "admin_payout_requested": {
+      "title": "নতুন পেআউট অনুরোধ",
+      "message": "সেলার {{sellerName}} কর্তৃক {{amount}} টাকা পেআউটের অনুরোধ এসেছে।"
+    },
+    "payout_approved": {
+      "title": "পেআউট সম্পন্ন হয়েছে",
+      "message": "আপনার {{amount}} টাকার পেআউট অনুরোধ অনুমোদিত ও সফলভাবে প্রদান করা হয়েছে।"
+    },
+    "payout_rejected": {
+      "title": "পেআউট অনুরোধ প্রত্যাখ্যাত",
+      "message": "আপনার {{amount}} টাকার পেআউট অনুরোধটি বাতিল করা হয়েছে।"
+    }
   }
 }

@@ -62,7 +62,15 @@ describe('PaymentsService', () => {
         { provide: getRepositoryToken(Payment), useValue: paymentRepo },
         { provide: getDataSourceToken(), useValue: dataSource },
         { provide: AuditLogsService, useValue: { record: vi.fn() } },
-        { provide: NotificationsService, useValue: { sendOrderConfirmationEmail: vi.fn() } },
+        {
+          provide: NotificationsService,
+          useValue: {
+            sendOrderConfirmationEmail: vi.fn(),
+            notifyUser: vi.fn().mockResolvedValue(null),
+            notifyUsers: vi.fn().mockResolvedValue([]),
+            notifyRole: vi.fn().mockResolvedValue([]),
+          },
+        },
       ],
     }).compile();
 
