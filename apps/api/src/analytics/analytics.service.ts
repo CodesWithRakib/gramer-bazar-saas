@@ -24,28 +24,34 @@ export class AnalyticsService {
   async getDashboardMetrics() {
     // Basic metrics
     const totalOrders = await this.orderRepository.count();
-    const pendingOrders = await this.orderRepository.count({ where: { status: OrderStatus.PENDING } });
-    
+    const pendingOrders = await this.orderRepository.count({
+      where: { status: OrderStatus.PENDING },
+    });
+
     // Calculate total sales (sum of delivered/completed orders)
-    const salesResult = await this.orderRepository.createQueryBuilder('order')
+    const salesResult = await this.orderRepository
+      .createQueryBuilder('order')
       .where('order.status = :status', { status: OrderStatus.DELIVERED })
       .select('SUM(order.total)', 'total')
       .getRawOne();
-      
+
     const totalSales = Number(salesResult?.total) || 0;
 
     // User metrics
-    const totalCustomers = await this.userRepository.createQueryBuilder('user')
+    const totalCustomers = await this.userRepository
+      .createQueryBuilder('user')
       .innerJoin('user.roles', 'role')
       .where('role.name = :role', { role: Role.CUSTOMER })
       .getCount();
 
-    const totalSellers = await this.userRepository.createQueryBuilder('user')
+    const totalSellers = await this.userRepository
+      .createQueryBuilder('user')
       .innerJoin('user.roles', 'role')
       .where('role.name = :role', { role: Role.SELLER })
       .getCount();
-      
-    const totalRiders = await this.userRepository.createQueryBuilder('user')
+
+    const totalRiders = await this.userRepository
+      .createQueryBuilder('user')
       .innerJoin('user.roles', 'role')
       .where('role.name = :role', { role: Role.RIDER })
       .getCount();
@@ -60,13 +66,14 @@ export class AnalyticsService {
     });
 
     // Revenue trend (last 7 days)
-    const revenueTrendRaw = await this.orderRepository.createQueryBuilder('order')
+    const revenueTrendRaw = await this.orderRepository
+      .createQueryBuilder('order')
       .select("TO_CHAR(order.createdAt, 'Dy')", 'name')
-      .addSelect("SUM(order.total)", 'revenue')
+      .addSelect('SUM(order.total)', 'revenue')
       .where('order.status = :status', { status: OrderStatus.DELIVERED })
       .andWhere("order.createdAt >= NOW() - INTERVAL '7 days'")
       .groupBy("TO_CHAR(order.createdAt, 'Dy')")
-      .orderBy("MIN(order.createdAt)", 'ASC')
+      .orderBy('MIN(order.createdAt)', 'ASC')
       .getRawMany();
 
     const revenueData = revenueTrendRaw.map((r: any) => ({
@@ -84,9 +91,11 @@ export class AnalyticsService {
         totalRiders,
         totalProducts,
       },
-      recentOrders: recentOrders.map(o => ({
+      recentOrders: recentOrders.map((o) => ({
         id: o.id,
-        customerName: o.user ? `${o.user.firstName} ${o.user.lastName}` : 'Unknown',
+        customerName: o.user
+          ? `${o.user.firstName} ${o.user.lastName}`
+          : 'Unknown',
         totalAmount: o.total,
         status: o.status,
         createdAt: o.createdAt,
@@ -97,25 +106,37 @@ export class AnalyticsService {
 
   async recordBulkEvents(events: any[], userId?: string) {
     if (!events || !events.length) return { success: true };
-    
-    const demandEvents = this.demandEventRepository.create(events.map(e => ({
-      ...e,
-      userId: userId || null, // Authenticated user if available
-    })));
-    
+
+    const demandEvents = this.demandEventRepository.create(
+      events.map((e) => ({
+        ...e,
+        userId: userId || null, // Authenticated user if available
+      })),
+    );
+
     await this.demandEventRepository.insert(demandEvents);
     return { success: true };
   }
 
   async getDemandAnalytics() {
     // 1. Popular Products (by VIEW, ADD_TO_CART, PURCHASE)
-    const popularProductsRaw = await this.demandEventRepository.createQueryBuilder('event')
+    const popularProductsRaw = await this.demandEventRepository
+      .createQueryBuilder('event')
       .select('event.productId', 'productId')
       .addSelect('product.nameEn', 'productName')
       .addSelect('product.nameBn', 'productNameBn')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'VIEW' THEN 1 END)", 'views')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)", 'carts')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
+      .addSelect(
+        "COUNT(CASE WHEN event.eventType = 'VIEW' THEN 1 END)",
+        'views',
+      )
+      .addSelect(
+        "COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)",
+        'carts',
+      )
+      .addSelect(
+        "COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)",
+        'purchases',
+      )
       .leftJoin(Product, 'product', 'product.id = event.productId')
       .where('event.productId IS NOT NULL')
       .groupBy('event.productId')
@@ -134,7 +155,8 @@ export class AnalyticsService {
     }));
 
     // 2. Popular Searches
-    const popularSearchesRaw = await this.demandEventRepository.createQueryBuilder('event')
+    const popularSearchesRaw = await this.demandEventRepository
+      .createQueryBuilder('event')
       .select('event.searchQuery', 'query')
       .addSelect('COUNT(*)', 'count')
       .where("event.eventType = 'SEARCH'")
@@ -150,10 +172,17 @@ export class AnalyticsService {
     }));
 
     // 3. Purchase Trends (Last 7 days)
-    const purchaseTrendsRaw = await this.demandEventRepository.createQueryBuilder('event')
+    const purchaseTrendsRaw = await this.demandEventRepository
+      .createQueryBuilder('event')
       .select("TO_CHAR(event.created_at, 'YYYY-MM-DD')", 'date')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)", 'carts')
+      .addSelect(
+        "COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)",
+        'purchases',
+      )
+      .addSelect(
+        "COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)",
+        'carts',
+      )
       .where("event.eventType IN ('PURCHASE', 'ADD_TO_CART')")
       .andWhere("event.created_at >= NOW() - INTERVAL '7 days'")
       .groupBy("TO_CHAR(event.created_at, 'YYYY-MM-DD')")
@@ -167,7 +196,8 @@ export class AnalyticsService {
     }));
 
     // 4. Category Demand
-    const categoryDemandRaw = await this.demandEventRepository.createQueryBuilder('event')
+    const categoryDemandRaw = await this.demandEventRepository
+      .createQueryBuilder('event')
       .select('event.categoryId', 'categoryId')
       .addSelect('COUNT(*)', 'count')
       .where('event.categoryId IS NOT NULL')
@@ -182,7 +212,8 @@ export class AnalyticsService {
     }));
 
     // 5. Frequently Unavailable Products (Viewed but no stock)
-    const unavailableRaw = await this.demandEventRepository.createQueryBuilder('event')
+    const unavailableRaw = await this.demandEventRepository
+      .createQueryBuilder('event')
       .select('event.productId', 'productId')
       .addSelect('product.nameEn', 'productName')
       .addSelect('product.nameBn', 'productNameBn')
@@ -190,14 +221,16 @@ export class AnalyticsService {
       .leftJoin(Product, 'product', 'product.id = event.productId')
       .where("event.eventType = 'VIEW'")
       .andWhere('event.productId IS NOT NULL')
-      .andWhere(`NOT EXISTS (
+      .andWhere(
+        `NOT EXISTS (
         SELECT 1 FROM product_variants pv
         JOIN seller_products sp ON sp.product_variant_id = pv.id AND sp.is_active = true
         JOIN inventory inv ON inv.seller_product_id = sp.id
         WHERE pv.product_id = event.productId 
           AND pv.is_active = true 
           AND (inv.quantity - inv.reserved_quantity) > 0
-      )`)
+      )`,
+      )
       .groupBy('event.productId')
       .addGroupBy('product.nameEn')
       .addGroupBy('product.nameBn')
@@ -212,10 +245,17 @@ export class AnalyticsService {
     }));
 
     // 6. Requested Products
-    const requestedProductsRaw = await this.demandEventRepository.createQueryBuilder('event')
+    const requestedProductsRaw = await this.demandEventRepository
+      .createQueryBuilder('event')
       .select('event.productRequestId', 'productRequestId')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'REQUEST' THEN 1 END)", 'requests')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
+      .addSelect(
+        "COUNT(CASE WHEN event.eventType = 'REQUEST' THEN 1 END)",
+        'requests',
+      )
+      .addSelect(
+        "COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)",
+        'purchases',
+      )
       .where('event.productRequestId IS NOT NULL')
       .groupBy('event.productRequestId')
       .orderBy('requests', 'DESC')
@@ -226,7 +266,8 @@ export class AnalyticsService {
       productRequestId: r.productRequestId,
       requests: Number(r.requests),
       purchases: Number(r.purchases),
-      conversionRate: r.requests > 0 ? (Number(r.purchases) / Number(r.requests)) * 100 : 0,
+      conversionRate:
+        r.requests > 0 ? (Number(r.purchases) / Number(r.requests)) * 100 : 0,
     }));
 
     return {

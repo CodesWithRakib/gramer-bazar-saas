@@ -129,8 +129,8 @@ export interface CreateProductDto {
 export interface ImportLog {
   id: string;
   source: string;
-  mode: 'DRY_RUN' | 'IMPORT' | 'RETRY_IMAGES';
-  status: 'RUNNING' | 'COMPLETED' | 'FAILED';
+  mode: "DRY_RUN" | "IMPORT" | "RETRY_IMAGES";
+  status: "RUNNING" | "COMPLETED" | "FAILED";
   totalFetched: number;
   createdCount: number;
   updatedCount: number;
@@ -147,14 +147,12 @@ export interface ImportLog {
 }
 
 export interface RunImportDto {
-  source: 'dummyjson' | 'openfoodfacts';
-  mode?: 'DRY_RUN' | 'IMPORT' | 'RETRY_IMAGES';
+  source: "dummyjson" | "openfoodfacts";
+  mode?: "DRY_RUN" | "IMPORT" | "RETRY_IMAGES";
   limit?: number;
   category?: string;
   updateExisting?: boolean;
 }
-
-
 
 export interface SellerProduct {
   id: string;
@@ -222,7 +220,9 @@ export interface SearchParams {
 }
 
 export interface CategorySection {
-  category: Category & { subCategories: Array<Category & { productCount: number }> };
+  category: Category & {
+    subCategories: Array<Category & { productCount: number }>;
+  };
   products: SellerProduct[];
 }
 
@@ -251,10 +251,54 @@ export interface SearchSuggestions {
   }>;
 }
 
+export interface HomepageData {
+  categories: Category[];
+  featuredProducts: SellerProduct[];
+  popularProducts: SellerProduct[];
+  featuredShops: Array<{
+    id: string;
+    sellerId: string;
+    nameEn: string;
+    nameBn: string;
+    slug: string;
+    shortDescription?: string | null;
+    description?: string | null;
+    logo?: string | null;
+    banner?: string | null;
+    isVerified: boolean;
+    isActive: boolean;
+    phone?: string | null;
+    district?: string | null;
+    upazila?: string | null;
+    area?: string | null;
+    productCount: number;
+    averageRating: number;
+    totalReviews: number;
+  }>;
+  offers: Array<{
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    bannerImage?: string | null;
+    isActive: boolean;
+  }>;
+  categorySections: CategorySection[];
+  recentlyAdded: SellerProduct[];
+}
+
 export const catalogApi = api
   .enhanceEndpoints({ addTagTypes: ["Catalog", "Category"] })
   .injectEndpoints({
     endpoints: (builder) => ({
+      getHomepageData: builder.query<HomepageData, void>({
+        query: () => "/public/catalog/homepage",
+        providesTags: ["Catalog", "Category"],
+      }),
+      getRecentlyAddedProducts: builder.query<SearchResponse, number | void>({
+        query: (limit = 8) => `/public/catalog/recently-added?limit=${limit}`,
+        providesTags: ["Catalog"],
+      }),
       getPublicCategories: builder.query<Category[], void>({
         query: () => "/public/categories",
         providesTags: ["Category"],
@@ -274,14 +318,20 @@ export const catalogApi = api
         query: (limit = 8) => `/public/catalog/popular?limit=${limit}`,
         providesTags: ["Catalog"],
       }),
-      getPublicBrands: builder.query<Brand[], { categoryId?: string; search?: string } | void>({
+      getPublicBrands: builder.query<
+        Brand[],
+        { categoryId?: string; search?: string } | void
+      >({
         query: (params) => {
           if (!params) return "/public/catalog/brands";
           const searchParams = new URLSearchParams();
-          if (params.categoryId) searchParams.append("categoryId", params.categoryId);
+          if (params.categoryId)
+            searchParams.append("categoryId", params.categoryId);
           if (params.search) searchParams.append("search", params.search);
           const queryString = searchParams.toString();
-          return queryString ? `/public/catalog/brands?${queryString}` : "/public/catalog/brands";
+          return queryString
+            ? `/public/catalog/brands?${queryString}`
+            : "/public/catalog/brands";
         },
         providesTags: ["Catalog"],
       }),
@@ -499,6 +549,8 @@ export const catalogApi = api
   });
 
 export const {
+  useGetHomepageDataQuery,
+  useGetRecentlyAddedProductsQuery,
   useGetPublicCategoriesQuery,
   useGetPublicCategoryTreeQuery,
   useGetCategorySectionsQuery,

@@ -34,11 +34,7 @@ export function MarketplaceHero({ lang }: MarketplaceHeroProps) {
   return (
     <div className="space-y-6">
       {/* Marketplace Search Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-primary/10 via-primary/5 to-background border border-primary/15 p-6 md:p-10 shadow-sm text-center">
-        {/* Subtle decorative background blur spots */}
-        <div className="absolute -top-24 -left-24 w-72 h-72 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
+      <div className="relative overflow-hidden rounded-3xl bg-muted/40 border border-border/80 p-6 md:p-10 shadow-xs text-center">
         <div className="relative z-10 max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-background border border-primary/20 text-xs font-semibold text-primary shadow-xs">
             <MapPin className="h-3.5 w-3.5 text-primary" />
@@ -51,7 +47,9 @@ export function MarketplaceHero({ lang }: MarketplaceHeroProps) {
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
             {isBn ? "আপনার এলাকার যা প্রয়োজন," : "Find what you need"}{" "}
-            <span className="text-primary">{isBn ? "সব এক জায়গায়" : "near you"}</span>
+            <span className="text-primary">
+              {isBn ? "সব এক জায়গায়" : "near you"}
+            </span>
           </h1>
 
           <p className="text-xs sm:text-sm md:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">

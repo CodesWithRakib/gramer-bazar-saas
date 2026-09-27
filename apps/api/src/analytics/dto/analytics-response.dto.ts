@@ -1,14 +1,20 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OrderStatus } from '../../orders/enums/order-status.enum.js';
 
 export class DashboardMetricsSummaryDto {
   @ApiProperty({ example: 1250, description: 'Total historical orders' })
   totalOrders: number;
 
-  @ApiProperty({ example: 45, description: 'Currently pending unfulfilled orders' })
+  @ApiProperty({
+    example: 45,
+    description: 'Currently pending unfulfilled orders',
+  })
   pendingOrders: number;
 
-  @ApiProperty({ example: 485000, description: 'Total gross merchandise volume in BDT' })
+  @ApiProperty({
+    example: 485000,
+    description: 'Total gross merchandise volume in BDT',
+  })
   totalSales: number;
 
   @ApiProperty({ example: 820, description: 'Total registered customers' })
@@ -22,6 +28,24 @@ export class DashboardMetricsSummaryDto {
 
   @ApiProperty({ example: 250, description: 'Total catalog products' })
   totalProducts: number;
+
+  @ApiProperty({
+    example: 28,
+    description: 'Total active verified vendor shops',
+  })
+  activeShops: number;
+
+  @ApiProperty({
+    example: 5,
+    description: 'Pending seller and rider applications',
+  })
+  pendingApplications: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'Active open disputes requiring attention',
+  })
+  pendingDisputes: number;
 }
 
 export class RecentOrderSummaryDto {
@@ -47,6 +71,39 @@ export class RevenueTrendItemDto {
 
   @ApiProperty({ example: 12500 })
   revenue: number;
+
+  @ApiPropertyOptional({ example: 14 })
+  orders?: number;
+}
+
+export class OrderStatusCountDto {
+  @ApiProperty({ example: 'PENDING' })
+  name: string;
+
+  @ApiProperty({ example: 18 })
+  count: number;
+}
+
+export class CategoryPerformanceDto {
+  @ApiProperty({ example: 'Fresh & Vegetables' })
+  name: string;
+
+  @ApiProperty({ example: 142 })
+  count: number;
+
+  @ApiProperty({ example: 45000 })
+  revenue: number;
+}
+
+export class TopProductSalesDto {
+  @ApiProperty({ example: 'Miniket Rice 25kg' })
+  name: string;
+
+  @ApiProperty({ example: 85 })
+  sales: number;
+
+  @ApiProperty({ example: 51000 })
+  revenue: number;
 }
 
 export class AdminDashboardResponseDto {
@@ -58,6 +115,15 @@ export class AdminDashboardResponseDto {
 
   @ApiProperty({ type: [RevenueTrendItemDto] })
   revenueData: RevenueTrendItemDto[];
+
+  @ApiProperty({ type: [OrderStatusCountDto] })
+  orderStatusDistribution: OrderStatusCountDto[];
+
+  @ApiProperty({ type: [CategoryPerformanceDto] })
+  categoryPerformance: CategoryPerformanceDto[];
+
+  @ApiProperty({ type: [TopProductSalesDto] })
+  topProducts: TopProductSalesDto[];
 }
 
 export class PopularProductAnalyticsDto {

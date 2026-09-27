@@ -7,6 +7,7 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 import { Category } from './category.entity.js';
@@ -16,6 +17,13 @@ import { ProductVariant } from './product-variant.entity.js';
 import { ProductImage } from './product-image.entity.js';
 
 @Entity('products')
+@Index('idx_products_category_id', ['categoryId'])
+@Index('idx_products_sub_category_id', ['subCategoryId'])
+@Index('idx_products_brand_id', ['brandId'])
+@Index('idx_products_is_featured', ['isFeatured'])
+@Index('idx_products_is_active', ['isActive'])
+@Index('idx_products_status', ['status'])
+@Index('idx_products_created_at', ['createdAt'])
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -71,7 +79,13 @@ export class Product {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   price: number | null;
 
-  @Column({ name: 'compare_at_price', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Column({
+    name: 'compare_at_price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
   compareAtPrice: number | null;
 
   @Column({ type: 'int', default: 0 })
@@ -92,16 +106,32 @@ export class Product {
   @Column({ type: 'varchar', length: 50, nullable: true })
   source: string | null;
 
-  @Column({ name: 'source_product_id', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'source_product_id',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   sourceProductId: string | null;
 
   @Column({ name: 'source_url', type: 'text', nullable: true })
   sourceUrl: string | null;
 
-  @Column({ name: 'source_price', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Column({
+    name: 'source_price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
   sourcePrice: number | null;
 
-  @Column({ name: 'source_currency', type: 'varchar', length: 10, nullable: true })
+  @Column({
+    name: 'source_currency',
+    type: 'varchar',
+    length: 10,
+    nullable: true,
+  })
   sourceCurrency: string | null;
 
   @OneToMany(() => ProductImage, (image) => image.product, {

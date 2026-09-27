@@ -1,135 +1,313 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useGetRiderDeliveriesQuery } from '@/features/deliveries/deliveriesApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { DeliveryStatus } from '@/features/deliveries/deliveriesApi';
-import Link from 'next/link';
-import { MapPin, Phone, Banknote, Navigation } from 'lucide-react';
+import React from "react";
+import { useGetRiderDashboardQuery } from "@/features/deliveries/deliveriesApi";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import {
+  MapPin,
+  Phone,
+  Banknote,
+  Navigation,
+  CheckCircle2,
+  TrendingUp,
+} from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 export interface RiderDashboardViewProps {
   lang?: string;
 }
 
-export function RiderDashboardView({ lang = 'en' }: RiderDashboardViewProps) {
-  
-  
-  const isBn = lang === 'bn';
+export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
+  const isBn = lang === "bn";
 
-  const { data: deliveries, isLoading } = useGetRiderDeliveriesQuery(undefined, {
-    pollingInterval: 30000, // refresh every 30 seconds
+  const { data, isLoading, isError } = useGetRiderDashboardQuery(undefined, {
+    pollingInterval: 30000,
   });
 
   if (isLoading) {
-    return <div className="space-y-4"><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>;
+    return (
+      <div className="space-y-4 pt-2">
+        <Skeleton className="h-28 w-full rounded-2xl" />
+        <Skeleton className="h-64 w-full rounded-2xl" />
+      </div>
+    );
   }
 
-  const activeDeliveries = deliveries?.filter(d => 
-    [DeliveryStatus.ACCEPTED, DeliveryStatus.PICKED_UP, DeliveryStatus.OUT_FOR_DELIVERY].includes(d.status)
-  ) || [];
+  if (isError || !data) {
+    return (
+      <div className="p-8 text-center text-sm text-destructive bg-destructive/5 rounded-2xl border border-destructive/20 my-4">
+        {isBn
+          ? "ড্যাশবোর্ড লোড করতে সমস্যা হয়েছে।"
+          : "Failed to load rider dashboard."}
+      </div>
+    );
+  }
 
-  const pendingDeliveries = deliveries?.filter(d => d.status === DeliveryStatus.ASSIGNED) || [];
-
-  const completedDeliveries = deliveries?.filter(d => d.status === DeliveryStatus.DELIVERED) || [];
+  const { metrics, deliveriesTrend = [], recentDeliveries = [] } = data;
+  const activeCount = metrics.activeCount || 0;
+  const pendingCount = metrics.assignedCount || 0;
+  const completedCount = metrics.completedCount || 0;
+  const totalEarnings = metrics.totalEarnings || 0;
 
   return (
     <div className="space-y-6 pt-2">
+      {/* Header Banner */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{isBn ? 'ড্যাশবোর্ড' : 'Dashboard'}</h1>
-          <p className="text-muted-foreground text-sm">{isBn ? 'আজকের কাজ' : 'Today\'s tasks'}</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            {isBn ? "রাইডার ড্যাশবোর্ড" : "Rider Dashboard"}
+          </h1>
+          <p className="text-muted-foreground text-xs md:text-sm">
+            {isBn
+              ? "আজকের কাজ ও ডেলিভারি অগ্রগতি"
+              : "Today's deliveries & earnings progress"}
+          </p>
         </div>
-        <Badge variant={activeDeliveries.length > 0 ? "default" : "secondary"} className="h-8">
-          {activeDeliveries.length > 0 ? (isBn ? 'কাজে আছেন' : 'On Duty') : (isBn ? 'অপেক্ষমাণ' : 'Standby')}
+        <Badge
+          variant={activeCount > 0 ? "default" : "secondary"}
+          className="h-8 px-3 font-semibold text-xs"
+        >
+          {activeCount > 0
+            ? isBn
+              ? "ডিউটিতে আছেন"
+              : "On Duty"
+            : isBn
+              ? "অপেক্ষমাণ"
+              : "Standby"}
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="rounded-xl border">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+      {/* KPI Cards Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="rounded-xl border border-border bg-card shadow-none">
+          <CardContent className="p-4 flex items-center gap-3.5">
+            <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
               <Banknote className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-muted-foreground">{isBn ? 'নতুন অ্যাসাইনমেন্ট' : 'New Assignments'}</p>
-              <h3 className="text-2xl font-bold tracking-tight">{pendingDeliveries.length} <span className="text-base font-normal text-muted-foreground">{isBn ? 'টি' : ''}</span></h3>
+              <p className="text-xs font-medium text-muted-foreground">
+                {isBn ? "অ্যাসাইনকৃত" : "Assigned"}
+              </p>
+              <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+                {pendingCount}
+              </h3>
             </div>
           </CardContent>
         </Card>
-        
-        <Card className="rounded-xl border">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-lg bg-muted text-foreground flex items-center justify-center">
+
+        <Card className="rounded-xl border border-border bg-card shadow-none">
+          <CardContent className="p-4 flex items-center gap-3.5">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
               <Navigation className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-muted-foreground">{isBn ? 'সম্পন্ন' : 'Completed'}</p>
-              <h3 className="text-2xl font-bold tracking-tight">{completedDeliveries.length} <span className="text-base font-normal text-muted-foreground">{isBn ? 'টি' : ''}</span></h3>
+              <p className="text-xs font-medium text-muted-foreground">
+                {isBn ? "চলমান" : "Active"}
+              </p>
+              <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+                {activeCount}
+              </h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl border border-border bg-card shadow-none">
+          <CardContent className="p-4 flex items-center gap-3.5">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">
+                {isBn ? "সম্পন্ন" : "Delivered"}
+              </p>
+              <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+                {completedCount}
+              </h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl border border-border bg-card shadow-none">
+          <CardContent className="p-4 flex items-center gap-3.5">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">
+                {isBn ? "মোট আয়" : "Earnings"}
+              </p>
+              <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+                ৳{totalEarnings.toLocaleString()}
+              </h3>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {activeDeliveries.length > 0 && (
+      {/* 7-Day Performance Chart */}
+      {deliveriesTrend.length > 0 && (
+        <Card className="rounded-xl border border-border bg-card shadow-none overflow-hidden">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-sm font-semibold text-foreground">
+              {isBn
+                ? "ডেলিভারি প্রবণতা (গত ৭ দিন)"
+                : "Delivery Trends (Last 7 Days)"}
+            </CardTitle>
+            <CardDescription className="text-xs">
+              {isBn
+                ? "প্রতিদিনের সম্পন্ন ডেলিভারি ও আয়"
+                : "Daily completed deliveries & earnings"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pl-0 pt-6 pr-6">
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={deliveriesTrend}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="name"
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    dx={-10}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "8px",
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="completed"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    fillOpacity={0.15}
+                    fill="hsl(var(--primary))"
+                    name={isBn ? "সম্পন্ন" : "Completed"}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recent Deliveries List */}
+      <div className="space-y-3">
+        <h2 className="font-semibold text-base md:text-lg text-foreground">
+          {isBn ? "সাম্প্রতিক অ্যাসাইনমেন্ট ও কাজ" : "Assigned Deliveries"} (
+          {recentDeliveries.length})
+        </h2>
+
+        {recentDeliveries.length === 0 && (
+          <div className="p-8 text-center bg-muted/20 border border-dashed border-border rounded-xl">
+            <p className="text-xs text-muted-foreground">
+              {isBn
+                ? "এই মুহূর্তে কোনো নতুন ডেলিভারি অ্যাসাইনমেন্ট নেই।"
+                : "No active delivery assignments at the moment."}
+            </p>
+          </div>
+        )}
+
         <div className="space-y-3">
-          <h2 className="font-semibold text-lg">{isBn ? 'বর্তমান ডেলিভারি' : 'Active Delivery'}</h2>
-          {activeDeliveries.map(delivery => (
-            <Card key={delivery.id} className="border-primary/40 shadow-md overflow-hidden relative group">
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
-              <CardHeader className="pb-3 pt-5 px-6">
-                <div className="flex justify-between items-start">
-                  <Badge variant="default" className="text-xs uppercase font-bold shadow-sm">{delivery.status.replace(/_/g, ' ')}</Badge>
-                  <span className="text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded-md">#{delivery.order.id.slice(-6).toUpperCase()}</span>
+          {recentDeliveries.map((delivery) => (
+            <Card
+              key={delivery.id}
+              className="border border-border/80 bg-card rounded-xl overflow-hidden hover:border-primary/40 transition-colors shadow-none"
+            >
+              <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
+                <div>
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] font-semibold uppercase"
+                  >
+                    {delivery.status.replace(/_/g, " ")}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground font-mono ml-2">
+                    #
+                    {delivery.order?.id
+                      ? delivery.order.id.slice(0, 8)
+                      : delivery.id.slice(0, 8)}
+                  </span>
                 </div>
-                <CardTitle className="text-xl mt-3">{delivery.order.user?.firstName} {delivery.order.user?.lastName}</CardTitle>
+                <span className="text-xs font-semibold text-primary">
+                  ৳{Number(delivery.order?.total || 0).toLocaleString()}
+                </span>
               </CardHeader>
-              <CardContent className="space-y-5 px-6 pb-6">
-                <div className="flex items-start gap-3 text-sm bg-muted/30 p-3 rounded-lg border border-muted/50">
-                  <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <span className="text-foreground font-medium">{delivery.order.address?.street}, {delivery.order.address?.city}</span>
+              <CardContent className="px-4 pb-4 pt-1 space-y-3">
+                <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>
+                    {delivery.order?.address?.streetAddress ||
+                      delivery.order?.address?.street ||
+                      (isBn ? "ঠিকানা উপলব্ধ নেই" : "Address not specified")}
+                  </span>
                 </div>
-                <div className="flex gap-3">
-                  <Button asChild className="flex-1 shadow-sm font-semibold rounded-xl" size="lg">
+                <div className="flex gap-2">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="flex-1 font-semibold rounded-lg"
+                  >
                     <Link href={`/${lang}/rider/deliveries/${delivery.id}`}>
-                      {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
+                      {isBn ? "বিস্তারিত ও ট্র্যাক" : "View & Track"}
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="rounded-xl w-14 shrink-0 shadow-sm border-muted/50 hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all">
-                    <a href={`tel:${delivery.order.user?.phone}`}><Phone className="w-5 h-5" /></a>
-                  </Button>
+                  {delivery.order?.user?.phone && (
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="rounded-lg px-3"
+                    >
+                      <a
+                        href={`tel:${delivery.order.user.phone}`}
+                        aria-label="Call customer"
+                      >
+                        <Phone className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
-      )}
-
-      <div className="space-y-3">
-        <h2 className="font-semibold text-lg">{isBn ? 'নতুন অ্যাসাইনমেন্ট' : 'New Assignments'} ({pendingDeliveries.length})</h2>
-        {pendingDeliveries.length === 0 && (
-          <p className="text-muted-foreground text-sm">{isBn ? 'কোনো নতুন ডেলিভারি নেই।' : 'No new deliveries.'}</p>
-        )}
-        {pendingDeliveries.map(delivery => (
-          <Card key={delivery.id} className="shadow-sm border-muted/50 hover:border-muted transition-colors rounded-xl overflow-hidden group">
-            <CardHeader className="pb-3 pt-4 px-5">
-              <div className="flex justify-between items-start">
-                <Badge variant="outline" className="text-xs uppercase font-semibold bg-background">{delivery.status.replace(/_/g, ' ')}</Badge>
-                <span className="text-xs text-muted-foreground font-mono">#{delivery.order.id.slice(-6).toUpperCase()}</span>
-              </div>
-              <CardTitle className="text-lg mt-3">{delivery.order.user?.firstName} {delivery.order.user?.lastName}</CardTitle>
-            </CardHeader>
-            <CardContent className="px-5 pb-5 pt-0">
-              <Button asChild className="w-full mt-3 rounded-lg bg-secondary/50 hover:bg-secondary text-secondary-foreground transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md">
-                <Link href={`/${lang}/rider/deliveries/${delivery.id}`}>
-                  {isBn ? 'অ্যাক্সেপ্ট করুন' : 'Review & Accept'}
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
       </div>
     </div>
   );

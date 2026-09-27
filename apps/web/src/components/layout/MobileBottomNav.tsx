@@ -3,7 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
+import {
+  Home,
+  LayoutGrid,
+  ShoppingCart,
+  User,
+  LayoutDashboard,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setCartOpen } from "@/store/slices/cartSlice";
@@ -19,9 +25,15 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
   const dispatch = useDispatch();
   const isBn = lang === "bn";
 
-  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth,
+  );
   const cartItemsCount = useSelector((state: RootState) =>
-    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+    state.cart.items.reduce((total, item) => total + item.quantity, 0),
+  );
+  const userRoles = getUserRoles(user);
+  const isStaffOrSeller = userRoles.some((r) =>
+    ["SELLER", "RIDER", "ADMIN", "SUPER_ADMIN"].includes(r),
   );
 
   const navItems = [
@@ -41,7 +53,6 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
 
   const getProfileHref = () => {
     if (!isAuthenticated) return `/${lang}/login`;
-    const userRoles = getUserRoles(user);
     if (userRoles.includes("SUPER_ADMIN")) return `/${lang}/super-admin`;
     if (userRoles.includes("ADMIN")) return `/${lang}/admin`;
     if (userRoles.includes("SELLER")) return `/${lang}/seller`;
@@ -58,7 +69,9 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
             href={item.href}
             className={cn(
               "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-              item.isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
+              item.isActive
+                ? "text-primary"
+                : "text-muted-foreground hover:text-primary",
             )}
           >
             <item.icon className="h-5 w-5" />
@@ -66,40 +79,56 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
           </Link>
         ))}
 
-        <button
-          type="button"
-          aria-label={isBn ? "কার্ট খুলুন" : "Open shopping cart"}
-          onClick={() => dispatch(setCartOpen(true))}
-          className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground hover:text-primary relative"
-        >
-          <div className="relative">
-            <ShoppingCart className="h-5 w-5" />
-            {cartItemsCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center border border-background">
-                {cartItemsCount}
-              </span>
-            )}
-          </div>
-          <span className="text-[10px] font-medium">{isBn ? "কার্ট" : "Cart"}</span>
-        </button>
+        {!isStaffOrSeller ? (
+          <button
+            type="button"
+            aria-label={isBn ? "কার্ট খুলুন" : "Open shopping cart"}
+            onClick={() => dispatch(setCartOpen(true))}
+            className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground hover:text-primary relative"
+          >
+            <div className="relative">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center border border-background">
+                  {cartItemsCount}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-medium">
+              {isBn ? "কার্ট" : "Cart"}
+            </span>
+          </button>
+        ) : (
+          <Link
+            href={getProfileHref()}
+            className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground hover:text-primary"
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            <span className="text-[10px] font-medium">
+              {isBn ? "ড্যাশবোর্ড" : "Dashboard"}
+            </span>
+          </Link>
+        )}
 
         <Link
           href={getProfileHref()}
           className={cn(
             "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-            pathname.includes(`/${lang}/customer`) || 
-            pathname.includes(`/${lang}/profile`) || 
-            pathname.includes(`/${lang}/super-admin`) || 
-            pathname.includes(`/${lang}/admin`) || 
-            pathname.includes(`/${lang}/seller`) || 
-            pathname.includes(`/${lang}/rider`) ||
-            pathname.includes(`/${lang}/login`)
-              ? "text-primary" 
-              : "text-muted-foreground hover:text-primary"
+            pathname.includes(`/${lang}/customer`) ||
+              pathname.includes(`/${lang}/profile`) ||
+              pathname.includes(`/${lang}/super-admin`) ||
+              pathname.includes(`/${lang}/admin`) ||
+              pathname.includes(`/${lang}/seller`) ||
+              pathname.includes(`/${lang}/rider`) ||
+              pathname.includes(`/${lang}/login`)
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary",
           )}
         >
           <User className="h-5 w-5" />
-          <span className="text-[10px] font-medium">{isBn ? "অ্যাকাউন্ট" : "Account"}</span>
+          <span className="text-[10px] font-medium">
+            {isBn ? "অ্যাকাউন্ট" : "Account"}
+          </span>
         </Link>
       </nav>
     </div>

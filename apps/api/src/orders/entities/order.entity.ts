@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 
@@ -22,6 +23,9 @@ import { Address } from '../../addresses/entities/address.entity.js';
 import { Payment } from '../../payments/entities/payment.entity.js';
 
 @Entity('orders')
+@Index('idx_orders_user_id', ['userId'])
+@Index('idx_orders_status', ['status'])
+@Index('idx_orders_created_at', ['createdAt'])
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -83,7 +87,9 @@ export class Order {
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   items: Relation<OrderItem[]>;
 
-  @OneToMany(() => OrderStatusHistory, (history) => history.order, { cascade: true })
+  @OneToMany(() => OrderStatusHistory, (history) => history.order, {
+    cascade: true,
+  })
   statusHistory: Relation<OrderStatusHistory[]>;
 
   @OneToMany(() => Payment, (payment) => payment.order)

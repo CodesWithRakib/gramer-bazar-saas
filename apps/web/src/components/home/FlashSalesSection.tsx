@@ -100,7 +100,7 @@ export function FlashSalesSection({ lang }: { lang: string }) {
                 <div className="mt-2 px-1">
                   <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-orange-500 to-rose-600 h-1.5 rounded-full transition-all duration-500"
+                      className="bg-rose-500 h-1.5 rounded-full transition-all duration-500"
                       style={{ width: `${soldPercent}%` }}
                     />
                   </div>
@@ -117,3 +117,4 @@ export function FlashSalesSection({ lang }: { lang: string }) {
     </section>
   );
 }
+

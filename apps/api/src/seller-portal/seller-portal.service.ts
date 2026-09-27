@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { Shop } from '../shops/entities/shop.entity.js';
@@ -38,13 +42,15 @@ export class SellerPortalService {
 
   async getDashboardMetrics(sellerId: string) {
     const shop = await this.getShopForSeller(sellerId);
-    
+
     // Low stock count
     const lowStockCount = await this.inventoryRepository
       .createQueryBuilder('inv')
       .innerJoin('inv.sellerProduct', 'sp')
       .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold')
+      .andWhere(
+        '(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold',
+      )
       .getCount();
 
     // Pending/Active orders count (orders that have items from this shop and are not delivered/cancelled)
@@ -53,8 +59,12 @@ export class SellerPortalService {
       .innerJoin('item.sellerProduct', 'sp')
       .innerJoin('item.order', 'order')
       .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('order.status NOT IN (:...statuses)', { 
-        statuses: [OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.FAILED] 
+      .andWhere('order.status NOT IN (:...statuses)', {
+        statuses: [
+          OrderStatus.DELIVERED,
+          OrderStatus.CANCELLED,
+          OrderStatus.FAILED,
+        ],
       })
       .select('order.id')
       .distinct(true)
@@ -81,9 +91,11 @@ export class SellerPortalService {
       .limit(5)
       .getMany();
 
-    const recentOrders = recentOrderItems.map(item => ({
+    const recentOrders = recentOrderItems.map((item) => ({
       id: item.order.id,
-      customerName: item.order.user ? `${item.order.user.firstName} ${item.order.user.lastName}` : 'Unknown',
+      customerName: item.order.user
+        ? `${item.order.user.firstName} ${item.order.user.lastName}`
+        : 'Unknown',
       totalAmount: item.subtotal,
       status: item.order.status,
       createdAt: item.order.createdAt,
@@ -95,25 +107,123 @@ export class SellerPortalService {
       .innerJoin('item.sellerProduct', 'sp')
       .innerJoin('item.order', 'order')
       .select("TO_CHAR(order.createdAt, 'Dy')", 'name')
-      .addSelect("SUM(item.subtotal)", 'revenue')
+      .addSelect('SUM(item.subtotal)', 'revenue')
       .where('sp.shopId = :shopId', { shopId: shop.id })
       .andWhere('order.status = :status', { status: OrderStatus.DELIVERED })
       .andWhere("order.createdAt >= NOW() - INTERVAL '7 days'")
       .groupBy("TO_CHAR(order.createdAt, 'Dy')")
-      .orderBy("MIN(order.createdAt)", 'ASC')
+      .orderBy('MIN(order.createdAt)', 'ASC')
       .getRawMany();
 
-    const revenueData = revenueTrendRaw.map(r => ({
+    const revenueData = revenueTrendRaw.map((r) => ({
       name: r.name,
       revenue: Number(r.revenue),
+    }));
+
+    // Total distinct orders for this shop
+    const totalOrders = await this.orderItemRepository
+      .createQueryBuilder('item')
+      .innerJoin('item.sellerProduct', 'sp')
+      .where('sp.shopId = :shopId', { shopId: shop.id })
+      .select('item.orderId')
+      .distinct(true)
+      .getCount();
+
+    // Total products in shop
+    const totalProducts = await this.sellerProductRepository.count({
+      where: { shopId: shop.id, isActive: true },
+    });
+
+    // Pending orders count
+    const pendingOrdersCount = await this.orderItemRepository
+      .createQueryBuilder('item')
+      .innerJoin('item.sellerProduct', 'sp')
+      .innerJoin('item.order', 'order')
+      .where('sp.shopId = :shopId', { shopId: shop.id })
+      .andWhere('order.status = :status', { status: OrderStatus.PENDING })
+      .select('order.id')
+      .distinct(true)
+      .getCount();
+
+    // Order status distribution
+    const statusRows = await this.orderItemRepository
+      .createQueryBuilder('item')
+      .innerJoin('item.sellerProduct', 'sp')
+      .innerJoin('item.order', 'order')
+      .where('sp.shopId = :shopId', { shopId: shop.id })
+      .select('order.status', 'status')
+      .addSelect('COUNT(DISTINCT order.id)', 'count')
+      .groupBy('order.status')
+      .getRawMany();
+
+    const orderStatusDistribution = statusRows.map((r) => ({
+      status: r.status,
+      count: Number(r.count),
+    }));
+
+    // Top Products
+    const topProductsRaw = await this.orderItemRepository.manager.query(
+      `
+      SELECT sp.id, COALESCE(p.name_en, 'Product') as "nameEn", COALESCE(p.name_bn, 'পণ্য') as "nameBn",
+             SUM(oi.quantity)::int as "quantitySold", SUM(oi.subtotal)::float as "revenue"
+      FROM order_items oi
+      JOIN seller_products sp ON sp.id = oi.seller_product_id
+      JOIN product_variants pv ON pv.id = sp.product_variant_id
+      JOIN products p ON p.id = pv.product_id
+      WHERE sp.shop_id = $1
+      GROUP BY sp.id, p.name_en, p.name_bn
+      ORDER BY "quantitySold" DESC
+      LIMIT 5
+    `,
+      [shop.id],
+    );
+
+    const topProducts = topProductsRaw.map((r: any) => ({
+      id: r.id,
+      nameEn: r.nameEn,
+      nameBn: r.nameBn,
+      quantitySold: Number(r.quantitySold || 0),
+      revenue: Number(r.revenue || 0),
+    }));
+
+    // Low stock items list (up to 5)
+    const lowStockItemsRaw = await this.inventoryRepository
+      .createQueryBuilder('inv')
+      .innerJoin('inv.sellerProduct', 'sp')
+      .innerJoin('sp.productVariant', 'pv')
+      .innerJoin('pv.product', 'p')
+      .where('sp.shopId = :shopId', { shopId: shop.id })
+      .andWhere(
+        '(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold',
+      )
+      .select('sp.id', 'id')
+      .addSelect('p.nameEn', 'nameEn')
+      .addSelect('p.nameBn', 'nameBn')
+      .addSelect('inv.quantity', 'quantity')
+      .addSelect('inv.lowStockThreshold', 'lowStockThreshold')
+      .limit(5)
+      .getRawMany();
+
+    const lowStockProducts = lowStockItemsRaw.map((r) => ({
+      id: r.id,
+      nameEn: r.nameEn,
+      nameBn: r.nameBn,
+      quantity: Number(r.quantity),
+      lowStockThreshold: Number(r.lowStockThreshold),
     }));
 
     return {
       lowStockCount,
       activeOrdersCount,
+      pendingOrdersCount,
+      totalOrders,
+      totalProducts,
       totalSales: parseFloat(salesData?.totalSales || '0'),
       recentOrders,
       revenueData,
+      orderStatusDistribution,
+      topProducts,
+      lowStockProducts,
     };
   }
 
@@ -140,7 +250,8 @@ export class SellerPortalService {
 
   async getProducts(sellerId: string, search?: string) {
     const shop = await this.getShopForSeller(sellerId);
-    const query = this.sellerProductRepository.createQueryBuilder('sp')
+    const query = this.sellerProductRepository
+      .createQueryBuilder('sp')
       .leftJoinAndSelect('sp.inventory', 'inventory')
       .leftJoinAndSelect('sp.productVariant', 'variant')
       .leftJoinAndSelect('variant.product', 'product')
@@ -149,7 +260,7 @@ export class SellerPortalService {
     if (search) {
       query.andWhere(
         '(product.nameEn ILIKE :search OR product.nameBn ILIKE :search OR variant.sku ILIKE :search OR sp.sellerSku ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
@@ -158,17 +269,20 @@ export class SellerPortalService {
 
   async addProduct(sellerId: string, dto: AddSellerProductDto) {
     const shop = await this.getShopForSeller(sellerId);
-    
+
     return this.dataSource.transaction(async (manager) => {
       // Check if variant exists
-      const variant = await manager.findOne(ProductVariant, { where: { id: dto.productVariantId } });
+      const variant = await manager.findOne(ProductVariant, {
+        where: { id: dto.productVariantId },
+      });
       if (!variant) throw new NotFoundException('Product variant not found');
 
       // Check if seller already has this product
       const existing = await manager.findOne(SellerProduct, {
-        where: { shopId: shop.id, productVariantId: dto.productVariantId }
+        where: { shopId: shop.id, productVariantId: dto.productVariantId },
       });
-      if (existing) throw new BadRequestException('Product already exists in your shop');
+      if (existing)
+        throw new BadRequestException('Product already exists in your shop');
 
       const sellerProduct = new SellerProduct();
       sellerProduct.shopId = shop.id;
@@ -195,19 +309,25 @@ export class SellerPortalService {
     });
   }
 
-  async updateProduct(sellerId: string, id: string, dto: UpdateSellerProductDto) {
+  async updateProduct(
+    sellerId: string,
+    id: string,
+    dto: UpdateSellerProductDto,
+  ) {
     const shop = await this.getShopForSeller(sellerId);
-    
+
     return this.dataSource.transaction(async (manager) => {
       const sellerProduct = await manager.findOne(SellerProduct, {
         where: { id, shopId: shop.id },
-        relations: ['inventory']
+        relations: ['inventory'],
       });
 
-      if (!sellerProduct) throw new NotFoundException('Seller product not found');
+      if (!sellerProduct)
+        throw new NotFoundException('Seller product not found');
 
       if (dto.price !== undefined) sellerProduct.price = dto.price;
-      if (dto.discountPrice !== undefined) sellerProduct.discountPrice = dto.discountPrice;
+      if (dto.discountPrice !== undefined)
+        sellerProduct.discountPrice = dto.discountPrice;
       if (dto.isActive !== undefined) sellerProduct.isActive = dto.isActive;
 
       await manager.save(SellerProduct, sellerProduct);
@@ -216,7 +336,9 @@ export class SellerPortalService {
         if (dto.quantity !== undefined) {
           // Validate quantity doesn't drop below reserved
           if (dto.quantity < sellerProduct.inventory.reservedQuantity) {
-            throw new BadRequestException(`Cannot set quantity below reserved quantity (${sellerProduct.inventory.reservedQuantity})`);
+            throw new BadRequestException(
+              `Cannot set quantity below reserved quantity (${sellerProduct.inventory.reservedQuantity})`,
+            );
           }
           sellerProduct.inventory.quantity = dto.quantity;
         }
@@ -237,9 +359,10 @@ export class SellerPortalService {
 
   async getOrders(sellerId: string) {
     const shop = await this.getShopForSeller(sellerId);
-    
+
     // Get distinct orders that contain items from this seller's shop
-    const orders = await this.orderRepository.createQueryBuilder('order')
+    const orders = await this.orderRepository
+      .createQueryBuilder('order')
       .innerJoinAndSelect('order.items', 'item')
       .innerJoin('item.sellerProduct', 'sp')
       .innerJoinAndSelect('order.user', 'user')
@@ -247,16 +370,17 @@ export class SellerPortalService {
       .orderBy('order.createdAt', 'DESC')
       .getMany();
 
-    // Since the join filters the items in the result to ONLY those of this shop, 
-    // the returned order.items array will only contain the seller's items. 
+    // Since the join filters the items in the result to ONLY those of this shop,
+    // the returned order.items array will only contain the seller's items.
     // This correctly isolates data so seller A doesn't see seller B's items in the same order.
     return orders;
   }
 
   async getOrderDetails(sellerId: string, orderId: string) {
     const shop = await this.getShopForSeller(sellerId);
-    
-    const order = await this.orderRepository.createQueryBuilder('order')
+
+    const order = await this.orderRepository
+      .createQueryBuilder('order')
       .innerJoinAndSelect('order.items', 'item')
       .innerJoinAndSelect('item.sellerProduct', 'sp')
       .leftJoinAndSelect('sp.productVariant', 'variant')
@@ -270,17 +394,22 @@ export class SellerPortalService {
       .getOne();
 
     if (!order) {
-      throw new NotFoundException('Order not found or contains no items from your shop');
+      throw new NotFoundException(
+        'Order not found or contains no items from your shop',
+      );
     }
 
     // Adjust the order total to reflect only this seller's items
-    const sellerSubtotal = order.items.reduce((sum, item) => sum + Number(item.subtotal), 0);
-    // (Note: delivery fee and discounts are complex to split. For a multi-vendor cart, it should be handled explicitly. 
+    const sellerSubtotal = order.items.reduce(
+      (sum, item) => sum + Number(item.subtotal),
+      0,
+    );
+    // (Note: delivery fee and discounts are complex to split. For a multi-vendor cart, it should be handled explicitly.
     // Here we'll just expose the items and subtotal to the seller)
-    
+
     return {
       ...order,
-      sellerSubtotal
+      sellerSubtotal,
     };
   }
 }

@@ -1,9 +1,12 @@
-import { api } from '../../store/api';
-import { Order } from '../orders/ordersApi';
+import { api } from "../../store/api";
+import { Order } from "../orders/ordersApi";
 
 export interface DashboardMetrics {
   lowStockCount: number;
   activeOrdersCount: number;
+  pendingOrdersCount?: number;
+  totalOrders?: number;
+  totalProducts?: number;
   totalSales: number;
   recentOrders: Array<{
     id: string;
@@ -15,6 +18,24 @@ export interface DashboardMetrics {
   revenueData: Array<{
     name: string;
     revenue: number;
+  }>;
+  orderStatusDistribution?: Array<{
+    status: string;
+    count: number;
+  }>;
+  topProducts?: Array<{
+    id: string;
+    nameEn: string;
+    nameBn: string;
+    quantitySold: number;
+    revenue: number;
+  }>;
+  lowStockProducts?: Array<{
+    id: string;
+    nameEn: string;
+    nameBn: string;
+    quantity: number;
+    lowStockThreshold: number;
   }>;
 }
 
@@ -81,78 +102,87 @@ export interface SellerProductItem {
 export const sellerPortalApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getSellerDashboard: builder.query<DashboardMetrics, void>({
-      query: () => '/seller-portal/dashboard',
-      providesTags: ['Order', 'Catalog'],
+      query: () => "/seller-portal/dashboard",
+      providesTags: ["Order", "Catalog"],
     }),
     getSellerShop: builder.query<SellerShop, void>({
-      query: () => '/seller-portal/shop',
-      providesTags: ['User'],
+      query: () => "/seller-portal/shop",
+      providesTags: ["User"],
     }),
     updateSellerShop: builder.mutation<SellerShop, Partial<SellerShop>>({
       query: (body) => ({
-        url: '/seller-portal/shop',
-        method: 'PATCH',
+        url: "/seller-portal/shop",
+        method: "PATCH",
         body,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
     uploadShopLogo: builder.mutation<{ logoUrl: string }, FormData>({
       query: (body) => ({
-        url: '/seller-portal/shop/logo',
-        method: 'POST',
+        url: "/seller-portal/shop/logo",
+        method: "POST",
         body,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
     uploadShopBanner: builder.mutation<{ bannerUrl: string }, FormData>({
       query: (body) => ({
-        url: '/seller-portal/shop/banner',
-        method: 'POST',
+        url: "/seller-portal/shop/banner",
+        method: "POST",
         body,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
     getSellerProducts: builder.query<SellerProductItem[], string | void>({
       query: (search) => {
-        let url = '/seller-portal/products';
+        let url = "/seller-portal/products";
         if (search) {
           url += `?search=${encodeURIComponent(search)}`;
         }
         return url;
       },
-      providesTags: ['Catalog'],
+      providesTags: ["Catalog"],
     }),
-    addSellerProduct: builder.mutation<SellerProductItem, Partial<SellerProductItem>>({
+    addSellerProduct: builder.mutation<
+      SellerProductItem,
+      Partial<SellerProductItem>
+    >({
       query: (body) => ({
-        url: '/seller-portal/products',
-        method: 'POST',
+        url: "/seller-portal/products",
+        method: "POST",
         body,
       }),
-      invalidatesTags: ['Catalog'],
+      invalidatesTags: ["Catalog"],
     }),
-    updateSellerProduct: builder.mutation<SellerProductItem, { id: string; data: Partial<SellerProductItem> }>({
+    updateSellerProduct: builder.mutation<
+      SellerProductItem,
+      { id: string; data: Partial<SellerProductItem> }
+    >({
       query: ({ id, data }) => ({
         url: `/seller-portal/products/${id}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ['Catalog'],
+      invalidatesTags: ["Catalog"],
     }),
-    updateInventory: builder.mutation<SellerInventory, { id: string; quantity: number }>({
+    updateInventory: builder.mutation<
+      SellerInventory,
+      { id: string; quantity: number }
+    >({
       query: ({ id, quantity }) => ({
         url: `/inventory/${id}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: { quantity },
       }),
-      invalidatesTags: ['Catalog'],
+      invalidatesTags: ["Catalog"],
     }),
     getSellerOrders: builder.query<Order[], void>({
-      query: () => '/seller-portal/orders',
-      providesTags: ['Order'],
+      query: () => "/seller-portal/orders",
+      providesTags: ["Order"],
     }),
     getSellerOrderById: builder.query<Order, string>({
       query: (id) => `/seller-portal/orders/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Order', id }],
+      providesTags: (result, error, id) => [{ type: "Order", id }],
     }),
   }),
 });

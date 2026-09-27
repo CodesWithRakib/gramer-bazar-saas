@@ -1,7 +1,7 @@
-import { api } from '../../store/api';
-import { PaginationMeta } from '../catalog/catalogApi';
-import { User } from '../users/usersApi';
-import { Order } from '../orders/ordersApi';
+import { api } from "../../store/api";
+import { PaginationMeta } from "../catalog/catalogApi";
+import { User } from "../users/usersApi";
+import { Order } from "../orders/ordersApi";
 
 export interface Delivery {
   id: string;
@@ -22,60 +22,99 @@ export interface Delivery {
 }
 
 export enum DeliveryStatus {
-  UNASSIGNED = 'UNASSIGNED',
-  ASSIGNED = 'ASSIGNED',
-  ACCEPTED = 'ACCEPTED',
-  PICKED_UP = 'PICKED_UP',
-  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
-  DELIVERED = 'DELIVERED',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED',
+  UNASSIGNED = "UNASSIGNED",
+  ASSIGNED = "ASSIGNED",
+  ACCEPTED = "ACCEPTED",
+  PICKED_UP = "PICKED_UP",
+  OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
+  DELIVERED = "DELIVERED",
+  FAILED = "FAILED",
+  CANCELLED = "CANCELLED",
+}
+
+export interface RiderDashboardMetrics {
+  assignedCount: number;
+  activeCount: number;
+  completedCount: number;
+  totalEarnings: number;
+}
+
+export interface RiderDeliveryTrendPoint {
+  name: string;
+  completed: number;
+  pending: number;
+  earnings: number;
+}
+
+export interface RiderDashboardResponse {
+  metrics: RiderDashboardMetrics;
+  deliveriesTrend: RiderDeliveryTrendPoint[];
+  recentDeliveries: Delivery[];
 }
 
 export const deliveriesApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // ADMIN ENDPOINTS
-    getAdminDeliveries: builder.query<{ data: Delivery[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
+    getAdminDeliveries: builder.query<
+      { data: Delivery[]; meta: PaginationMeta },
+      { page?: number; limit?: number; search?: string }
+    >({
       query: (params) => ({
-        url: '/deliveries/admin',
+        url: "/deliveries/admin",
         params,
       }),
-      providesTags: ['Order'],
+      providesTags: ["Order"],
     }),
     getRiders: builder.query<User[], void>({
-      query: () => '/deliveries/admin/riders',
-      providesTags: ['User'],
+      query: () => "/deliveries/admin/riders",
+      providesTags: ["User"],
     }),
-    assignDelivery: builder.mutation<Delivery, { orderId: string; riderId: string }>({
+    assignDelivery: builder.mutation<
+      Delivery,
+      { orderId: string; riderId: string }
+    >({
       query: (body) => ({
-        url: '/deliveries/admin/assign',
-        method: 'POST',
+        url: "/deliveries/admin/assign",
+        method: "POST",
         body,
       }),
-      invalidatesTags: ['Order'],
+      invalidatesTags: ["Order"],
     }),
 
     // RIDER ENDPOINTS
+    getRiderDashboard: builder.query<RiderDashboardResponse, void>({
+      query: () => "/deliveries/rider/dashboard",
+      providesTags: ["Order"],
+    }),
     getRiderDeliveries: builder.query<Delivery[], void>({
-      query: () => '/deliveries/rider/assigned',
-      providesTags: ['Order'],
+      query: () => "/deliveries/rider/assigned",
+      providesTags: ["Order"],
     }),
     getRiderDeliveryDetails: builder.query<Delivery, string>({
       query: (id) => `/deliveries/rider/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Order', id }],
+      providesTags: (result, error, id) => [{ type: "Order", id }],
     }),
-    updateDeliveryStatus: builder.mutation<Delivery, { id: string; status: DeliveryStatus; notes?: string }>({
+    updateDeliveryStatus: builder.mutation<
+      Delivery,
+      { id: string; status: DeliveryStatus; notes?: string }
+    >({
       query: ({ id, ...body }) => ({
         url: `/deliveries/rider/${id}/status`,
-        method: 'PATCH',
+        method: "PATCH",
         body,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Order', id }, 'Order'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Order", id },
+        "Order",
+      ],
     }),
-    updateRiderLocation: builder.mutation<Delivery, { id: string; lat: number; lng: number }>({
+    updateRiderLocation: builder.mutation<
+      Delivery,
+      { id: string; lat: number; lng: number }
+    >({
       query: ({ id, ...body }) => ({
         url: `/deliveries/rider/${id}/location`,
-        method: 'PATCH',
+        method: "PATCH",
         body,
       }),
       // Don't invalidate entire order list for location updates to avoid excessive re-fetching,
@@ -85,7 +124,7 @@ export const deliveriesApi = api.injectEndpoints({
     // CUSTOMER ENDPOINTS
     getCustomerDelivery: builder.query<Delivery, string>({
       query: (orderId) => `/deliveries/customer/${orderId}`,
-      providesTags: (result, error, id) => [{ type: 'Order', id }],
+      providesTags: (result, error, id) => [{ type: "Order", id }],
     }),
   }),
 });
@@ -94,6 +133,7 @@ export const {
   useGetAdminDeliveriesQuery,
   useGetRidersQuery,
   useAssignDeliveryMutation,
+  useGetRiderDashboardQuery,
   useGetRiderDeliveriesQuery,
   useGetRiderDeliveryDetailsQuery,
   useUpdateDeliveryStatusMutation,

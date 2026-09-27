@@ -7,6 +7,7 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 import { Shop } from '../../shops/entities/shop.entity.js';
@@ -14,6 +15,11 @@ import { ProductVariant } from '../../catalog/entities/product-variant.entity.js
 import { Inventory } from './inventory.entity.js';
 
 @Entity('seller_products')
+@Index('idx_seller_products_shop_id', ['shopId'])
+@Index('idx_seller_products_variant_id', ['productVariantId'])
+@Index('idx_seller_products_is_active', ['isActive'])
+@Index('idx_seller_products_price', ['price'])
+@Index('idx_seller_products_created_at', ['createdAt'])
 export class SellerProduct {
   @PrimaryGeneratedColumn('uuid')
   id: string;

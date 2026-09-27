@@ -5,6 +5,7 @@ import { SearchCatalogDto } from './dto/search-catalog.dto.js';
 import { ProductResponseDto } from '../../catalog/dto/product-response.dto.js';
 import { BrandResponseDto } from '../../catalog/dto/brand-response.dto.js';
 import { CategorySectionResponseDto } from './dto/category-section-response.dto.js';
+import { HomepageResponseDto } from './dto/homepage-response.dto.js';
 import {
   ApiStandardResponse,
   ApiStandardPaginatedResponse,
@@ -16,10 +17,47 @@ import {
 export class PublicCatalogController {
   constructor(private readonly catalogService: CatalogService) {}
 
+  @Get('homepage')
+  @ApiOperation({
+    summary: 'Optimized homepage aggregated discovery data',
+    description:
+      'Returns compact curated payload including categories, featured & popular products, featured shops, flash sales, and category shelves in a single fast query.',
+  })
+  @ApiStandardResponse({
+    type: HomepageResponseDto,
+    status: HttpStatus.OK,
+    description: 'Homepage discovery data',
+  })
+  @ApiCommonErrors([500])
+  getHomepage() {
+    return this.catalogService.getHomepage();
+  }
+
+  @Get('recently-added')
+  @ApiOperation({
+    summary: 'Retrieve recently added storefront products',
+    description:
+      'Returns latest catalog products sorted by creation timestamp descending.',
+  })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 8 })
+  @ApiStandardResponse({
+    type: ProductResponseDto,
+    isArray: true,
+    status: HttpStatus.OK,
+    description: 'List of recently added products',
+  })
+  @ApiCommonErrors([500])
+  getRecentlyAdded(@Query('limit') limit?: string) {
+    return this.catalogService.getRecentlyAdded(
+      limit ? parseInt(limit, 10) : 8,
+    );
+  }
+
   @Get('search')
   @ApiOperation({
     summary: 'Search and filter storefront catalog products',
-    description: 'High-performance customer search supporting fuzzy matching, price ranges, brand/category filters, and sorting.',
+    description:
+      'High-performance customer search supporting fuzzy matching, price ranges, brand/category filters, and sorting.',
   })
   @ApiStandardPaginatedResponse(ProductResponseDto, {
     description: 'Paginated search results',
@@ -48,7 +86,8 @@ export class PublicCatalogController {
   @Get('popular')
   @ApiOperation({
     summary: 'Retrieve trending / popular products for storefront',
-    description: 'Returns top products ordered by customer demand and sales volume.',
+    description:
+      'Returns top products ordered by customer demand and sales volume.',
   })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 8 })
   @ApiStandardResponse({
@@ -67,7 +106,13 @@ export class PublicCatalogController {
     summary: 'Real-time search keyword suggestions',
     description: 'Returns autocompletion keywords matching typed input prefix.',
   })
-  @ApiQuery({ name: 'q', required: true, type: String, example: 'pota', description: 'Query search prefix' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    type: String,
+    example: 'pota',
+    description: 'Query search prefix',
+  })
   @ApiStandardResponse({
     type: String,
     isArray: true,
@@ -82,7 +127,8 @@ export class PublicCatalogController {
   @Get('category-sections')
   @ApiOperation({
     summary: 'Homepage category product shelves',
-    description: 'Returns curated top categories paired with their leading products for grid displays.',
+    description:
+      'Returns curated top categories paired with their leading products for grid displays.',
   })
   @ApiStandardResponse({
     type: CategorySectionResponseDto,
@@ -98,7 +144,8 @@ export class PublicCatalogController {
   @Get('brands')
   @ApiOperation({
     summary: 'List active storefront brands',
-    description: 'Returns all active brand partners for brand sliders and filters.',
+    description:
+      'Returns all active brand partners for brand sliders and filters.',
   })
   @ApiStandardResponse({
     type: BrandResponseDto,
@@ -114,9 +161,15 @@ export class PublicCatalogController {
   @Get(':slug')
   @ApiOperation({
     summary: 'Retrieve product details by URL slug',
-    description: 'Returns complete product information, variant combinations, media assets, and verified reviews.',
+    description:
+      'Returns complete product information, variant combinations, media assets, and verified reviews.',
   })
-  @ApiParam({ name: 'slug', type: String, example: 'organic-red-potato', description: 'Product unique slug' })
+  @ApiParam({
+    name: 'slug',
+    type: String,
+    example: 'organic-red-potato',
+    description: 'Product unique slug',
+  })
   @ApiStandardResponse({
     type: ProductResponseDto,
     status: HttpStatus.OK,
@@ -130,7 +183,8 @@ export class PublicCatalogController {
   @Get(':slug/related')
   @ApiOperation({
     summary: 'Retrieve related product recommendations',
-    description: 'Returns related products sharing same category or brand taxonomy.',
+    description:
+      'Returns related products sharing same category or brand taxonomy.',
   })
   @ApiParam({ name: 'slug', type: String, example: 'organic-red-potato' })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 5 })
@@ -141,7 +195,13 @@ export class PublicCatalogController {
     description: 'Related product recommendations',
   })
   @ApiCommonErrors([404, 500])
-  getRelatedProducts(@Param('slug') slug: string, @Query('limit') limit?: string) {
-    return this.catalogService.getRelatedProducts(slug, limit ? parseInt(limit, 10) : 5);
+  getRelatedProducts(
+    @Param('slug') slug: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.catalogService.getRelatedProducts(
+      slug,
+      limit ? parseInt(limit, 10) : 5,
+    );
   }
 }

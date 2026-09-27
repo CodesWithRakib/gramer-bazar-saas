@@ -59,7 +59,7 @@ export function PromotionalModal({ lang }: { lang: string }) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden rounded-3xl border-0 shadow-2xl bg-card">
         {/* Banner Header Image / Graphic */}
-        <div className="relative h-44 w-full bg-gradient-to-tr from-emerald-800 via-teal-700 to-green-600 flex flex-col justify-end p-6 text-white overflow-hidden">
+        <div className="relative h-44 w-full bg-emerald-900 flex flex-col justify-end p-6 text-white overflow-hidden">
           {activeSale?.bannerImage ? (
             <Image
               src={activeSale.bannerImage}
@@ -68,7 +68,7 @@ export function PromotionalModal({ lang }: { lang: string }) {
               className="object-cover opacity-35 pointer-events-none"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-tr from-rose-600 via-orange-600 to-amber-500 opacity-90" />
+            <div className="absolute inset-0 bg-primary opacity-90" />
           )}
 
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl pointer-events-none" />
@@ -141,3 +141,4 @@ export function PromotionalModal({ lang }: { lang: string }) {
     </Dialog>
   );
 }
+

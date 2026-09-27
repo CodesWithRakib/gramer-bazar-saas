@@ -7,12 +7,15 @@ import {
   DeleteDateColumn,
   ManyToMany,
   JoinTable,
+  Index,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UserStatus } from '../enums/user-status.enum.js';
 import { RoleEntity } from '../../roles/entities/role.entity.js';
 
 @Entity('users')
+@Index('idx_users_status', ['status'])
+@Index('idx_users_created_at', ['createdAt'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;

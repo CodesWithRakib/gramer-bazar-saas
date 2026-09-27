@@ -6,12 +6,15 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
 import { ApplicationStatus } from '../enums/application-status.enum.js';
 
 @Entity('rider_applications')
+@Index('idx_rider_applications_status', ['status'])
+@Index('idx_rider_applications_created_at', ['createdAt'])
 export class RiderApplication {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -35,19 +38,44 @@ export class RiderApplication {
   @Column({ name: 'nid_number', type: 'varchar', length: 50 })
   nidNumber: string;
 
-  @Column({ name: 'vehicle_type', type: 'varchar', length: 50, default: 'BIKE' })
+  @Column({
+    name: 'vehicle_type',
+    type: 'varchar',
+    length: 50,
+    default: 'BIKE',
+  })
   vehicleType: string;
 
-  @Column({ name: 'vehicle_plate_number', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'vehicle_plate_number',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   vehiclePlateNumber: string | null;
 
-  @Column({ name: 'driving_license_number', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'driving_license_number',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   drivingLicenseNumber: string | null;
 
-  @Column({ name: 'preferred_zone', type: 'varchar', length: 150, nullable: true })
+  @Column({
+    name: 'preferred_zone',
+    type: 'varchar',
+    length: 150,
+    nullable: true,
+  })
   preferredZone: string | null;
 
-  @Column({ name: 'emergency_contact', type: 'varchar', length: 50, nullable: true })
+  @Column({
+    name: 'emergency_contact',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
   emergencyContact: string | null;
 
   @Column({

@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToOne,
   JoinColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 import { DeliveryStatus } from '../enums/delivery-status.enum.js';
@@ -14,6 +15,9 @@ import { Order } from '../../orders/entities/order.entity.js';
 import { User } from '../../users/entities/user.entity.js';
 
 @Entity('deliveries')
+@Index('idx_deliveries_rider_id', ['riderId'])
+@Index('idx_deliveries_status', ['status'])
+@Index('idx_deliveries_created_at', ['createdAt'])
 export class Delivery {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -32,7 +36,11 @@ export class Delivery {
   @JoinColumn({ name: 'rider_id' })
   rider: Relation<User> | null;
 
-  @Column({ type: 'enum', enum: DeliveryStatus, default: DeliveryStatus.UNASSIGNED })
+  @Column({
+    type: 'enum',
+    enum: DeliveryStatus,
+    default: DeliveryStatus.UNASSIGNED,
+  })
   status: DeliveryStatus;
 
   @Column({ name: 'assigned_at', type: 'timestamp', nullable: true })
@@ -47,13 +55,29 @@ export class Delivery {
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 
-  @Column({ name: 'current_lat', type: 'decimal', precision: 10, scale: 8, nullable: true })
+  @Column({
+    name: 'current_lat',
+    type: 'decimal',
+    precision: 10,
+    scale: 8,
+    nullable: true,
+  })
   currentLat: number | null;
 
-  @Column({ name: 'current_lng', type: 'decimal', precision: 11, scale: 8, nullable: true })
+  @Column({
+    name: 'current_lng',
+    type: 'decimal',
+    precision: 11,
+    scale: 8,
+    nullable: true,
+  })
   currentLng: number | null;
 
-  @Column({ name: 'last_location_updated_at', type: 'timestamp', nullable: true })
+  @Column({
+    name: 'last_location_updated_at',
+    type: 'timestamp',
+    nullable: true,
+  })
   lastLocationUpdatedAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })

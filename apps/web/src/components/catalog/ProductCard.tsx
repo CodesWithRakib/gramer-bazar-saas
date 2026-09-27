@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { CustomImage } from '@/components/ui/CustomImage';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '@/store/slices/cartSlice';
-import { toast } from 'sonner';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React from "react";
+import Link from "next/link";
+import { CustomImage } from "@/components/ui/CustomImage";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "@/store/slices/cartSlice";
+import { toast } from "sonner";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   ShoppingCart,
   Heart,
@@ -25,14 +25,16 @@ import {
   Wheat,
   Shirt,
   Utensils,
-} from 'lucide-react';
-import type { SellerProduct } from '@/features/catalog/catalogApi';
-import { RootState } from '@/store/store';
+} from "lucide-react";
+import type { SellerProduct } from "@/features/catalog/catalogApi";
+import { RootState } from "@/store/store";
+import { setLoginModalOpen } from "@/store/slices/authSlice";
+import { getUserRoles } from "@/lib/roles";
 import {
   useGetUserWishlistQuery,
   useAddProductToWishlistMutation,
   useRemoveProductFromWishlistMutation,
-} from '@/features/wishlists/wishlistsApi';
+} from "@/features/wishlists/wishlistsApi";
 
 interface ProductCardProps {
   product: SellerProduct;
@@ -44,232 +46,250 @@ function getCategoryTheme(
   categorySlug: string,
   subCategorySlug: string,
   productName: string,
-  isBn: boolean
+  isBn: boolean,
 ) {
-  const combined = `${categorySlug} ${subCategorySlug} ${productName}`.toLowerCase();
+  const combined =
+    `${categorySlug} ${subCategorySlug} ${productName}`.toLowerCase();
 
   // Fish & Seafood
   if (
-    combined.includes('fish') ||
-    combined.includes('মাছ') ||
-    combined.includes('রুই') ||
-    combined.includes('কাতল') ||
-    combined.includes('ইলিশ')
+    combined.includes("fish") ||
+    combined.includes("মাছ") ||
+    combined.includes("রুই") ||
+    combined.includes("কাতল") ||
+    combined.includes("ইলিশ")
   ) {
     return {
-      type: 'fish',
-      label: isBn ? 'তাজা মাছ' : 'Fresh Fish',
-      badgeClass: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'fish',
+      type: "fish",
+      label: isBn ? "তাজা মাছ" : "Fresh Fish",
+      badgeClass:
+        "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "fish",
     };
   }
 
   // Meat & Poultry
   if (
-    combined.includes('meat') ||
-    combined.includes('chicken') ||
-    combined.includes('beef') ||
-    combined.includes('মাংস') ||
-    combined.includes('মুরগি') ||
-    combined.includes('গরু')
+    combined.includes("meat") ||
+    combined.includes("chicken") ||
+    combined.includes("beef") ||
+    combined.includes("মাংস") ||
+    combined.includes("মুরগি") ||
+    combined.includes("গরু")
   ) {
     return {
-      type: 'meat',
-      label: isBn ? 'দেশি মাংস' : 'Fresh Meat',
-      badgeClass: 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'flame',
+      type: "meat",
+      label: isBn ? "দেশি মাংস" : "Fresh Meat",
+      badgeClass:
+        "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "flame",
     };
   }
 
   // Fruits
   if (
-    combined.includes('fruit') ||
-    combined.includes('ফল') ||
-    combined.includes('আম') ||
-    combined.includes('কলা') ||
-    combined.includes('আপেল')
+    combined.includes("fruit") ||
+    combined.includes("ফল") ||
+    combined.includes("আম") ||
+    combined.includes("কলা") ||
+    combined.includes("আপেল")
   ) {
     return {
-      type: 'fruits',
-      label: isBn ? 'তাজা ফল' : 'Fresh Fruits',
-      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'sparkles',
+      type: "fruits",
+      label: isBn ? "তাজা ফল" : "Fresh Fruits",
+      badgeClass:
+        "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "sparkles",
     };
   }
 
   // Spices & Condiments
   if (
-    combined.includes('spice') ||
-    combined.includes('মসলা') ||
-    combined.includes('জিরা') ||
-    combined.includes('হলুদ')
+    combined.includes("spice") ||
+    combined.includes("মসলা") ||
+    combined.includes("জিরা") ||
+    combined.includes("হলুদ")
   ) {
     return {
-      type: 'spices',
-      label: isBn ? 'খাঁটি মসলা' : 'Pure Spices',
-      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'sparkles',
+      type: "spices",
+      label: isBn ? "খাঁটি মসলা" : "Pure Spices",
+      badgeClass:
+        "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "sparkles",
     };
   }
 
   // Fresh Vegetables & Greens
   if (
-    combined.includes('vegetable') ||
-    combined.includes('সবজি') ||
-    combined.includes('শাক') ||
-    combined.includes('আলু') ||
-    combined.includes('টমেটো')
+    combined.includes("vegetable") ||
+    combined.includes("সবজি") ||
+    combined.includes("শাক") ||
+    combined.includes("আলু") ||
+    combined.includes("টমেটো")
   ) {
     return {
-      type: 'vegetables',
-      label: isBn ? 'টাটকা সবজি' : 'Fresh Vegetables',
-      badgeClass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'leaf',
+      type: "vegetables",
+      label: isBn ? "টাটকা সবজি" : "Fresh Vegetables",
+      badgeClass:
+        "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "leaf",
     };
   }
 
   // Pure Oils, Ghee & Honey
   if (
-    combined.includes('oil') ||
-    combined.includes('ghee') ||
-    combined.includes('তেল') ||
-    combined.includes('ঘি') ||
-    combined.includes('honey') ||
-    combined.includes('মধু')
+    combined.includes("oil") ||
+    combined.includes("ghee") ||
+    combined.includes("তেল") ||
+    combined.includes("ঘি") ||
+    combined.includes("honey") ||
+    combined.includes("মধু")
   ) {
     return {
-      type: 'oil',
-      label: isBn ? 'খাঁটি প্রাকৃতিক' : 'Pure Organic',
-      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'droplets',
+      type: "oil",
+      label: isBn ? "খাঁটি প্রাকৃতিক" : "Pure Organic",
+      badgeClass:
+        "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "droplets",
     };
   }
 
   // Grains, Rice, Pulses
   if (
-    combined.includes('rice') ||
-    combined.includes('dal') ||
-    combined.includes('grain') ||
-    combined.includes('চাল') ||
-    combined.includes('ডাল')
+    combined.includes("rice") ||
+    combined.includes("dal") ||
+    combined.includes("grain") ||
+    combined.includes("চাল") ||
+    combined.includes("ডাল")
   ) {
     return {
-      type: 'grains',
-      label: isBn ? 'খাদ্যশস্য' : 'Grains & Rice',
-      badgeClass: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'wheat',
+      type: "grains",
+      label: isBn ? "খাদ্যশস্য" : "Grains & Rice",
+      badgeClass:
+        "bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "wheat",
     };
   }
 
   // Electronics & Gadgets
   if (
-    combined.includes('electron') ||
-    combined.includes('mobile') ||
-    combined.includes('gadget') ||
-    combined.includes('ফোন')
+    combined.includes("electron") ||
+    combined.includes("mobile") ||
+    combined.includes("gadget") ||
+    combined.includes("ফোন")
   ) {
     return {
-      type: 'electronics',
-      label: isBn ? 'অফিশিয়াল' : 'Official',
-      badgeClass: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'shieldCheck',
+      type: "electronics",
+      label: isBn ? "অফিশিয়াল" : "Official",
+      badgeClass:
+        "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "shieldCheck",
     };
   }
 
   // Fashion & Apparel
   if (
-    combined.includes('cloth') ||
-    combined.includes('fashion') ||
-    combined.includes('wear') ||
-    combined.includes('পোশাক')
+    combined.includes("cloth") ||
+    combined.includes("fashion") ||
+    combined.includes("wear") ||
+    combined.includes("পোশাক")
   ) {
     return {
-      type: 'fashion',
-      label: isBn ? 'ফ্যাশন' : 'Fashion',
-      badgeClass: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20',
-      accentBorder: 'hover:border-primary/50',
-      icon: 'shirt',
+      type: "fashion",
+      label: isBn ? "ফ্যাশন" : "Fashion",
+      badgeClass:
+        "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20",
+      accentBorder: "hover:border-primary/50",
+      icon: "shirt",
     };
   }
 
   return {
-    type: 'general',
-    label: '',
-    badgeClass: 'bg-muted text-muted-foreground border-border/60',
-    accentBorder: 'hover:border-primary/50',
-    icon: 'sparkles',
+    type: "general",
+    label: "",
+    badgeClass: "bg-muted text-muted-foreground border-border/60",
+    accentBorder: "hover:border-primary/50",
+    icon: "sparkles",
   };
 }
 
 function formatUnit(unit: string | undefined, isBn: boolean): string {
-  if (!unit) return '';
+  if (!unit) return "";
   if (!isBn) return unit;
   const lower = unit.toLowerCase().trim();
   const unitMap: Record<string, string> = {
-    kg: 'কেজি',
-    gm: 'গ্রাম',
-    g: 'গ্রাম',
-    gram: 'গ্রাম',
-    liter: 'লিটার',
-    litre: 'লিটার',
-    l: 'লিটার',
-    ml: 'মি.লি.',
-    pack: 'প্যাক',
-    packet: 'প্যাকেট',
-    bundle: 'আঁটি',
-    piece: 'পিস',
-    pcs: 'পিস',
-    pc: 'পিস',
-    jar: 'জার',
-    box: 'বক্স',
-    dozen: 'ডজন',
+    kg: "কেজি",
+    gm: "গ্রাম",
+    g: "গ্রাম",
+    gram: "গ্রাম",
+    liter: "লিটার",
+    litre: "লিটার",
+    l: "লিটার",
+    ml: "মি.লি.",
+    pack: "প্যাক",
+    packet: "প্যাকেট",
+    bundle: "আঁটি",
+    piece: "পিস",
+    pcs: "পিস",
+    pc: "পিস",
+    jar: "জার",
+    box: "বক্স",
+    dozen: "ডজন",
   };
   return unitMap[lower] || unit;
 }
 
-export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCardProps) {
+export function ProductCard({
+  product,
+  lang,
+  flashSaleDiscountPrice,
+}: ProductCardProps) {
   const dispatch = useDispatch();
-  const isBn = lang === 'bn';
+  const isBn = lang === "bn";
 
   const productData = product.productVariant?.product;
-  const productName = isBn ? productData?.nameBn || productData?.nameEn : productData?.nameEn;
+  const productName = isBn
+    ? productData?.nameBn || productData?.nameEn
+    : productData?.nameEn;
   const variantName = isBn
     ? product.productVariant?.nameBn || product.productVariant?.nameEn
     : product.productVariant?.nameEn;
 
   const hasDistinctVariant =
     variantName &&
-    variantName.toLowerCase() !== 'standard' &&
-    variantName.toLowerCase() !== 'default' &&
-    variantName !== 'স্ট্যান্ডার্ড' &&
-    variantName !== 'ডিফল্ট' &&
+    variantName.toLowerCase() !== "standard" &&
+    variantName.toLowerCase() !== "default" &&
+    variantName !== "স্ট্যান্ডার্ড" &&
+    variantName !== "ডিফল্ট" &&
     variantName !== productName;
-  const displayName = hasDistinctVariant ? `${productName} (${variantName})` : productName || '';
+  const displayName = hasDistinctVariant
+    ? `${productName} (${variantName})`
+    : productName || "";
 
-  const image = product.productVariant?.images?.[0] || '/placeholder.jpg';
-  const slug = productData?.slug || '';
-  const productId = productData?.id || '';
-  const rawUnit = productData?.unit || '';
+  const image = product.productVariant?.images?.[0] || "/placeholder.jpg";
+  const slug = productData?.slug || "";
+  const productId = productData?.id || "";
+  const rawUnit = productData?.unit || "";
   const formattedUnit = formatUnit(rawUnit, isBn);
   const stock = product.inventory?.quantity ?? 0;
   const isOutOfStock = stock <= 0;
 
   // Category theme resolution
-  const categorySlug = productData?.category?.slug || '';
-  const subCategorySlug = productData?.subCategory?.slug || '';
+  const categorySlug = productData?.category?.slug || "";
+  const subCategorySlug = productData?.subCategory?.slug || "";
   const categoryTheme = getCategoryTheme(
     categorySlug,
     subCategorySlug,
-    `${productData?.nameEn || ''} ${productData?.nameBn || ''}`,
-    isBn
+    `${productData?.nameEn || ""} ${productData?.nameBn || ""}`,
+    isBn,
   );
 
   // Fallback badge text if general
@@ -280,15 +300,19 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         ? productData.subCategory.nameBn
         : productData.subCategory.nameEn
       : productData?.category
-      ? isBn
-        ? productData.category.nameBn
-        : productData.category.nameEn
-      : '');
+        ? isBn
+          ? productData.category.nameBn
+          : productData.category.nameEn
+        : "");
 
   // Resolve prices
   const rawPrice = Number(product.price);
-  const rawDiscount = product.discountPrice ? Number(product.discountPrice) : null;
-  const compareAt = productData?.compareAtPrice ? Number(productData.compareAtPrice) : null;
+  const rawDiscount = product.discountPrice
+    ? Number(product.discountPrice)
+    : null;
+  const compareAt = productData?.compareAtPrice
+    ? Number(productData.compareAtPrice)
+    : null;
 
   let currentPrice = rawPrice;
   let originalPrice: number | null = null;
@@ -312,9 +336,19 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
       ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
       : null;
 
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const { data: wishlist } = useGetUserWishlistQuery(undefined, { skip: !isAuthenticated });
-  const [addToWishlist, { isLoading: isAddingWishlist }] = useAddProductToWishlistMutation();
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth,
+  );
+  const userRoles = getUserRoles(user);
+  const isStaffOrSeller = userRoles.some((r) =>
+    ["SELLER", "RIDER", "ADMIN", "SUPER_ADMIN"].includes(r),
+  );
+
+  const { data: wishlist } = useGetUserWishlistQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+  const [addToWishlist, { isLoading: isAddingWishlist }] =
+    useAddProductToWishlistMutation();
   const [removeFromWishlist, { isLoading: isRemovingWishlist }] =
     useRemoveProductFromWishlistMutation();
 
@@ -323,35 +357,59 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
   const toggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      toast.error(isBn ? 'দয়া করে লগইন করুন' : 'Please login first');
+      toast.info(
+        isBn
+          ? "দয়া করে গ্রাহক হিসেবে লগইন করুন"
+          : "Please login to save favorites",
+      );
+      dispatch(setLoginModalOpen(true));
       return;
     }
     try {
       if (isWishlisted) {
         await removeFromWishlist(productId).unwrap();
-        toast.success(isBn ? 'উইশলিস্ট থেকে সরানো হয়েছে' : 'Removed from wishlist');
+        toast.success(
+          isBn ? "উইশলিস্ট থেকে সরানো হয়েছে" : "Removed from wishlist",
+        );
       } else {
         await addToWishlist(productId).unwrap();
-        toast.success(isBn ? 'উইশলিস্টে যোগ করা হয়েছে' : 'Added to wishlist');
+        toast.success(isBn ? "উইশলিস্টে যোগ করা হয়েছে" : "Added to wishlist");
       }
     } catch {
-      toast.error(isBn ? 'একটি ত্রুটি হয়েছে' : 'An error occurred');
+      toast.error(isBn ? "একটি ত্রুটি হয়েছে" : "An error occurred");
     }
   };
 
   const handleAddToCart = () => {
+    if (isStaffOrSeller) {
+      toast.info(
+        isBn
+          ? "কার্ট ও পণ্য ক্রয় শুধুমাত্র কাস্টমার অ্যাকাউন্টের জন্য প্রযোজ্য।"
+          : "Shopping and cart actions are reserved for customer accounts.",
+      );
+      return;
+    }
+    if (!isAuthenticated) {
+      toast.info(
+        isBn
+          ? "কার্টে যোগ করতে অনুগ্রহ করে লগইন করুন"
+          : "Please login as a customer to add items to cart",
+      );
+      dispatch(setLoginModalOpen(true));
+      return;
+    }
     dispatch(
       addToCart({
         sellerProductId: product.id,
-        nameEn: product.productVariant?.nameEn || productData?.nameEn || '',
-        nameBn: product.productVariant?.nameBn || productData?.nameBn || '',
+        nameEn: product.productVariant?.nameEn || productData?.nameEn || "",
+        nameBn: product.productVariant?.nameBn || productData?.nameBn || "",
         price: currentPrice,
         quantity: 1,
         image,
         maxQuantity: stock,
-      })
+      }),
     );
-    toast.success(isBn ? 'কার্টে যোগ করা হয়েছে' : 'Added to cart');
+    toast.success(isBn ? "কার্টে যোগ করা হয়েছে" : "Added to cart");
   };
 
   const avgRating = productData?.averageRating || 0;
@@ -359,27 +417,29 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
   const brandName = isBn
     ? productData?.brand?.nameBn || productData?.brand?.nameEn
     : productData?.brand?.nameEn;
-  const shopName = isBn ? product.shop?.nameBn || product.shop?.nameEn : product.shop?.nameEn;
+  const shopName = isBn
+    ? product.shop?.nameBn || product.shop?.nameEn
+    : product.shop?.nameEn;
 
   const renderCategoryIcon = () => {
     switch (categoryTheme.icon) {
-      case 'fish':
+      case "fish":
         return <Fish className="w-2.5 h-2.5" />;
-      case 'flame':
+      case "flame":
         return <Flame className="w-2.5 h-2.5" />;
-      case 'leaf':
+      case "leaf":
         return <Leaf className="w-2.5 h-2.5" />;
-      case 'droplets':
+      case "droplets":
         return <Droplets className="w-2.5 h-2.5" />;
-      case 'wheat':
+      case "wheat":
         return <Wheat className="w-2.5 h-2.5" />;
-      case 'shirt':
+      case "shirt":
         return <Shirt className="w-2.5 h-2.5" />;
-      case 'utensils':
+      case "utensils":
         return <Utensils className="w-2.5 h-2.5" />;
-      case 'shieldCheck':
+      case "shieldCheck":
         return <ShieldCheck className="w-2.5 h-2.5" />;
-      case 'zap':
+      case "zap":
         return <Zap className="w-2.5 h-2.5" />;
       default:
         return <Sparkles className="w-2.5 h-2.5" />;
@@ -426,7 +486,7 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         {isOutOfStock && (
           <div className="absolute inset-0 bg-background/65 backdrop-blur-[2px] flex items-center justify-center z-10">
             <span className="bg-zinc-900/90 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
-              {isBn ? 'স্টক শেষ' : 'Out of Stock'}
+              {isBn ? "স্টক শেষ" : "Out of Stock"}
             </span>
           </div>
         )}
@@ -438,10 +498,10 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
           onClick={toggleWishlist}
           disabled={isAddingWishlist || isRemovingWishlist}
           className="absolute top-2.5 right-2.5 h-8 w-8 bg-background/90 hover:bg-background shadow-xs z-10 rounded-full transition-all opacity-85 group-hover:opacity-100"
-          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
-            className={`h-4 w-4 ${isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground/70'}`}
+            className={`h-4 w-4 ${isWishlisted ? "fill-destructive text-destructive" : "text-foreground/70"}`}
           />
         </Button>
 
@@ -479,7 +539,9 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
                 <Star className="h-3 w-3 fill-current" />
                 <span>{avgRating.toFixed(1)}</span>
                 {totalReviews > 0 && (
-                  <span className="text-muted-foreground">({totalReviews})</span>
+                  <span className="text-muted-foreground">
+                    ({totalReviews})
+                  </span>
                 )}
               </div>
             )}
@@ -495,18 +557,19 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
           </Link>
 
           {/* Electronics / Specs snippet */}
-          {categoryTheme.type === 'electronics' && productData?.shortDescriptionEn && (
-            <p className="text-[11px] text-muted-foreground line-clamp-1 mb-2">
-              {isBn && productData.shortDescriptionBn
-                ? productData.shortDescriptionBn
-                : productData.shortDescriptionEn}
-            </p>
-          )}
+          {categoryTheme.type === "electronics" &&
+            productData?.shortDescriptionEn && (
+              <p className="text-[11px] text-muted-foreground line-clamp-1 mb-2">
+                {isBn && productData.shortDescriptionBn
+                  ? productData.shortDescriptionBn
+                  : productData.shortDescriptionEn}
+              </p>
+            )}
 
-          {categoryTheme.type !== 'electronics' && avgRating === 0 && (
+          {categoryTheme.type !== "electronics" && avgRating === 0 && (
             <div className="flex items-center gap-1.5 mb-2">
               <span className="text-[10px] font-medium text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">
-                {isBn ? 'নতুন পণ্য' : 'New'}
+                {isBn ? "নতুন পণ্য" : "New"}
               </span>
             </div>
           )}
@@ -515,12 +578,18 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         {/* Price & Shop Section */}
         <div className="pt-2 border-t border-border/40 mt-1">
           <div className="flex items-baseline flex-wrap gap-1.5">
-            <span className="text-base md:text-lg font-bold text-primary">৳{currentPrice}</span>
+            <span className="text-base md:text-lg font-bold text-primary">
+              ৳{currentPrice}
+            </span>
             {originalPrice && originalPrice > currentPrice && (
-              <span className="text-xs text-muted-foreground line-through">৳{originalPrice}</span>
+              <span className="text-xs text-muted-foreground line-through">
+                ৳{originalPrice}
+              </span>
             )}
             {formattedUnit && (
-              <span className="text-xs text-muted-foreground">/ {formattedUnit}</span>
+              <span className="text-xs text-muted-foreground">
+                / {formattedUnit}
+              </span>
             )}
           </div>
 
@@ -539,16 +608,21 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         <Button
           className="w-full h-9 text-xs font-semibold rounded-xl shadow-xs"
           disabled={isOutOfStock}
+          variant={isStaffOrSeller ? "secondary" : "default"}
           onClick={handleAddToCart}
         >
           <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
           {isOutOfStock
             ? isBn
-              ? 'স্টক শেষ'
-              : 'Out of Stock'
-            : isBn
-            ? 'কার্টে যোগ করুন'
-            : 'Add to Cart'}
+              ? "স্টক শেষ"
+              : "Out of Stock"
+            : isStaffOrSeller
+              ? isBn
+                ? "কাস্টমার ফিচার"
+                : "Customer Feature"
+              : isBn
+                ? "কার্টে যোগ করুন"
+                : "Add to Cart"}
         </Button>
       </CardFooter>
     </Card>

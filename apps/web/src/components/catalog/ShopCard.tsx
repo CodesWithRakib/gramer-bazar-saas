@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Store, CheckCircle, ChevronRight, Star, Package } from 'lucide-react';
-import type { Shop } from '@/features/shops/shopsApi';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Store, CheckCircle, ChevronRight, Star, Package } from "lucide-react";
+import type { Shop } from "@/features/shops/shopsApi";
 
 export interface ShopCardProps {
   shop: Shop;
@@ -15,9 +15,10 @@ export interface ShopCardProps {
 }
 
 export function ShopCard({ shop, lang }: ShopCardProps) {
-  const isBn = lang === 'bn';
+  const isBn = lang === "bn";
   const name = isBn ? shop.nameBn : shop.nameEn;
-  const description = shop.description || (isBn ? 'কোন বিবরণ নেই' : 'No description available');
+  const description =
+    shop.description || (isBn ? "কোন বিবরণ নেই" : "No description available");
 
   return (
     <Card className="group overflow-hidden hover:shadow-md hover:border-primary/40 transition-all duration-300 bg-card border-border/70 flex flex-col h-full">
@@ -32,7 +33,7 @@ export function ShopCard({ shop, lang }: ShopCardProps) {
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-primary/15 via-emerald-500/10 to-primary/5">
+          <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
             <Store className="h-10 w-10 text-primary/40" />
           </div>
         )}
@@ -40,9 +41,12 @@ export function ShopCard({ shop, lang }: ShopCardProps) {
         {/* Verification Pill */}
         {shop.isVerified && (
           <div className="absolute top-2.5 right-2.5 z-10">
-            <Badge variant="success" className="gap-1 text-[10px] px-2 py-0.5 shadow-xs">
+            <Badge
+              variant="success"
+              className="gap-1 text-[10px] px-2 py-0.5 shadow-xs"
+            >
               <CheckCircle className="h-3 w-3" />
-              <span>{isBn ? 'ভেরিফাইড' : 'Verified'}</span>
+              <span>{isBn ? "ভেরিফাইড" : "Verified"}</span>
             </Badge>
           </div>
         )}
@@ -86,7 +90,7 @@ export function ShopCard({ shop, lang }: ShopCardProps) {
               <span className="flex items-center gap-1">
                 <Package className="h-3.5 w-3.5 text-muted-foreground" />
                 <span>
-                  {shop.productCount} {isBn ? 'টি পণ্য' : 'products'}
+                  {shop.productCount} {isBn ? "টি পণ্য" : "products"}
                 </span>
               </span>
             )}
@@ -105,7 +109,7 @@ export function ShopCard({ shop, lang }: ShopCardProps) {
           className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 mt-auto"
         >
           <Link href={`/${lang}/shops/${shop.id}`}>
-            <span>{isBn ? 'দোকান দেখুন' : 'Visit Shop'}</span>
+            <span>{isBn ? "দোকান দেখুন" : "Visit Shop"}</span>
             <ChevronRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-1" />
           </Link>
         </Button>

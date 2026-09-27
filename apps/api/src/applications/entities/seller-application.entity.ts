@@ -6,12 +6,15 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
 import { ApplicationStatus } from '../enums/application-status.enum.js';
 
 @Entity('seller_applications')
+@Index('idx_seller_applications_status', ['status'])
+@Index('idx_seller_applications_created_at', ['createdAt'])
 export class SellerApplication {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -44,7 +47,12 @@ export class SellerApplication {
   @Column({ type: 'text', nullable: true })
   address: string | null;
 
-  @Column({ name: 'trade_license_number', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'trade_license_number',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   tradeLicenseNumber: string | null;
 
   @Column({ name: 'nid_number', type: 'varchar', length: 50, nullable: true })

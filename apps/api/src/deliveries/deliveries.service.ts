@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Delivery } from './entities/delivery.entity.js';
@@ -7,8 +11,16 @@ import { Order } from '../orders/entities/order.entity.js';
 import { OrderStatusHistory } from '../orders/entities/order-status-history.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { DeliveryStatus } from './enums/delivery-status.enum.js';
-import { OrderStatus, PaymentStatus, PaymentMethod } from '../orders/enums/order-status.enum.js';
-import { Notification, NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
+import {
+  OrderStatus,
+  PaymentStatus,
+  PaymentMethod,
+} from '../orders/enums/order-status.enum.js';
+import {
+  Notification,
+  NotificationType,
+  NotificationPriority,
+} from '../notifications/entities/notification.entity.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
@@ -40,14 +52,17 @@ export class DeliveriesService {
       });
     }
 
-    const query = this.deliveryRepository.createQueryBuilder('delivery')
+    const query = this.deliveryRepository
+      .createQueryBuilder('delivery')
       .leftJoinAndSelect('delivery.order', 'order')
       .leftJoinAndSelect('delivery.rider', 'rider')
       .leftJoinAndSelect('order.address', 'address')
       .orderBy('delivery.createdAt', 'DESC');
 
     if (search) {
-      query.andWhere('delivery.id::text ILIKE :search', { search: `%${search}%` });
+      query.andWhere('delivery.id::text ILIKE :search', {
+        search: `%${search}%`,
+      });
     }
 
     const [data, total] = await query
@@ -67,7 +82,8 @@ export class DeliveriesService {
   }
 
   async getRiders() {
-    return this.userRepository.createQueryBuilder('user')
+    return this.userRepository
+      .createQueryBuilder('user')
       .innerJoin('user.roles', 'role')
       .where('role.name = :role', { role: Role.RIDER })
       .select(['user.id', 'user.firstName', 'user.lastName', 'user.phone'])
@@ -76,7 +92,9 @@ export class DeliveriesService {
 
   async assignDelivery(adminId: string, dto: AssignDeliveryDto) {
     return this.dataSource.transaction(async (manager) => {
-      const order = await manager.findOne(Order, { where: { id: dto.orderId } });
+      const order = await manager.findOne(Order, {
+        where: { id: dto.orderId },
+      });
       if (!order) throw new NotFoundException('Order not found');
 
       const rider = await manager.findOne(User, {
@@ -87,8 +105,10 @@ export class DeliveriesService {
         throw new BadRequestException('Invalid rider ID');
       }
 
-      let delivery = await manager.findOne(Delivery, { where: { orderId: order.id } });
-      
+      let delivery = await manager.findOne(Delivery, {
+        where: { orderId: order.id },
+      });
+
       if (delivery) {
         // Re-assign logic
         delivery.riderId = dto.riderId;
@@ -103,7 +123,7 @@ export class DeliveriesService {
           assignedAt: new Date(),
         });
       }
-      
+
       delivery = await manager.save(Delivery, delivery);
 
       // Save delivery history
@@ -116,7 +136,9 @@ export class DeliveriesService {
 
       // Notifications for the rider and customer
       const orderShortId = order.id.slice(0, 8).toUpperCase();
-      const riderFullName = `${rider.firstName || ''} ${rider.lastName || ''}`.trim() || 'Delivery Rider';
+      const riderFullName =
+        `${rider.firstName || ''} ${rider.lastName || ''}`.trim() ||
+        'Delivery Rider';
 
       void this.notificationsService.notifyUser(rider.id, {
         type: NotificationType.DELIVERY_ASSIGNED,
@@ -125,7 +147,11 @@ export class DeliveriesService {
         titleKey: 'notifications.delivery_assigned_rider.title',
         messageKey: 'notifications.delivery_assigned_rider.message',
         priority: NotificationPriority.HIGH,
-        data: { orderId: order.id, deliveryId: delivery.id, orderNumber: orderShortId },
+        data: {
+          orderId: order.id,
+          deliveryId: delivery.id,
+          orderNumber: orderShortId,
+        },
       });
 
       void this.notificationsService.notifyUser(order.userId, {
@@ -157,17 +183,90 @@ export class DeliveriesService {
     });
   }
 
+  async getRiderDashboard(riderId: string) {
+    const deliveries = await this.deliveryRepository.find({
+      where: { riderId },
+      relations: ['order', 'order.address', 'order.user'],
+      order: { updatedAt: 'DESC' },
+    });
+
+    const assignedCount = deliveries.filter(
+      (d) => d.status === DeliveryStatus.ASSIGNED,
+    ).length;
+    const activeCount = deliveries.filter((d) =>
+      [
+        DeliveryStatus.ACCEPTED,
+        DeliveryStatus.PICKED_UP,
+        DeliveryStatus.OUT_FOR_DELIVERY,
+      ].includes(d.status),
+    ).length;
+    const completedCount = deliveries.filter(
+      (d) => d.status === DeliveryStatus.DELIVERED,
+    ).length;
+
+    const totalEarnings = deliveries
+      .filter((d) => d.status === DeliveryStatus.DELIVERED)
+      .reduce((sum, d) => sum + (Number(d.order?.deliveryFee) || 50), 0);
+
+    const deliveriesTrendRaw = await this.deliveryRepository.manager.query(
+      `
+      SELECT TO_CHAR(d.created_at, 'Dy') as name,
+             COUNT(CASE WHEN d.status = 'DELIVERED' THEN 1 END)::int as completed,
+             COUNT(CASE WHEN d.status != 'DELIVERED' THEN 1 END)::int as pending,
+             SUM(CASE WHEN d.status = 'DELIVERED' THEN COALESCE(o.delivery_fee, 50) ELSE 0 END)::float as earnings
+      FROM deliveries d
+      LEFT JOIN orders o ON o.id = d.order_id
+      WHERE d.rider_id = $1 AND d.created_at >= NOW() - INTERVAL '7 days'
+      GROUP BY TO_CHAR(d.created_at, 'Dy')
+      ORDER BY MIN(d.created_at) ASC
+    `,
+      [riderId],
+    );
+
+    const deliveriesTrend = deliveriesTrendRaw.map((r: any) => ({
+      name: r.name,
+      completed: Number(r.completed || 0),
+      pending: Number(r.pending || 0),
+      earnings: Number(r.earnings || 0),
+    }));
+
+    return {
+      metrics: {
+        assignedCount,
+        activeCount,
+        completedCount,
+        totalEarnings,
+      },
+      deliveriesTrend,
+      recentDeliveries: deliveries.slice(0, 5),
+    };
+  }
+
   async getDeliveryByIdForRider(riderId: string, id: string) {
     const delivery = await this.deliveryRepository.findOne({
       where: { id, riderId },
-      relations: ['order', 'order.address', 'order.user', 'order.items', 'order.items.sellerProduct', 'order.items.sellerProduct.productVariant', 'order.items.sellerProduct.productVariant.product'],
+      relations: [
+        'order',
+        'order.address',
+        'order.user',
+        'order.items',
+        'order.items.sellerProduct',
+        'order.items.sellerProduct.productVariant',
+        'order.items.sellerProduct.productVariant.product',
+      ],
     });
 
-    if (!delivery) throw new NotFoundException('Delivery not found or not assigned to you');
+    if (!delivery)
+      throw new NotFoundException('Delivery not found or not assigned to you');
     return delivery;
   }
 
-  async updateDeliveryStatus(userId: string, id: string, dto: UpdateDeliveryStatusDto, isAdmin: boolean = false) {
+  async updateDeliveryStatus(
+    userId: string,
+    id: string,
+    dto: UpdateDeliveryStatusDto,
+    isAdmin: boolean = false,
+  ) {
     return this.dataSource.transaction(async (manager) => {
       const delivery = await manager.findOne(Delivery, {
         where: { id },
@@ -224,14 +323,17 @@ export class DeliveriesService {
       if (newOrderStatus && order.status !== newOrderStatus) {
         const previousOrderStatus = order.status;
         order.status = newOrderStatus;
-        
+
         // Synchronize COD payment status
-        if (newOrderStatus === OrderStatus.DELIVERED && order.paymentMethod === PaymentMethod.COD) {
+        if (
+          newOrderStatus === OrderStatus.DELIVERED &&
+          order.paymentMethod === PaymentMethod.COD
+        ) {
           order.paymentStatus = PaymentStatus.PAID;
         }
 
         await manager.save(Order, order);
-        
+
         const history = new OrderStatusHistory();
         history.orderId = order.id;
         history.fromStatus = previousOrderStatus;
@@ -263,7 +365,11 @@ export class DeliveriesService {
             titleKey: 'notifications.delivery_started.title',
             messageKey: 'notifications.delivery_started.message',
             priority: NotificationPriority.NORMAL,
-            data: { orderId: order.id, deliveryId: delivery.id, orderNumber: orderShortId },
+            data: {
+              orderId: order.id,
+              deliveryId: delivery.id,
+              orderNumber: orderShortId,
+            },
           });
         } else if (dto.status === DeliveryStatus.FAILED) {
           void this.notificationsService.notifyUser(order.userId, {
@@ -273,7 +379,11 @@ export class DeliveriesService {
             titleKey: 'notifications.delivery_failed.title',
             messageKey: 'notifications.delivery_failed.message',
             priority: NotificationPriority.HIGH,
-            data: { orderId: order.id, deliveryId: delivery.id, orderNumber: orderShortId },
+            data: {
+              orderId: order.id,
+              deliveryId: delivery.id,
+              orderNumber: orderShortId,
+            },
           });
         }
 
@@ -292,13 +402,28 @@ export class DeliveriesService {
     });
   }
 
-  private validateStatusTransition(current: DeliveryStatus, next: DeliveryStatus) {
+  private validateStatusTransition(
+    current: DeliveryStatus,
+    next: DeliveryStatus,
+  ) {
     const transitions: Record<DeliveryStatus, DeliveryStatus[]> = {
       [DeliveryStatus.UNASSIGNED]: [DeliveryStatus.ASSIGNED],
-      [DeliveryStatus.ASSIGNED]: [DeliveryStatus.ACCEPTED, DeliveryStatus.CANCELLED],
-      [DeliveryStatus.ACCEPTED]: [DeliveryStatus.PICKED_UP, DeliveryStatus.CANCELLED],
-      [DeliveryStatus.PICKED_UP]: [DeliveryStatus.OUT_FOR_DELIVERY, DeliveryStatus.FAILED],
-      [DeliveryStatus.OUT_FOR_DELIVERY]: [DeliveryStatus.DELIVERED, DeliveryStatus.FAILED],
+      [DeliveryStatus.ASSIGNED]: [
+        DeliveryStatus.ACCEPTED,
+        DeliveryStatus.CANCELLED,
+      ],
+      [DeliveryStatus.ACCEPTED]: [
+        DeliveryStatus.PICKED_UP,
+        DeliveryStatus.CANCELLED,
+      ],
+      [DeliveryStatus.PICKED_UP]: [
+        DeliveryStatus.OUT_FOR_DELIVERY,
+        DeliveryStatus.FAILED,
+      ],
+      [DeliveryStatus.OUT_FOR_DELIVERY]: [
+        DeliveryStatus.DELIVERED,
+        DeliveryStatus.FAILED,
+      ],
       [DeliveryStatus.DELIVERED]: [],
       [DeliveryStatus.FAILED]: [],
       [DeliveryStatus.CANCELLED]: [],
@@ -306,18 +431,28 @@ export class DeliveriesService {
 
     const allowed = transitions[current] || [];
     if (!allowed.includes(next)) {
-      throw new BadRequestException(`Cannot transition delivery from ${current} to ${next}`);
+      throw new BadRequestException(
+        `Cannot transition delivery from ${current} to ${next}`,
+      );
     }
   }
 
-  async updateRiderLocation(riderId: string, id: string, lat: number, lng: number) {
+  async updateRiderLocation(
+    riderId: string,
+    id: string,
+    lat: number,
+    lng: number,
+  ) {
     const delivery = await this.deliveryRepository.findOne({
       where: { id, riderId },
     });
 
-    if (!delivery) throw new NotFoundException('Delivery not found or not assigned to you');
+    if (!delivery)
+      throw new NotFoundException('Delivery not found or not assigned to you');
     if (delivery.status !== DeliveryStatus.OUT_FOR_DELIVERY) {
-      throw new BadRequestException('Can only update location when OUT_FOR_DELIVERY');
+      throw new BadRequestException(
+        'Can only update location when OUT_FOR_DELIVERY',
+      );
     }
 
     delivery.currentLat = lat;
@@ -328,15 +463,23 @@ export class DeliveriesService {
     // TypeORM returns decimal columns as strings from PostgreSQL — coerce back to numbers
     return {
       ...saved,
-      currentLat: saved.currentLat !== null ? parseFloat(saved.currentLat as unknown as string) : null,
-      currentLng: saved.currentLng !== null ? parseFloat(saved.currentLng as unknown as string) : null,
+      currentLat:
+        saved.currentLat !== null
+          ? parseFloat(saved.currentLat as unknown as string)
+          : null,
+      currentLng:
+        saved.currentLng !== null
+          ? parseFloat(saved.currentLng as unknown as string)
+          : null,
     };
   }
 
   // --- CUSTOMER ACTIONS ---
 
   async getCustomerDelivery(userId: string, orderId: string) {
-    const order = await this.orderRepository.findOne({ where: { id: orderId, userId } });
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, userId },
+    });
     if (!order) throw new NotFoundException('Order not found');
 
     const delivery = await this.deliveryRepository.findOne({
@@ -355,11 +498,13 @@ export class DeliveriesService {
       currentLat: delivery.currentLat,
       currentLng: delivery.currentLng,
       lastLocationUpdatedAt: delivery.lastLocationUpdatedAt,
-      rider: delivery.rider ? {
-        firstName: delivery.rider.firstName,
-        lastName: delivery.rider.lastName,
-        phone: delivery.rider.phone,
-      } : null,
+      rider: delivery.rider
+        ? {
+            firstName: delivery.rider.firstName,
+            lastName: delivery.rider.lastName,
+            phone: delivery.rider.phone,
+          }
+        : null,
     };
   }
 }
