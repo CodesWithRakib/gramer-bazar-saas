@@ -16,7 +16,13 @@ import {
 } from "@/config/dashboard-routes";
 import { api } from "@/store/api";
 import { Menu, LogOut, Store, User, Settings, ChevronDown } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
@@ -66,7 +72,9 @@ function NavItem({ href, icon: Icon, title, isActive, onClick }: NavItemProps) {
     >
       <Icon
         className={`w-4 h-4 shrink-0 transition-colors ${
-          isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+          isActive
+            ? "text-primary"
+            : "text-muted-foreground group-hover:text-foreground"
         }`}
       />
       <span className="truncate">{title}</span>
@@ -88,7 +96,11 @@ function SidebarContent({
   onItemClick?: () => void;
 }) {
   // Group routes by section for clean visual non-interactive section labels
-  const sections: { title: string; titleBn: string; items: DashboardRoute[] }[] = [];
+  const sections: {
+    title: string;
+    titleBn: string;
+    items: DashboardRoute[];
+  }[] = [];
   routes.forEach((route) => {
     const secTitle = route.section || "Main";
     const secTitleBn = route.sectionBn || "মূল";
@@ -126,7 +138,9 @@ function SidebarContent({
                 const isExactActive = pathname === fullHref;
                 const isPrefixActive =
                   route.matchPrefixes?.some(
-                    (p) => pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`)
+                    (p) =>
+                      pathname === `/${lang}${p}` ||
+                      pathname.startsWith(`/${lang}${p}/`),
                   ) ?? false;
                 const isSubActive =
                   route.href !== "/admin" &&
@@ -164,13 +178,14 @@ export function DashboardLayout({
   routeType,
   lang,
 }: DashboardLayoutProps) {
-  const routesMap: Record<DashboardLayoutProps["routeType"], DashboardRoute[]> = {
-    admin: adminRoutes,
-    "super-admin": superAdminRoutes,
-    seller: sellerRoutes,
-    rider: riderRoutes,
-    customer: customerRoutes,
-  };
+  const routesMap: Record<DashboardLayoutProps["routeType"], DashboardRoute[]> =
+    {
+      admin: adminRoutes,
+      "super-admin": superAdminRoutes,
+      seller: sellerRoutes,
+      rider: riderRoutes,
+      customer: customerRoutes,
+    };
   const routes = routesMap[routeType] || adminRoutes;
   const isBn = lang === "bn";
   const pathname = usePathname();
@@ -193,7 +208,7 @@ export function DashboardLayout({
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
           },
-        }
+        },
       );
     } catch {
       // Ignore network error on logout
@@ -214,7 +229,8 @@ export function DashboardLayout({
       pathname === fullHref ||
       pathname.startsWith(`${fullHref}/`) ||
       route.matchPrefixes?.some(
-        (p) => pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`)
+        (p) =>
+          pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`),
       )
     ) {
       activeTitle = isBn ? route.titleBn : route.title;
@@ -252,7 +268,9 @@ export function DashboardLayout({
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
                 <SheetHeader className="sr-only">
-                  <SheetTitle>{isBn ? "ন্যাভিগেশন মেনু" : "Navigation Menu"}</SheetTitle>
+                  <SheetTitle>
+                    {isBn ? "ন্যাভিগেশন মেনু" : "Navigation Menu"}
+                  </SheetTitle>
                 </SheetHeader>
                 <SidebarContent
                   routes={routes}
@@ -282,7 +300,9 @@ export function DashboardLayout({
                   className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/60 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs ring-1 ring-primary/20 shrink-0">
-                    {user?.firstName?.[0]?.toUpperCase() || <User className="h-4 w-4" />}
+                    {user?.firstName?.[0]?.toUpperCase() || (
+                      <User className="h-4 w-4" />
+                    )}
                   </div>
                   <div className="hidden sm:block text-left text-xs">
                     <p className="font-semibold text-foreground leading-tight truncate max-w-[120px]">
@@ -295,7 +315,10 @@ export function DashboardLayout({
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground hidden sm:block opacity-60" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 p-1.5 rounded-xl shadow-lg border-border">
+              <DropdownMenuContent
+                align="end"
+                className="w-56 p-1.5 rounded-xl shadow-lg border-border"
+              >
                 <DropdownMenuLabel className="px-2 py-1.5 font-normal">
                   <p className="text-xs font-semibold text-foreground truncate">
                     {user?.firstName} {user?.lastName}
@@ -306,14 +329,17 @@ export function DashboardLayout({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="my-1" />
 
-                <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-lg cursor-pointer py-2 text-xs"
+                >
                   <Link
                     href={
                       routeType === "seller"
                         ? `/${lang}/seller/profile`
                         : routeType === "rider"
-                        ? `/${lang}/rider/profile`
-                        : `/${lang}/customer/profile`
+                          ? `/${lang}/rider/profile`
+                          : `/${lang}/customer/profile`
                     }
                     className="flex items-center gap-2 w-full"
                   >
@@ -322,14 +348,17 @@ export function DashboardLayout({
                   </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-lg cursor-pointer py-2 text-xs"
+                >
                   <Link
                     href={
                       routeType === "admin"
                         ? `/${lang}/admin/settings`
                         : routeType === "super-admin"
-                        ? `/${lang}/super-admin/settings`
-                        : `/${lang}/customer/settings`
+                          ? `/${lang}/super-admin/settings`
+                          : `/${lang}/customer/settings`
                     }
                     className="flex items-center gap-2 w-full"
                   >
@@ -392,8 +421,8 @@ export function DashboardLayout({
                   ? "লগআউট হচ্ছে..."
                   : "Logging out..."
                 : isBn
-                ? "লগআউট"
-                : "Logout"}
+                  ? "লগআউট"
+                  : "Logout"}
             </Button>
           </DialogFooter>
         </DialogContent>

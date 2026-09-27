@@ -68,20 +68,33 @@ export class ConversationResponseDto {
 }
 
 export class ChatUnreadCountsResponseDto {
-  @ApiProperty({ example: 5, description: 'Total unread messages across all conversations' })
+  @ApiProperty({
+    example: 5,
+    description: 'Total unread messages across all conversations',
+  })
   unreadCount: number;
 
-  @ApiProperty({ example: 2, description: 'Total conversations with at least one unread message' })
+  @ApiProperty({
+    example: 2,
+    description: 'Total conversations with at least one unread message',
+  })
   unreadConversationsCount: number;
 }
 
 export class SendChatMessageDto {
-  @ApiProperty({ example: 'Hello, I have a question regarding my order.', description: 'Message body text' })
+  @ApiProperty({
+    example: 'Hello, I have a question regarding my order.',
+    description: 'Message body text',
+  })
   @IsString()
   @IsNotEmpty()
   content: string;
 
-  @ApiPropertyOptional({ example: 'TEXT', default: 'TEXT', description: 'Message type (TEXT, IMAGE, SYSTEM)' })
+  @ApiPropertyOptional({
+    example: 'TEXT',
+    default: 'TEXT',
+    description: 'Message type (TEXT, IMAGE, SYSTEM)',
+  })
   @IsString()
   @IsOptional()
   messageType?: string;

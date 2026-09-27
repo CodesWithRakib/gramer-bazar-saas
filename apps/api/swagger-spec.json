@@ -965,9 +965,19 @@
     },
     "/api/v1/auth/refresh": {
       "post": {
-        "description": "Reads refresh token from secure cookie, validates signature and database hash, and issues a fresh access token.",
+        "description": "Reads refresh token from secure cookie, body, or x-refresh-token header, validates signature and database hash, and issues a fresh access token.",
         "operationId": "AuthController_refresh",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "New access token issued successfully",
@@ -1022,7 +1032,7 @@
             }
           }
         },
-        "summary": "Refresh access token using HTTP-only cookie",
+        "summary": "Refresh access token using HTTP-only cookie, body, or header",
         "tags": [
           "Auth"
         ]
@@ -8777,9 +8787,39 @@
     },
     "/api/v1/notifications": {
       "get": {
-        "description": "Returns all notifications received by the authenticated user in reverse chronological order.",
+        "description": "Returns all notifications received by the authenticated user in reverse chronological order with optional filtering and pagination.",
         "operationId": "NotificationsController_getUserNotifications",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "unreadOnly",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "List of user notifications",
@@ -14273,7 +14313,21 @@
       "get": {
         "description": "Lists all active chat threads for the authenticated user, ordered by latest activity.",
         "operationId": "ChatController_getConversations",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by conversation type (DIRECT or SUPPORT)",
+            "schema": {
+              "enum": [
+                "DIRECT",
+                "SUPPORT"
+              ],
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "List of conversations",
@@ -14362,7 +14416,7 @@
         ]
       },
       "post": {
-        "description": "Finds or creates a chat conversation between user and participant (optionally linked to order/product).",
+        "description": "Finds or creates a chat conversation (DIRECT or SUPPORT).",
         "operationId": "ChatController_createConversation",
         "parameters": [],
         "requestBody": {
@@ -14791,7 +14845,7 @@
     },
     "/api/v1/chat/conversations/{id}/read": {
       "patch": {
-        "description": "Marks all incoming unread messages in the thread as read.",
+        "description": "Marks all incoming unread messages up to cursor in the thread as read.",
         "operationId": "ChatController_markAsRead",
         "parameters": [
           {
@@ -14804,6 +14858,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkReadDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Conversation messages marked as read",
@@ -14884,6 +14948,215 @@
           }
         ],
         "summary": "Mark conversation messages as read",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/v1/chat/support/cases": {
+      "get": {
+        "description": "Retrieves all ongoing and historical support conversations.",
+        "operationId": "ChatController_listSupportCases",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ACTIVE",
+                "OPEN",
+                "IN_PROGRESS",
+                "RESOLVED",
+                "CLOSED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "priority",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "LOW",
+                "MEDIUM",
+                "HIGH",
+                "URGENT"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Bad Request / Validation Failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized / Missing or Invalid Authentication Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden / User lacks required role or permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found / Requested resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error / Unexpected server failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List support tickets (Admin only)",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/v1/chat/support/cases/{id}": {
+      "patch": {
+        "operationId": "ChatController_updateSupportCase",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Support conversation UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSupportCaseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Bad Request / Validation Failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized / Missing or Invalid Authentication Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden / User lacks required role or permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found / Requested resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error / Unexpected server failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update support ticket status or assignment (Admin only)",
         "tags": [
           "Chat"
         ]
@@ -20315,6 +20588,15 @@
           "password"
         ]
       },
+      "RefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Optional refresh token if not provided via HTTP-only cookie"
+          }
+        }
+      },
       "UserProfileResponseDto": {
         "type": "object",
         "properties": {
@@ -23476,15 +23758,56 @@
             "type": "string",
             "example": "Your order #ORD-12345 has been picked up by the delivery rider."
           },
+          "titleKey": {
+            "type": "object",
+            "example": "notifications.delivery_started.title",
+            "nullable": true
+          },
+          "messageKey": {
+            "type": "object",
+            "example": "notifications.delivery_started.message",
+            "nullable": true
+          },
           "type": {
             "type": "string",
             "enum": [
-              "ORDER_UPDATE",
+              "ORDER_CREATED",
+              "ORDER_CONFIRMED",
+              "ORDER_CANCELLED",
+              "ORDER_STATUS_CHANGED",
+              "DELIVERY_ASSIGNED",
+              "DELIVERY_STARTED",
+              "DELIVERY_COMPLETED",
+              "DELIVERY_FAILED",
+              "PAYMENT_SUCCESS",
+              "PAYMENT_FAILED",
+              "SELLER_APPLICATION_SUBMITTED",
+              "SELLER_APPLICATION_APPROVED",
+              "SELLER_APPLICATION_REJECTED",
+              "RIDER_APPLICATION_SUBMITTED",
+              "RIDER_APPLICATION_APPROVED",
+              "RIDER_APPLICATION_REJECTED",
+              "PAYOUT_REQUESTED",
+              "PAYOUT_PROCESSED",
+              "PAYOUT_REJECTED",
+              "DISPUTE_OPENED",
+              "DISPUTE_RESOLVED",
               "SYSTEM",
+              "ORDER_UPDATE",
               "PROMO",
               "REQUEST"
             ],
-            "example": "ORDER_UPDATE"
+            "example": "ORDER_STATUS_CHANGED"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "NORMAL",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "example": "NORMAL"
           },
           "isRead": {
             "type": "boolean",
@@ -23513,6 +23836,7 @@
           "title",
           "message",
           "type",
+          "priority",
           "isRead",
           "createdAt"
         ]
@@ -24903,6 +25227,28 @@
           "phone": {
             "type": "string",
             "example": "01712345678"
+          },
+          "avatar": {
+            "type": "object",
+            "example": "https://example.com/avatar.jpg",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "example": "CUSTOMER",
+            "nullable": true
+          },
+          "roles": {
+            "example": [
+              {
+                "id": "1",
+                "name": "CUSTOMER"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -24939,13 +25285,45 @@
             "example": "CUSTOMER",
             "nullable": true
           },
+          "status": {
+            "type": "string",
+            "example": "SENT",
+            "enum": [
+              "SENT",
+              "DELIVERED",
+              "READ"
+            ]
+          },
           "isRead": {
             "type": "boolean",
             "example": false
           },
+          "clientMessageId": {
+            "type": "object",
+            "example": "client-temp-uuid-123"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "orderId": "1001"
+            }
+          },
+          "deliveredAt": {
+            "type": "object",
+            "example": "2026-09-26T10:01:00.000Z",
+            "nullable": true
+          },
+          "readAt": {
+            "type": "object",
+            "example": "2026-09-26T10:02:00.000Z",
+            "nullable": true
+          },
           "createdAt": {
             "type": "string",
             "example": "2026-09-26T10:00:00.000Z"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/ConversationParticipantDto"
           }
         },
         "required": [
@@ -24954,6 +25332,7 @@
           "senderId",
           "content",
           "messageType",
+          "status",
           "isRead",
           "createdAt"
         ]
@@ -24964,6 +25343,54 @@
           "id": {
             "type": "string",
             "example": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d"
+          },
+          "type": {
+            "type": "string",
+            "example": "DIRECT",
+            "enum": [
+              "DIRECT",
+              "SUPPORT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "example": "ACTIVE",
+            "enum": [
+              "ACTIVE",
+              "OPEN",
+              "IN_PROGRESS",
+              "RESOLVED",
+              "CLOSED"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "example": "MEDIUM",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "URGENT"
+            ]
+          },
+          "supportCaseNumber": {
+            "type": "object",
+            "example": "SUP-1024",
+            "nullable": true
+          },
+          "assignedAdminId": {
+            "type": "object",
+            "example": "admin-uuid-123",
+            "nullable": true
+          },
+          "assignedAdmin": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConversationParticipantDto"
+              }
+            ]
           },
           "referenceId": {
             "type": "object",
@@ -25005,6 +25432,9 @@
         },
         "required": [
           "id",
+          "type",
+          "status",
+          "priority",
           "participants",
           "createdAt",
           "updatedAt"
@@ -25012,7 +25442,47 @@
       },
       "CreateConversationDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "participantId": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+            "description": "Required for DIRECT conversations"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DIRECT",
+              "SUPPORT"
+            ],
+            "default": "DIRECT"
+          },
+          "referenceId": {
+            "type": "string",
+            "example": "order-12345"
+          },
+          "referenceType": {
+            "type": "string",
+            "example": "ORDER"
+          },
+          "subject": {
+            "type": "string",
+            "example": "Help with delayed delivery"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "URGENT"
+            ],
+            "default": "MEDIUM"
+          },
+          "initialMessage": {
+            "type": "string",
+            "example": "Hello, I need help with my recent purchase."
+          }
+        }
       },
       "SendChatMessageDto": {
         "type": "object",
@@ -25027,11 +25497,55 @@
             "example": "TEXT",
             "default": "TEXT",
             "description": "Message type (TEXT, IMAGE, SYSTEM)"
+          },
+          "clientMessageId": {
+            "type": "string",
+            "example": "temp-id-uuid-123",
+            "description": "Client idempotency key"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "orderId": "1001"
+            },
+            "description": "Additional message metadata"
           }
         },
         "required": [
           "content"
         ]
+      },
+      "MarkReadDto": {
+        "type": "object",
+        "properties": {
+          "lastReadMessageId": {
+            "type": "string",
+            "example": "msg-uuid-123",
+            "description": "Latest message ID read"
+          }
+        }
+      },
+      "UpdateSupportCaseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "IN_PROGRESS"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "URGENT"
+            ]
+          },
+          "assignedAdminId": {
+            "type": "string",
+            "example": "admin-uuid-12345"
+          }
+        }
       },
       "SeederResponseDto": {
         "type": "object",

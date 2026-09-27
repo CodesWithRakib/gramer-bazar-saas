@@ -275,8 +275,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Refresh access token using HTTP-only cookie
-         * @description Reads refresh token from secure cookie, validates signature and database hash, and issues a fresh access token.
+         * Refresh access token using HTTP-only cookie, body, or header
+         * @description Reads refresh token from secure cookie, body, or x-refresh-token header, validates signature and database hash, and issues a fresh access token.
          */
         post: operations["AuthController_refresh"];
         delete?: never;
@@ -1658,7 +1658,7 @@ export interface paths {
         };
         /**
          * Get current user notifications
-         * @description Returns all notifications received by the authenticated user in reverse chronological order.
+         * @description Returns all notifications received by the authenticated user in reverse chronological order with optional filtering and pagination.
          */
         get: operations["NotificationsController_getUserNotifications"];
         put?: never;
@@ -2700,7 +2700,7 @@ export interface paths {
         put?: never;
         /**
          * Create or retrieve existing conversation
-         * @description Finds or creates a chat conversation between user and participant (optionally linked to order/product).
+         * @description Finds or creates a chat conversation (DIRECT or SUPPORT).
          */
         post: operations["ChatController_createConversation"];
         delete?: never;
@@ -2768,9 +2768,46 @@ export interface paths {
         head?: never;
         /**
          * Mark conversation messages as read
-         * @description Marks all incoming unread messages in the thread as read.
+         * @description Marks all incoming unread messages up to cursor in the thread as read.
          */
         patch: operations["ChatController_markAsRead"];
+        trace?: never;
+    };
+    "/api/v1/chat/support/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List support tickets (Admin only)
+         * @description Retrieves all ongoing and historical support conversations.
+         */
+        get: operations["ChatController_listSupportCases"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/support/cases/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update support ticket status or assignment (Admin only) */
+        patch: operations["ChatController_updateSupportCase"];
         trace?: never;
     };
     "/api/v1/dev/seed": {
@@ -3952,6 +3989,10 @@ export interface components {
              * @example Secret123!
              */
             password: string;
+        };
+        RefreshDto: {
+            /** @description Optional refresh token if not provided via HTTP-only cookie */
+            refreshToken?: string;
         };
         UserProfileResponseDto: {
             /**
@@ -5609,11 +5650,20 @@ export interface components {
             title: string;
             /** @example Your order #ORD-12345 has been picked up by the delivery rider. */
             message: string;
+            /** @example notifications.delivery_started.title */
+            titleKey?: Record<string, never> | null;
+            /** @example notifications.delivery_started.message */
+            messageKey?: Record<string, never> | null;
             /**
-             * @example ORDER_UPDATE
+             * @example ORDER_STATUS_CHANGED
              * @enum {string}
              */
-            type: "ORDER_UPDATE" | "SYSTEM" | "PROMO" | "REQUEST";
+            type: "ORDER_CREATED" | "ORDER_CONFIRMED" | "ORDER_CANCELLED" | "ORDER_STATUS_CHANGED" | "DELIVERY_ASSIGNED" | "DELIVERY_STARTED" | "DELIVERY_COMPLETED" | "DELIVERY_FAILED" | "PAYMENT_SUCCESS" | "PAYMENT_FAILED" | "SELLER_APPLICATION_SUBMITTED" | "SELLER_APPLICATION_APPROVED" | "SELLER_APPLICATION_REJECTED" | "RIDER_APPLICATION_SUBMITTED" | "RIDER_APPLICATION_APPROVED" | "RIDER_APPLICATION_REJECTED" | "PAYOUT_REQUESTED" | "PAYOUT_PROCESSED" | "PAYOUT_REJECTED" | "DISPUTE_OPENED" | "DISPUTE_RESOLVED" | "SYSTEM" | "ORDER_UPDATE" | "PROMO" | "REQUEST";
+            /**
+             * @example NORMAL
+             * @enum {string}
+             */
+            priority: "LOW" | "NORMAL" | "HIGH" | "CRITICAL";
             /** @example false */
             isRead: boolean;
             /** @example 2026-09-26T10:15:00.000Z */
@@ -6162,6 +6212,19 @@ export interface components {
             lastName?: Record<string, never> | null;
             /** @example 01712345678 */
             phone: string;
+            /** @example https://example.com/avatar.jpg */
+            avatar?: Record<string, never> | null;
+            /** @example CUSTOMER */
+            role?: string | null;
+            /**
+             * @example [
+             *       {
+             *         "id": "1",
+             *         "name": "CUSTOMER"
+             *       }
+             *     ]
+             */
+            roles?: string[];
         };
         ChatMessageResponseDto: {
             /** @example a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d */
@@ -6176,14 +6239,52 @@ export interface components {
             messageType: string;
             /** @example CUSTOMER */
             senderRole?: Record<string, never> | null;
+            /**
+             * @example SENT
+             * @enum {string}
+             */
+            status: "SENT" | "DELIVERED" | "READ";
             /** @example false */
             isRead: boolean;
+            /** @example client-temp-uuid-123 */
+            clientMessageId?: Record<string, never>;
+            /**
+             * @example {
+             *       "orderId": "1001"
+             *     }
+             */
+            metadata?: Record<string, never>;
+            /** @example 2026-09-26T10:01:00.000Z */
+            deliveredAt?: Record<string, never> | null;
+            /** @example 2026-09-26T10:02:00.000Z */
+            readAt?: Record<string, never> | null;
             /** @example 2026-09-26T10:00:00.000Z */
             createdAt: string;
+            sender?: components["schemas"]["ConversationParticipantDto"];
         };
         ConversationResponseDto: {
             /** @example a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d */
             id: string;
+            /**
+             * @example DIRECT
+             * @enum {string}
+             */
+            type: "DIRECT" | "SUPPORT";
+            /**
+             * @example ACTIVE
+             * @enum {string}
+             */
+            status: "ACTIVE" | "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+            /**
+             * @example MEDIUM
+             * @enum {string}
+             */
+            priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+            /** @example SUP-1024 */
+            supportCaseNumber?: Record<string, never> | null;
+            /** @example admin-uuid-123 */
+            assignedAdminId?: Record<string, never> | null;
+            assignedAdmin?: components["schemas"]["ConversationParticipantDto"] | null;
             /** @example order-uuid-12345 */
             referenceId?: Record<string, never> | null;
             /** @example ORDER */
@@ -6197,7 +6298,31 @@ export interface components {
             /** @example 2026-09-26T10:00:00.000Z */
             updatedAt: string;
         };
-        CreateConversationDto: Record<string, never>;
+        CreateConversationDto: {
+            /**
+             * @description Required for DIRECT conversations
+             * @example a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
+             */
+            participantId?: string;
+            /**
+             * @default DIRECT
+             * @enum {string}
+             */
+            type: "DIRECT" | "SUPPORT";
+            /** @example order-12345 */
+            referenceId?: string;
+            /** @example ORDER */
+            referenceType?: string;
+            /** @example Help with delayed delivery */
+            subject?: string;
+            /**
+             * @default MEDIUM
+             * @enum {string}
+             */
+            priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+            /** @example Hello, I need help with my recent purchase. */
+            initialMessage?: string;
+        };
         SendChatMessageDto: {
             /**
              * @description Message body text
@@ -6210,6 +6335,33 @@ export interface components {
              * @example TEXT
              */
             messageType: string;
+            /**
+             * @description Client idempotency key
+             * @example temp-id-uuid-123
+             */
+            clientMessageId?: string;
+            /**
+             * @description Additional message metadata
+             * @example {
+             *       "orderId": "1001"
+             *     }
+             */
+            metadata?: Record<string, never>;
+        };
+        MarkReadDto: {
+            /**
+             * @description Latest message ID read
+             * @example msg-uuid-123
+             */
+            lastReadMessageId?: string;
+        };
+        UpdateSupportCaseDto: {
+            /** @example IN_PROGRESS */
+            status?: string;
+            /** @enum {string} */
+            priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+            /** @example admin-uuid-12345 */
+            assignedAdminId?: string;
         };
         SeederResponseDto: {
             /** @example true */
@@ -7468,7 +7620,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshDto"];
+            };
+        };
         responses: {
             /** @description New access token issued successfully */
             200: {
@@ -12587,7 +12743,11 @@ export interface operations {
     };
     NotificationsController_getUserNotifications: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                limit?: number;
+                unreadOnly?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -16267,7 +16427,10 @@ export interface operations {
     };
     ChatController_getConversations: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Filter by conversation type (DIRECT or SUPPORT) */
+                type?: "DIRECT" | "SUPPORT";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -16631,7 +16794,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkReadDto"];
+            };
+        };
         responses: {
             /** @description Conversation messages marked as read */
             200: {
@@ -16643,6 +16810,142 @@ export interface operations {
                         data?: components["schemas"]["MessageResponseDto"];
                     };
                 };
+            };
+            /** @description Bad Request / Validation Failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized / Missing or Invalid Authentication Token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Forbidden / User lacks required role or permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Not Found / Requested resource does not exist */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Internal Server Error / Unexpected server failure */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ChatController_listSupportCases: {
+        parameters: {
+            query?: {
+                status?: "ACTIVE" | "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+                priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request / Validation Failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized / Missing or Invalid Authentication Token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Forbidden / User lacks required role or permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Not Found / Requested resource does not exist */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+            /** @description Internal Server Error / Unexpected server failure */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ChatController_updateSupportCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Support conversation UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSupportCaseDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request / Validation Failure */
             400: {
