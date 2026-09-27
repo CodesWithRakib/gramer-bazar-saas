@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import * as React from "react";
 import {
   ColumnDef,
   flexRender,
@@ -8,7 +8,7 @@ import {
   useReactTable,
   SortingState,
   PaginationState,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -17,11 +17,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { AdminPagination } from '@/components/ui/AdminPagination';
-import { Search, X, Loader2, TriangleAlert, Inbox } from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { AdminPagination } from "@/components/ui/AdminPagination";
+import { Search, X, Loader2, TriangleAlert, Inbox } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,7 +35,7 @@ export interface DataTableProps<TData, TValue> {
   itemsPerPage?: number;
   onPageChange?: (page: number) => void;
   onLimitChange?: (limit: number) => void;
-  lang?: 'ar' | 'en' | 'bn';
+  lang?: "ar" | "en" | "bn";
   itemLabel?: { singular: string; plural: string };
   sorting?: SortingState;
   onSortingChange?: React.Dispatch<React.SetStateAction<SortingState>>;
@@ -111,13 +111,15 @@ export function DataTable<TData, TValue>({
 
   const hasToolbar = Boolean(onSearchChange || filterSlot || actionSlot);
   const effectiveTotalItems =
-    totalItems ?? totalCount ?? (pageCount > 0 ? pageCount * pagination.pageSize : data.length);
-  const effectiveLang = lang ?? (isBn ? 'bn' : 'en');
+    totalItems ??
+    totalCount ??
+    (pageCount > 0 ? pageCount * pagination.pageSize : data.length);
+  const effectiveLang = lang ?? (isBn ? "bn" : "en");
 
   return (
     <div
       className={cn(
-        'rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 dark:border-border dark:bg-card',
+        "rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 dark:border-border dark:bg-card",
         className,
       )}
     >
@@ -130,11 +132,11 @@ export function DataTable<TData, TValue>({
                 <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-muted-foreground" />
                 <input
                   type="text"
-                  value={search ?? ''}
+                  value={search ?? ""}
                   onChange={(e) => onSearchChange(e.target.value)}
                   placeholder={
                     searchPlaceholder ??
-                    (isBn ? 'অনুসন্ধান করুন...' : 'Search...')
+                    (isBn ? "অনুসন্ধান করুন..." : "Search...")
                   }
                   className="h-11 w-full rounded-full border border-gray-200 bg-white pl-11 pr-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-border dark:bg-background dark:text-foreground dark:placeholder:text-muted-foreground"
                 />
@@ -145,7 +147,7 @@ export function DataTable<TData, TValue>({
                   {search && (
                     <button
                       type="button"
-                      onClick={() => onSearchChange('')}
+                      onClick={() => onSearchChange("")}
                       className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none dark:hover:bg-muted"
                       aria-label="Clear search"
                     >
@@ -160,7 +162,9 @@ export function DataTable<TData, TValue>({
           </div>
 
           {actionSlot && (
-            <div className="flex shrink-0 items-center gap-2">{actionSlot}</div>
+            <div className="flex w-full sm:w-auto flex-wrap sm:flex-nowrap items-center gap-2">
+              {actionSlot}
+            </div>
           )}
         </div>
       )}
@@ -199,7 +203,7 @@ export function DataTable<TData, TValue>({
                         <div
                           className="h-4 rounded bg-gray-200 dark:bg-muted"
                           style={{
-                            width: `${Math.max(40, (colIndex * 37) % 90 + 30)}%`,
+                            width: `${Math.max(40, ((colIndex * 37) % 90) + 30)}%`,
                           }}
                         />
                       </TableCell>
@@ -217,8 +221,8 @@ export function DataTable<TData, TValue>({
                       <p className="font-medium">
                         {errorMessage ??
                           (isBn
-                            ? 'ডেটা লোড করা যায়নি।'
-                            : 'Failed to load data.')}
+                            ? "ডেটা লোড করা যায়নি।"
+                            : "Failed to load data.")}
                       </p>
                       {onRetry && (
                         <Button
@@ -227,7 +231,7 @@ export function DataTable<TData, TValue>({
                           onClick={onRetry}
                           className="mt-1 rounded-full border-gray-200 text-xs"
                         >
-                          {isBn ? 'আবার চেষ্টা করুন' : 'Try again'}
+                          {isBn ? "আবার চেষ্টা করুন" : "Try again"}
                         </Button>
                       )}
                     </div>
@@ -237,7 +241,7 @@ export function DataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
+                    data-state={row.getIsSelected() && "selected"}
                     className="transition-colors hover:bg-gray-50/70 dark:hover:bg-muted/30"
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -264,25 +268,25 @@ export function DataTable<TData, TValue>({
                         <Inbox className="h-6 w-6 text-gray-400 dark:text-muted-foreground" />
                       </div>
                       <h3 className="mb-1 text-base font-semibold text-gray-900 dark:text-foreground">
-                        {isBn ? 'কোনো তথ্য পাওয়া যায়নি' : 'No records found'}
+                        {isBn ? "কোনো তথ্য পাওয়া যায়নি" : "No records found"}
                       </h3>
                       <p className="max-w-md text-xs text-gray-500 dark:text-muted-foreground">
                         {search
                           ? isBn
-                            ? 'অনুসন্ধানের সাথে কোনো মিল পাওয়া যায়নি।'
-                            : 'No records match your search criteria.'
-                          : emptyMessage ??
+                            ? "অনুসন্ধানের সাথে কোনো মিল পাওয়া যায়নি।"
+                            : "No records match your search criteria."
+                          : (emptyMessage ??
                             (isBn
-                              ? 'প্রদর্শনের জন্য কোনো ডেটা নেই।'
-                              : 'There are no items to display at this time.')}
+                              ? "প্রদর্শনের জন্য কোনো ডেটা নেই।"
+                              : "There are no items to display at this time."))}
                       </p>
                       {search && onSearchChange && (
                         <button
                           type="button"
-                          onClick={() => onSearchChange('')}
+                          onClick={() => onSearchChange("")}
                           className="mt-3 text-xs font-semibold text-primary hover:underline"
                         >
-                          {isBn ? 'অনুসন্ধান মুছুন' : 'Clear search'}
+                          {isBn ? "অনুসন্ধান মুছুন" : "Clear search"}
                         </button>
                       )}
                     </div>
@@ -299,7 +303,7 @@ export function DataTable<TData, TValue>({
         <AdminPagination
           totalItems={effectiveTotalItems}
           itemsPerPage={itemsPerPage ?? pagination.pageSize}
-          currentPage={currentPage ?? (pagination.pageIndex + 1)}
+          currentPage={currentPage ?? pagination.pageIndex + 1}
           lang={effectiveLang}
           itemLabel={itemLabel}
           onPageChange={(page) => {

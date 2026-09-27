@@ -38,9 +38,7 @@ export function Header({ lang }: HeaderProps) {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(isSearchPage);
   const isBn = lang === "bn";
 
-  const { isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   return (
     <>
@@ -102,20 +100,32 @@ export function Header({ lang }: HeaderProps) {
         </div>
 
         {/* Main Header Bar */}
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-3 sm:gap-6">
+        <div className="container mx-auto px-2.5 sm:px-4 h-16 flex items-center justify-between gap-1 sm:gap-6">
           {/* Left Section: Logo & Mobile Menu Trigger */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden -ml-2 text-foreground hover:bg-muted"
+              className="md:hidden h-9 w-9 -ml-1 text-foreground hover:bg-muted shrink-0"
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
               <span className="sr-only">{isBn ? "মেনু" : "Menu"}</span>
             </Button>
-            <Link href={`/${lang}`} className="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity">
-              <BrandLogo lang={lang} variant="full" width={160} height={44} />
+            <Link
+              href={`/${lang}`}
+              className="flex items-center shrink-0 hover:opacity-90 transition-opacity"
+            >
+              <div className="w-[110px] xs:w-[125px] sm:w-[155px] shrink-0">
+                <BrandLogo
+                  lang={lang}
+                  variant="full"
+                  width={155}
+                  height={42}
+                  className="w-full h-auto"
+                  imageClassName="w-full h-auto max-h-8 sm:max-h-10 object-contain"
+                />
+              </div>
             </Link>
           </div>
 
@@ -125,12 +135,12 @@ export function Header({ lang }: HeaderProps) {
           </div>
 
           {/* Right Section: Mobile Search Toggle & User Actions */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMobileSearchOpen((prev) => !prev)}
-              className="md:hidden text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="md:hidden h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
               aria-label={
                 isBn
                   ? isMobileSearchOpen
@@ -142,9 +152,9 @@ export function Header({ lang }: HeaderProps) {
               }
             >
               {isMobileSearchOpen ? (
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
-                <Search className="h-5 w-5" />
+                <Search className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
             </Button>
             <UserActions lang={lang} />

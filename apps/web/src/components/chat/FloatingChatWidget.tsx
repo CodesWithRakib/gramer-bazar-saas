@@ -139,10 +139,10 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
   const totalUnread = unreadData?.unreadCount ?? 0;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 sm:z-50 flex flex-col items-end">
       {/* The Widget Panel */}
       {isWidgetOpen && (
-        <div className="bg-background border rounded-2xl shadow-2xl w-[350px] sm:w-[390px] h-[540px] mb-4 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
+        <div className="bg-background border rounded-2xl shadow-2xl w-[calc(100vw-32px)] sm:w-[390px] max-w-[390px] h-[70vh] sm:h-[540px] max-h-[580px] mb-3 sm:mb-4 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="p-3.5 border-b bg-primary text-primary-foreground flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
@@ -335,16 +335,16 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
       {/* Toggle Button */}
       <Button
         onClick={() => dispatch(toggleChatWidget())}
-        className={`rounded-full h-14 w-14 shadow-2xl transition-transform hover:scale-105 ${isWidgetOpen ? "bg-muted text-muted-foreground hover:bg-muted" : "bg-primary"}`}
+        className={`rounded-full h-12 w-12 sm:h-14 sm:w-14 shadow-2xl transition-transform hover:scale-105 ${isWidgetOpen ? "bg-muted text-muted-foreground hover:bg-muted" : "bg-primary"}`}
         size="icon"
       >
         {isWidgetOpen ? (
-          <X className="h-6 w-6" />
+          <X className="h-5 w-5 sm:h-6 sm:w-6" />
         ) : (
           <div className="relative">
-            <MessageCircle className="h-6 w-6" />
+            <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
             {totalUnread > 0 && (
-              <span className="absolute -top-2 -right-2 px-1.5 py-0.2 min-w-[20px] h-5 rounded-full bg-red-600 text-white text-[11px] font-bold flex items-center justify-center border-2 border-background shadow-sm animate-in zoom-in-50">
+              <span className="absolute -top-1.5 -right-1.5 px-1 min-w-[18px] h-4.5 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center border-2 border-background shadow-sm animate-in zoom-in-50">
                 {totalUnread > 99 ? "99+" : totalUnread}
               </span>
             )}

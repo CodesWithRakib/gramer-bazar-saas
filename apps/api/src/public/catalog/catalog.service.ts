@@ -344,11 +344,11 @@ export class CatalogService {
 
     // 6. Active Flash Sales / Offers
     const offers = await this.sellerProductRepo.manager.query(`
-      SELECT fs.id, fs.name, fs.start_date as "startDate", fs.end_date as "endDate",
-             fs.banner_image as "bannerImage", fs.is_active as "isActive"
+      SELECT fs.id, fs.name, fs."startDate" as "startDate", fs."endDate" as "endDate",
+             fs."bannerImage" as "bannerImage", fs."isActive" as "isActive"
       FROM flash_sales fs
-      WHERE fs.is_active = true AND fs.start_date <= NOW() AND fs.end_date >= NOW()
-      ORDER BY fs.start_date ASC
+      WHERE fs."isActive" = true AND fs."startDate" <= NOW() AND fs."endDate" >= NOW()
+      ORDER BY fs."startDate" ASC
       LIMIT 2
     `);
 
@@ -725,3 +725,4 @@ export class CatalogService {
     return items;
   }
 }
+

@@ -11,7 +11,13 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { BrandsService } from './brands.service.js';
 import { CreateBrandDto } from '../dto/create-brand.dto.js';
 import { UpdateBrandDto } from '../dto/update-brand.dto.js';
@@ -29,7 +35,7 @@ import { Roles } from '../../common/decorators/roles.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 
 @ApiTags('Catalog - Brands')
-@Controller('brands')
+@Controller(['catalog/brands', 'brands'])
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 
@@ -39,7 +45,8 @@ export class BrandsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Register a new brand in the catalog (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Creates brand and associates with target categories.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Creates brand and associates with target categories.',
   })
   @ApiStandardResponse({
     type: BrandResponseDto,
@@ -54,12 +61,18 @@ export class BrandsController {
   @Get()
   @ApiOperation({
     summary: 'List all brands with pagination and category filtering',
-    description: 'Retrieves brand directory filtered by keyword search, category, or active status.',
+    description:
+      'Retrieves brand directory filtered by keyword search, category, or active status.',
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
   @ApiQuery({ name: 'search', required: false, type: String, example: 'Pran' })
-  @ApiQuery({ name: 'categoryId', required: false, type: String, description: 'Category UUID filter' })
+  @ApiQuery({
+    name: 'categoryId',
+    required: false,
+    type: String,
+    description: 'Category UUID filter',
+  })
   @ApiQuery({ name: 'isActive', required: false, type: Boolean })
   @ApiStandardPaginatedResponse(BrandResponseDto, {
     description: 'Paginated brand list',
@@ -72,15 +85,27 @@ export class BrandsController {
     @Query('categoryId') categoryId?: string,
     @Query('isActive') isActive?: boolean,
   ) {
-    return this.brandsService.findAll(page, limit, search, categoryId, isActive);
+    return this.brandsService.findAll(
+      page,
+      limit,
+      search,
+      categoryId,
+      isActive,
+    );
   }
 
   @Get('by-category/:categoryId')
   @ApiOperation({
     summary: 'List active brands affiliated with a specific category',
-    description: 'Returns brands associated with the selected category UUID for dropdown selectors.',
+    description:
+      'Returns brands associated with the selected category UUID for dropdown selectors.',
   })
-  @ApiParam({ name: 'categoryId', type: String, format: 'uuid', description: 'Category UUID' })
+  @ApiParam({
+    name: 'categoryId',
+    type: String,
+    format: 'uuid',
+    description: 'Category UUID',
+  })
   @ApiStandardResponse({
     type: BrandResponseDto,
     isArray: true,
@@ -97,7 +122,12 @@ export class BrandsController {
     summary: 'Retrieve single brand by UUID',
     description: 'Returns complete brand record with category associations.',
   })
-  @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Brand UUID' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Brand UUID',
+  })
   @ApiStandardResponse({
     type: BrandResponseDto,
     status: HttpStatus.OK,
@@ -114,16 +144,25 @@ export class BrandsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Update brand details (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Updates name, slug, logo URL, or category links.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Updates name, slug, logo URL, or category links.',
   })
-  @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Brand UUID' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Brand UUID',
+  })
   @ApiStandardResponse({
     type: BrandResponseDto,
     status: HttpStatus.OK,
     description: 'Brand updated successfully',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateBrandDto: UpdateBrandDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateBrandDto: UpdateBrandDto,
+  ) {
     return this.brandsService.update(id, updateBrandDto);
   }
 
@@ -133,9 +172,15 @@ export class BrandsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Delete a brand (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Removes brand from directory.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Removes brand from directory.',
   })
-  @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Brand UUID' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Brand UUID',
+  })
   @ApiStandardMessageResponse({
     status: HttpStatus.OK,
     description: 'Brand deleted successfully',
