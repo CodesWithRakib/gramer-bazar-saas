@@ -41,7 +41,7 @@ export class PaymentsController {
   private getFrontendRedirectBase(payload: any): { baseUrl: string; lang: string } {
     let lang = payload.value_c || 'en';
     let frontendUrl =
-      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5000';
 
     if (payload.value_d && payload.value_d.startsWith('http')) {
       const match = payload.value_d.match(/^(https?:\/\/[^\/]+)(?:\/([a-z]{2}))?/);
@@ -64,7 +64,7 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Initiate payment session for an order', description: 'Creates a payment session and returns SSLCOMMERZ gateway redirect URL.' })
   @ApiStandardResponse({ type: InitiatePaymentResponseDto, status: 201, description: 'Payment session created successfully' })
   async initiatePayment(@Req() req: any, @Body() dto: InitiatePaymentDto) {
-    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:3000';
+    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:5000';
     return this.paymentsService.retryPayment(
       dto.orderId,
       req.user.id,
@@ -86,7 +86,7 @@ export class PaymentsController {
     @Param('orderId') orderId: string,
     @Query('lang') lang = 'en',
   ) {
-    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:3000';
+    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:5000';
     return this.paymentsService.retryPayment(
       orderId,
       req.user.id,

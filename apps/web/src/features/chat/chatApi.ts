@@ -51,6 +51,7 @@ export interface GetMessagesParams {
 }
 
 export const chatApi = api.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getUnreadCount: builder.query<UnreadCountResponse, void>({
       query: () => "/chat/unread-count",

@@ -15,13 +15,13 @@ const waitForHydration = async (page: Page) => {
 const login = async (page: Page, creds: { email: string; password: string }) => {
   await page.goto('/en/login');
   await waitForHydration(page);
-  await page.getByLabel('Email or Phone').fill(creds.email);
-  await page.getByLabel('Password').fill(creds.password);
+  await page.getByLabel(/Email or (Phone|Mobile Number)/i).fill(creds.email);
+  await page.getByLabel('Password', { exact: true }).fill(creds.password);
   await page
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
     .click();
-  await page.waitForURL(/\/(en)\/(profile|admin|seller|rider)/, { timeout: 25000 });
+  await page.waitForURL(/\/(en)\/(customer|profile|admin|seller|rider)/, { timeout: 25000 });
 };
 
 test.describe('Chat & socket consistency', () => {

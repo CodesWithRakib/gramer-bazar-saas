@@ -57,6 +57,7 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
     }),
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env', 'apps/api/.env', '.env.local'],
       load: [configuration],
       validate: (env) => envValidationSchema.parse(env),
     }),
@@ -134,7 +135,12 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
     ThrottlerModule.forRoot([
       {
         ttl: Number(process.env.THROTTLE_TTL_MS ?? 60000),
-        limit: Number(process.env.THROTTLE_LIMIT ?? 120),
+        limit:
+          process.env.NODE_ENV === 'test' ||
+          process.env.SKIP_THROTTLE === 'true' ||
+          process.env.CI
+            ? 10000
+            : Number(process.env.THROTTLE_LIMIT ?? 500),
       },
     ]),
     RolesModule,

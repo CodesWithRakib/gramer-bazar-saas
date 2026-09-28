@@ -19,7 +19,7 @@ export const envValidationSchema = z
     CORS_ORIGINS: z
       .string()
       .default(
-        'http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001',
+        'http://localhost:5000,http://localhost:5001,http://127.0.0.1:5000,http://127.0.0.1:5001,http://localhost:3000,http://127.0.0.1:3000',
       ),
     // Rate limiting. Defaults are production-safe; raise them (e.g. in .env for
     // local E2E runs) when automated journeys hit the limits from one IP.

@@ -16,8 +16,8 @@ const waitForHydration = async (page: Page) => {
 const login = async (page: Page, creds: { email: string; password: string }) => {
   await page.goto('/en/login');
   await waitForHydration(page);
-  await page.getByLabel('Email or Phone').fill(creds.email);
-  await page.getByLabel('Password').fill(creds.password);
+  await page.getByLabel(/Email or (Phone|Mobile Number)/i).fill(creds.email);
+  await page.getByLabel('Password', { exact: true }).fill(creds.password);
   await page
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
@@ -48,17 +48,16 @@ test.describe('Seller E2E Workflows', () => {
     test.setTimeout(240000);
 
     const routes: { label: string; url: RegExp; heading: RegExp }[] = [
-      { label: 'My Shop', url: /\/en\/seller\/shop$/, heading: /Shop Settings/ },
-      { label: 'Products', url: /\/en\/seller\/products$/, heading: /My Products/ },
-      { label: 'Inventory', url: /\/en\/seller\/inventory$/, heading: /Inventory Management/ },
-      { label: 'Orders', url: /\/en\/seller\/orders$/, heading: /^Orders$/ },
-      { label: 'Coupons', url: /\/en\/seller\/coupons$/, heading: /Shop Coupons/ },
-      { label: 'Reports', url: /\/en\/seller\/reports$/, heading: /Reports & Analytics/ },
-      { label: 'Wallet', url: /\/en\/seller\/wallet$/, heading: /My Wallet/ },
-      { label: 'Messages', url: /\/en\/seller\/messages$/, heading: /^Messages$/ },
-      { label: 'Disputes', url: /\/en\/seller\/disputes$/, heading: /Customer Disputes/ },
-      { label: 'Profile', url: /\/en\/seller\/profile$/, heading: /Shop Profile/ },
-      { label: 'Dashboard', url: /\/en\/seller$/, heading: /Seller Dashboard/ },
+      { label: 'Shop Profile', url: /\/en\/seller\/shop$/, heading: /Shop/ },
+      { label: 'Products & Stock', url: /\/en\/seller\/products$/, heading: /Product/ },
+      { label: 'Orders', url: /\/en\/seller\/orders$/, heading: /Order/ },
+      { label: 'Coupons', url: /\/en\/seller\/coupons$/, heading: /Coupon/ },
+      { label: 'Sales Reports', url: /\/en\/seller\/reports$/, heading: /Report/ },
+      { label: 'Wallet & Payouts', url: /\/en\/seller\/wallet$/, heading: /Wallet/ },
+      { label: 'Messages', url: /\/en\/seller\/messages$/, heading: /Message/ },
+      { label: 'Disputes', url: /\/en\/seller\/disputes$/, heading: /Dispute/ },
+      { label: 'Settings', url: /\/en\/seller\/settings$/, heading: /Setting/ },
+      { label: 'Dashboard', url: /\/en\/seller$/, heading: /Dashboard/ },
     ];
 
     for (const route of routes) {

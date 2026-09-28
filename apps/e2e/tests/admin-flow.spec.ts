@@ -14,8 +14,8 @@ const waitForHydration = async (page: Page) => {
 const login = async (page: Page, creds: { email: string; password: string }) => {
   await page.goto('/en/login');
   await waitForHydration(page);
-  await page.getByLabel('Email or Phone').fill(creds.email);
-  await page.getByLabel('Password').fill(creds.password);
+  await page.getByLabel(/Email or (Phone|Mobile Number)/i).fill(creds.email);
+  await page.getByLabel('Password', { exact: true }).fill(creds.password);
   await page
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
@@ -26,26 +26,14 @@ const expectNoErrorBoundary = async (page: Page) => {
   await expect(page.getByText(/something went wrong/i)).toHaveCount(0);
 };
 
-/** Every entry in `config/dashboard-routes.ts` → adminRoutes. */
 const ADMIN_ROUTES: { label: string; path: string }[] = [
-  { label: 'Users', path: '/admin/users' },
-  { label: 'Sellers', path: '/admin/sellers' },
-  { label: 'Products', path: '/admin/products' },
-  { label: 'Categories', path: '/admin/categories' },
-  { label: 'Brands', path: '/admin/brands' },
   { label: 'Orders', path: '/admin/orders' },
-  { label: 'Deliveries', path: '/admin/deliveries' },
-  { label: 'Riders', path: '/admin/riders' },
-  { label: 'Product Requests', path: '/admin/product-requests' },
-  { label: 'Flash Sales', path: '/admin/flash-sales' },
-  { label: 'Coupons', path: '/admin/coupons' },
-  { label: 'Banners', path: '/admin/banners' },
-  { label: 'Reviews', path: '/admin/reviews' },
-  { label: 'Disputes', path: '/admin/disputes' },
-  { label: 'Payouts', path: '/admin/payouts' },
-  { label: 'Reports', path: '/admin/reports/demand' },
-  { label: 'Audit Logs', path: '/admin/audit-logs' },
+  { label: 'Products', path: '/admin/products' },
+  { label: 'Promotions', path: '/admin/promotions' },
+  { label: 'Users & Partners', path: '/admin/users-management' },
+  { label: 'Finance', path: '/admin/finance' },
   { label: 'Messages', path: '/admin/messages' },
+  { label: 'Disputes', path: '/admin/disputes' },
   { label: 'Settings', path: '/admin/settings' },
   { label: 'Dashboard', path: '/admin' },
 ];
@@ -189,9 +177,8 @@ test.describe('Admin area access control', () => {
     await login(page, SELLER);
     await page.waitForURL(/\/en\/seller/, { timeout: 25000 });
 
-    await page.goto('/en/admin/users');
-    // The admin guard redirects non-admins back to the storefront
-    await page.waitForURL(/\/en$/, { timeout: 20000 });
+    await page.goto('/en/admin/users-management');
+    await expect(page.getByText(/Access Denied|403/i)).toBeVisible({ timeout: 20000 });
     await expectNoErrorBoundary(page);
   });
 });

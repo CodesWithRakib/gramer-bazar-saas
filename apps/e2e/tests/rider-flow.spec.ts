@@ -24,8 +24,8 @@ const waitForHydration = async (page: Page) => {
 const loginUi = async (page: Page, email: string, password: string) => {
   await page.goto('/en/login');
   await waitForHydration(page);
-  await page.getByLabel('Email or Phone').fill(email);
-  await page.getByLabel('Password').fill(password);
+  await page.getByLabel(/Email or (Phone|Mobile Number)/i).fill(email);
+  await page.getByLabel('Password', { exact: true }).fill(password);
   await page
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
@@ -58,7 +58,13 @@ const ensureRiderAccount = async (
       role: RIDER.role,
     },
   });
-  expect(created.ok(), `rider registration failed: ${await created.text()}`).toBeTruthy();
+  if (!created.ok()) {
+    const text = await created.text();
+    if (text.includes('already exists')) {
+      return;
+    }
+    expect(created.ok(), `rider registration failed: ${text}`).toBeTruthy();
+  }
   return created.json();
 };
 
@@ -218,10 +224,10 @@ test.describe('Delivery lifecycle across roles', () => {
 test.describe('Rider area access control', () => {
   test('a customer cannot open the rider area', async ({ page }) => {
     await loginUi(page, CUSTOMER.email, CUSTOMER.password);
-    await page.waitForURL(/\/(en)\/(profile|admin|seller|rider)/, { timeout: 25000 });
+    await page.waitForURL(/\/(en)\/(customer|profile|admin|seller|rider)/, { timeout: 25000 });
 
     await page.goto('/en/rider/deliveries');
-    await page.waitForURL(/\/en$/, { timeout: 20000 });
+    await expect(page.getByText(/Access Denied|403/i)).toBeVisible({ timeout: 20000 });
     await expectNoErrorBoundary(page);
   });
 });

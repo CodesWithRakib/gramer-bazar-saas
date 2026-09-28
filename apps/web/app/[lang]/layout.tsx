@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000'),
   keywords: ["ecommerce", "rural", "grocery", "bangladesh", "gramer bazar"],
   title: {
     default: "Gramer Bazar | Rural Hyper-marketplace",

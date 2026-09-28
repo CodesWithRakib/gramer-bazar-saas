@@ -13,7 +13,7 @@ export default defineConfig({
   expect: { timeout: 20_000 },
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:5000',
     trace: 'on-first-retry',
   },
   projects: [

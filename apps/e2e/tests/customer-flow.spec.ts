@@ -31,7 +31,7 @@ test.describe('Customer E2E Workflows', () => {
 
     // Categories section loads from the API
     await expect(
-      page.getByRole('heading', { name: /categories/i }).first(),
+      page.getByRole('heading', { name: /Shop by Category|Category/i }).first(),
     ).toBeVisible();
     await expect(page.getByText(/featured products/i).first()).toBeVisible();
 
@@ -61,7 +61,7 @@ test.describe('Customer E2E Workflows', () => {
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/public/catalog/search?limit=1`,
     );
     const body = await res.json();
-    const slug = body.data[0].productVariant.product.slug as string;
+    const slug = (body.data?.[0]?.slug || body.data?.[0]?.productVariant?.product?.slug) as string;
     expect(slug).toBeTruthy();
 
     await page.goto(`/en/products/${slug}`);
@@ -73,15 +73,15 @@ test.describe('Customer E2E Workflows', () => {
   }) => {
     await page.goto('/en/login');
     await waitForHydration(page);
-    await page.getByLabel('Email or Phone').fill(CUSTOMER.email);
-    await page.getByLabel('Password').fill(CUSTOMER.password);
+    await page.getByLabel(/Email or (Phone|Mobile Number)/i).fill(CUSTOMER.email);
+    await page.getByLabel('Password', { exact: true }).fill(CUSTOMER.password);
     await page
       .getByRole('main')
       .getByRole('button', { name: /login|sign in/i })
       .click();
 
     // The login endpoint must succeed and land on an authenticated page
-    await page.waitForURL(/\/(en|bn)\/(profile|admin|seller|rider)/, {
+    await page.waitForURL(/\/(en|bn)\/(customer|profile|admin|seller|rider)/, {
       timeout: 20000,
     });
     await expect(
@@ -109,13 +109,13 @@ test.describe('Customer E2E Workflows', () => {
     // 1. Login via the UI
     await page.goto('/en/login');
     await waitForHydration(page);
-    await page.getByLabel('Email or Phone').fill(CUSTOMER.email);
-    await page.getByLabel('Password').fill(CUSTOMER.password);
+    await page.getByLabel(/Email or (Phone|Mobile Number)/i).fill(CUSTOMER.email);
+    await page.getByLabel('Password', { exact: true }).fill(CUSTOMER.password);
     await page
       .getByRole('main')
       .getByRole('button', { name: /login|sign in/i })
       .click();
-    await page.waitForURL(/\/(en|bn)\/(profile|admin|seller|rider)/, {
+    await page.waitForURL(/\/(en|bn)\/(customer|profile|admin|seller|rider)/, {
       timeout: 20000,
     });
 
@@ -124,7 +124,7 @@ test.describe('Customer E2E Workflows', () => {
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/public/catalog/search?limit=1`,
     );
     const body = await res.json();
-    const slug = body.data[0].productVariant.product.slug as string;
+    const slug = (body.data?.[0]?.slug || body.data?.[0]?.productVariant?.product?.slug) as string;
     await page.goto(`/en/products/${slug}`);
     const addToCart = page.getByRole('button', { name: /add to cart/i });
     await expect(addToCart).toBeVisible({ timeout: 20000 });

@@ -14,13 +14,13 @@ const waitForHydration = async (page: Page) => {
 const loginUi = async (page: Page, email: string, password: string) => {
   await page.goto('/en/login');
   await waitForHydration(page);
-  await page.getByLabel('Email or Phone').fill(email);
-  await page.getByLabel('Password').fill(password);
+  await page.getByLabel(/Email or (Phone|Mobile Number)/i).fill(email);
+  await page.getByLabel('Password', { exact: true }).fill(password);
   await page
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
     .click();
-  await page.waitForURL(/\/en\/profile/, { timeout: 25000 });
+  await page.waitForURL(/\/(en|bn)\/(customer|profile)/, { timeout: 25000 });
 };
 
 test.describe('Wishlist journey', () => {
@@ -48,7 +48,7 @@ test.describe('Wishlist journey', () => {
     await expect(page.getByText(/added to wishlist/i).first()).toBeVisible();
 
     // The wishlist page shows the item (not the empty state)
-    await page.goto('/en/wishlist');
+    await page.goto('/en/customer/wishlist');
     await expect(page.getByRole('heading', { name: 'My Wishlist' })).toBeVisible({
       timeout: 20000,
     });

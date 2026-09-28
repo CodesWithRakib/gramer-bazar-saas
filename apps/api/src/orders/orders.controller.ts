@@ -53,7 +53,7 @@ export class OrdersController {
   })
   @ApiCommonErrors([400, 401, 500])
   async checkout(@Request() req: any, @Body() checkoutDto: CheckoutDto) {
-    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:3000';
+    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:5000';
     const baseUrl = originUrl.replace(/\/$/, '');
     const lang = checkoutDto.lang || 'en';
     const redirectUrl = `${baseUrl}/${lang}/customer/checkout`;
