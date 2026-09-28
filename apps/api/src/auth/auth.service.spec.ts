@@ -73,7 +73,10 @@ describe('AuthService', () => {
     it('logs in with a valid email + password and returns tokens', async () => {
       const passwordHash = await bcrypt.hash('password123', 10);
       usersService.findByEmail.mockResolvedValue(makeUser({ passwordHash }));
-      usersService.update.mockImplementation(async (_id, data) => ({ ...makeUser({ passwordHash }), ...data }));
+      usersService.update.mockImplementation(async (_id, data) => ({
+        ...makeUser({ passwordHash }),
+        ...data,
+      }));
 
       const result = await service.loginWithPassword('a@b.com', 'password123');
 
@@ -193,7 +196,9 @@ describe('AuthService', () => {
     it('creates a customer on first OTP verification', async () => {
       otpService.verifyOtp.mockResolvedValue(undefined);
       usersService.findByPhone.mockResolvedValue(null);
-      usersService.create.mockResolvedValue(makeUser({ passwordHash: null, roles: [{ name: 'CUSTOMER' }] }));
+      usersService.create.mockResolvedValue(
+        makeUser({ passwordHash: null, roles: [{ name: 'CUSTOMER' }] }),
+      );
       usersService.update.mockImplementation(async (_id, data) => ({ ...makeUser(), ...data }));
 
       const result = await service.verifyOtp('+8801', '123456');

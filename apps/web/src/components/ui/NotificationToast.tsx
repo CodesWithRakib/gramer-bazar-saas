@@ -66,7 +66,10 @@ export function NotificationToast({
         borderColor: 'border-l-amber-500',
       };
     }
-    if (type === NotificationType.ALERT || notification.priority === NotificationPriority.CRITICAL) {
+    if (
+      type === NotificationType.ALERT ||
+      notification.priority === NotificationPriority.CRITICAL
+    ) {
       return {
         icon: <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
         dotColor: 'bg-rose-500',
@@ -110,21 +113,15 @@ export function NotificationToast({
       className={`w-full max-w-sm sm:max-w-md bg-card border border-border border-l-4 ${borderColor} rounded-lg shadow-md p-3.5 flex items-start gap-3 transition-all duration-200 select-none`}
     >
       {/* Icon badge */}
-      <div className="flex-shrink-0 mt-0.5 p-1.5 rounded-md bg-muted/80">
-        {icon}
-      </div>
+      <div className="flex-shrink-0 mt-0.5 p-1.5 rounded-md bg-muted/80">{icon}</div>
 
       {/* Content */}
       <div className="flex-1 min-w-0 pr-1">
         <div className="flex items-center gap-2 mb-0.5">
           <span className={`w-2 h-2 rounded-full ${dotColor} flex-shrink-0`} />
-          <h4 className="text-sm font-semibold text-foreground truncate leading-tight">
-            {title}
-          </h4>
+          <h4 className="text-sm font-semibold text-foreground truncate leading-tight">{title}</h4>
         </div>
-        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-          {message}
-        </p>
+        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{message}</p>
 
         {/* Action Link if applicable */}
         {actionUrl && (
@@ -170,8 +167,8 @@ export function showNotificationToast(
     notification.priority === NotificationPriority.CRITICAL
       ? 10000
       : notification.priority === NotificationPriority.HIGH
-      ? 6500
-      : 4500;
+        ? 6500
+        : 4500;
 
   toast.custom(
     (t) => (

@@ -17,8 +17,20 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Ticket, Plus, Trash2, Calendar, Users, Edit, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -34,21 +46,24 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
   const [couponToDelete, setCouponToDelete] = useState<string | null>(null);
-  
+
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
-  const { data, isLoading } = useGetAdminCouponsQuery({ 
-    page, 
-    limit, 
-    search: search.trim() || undefined 
-  }, {
-    skip: !isAuthenticated,
-  });
+  const { data, isLoading } = useGetAdminCouponsQuery(
+    {
+      page,
+      limit,
+      search: search.trim() || undefined,
+    },
+    {
+      skip: !isAuthenticated,
+    }
+  );
 
   const [createCoupon] = useCreateCouponMutation();
   const [updateCoupon] = useUpdateCouponMutation();
@@ -56,7 +71,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  
+
   // Form State
   const [formData, setFormData] = useState({
     id: '',
@@ -72,7 +87,10 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
   });
 
   useEffect(() => {
-    if (!isAuthenticated || (!user?.roles?.includes('ADMIN') && !user?.roles?.includes('SUPER_ADMIN'))) {
+    if (
+      !isAuthenticated ||
+      (!user?.roles?.includes('ADMIN') && !user?.roles?.includes('SUPER_ADMIN'))
+    ) {
       router.push(`/${lang}/login`);
     }
   }, [isAuthenticated, user, router, lang]);
@@ -85,7 +103,11 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
     return rawCoupons.filter((c) => (statusFilter === 'ACTIVE' ? c.isActive : !c.isActive));
   }, [rawCoupons, statusFilter]);
 
-  if (!isAuthenticated || (!user?.roles?.includes('ADMIN') && !user?.roles?.includes('SUPER_ADMIN'))) return null;
+  if (
+    !isAuthenticated ||
+    (!user?.roles?.includes('ADMIN') && !user?.roles?.includes('SUPER_ADMIN'))
+  )
+    return null;
 
   const handleOpenCreateModal = () => {
     setIsEditing(false);
@@ -144,7 +166,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const payload = {
       code: formData.code.toUpperCase(),
       discountType: formData.discountType as 'PERCENTAGE' | 'FIXED',
@@ -180,7 +202,9 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
             {isBn ? 'প্ল্যাটফর্ম কুপনসমূহ' : 'Platform Coupons'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {isBn ? 'প্ল্যাটফর্ম-ওয়াইড এবং স্টোর কুপনসমূহ নিয়ন্ত্রণ ও পরিচালনা করুন।' : 'Create and manage global or targeted discount coupons.'}
+            {isBn
+              ? 'প্ল্যাটফর্ম-ওয়াইড এবং স্টোর কুপনসমূহ নিয়ন্ত্রণ ও পরিচালনা করুন।'
+              : 'Create and manage global or targeted discount coupons.'}
           </p>
         </div>
       </div>
@@ -240,115 +264,134 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
           {/* Action Slot */}
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleOpenCreateModal} className="rounded-full px-6 h-11 whitespace-nowrap">
+              <Button
+                onClick={handleOpenCreateModal}
+                className="rounded-full px-6 h-11 whitespace-nowrap"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 {isBn ? 'নতুন কুপন তৈরি করুন' : 'Create New Coupon'}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md md:max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{isEditing ? (isBn ? 'কুপন এডিট করুন' : 'Edit Coupon') : (isBn ? 'নতুন কুপন' : 'New Coupon')}</DialogTitle>
+                <DialogTitle>
+                  {isEditing
+                    ? isBn
+                      ? 'কুপন এডিট করুন'
+                      : 'Edit Coupon'
+                    : isBn
+                      ? 'নতুন কুপন'
+                      : 'New Coupon'}
+                </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>{isBn ? 'প্রোমো কোড' : 'Promo Code'}</Label>
-                    <Input 
-                      required 
+                    <Input
+                      required
                       className="uppercase"
-                      value={formData.code} 
-                      onChange={e => setFormData({...formData, code: e.target.value})} 
+                      value={formData.code}
+                      onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                       placeholder="e.g. SAVE20"
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label>{isBn ? 'ডিসকাউন্ট ধরন' : 'Discount Type'}</Label>
-                    <Select 
-                      value={formData.discountType} 
-                      onValueChange={(value) => setFormData({...formData, discountType: value})}
+                    <Select
+                      value={formData.discountType}
+                      onValueChange={(value) => setFormData({ ...formData, discountType: value })}
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="PERCENTAGE">{isBn ? 'শতাংশ (%)' : 'Percentage (%)'}</SelectItem>
-                        <SelectItem value="FIXED">{isBn ? 'নির্ধারিত পরিমাণ (৳)' : 'Fixed Amount (৳)'}</SelectItem>
+                        <SelectItem value="PERCENTAGE">
+                          {isBn ? 'শতাংশ (%)' : 'Percentage (%)'}
+                        </SelectItem>
+                        <SelectItem value="FIXED">
+                          {isBn ? 'নির্ধারিত পরিমাণ (৳)' : 'Fixed Amount (৳)'}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label>{isBn ? 'ডিসকাউন্ট মূল্য' : 'Discount Value'}</Label>
-                    <Input 
-                      type="number" 
-                      required 
+                    <Input
+                      type="number"
+                      required
                       min="1"
-                      value={formData.discountValue} 
-                      onChange={e => setFormData({...formData, discountValue: e.target.value})} 
+                      value={formData.discountValue}
+                      onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>{isBn ? 'সর্বনিম্ন অর্ডারের পরিমাণ (৳)' : 'Min Order Amount (৳)'}</Label>
-                    <Input 
-                      type="number" 
+                    <Input
+                      type="number"
                       min="0"
-                      value={formData.minOrderAmount} 
-                      onChange={e => setFormData({...formData, minOrderAmount: e.target.value})} 
+                      value={formData.minOrderAmount}
+                      onChange={(e) => setFormData({ ...formData, minOrderAmount: e.target.value })}
                     />
                   </div>
 
                   {formData.discountType === 'PERCENTAGE' && (
                     <div className="space-y-2">
                       <Label>{isBn ? 'সর্বোচ্চ ডিসকাউন্ট (৳)' : 'Max Discount Amount (৳)'}</Label>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         min="1"
                         placeholder="Optional"
-                        value={formData.maxDiscountAmount} 
-                        onChange={e => setFormData({...formData, maxDiscountAmount: e.target.value})} 
+                        value={formData.maxDiscountAmount}
+                        onChange={(e) =>
+                          setFormData({ ...formData, maxDiscountAmount: e.target.value })
+                        }
                       />
                     </div>
                   )}
 
                   <div className="space-y-2">
                     <Label>{isBn ? 'মোট ব্যবহারের সীমা' : 'Total Usage Limit'}</Label>
-                    <Input 
-                      type="number" 
+                    <Input
+                      type="number"
                       min="1"
                       placeholder="Optional"
-                      value={formData.usageLimit} 
-                      onChange={e => setFormData({...formData, usageLimit: e.target.value})} 
+                      value={formData.usageLimit}
+                      onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>{isBn ? 'গ্রাহক প্রতি সীমা' : 'Limit Per Customer'}</Label>
-                    <Input 
-                      type="number" 
-                      required 
+                    <Input
+                      type="number"
+                      required
                       min="1"
-                      value={formData.customerUsageLimit} 
-                      onChange={e => setFormData({...formData, customerUsageLimit: e.target.value})} 
+                      value={formData.customerUsageLimit}
+                      onChange={(e) =>
+                        setFormData({ ...formData, customerUsageLimit: e.target.value })
+                      }
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label>{isBn ? 'শুরুর তারিখ' : 'Start Date'}</Label>
-                    <Input 
-                      type="datetime-local" 
-                      value={formData.startDate} 
-                      onChange={e => setFormData({...formData, startDate: e.target.value})} 
+                    <Input
+                      type="datetime-local"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label>{isBn ? 'শেষের তারিখ' : 'End Date'}</Label>
-                    <Input 
-                      type="datetime-local" 
-                      value={formData.endDate} 
-                      onChange={e => setFormData({...formData, endDate: e.target.value})} 
+                    <Input
+                      type="datetime-local"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                     />
                   </div>
                 </div>
@@ -378,12 +421,24 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, index) => (
                     <tr key={`skeleton-${index}`} className="animate-pulse">
-                      <td className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-32 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-28 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-6 w-12 rounded-full bg-muted"></div></td>
-                      <td className="py-4 px-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-24 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-32 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-20 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-28 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-6 w-12 rounded-full bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      </td>
                     </tr>
                   ))
                 ) : coupons.length === 0 ? (
@@ -398,51 +453,91 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || statusFilter !== 'ALL'
-                            ? (isBn ? 'আপনার ফিল্টারের সাথে কোনো কুপন মেলেনি' : 'No coupons match your search criteria.')
-                            : (isBn ? 'এখনও কোনো কুপন তৈরি করা হয়নি' : 'No coupons created yet.')}
+                            ? isBn
+                              ? 'আপনার ফিল্টারের সাথে কোনো কুপন মেলেনি'
+                              : 'No coupons match your search criteria.'
+                            : isBn
+                              ? 'এখনও কোনো কুপন তৈরি করা হয়নি'
+                              : 'No coupons created yet.'}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   coupons.map((coupon) => (
-                    <tr key={coupon.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
-                      <td className="py-3.5 px-4 font-mono font-bold text-primary">{coupon.code}</td>
+                    <tr
+                      key={coupon.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
+                      <td className="py-3.5 px-4 font-mono font-bold text-primary">
+                        {coupon.code}
+                      </td>
                       <td className="py-3.5 px-4">
                         <span className="font-semibold text-foreground">
-                          {coupon.discountType === 'PERCENTAGE' 
-                            ? `${coupon.discountValue}% (Max: ৳${coupon.maxDiscountAmount || '∞'})` 
+                          {coupon.discountType === 'PERCENTAGE'
+                            ? `${coupon.discountValue}% (Max: ৳${coupon.maxDiscountAmount || '∞'})`
                             : `৳${coupon.discountValue}`}
                         </span>
-                        <div className="text-xs text-muted-foreground mt-0.5">Min: ৳{coupon.minOrderAmount}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          Min: ৳{coupon.minOrderAmount}
+                        </div>
                       </td>
                       <td className="py-3.5 px-4 text-muted-foreground">
                         <div className="flex items-center gap-1.5">
                           <Users className="h-3.5 w-3.5 text-muted-foreground/70" />
-                          <span>{coupon.usedCount} / {coupon.usageLimit || '∞'}</span>
+                          <span>
+                            {coupon.usedCount} / {coupon.usageLimit || '∞'}
+                          </span>
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex flex-col text-xs gap-0.5">
-                          {coupon.startDate && <span><Calendar className="h-3 w-3 inline mr-1 text-muted-foreground"/> {new Date(coupon.startDate).toLocaleDateString()}</span>}
-                          {coupon.endDate && <span className={new Date(coupon.endDate) < new Date() ? 'text-destructive font-medium' : ''}>
-                            <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground"/> {new Date(coupon.endDate).toLocaleDateString()}
-                          </span>}
-                          {!coupon.startDate && !coupon.endDate && <span className="text-muted-foreground">Always Valid</span>}
+                          {coupon.startDate && (
+                            <span>
+                              <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" />{' '}
+                              {new Date(coupon.startDate).toLocaleDateString()}
+                            </span>
+                          )}
+                          {coupon.endDate && (
+                            <span
+                              className={
+                                new Date(coupon.endDate) < new Date()
+                                  ? 'text-destructive font-medium'
+                                  : ''
+                              }
+                            >
+                              <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" />{' '}
+                              {new Date(coupon.endDate).toLocaleDateString()}
+                            </span>
+                          )}
+                          {!coupon.startDate && !coupon.endDate && (
+                            <span className="text-muted-foreground">Always Valid</span>
+                          )}
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <Switch 
-                          checked={coupon.isActive} 
+                        <Switch
+                          checked={coupon.isActive}
                           onCheckedChange={(val: boolean) => handleToggleActive(coupon.id, val)}
                         />
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleOpenEditModal(coupon)} className="h-8 w-8 rounded-full">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleOpenEditModal(coupon)}
+                            className="h-8 w-8 rounded-full"
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setCouponToDelete(coupon.id)} className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10" aria-label={isBn ? 'মুছে ফেলুন' : 'Delete'}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setCouponToDelete(coupon.id)}
+                            className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                            aria-label={isBn ? 'মুছে ফেলুন' : 'Delete'}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>

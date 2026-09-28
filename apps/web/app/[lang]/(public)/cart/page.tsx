@@ -15,9 +15,9 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const dispatch = useDispatch();
-  
+
   const { items } = useSelector((state: RootState) => state.cart);
-  const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   if (items.length === 0) {
     return (
@@ -26,10 +26,12 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
           <ShoppingBag className="h-16 w-16 text-muted-foreground" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-3xl font-bold">{isBn ? 'আপনার কার্ট সম্পূর্ণ খালি!' : 'Your cart is completely empty!'}</h2>
+          <h2 className="text-3xl font-bold">
+            {isBn ? 'আপনার কার্ট সম্পূর্ণ খালি!' : 'Your cart is completely empty!'}
+          </h2>
           <p className="text-muted-foreground text-lg max-w-md mx-auto">
-            {isBn 
-              ? 'আমাদের অসংখ্য পণ্য থেকে আপনার পছন্দের জিনিসগুলো বেছে নিন এবং কেনাকাটা শুরু করুন।' 
+            {isBn
+              ? 'আমাদের অসংখ্য পণ্য থেকে আপনার পছন্দের জিনিসগুলো বেছে নিন এবং কেনাকাটা শুরু করুন।'
               : 'Browse our extensive catalog and add your favorite items to start shopping.'}
           </p>
         </div>
@@ -54,8 +56,10 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
       <div className="flex flex-col md:flex-row gap-8">
         {/* Cart Items */}
         <div className="flex-1 space-y-6">
-          <h1 className="text-3xl font-bold">{isBn ? 'শপিং কার্ট' : 'Shopping Cart'} ({items.length} {isBn ? 'টি আইটেম' : 'items'})</h1>
-          
+          <h1 className="text-3xl font-bold">
+            {isBn ? 'শপিং কার্ট' : 'Shopping Cart'} ({items.length} {isBn ? 'টি আইটেম' : 'items'})
+          </h1>
+
           <div className="space-y-4">
             {items.map((item) => (
               <Card key={item.sellerProductId} className="overflow-hidden">
@@ -71,17 +75,21 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                         className="h-full w-full object-cover mix-blend-multiply"
                       />
                     </div>
-                    
+
                     <div className="flex-1 flex flex-col justify-between space-y-4">
                       <div className="flex justify-between items-start gap-4">
                         <div>
-                          <Link href={`/${lang}/products/${item.sellerProductId}`} className="hover:underline">
+                          <Link
+                            href={`/${lang}/products/${item.slug || item.sellerProductId}`}
+                            className="hover:underline"
+                          >
                             <h3 className="font-semibold text-lg line-clamp-2">
                               {isBn ? item.nameBn : item.nameEn}
                             </h3>
                           </Link>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {isBn ? 'সেলার:' : 'Seller:'} {isBn ? item.sellerNameBn : item.sellerNameEn}
+                            {isBn ? 'সেলার:' : 'Seller:'}{' '}
+                            {isBn ? item.sellerNameBn : item.sellerNameEn}
                           </p>
                         </div>
                         <div className="text-right">
@@ -93,26 +101,45 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                         <div className="flex items-center border rounded-md">
                           <button
                             className="px-3 py-1.5 text-muted-foreground hover:bg-muted font-medium transition-colors"
-                            onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: Math.max(1, item.quantity - 1) }))}
+                            onClick={() =>
+                              dispatch(
+                                updateQuantity({
+                                  sellerProductId: item.sellerProductId,
+                                  quantity: Math.max(1, item.quantity - 1),
+                                })
+                              )
+                            }
                           >
                             -
                           </button>
-                          <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
+                          <span className="w-10 text-center text-sm font-medium">
+                            {item.quantity}
+                          </span>
                           <button
                             className="px-3 py-1.5 text-muted-foreground hover:bg-muted font-medium transition-colors"
-                            onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: item.quantity + 1 }))}
+                            onClick={() =>
+                              dispatch(
+                                updateQuantity({
+                                  sellerProductId: item.sellerProductId,
+                                  quantity: item.quantity + 1,
+                                })
+                              )
+                            }
                           >
                             +
                           </button>
                         </div>
-                        
+
                         <div className="flex items-center gap-4">
                           <div className="text-sm font-medium text-muted-foreground hidden sm:block">
-                            {isBn ? 'মোট:' : 'Total:'} <span className="text-foreground">৳{(item.price * item.quantity).toFixed(2)}</span>
+                            {isBn ? 'মোট:' : 'Total:'}{' '}
+                            <span className="text-foreground">
+                              ৳{(item.price * item.quantity).toFixed(2)}
+                            </span>
                           </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                             onClick={() => dispatch(removeFromCart(item.sellerProductId))}
                           >
@@ -136,7 +163,7 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
               <h2 className="text-xl font-bold mb-6 pb-4 border-b">
                 {isBn ? 'অর্ডারের সারসংক্ষেপ' : 'Order Summary'}
               </h2>
-              
+
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-muted-foreground">
                   <span>{isBn ? 'সর্বমোট' : 'Subtotal'}</span>
@@ -144,7 +171,9 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>{isBn ? 'ডেলিভারি চার্জ' : 'Delivery Fee'}</span>
-                  <span className="text-sm italic">{isBn ? 'পরবর্তী ধাপে হিসাব করা হবে' : 'Calculated next step'}</span>
+                  <span className="text-sm italic">
+                    {isBn ? 'পরবর্তী ধাপে হিসাব করা হবে' : 'Calculated next step'}
+                  </span>
                 </div>
                 <div className="pt-4 border-t flex justify-between font-bold text-lg">
                   <span>{isBn ? 'মোট (আনুমানিক)' : 'Estimated Total'}</span>
@@ -160,8 +189,8 @@ export default function CartPage({ params }: { params: Promise<{ lang: string }>
               </Button>
 
               <div className="mt-4 pt-4 border-t text-center text-xs text-muted-foreground">
-                {isBn 
-                  ? 'নিরাপদ পেমেন্ট এবং দ্রুত ডেলিভারির নিশ্চয়তা' 
+                {isBn
+                  ? 'নিরাপদ পেমেন্ট এবং দ্রুত ডেলিভারির নিশ্চয়তা'
                   : 'Secure payments and fast delivery guaranteed'}
               </div>
             </CardContent>

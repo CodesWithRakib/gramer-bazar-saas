@@ -116,7 +116,9 @@ export function ApiStandardPaginatedResponse(
   );
 }
 
-export function ApiStandardMessageResponse(options: { status?: number; description?: string } = {}) {
+export function ApiStandardMessageResponse(
+  options: { status?: number; description?: string } = {},
+) {
   return ApiStandardResponse({
     type: MessageResponseDto,
     status: options.status ?? HttpStatus.OK,
@@ -125,9 +127,7 @@ export function ApiStandardMessageResponse(options: { status?: number; descripti
 }
 
 export function ApiCommonErrors(statusCodes: number[] = [400, 401, 403, 404, 500]) {
-  const decorators: MethodDecorator[] = [
-    ApiExtraModels(ApiErrorResponseDto) as MethodDecorator,
-  ];
+  const decorators: MethodDecorator[] = [ApiExtraModels(ApiErrorResponseDto) as MethodDecorator];
 
   if (statusCodes.includes(400)) {
     decorators.push(

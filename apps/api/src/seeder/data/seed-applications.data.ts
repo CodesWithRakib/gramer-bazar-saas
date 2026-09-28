@@ -41,12 +41,14 @@ export const SEED_SELLER_APPLICATIONS: SeedSellerApplicationItem[] = [
     shopSlug: 'rahim-traders',
     phone: '+8801711000002',
     email: 'seller1@gramerbazar.com',
-    description: 'Trusted wholesale and retail grocery supplier serving Debiganj for over 15 years.',
+    description:
+      'Trusted wholesale and retail grocery supplier serving Debiganj for over 15 years.',
     address: 'Station Road, Debiganj Bazar, Panchagarh',
     tradeLicenseNumber: 'TRAD/DBG/2021/0458',
     nidNumber: '19845218765432101',
     status: ApplicationStatus.APPROVED,
-    adminNotes: 'Trade license and NID verified on site. Shop inspection approved by Regional Officer.',
+    adminNotes:
+      'Trade license and NID verified on site. Shop inspection approved by Regional Officer.',
     reviewedDaysAgo: 60,
   },
   {
@@ -56,7 +58,8 @@ export const SEED_SELLER_APPLICATIONS: SeedSellerApplicationItem[] = [
     shopSlug: 'karim-groceries',
     phone: '+8801711000003',
     email: 'seller2@gramerbazar.com',
-    description: 'Fresh rural spices, mustard oil, organic turmeric, and pantry essentials direct from farmers.',
+    description:
+      'Fresh rural spices, mustard oil, organic turmeric, and pantry essentials direct from farmers.',
     address: 'Puratan Bazar, Debiganj, Panchagarh',
     tradeLicenseNumber: 'TRAD/DBG/2022/1129',
     nidNumber: '19885218765432202',
@@ -71,7 +74,8 @@ export const SEED_SELLER_APPLICATIONS: SeedSellerApplicationItem[] = [
     shopSlug: 'bhai-bhai-pharmacy',
     phone: '+8801711000004',
     email: 'seller3@gramerbazar.com',
-    description: 'Licensed retail drug store providing genuine medicine, first aid, and personal healthcare.',
+    description:
+      'Licensed retail drug store providing genuine medicine, first aid, and personal healthcare.',
     address: 'Hospital Gate, Debiganj Sadar, Panchagarh',
     tradeLicenseNumber: 'DGDA/DRUG/55412',
     nidNumber: '19795218765432303',
@@ -87,7 +91,8 @@ export const SEED_SELLER_APPLICATIONS: SeedSellerApplicationItem[] = [
     shopSlug: 'sonar-bangla-organic',
     phone: '+8801811000009',
     email: 'customer10@gramerbazar.com',
-    description: 'Farm-fresh deshi chicken, quail eggs, honey, and organic mustard oil from Debiganj char area.',
+    description:
+      'Farm-fresh deshi chicken, quail eggs, honey, and organic mustard oil from Debiganj char area.',
     address: 'Tengonmari, Debiganj, Panchagarh',
     tradeLicenseNumber: 'TRAD/DBG/2026/0019',
     nidNumber: '19955218765432404',
@@ -102,7 +107,8 @@ export const SEED_SELLER_APPLICATIONS: SeedSellerApplicationItem[] = [
     shopSlug: 'panchagarh-handicrafts',
     phone: '+8801811000010',
     email: 'customer11@gramerbazar.com',
-    description: 'Eco-friendly bamboo baskets, handloom mats, jute bags, and rural cottage craft items.',
+    description:
+      'Eco-friendly bamboo baskets, handloom mats, jute bags, and rural cottage craft items.',
     address: 'Boda Road, Panchagarh Sadar',
     tradeLicenseNumber: 'TRAD/PCH/2025/3381',
     nidNumber: '19925218765432505',
@@ -123,7 +129,8 @@ export const SEED_SELLER_APPLICATIONS: SeedSellerApplicationItem[] = [
     tradeLicenseNumber: 'PENDING_DOCUMENT',
     nidNumber: '19975218765432606',
     status: ApplicationStatus.REJECTED,
-    adminNotes: 'Application rejected: Trade license document missing and physical store verification failed.',
+    adminNotes:
+      'Application rejected: Trade license document missing and physical store verification failed.',
     reviewedDaysAgo: 10,
   },
 ];

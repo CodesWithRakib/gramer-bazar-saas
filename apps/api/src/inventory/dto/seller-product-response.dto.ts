@@ -23,28 +23,48 @@ export class InventorySummaryDto {
 }
 
 export class SellerProductResponseDto {
-  @ApiProperty({ example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', description: 'Seller product listing UUID' })
+  @ApiProperty({
+    example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
+    description: 'Seller product listing UUID',
+  })
   id: string;
 
   @ApiProperty({ example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e', description: 'Shop UUID' })
   shopId: string;
 
-  @ApiProperty({ example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f', description: 'Product variant UUID' })
+  @ApiProperty({
+    example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f',
+    description: 'Product variant UUID',
+  })
   productVariantId: string;
 
-  @ApiPropertyOptional({ type: () => ProductVariantResponseDto, description: 'Associated master variant details' })
+  @ApiPropertyOptional({
+    type: () => ProductVariantResponseDto,
+    description: 'Associated master variant details',
+  })
   productVariant?: ProductVariantResponseDto;
 
   @ApiProperty({ example: 120, description: 'Selling price set by seller in BDT' })
   price: number;
 
-  @ApiPropertyOptional({ example: 105, nullable: true, description: 'Promotional discount price in BDT' })
+  @ApiPropertyOptional({
+    example: 105,
+    nullable: true,
+    description: 'Promotional discount price in BDT',
+  })
   discountPrice: number | null;
 
-  @ApiPropertyOptional({ example: 'SELLER-SKU-001', nullable: true, description: 'Custom merchant inventory SKU' })
+  @ApiPropertyOptional({
+    example: 'SELLER-SKU-001',
+    nullable: true,
+    description: 'Custom merchant inventory SKU',
+  })
   sellerSku: string | null;
 
-  @ApiProperty({ example: false, description: 'Whether seller has regulatory permit approval for this item' })
+  @ApiProperty({
+    example: false,
+    description: 'Whether seller has regulatory permit approval for this item',
+  })
   isRegulatedApproved: boolean;
 
   @ApiProperty({ example: true, description: 'Whether the product is listed and active in shop' })
@@ -64,7 +84,10 @@ export class ShopProductsResponseDto {
   @ApiProperty({ type: [SellerProductResponseDto], description: 'List of seller products' })
   products: SellerProductResponseDto[];
 
-  @ApiProperty({ type: [CategoryResponseDto], description: 'Categories represented in this shop inventory' })
+  @ApiProperty({
+    type: [CategoryResponseDto],
+    description: 'Categories represented in this shop inventory',
+  })
   categories: CategoryResponseDto[];
 
   @ApiProperty({ example: 45, description: 'Total matched products' })

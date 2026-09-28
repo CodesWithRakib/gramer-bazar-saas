@@ -10,7 +10,10 @@ export class ApiResponseDto<T = any> {
   @ApiProperty({ example: '/api/v1/resource', description: 'Request endpoint path' })
   path: string;
 
-  @ApiProperty({ example: '2026-09-26T10:00:00.000Z', description: 'Timestamp of the response in ISO-8601 format' })
+  @ApiProperty({
+    example: '2026-09-26T10:00:00.000Z',
+    description: 'Timestamp of the response in ISO-8601 format',
+  })
   timestamp: string;
 }
 
@@ -30,7 +33,10 @@ export class PaginationMetaDto {
   @ApiPropertyOptional({ example: true, description: 'Whether there is a next page available' })
   hasNextPage?: boolean;
 
-  @ApiPropertyOptional({ example: false, description: 'Whether there is a previous page available' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Whether there is a previous page available',
+  })
   hasPreviousPage?: boolean;
 }
 
@@ -41,7 +47,10 @@ export class ApiErrorResponseDto {
   @ApiProperty({ example: 400, description: 'HTTP error status code' })
   statusCode: number;
 
-  @ApiProperty({ example: '2026-09-26T10:00:00.000Z', description: 'Timestamp of the error in ISO-8601 format' })
+  @ApiProperty({
+    example: '2026-09-26T10:00:00.000Z',
+    description: 'Timestamp of the error in ISO-8601 format',
+  })
   timestamp: string;
 
   @ApiProperty({ example: '/api/v1/resource', description: 'Request endpoint path' })
@@ -59,6 +68,9 @@ export class ApiErrorResponseDto {
 }
 
 export class MessageResponseDto {
-  @ApiProperty({ example: 'Operation completed successfully', description: 'Human-readable result message' })
+  @ApiProperty({
+    example: 'Operation completed successfully',
+    description: 'Human-readable result message',
+  })
   message: string;
 }

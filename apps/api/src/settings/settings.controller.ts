@@ -7,7 +7,10 @@ import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
-import { ApiStandardResponse, ApiCommonErrors } from '../common/decorators/api-standard-response.decorator.js';
+import {
+  ApiStandardResponse,
+  ApiCommonErrors,
+} from '../common/decorators/api-standard-response.decorator.js';
 import { PlatformSettingsResponseDto } from './dto/settings-response.dto.js';
 
 @ApiTags('Settings (Admin)')
@@ -23,15 +26,27 @@ export class SettingsController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get marketplace settings (Admin)', description: 'Returns system-wide operational configurations and payment gateway credentials.' })
-  @ApiStandardResponse({ type: PlatformSettingsResponseDto, description: 'Marketplace platform settings' })
+  @ApiOperation({
+    summary: 'Get marketplace settings (Admin)',
+    description: 'Returns system-wide operational configurations and payment gateway credentials.',
+  })
+  @ApiStandardResponse({
+    type: PlatformSettingsResponseDto,
+    description: 'Marketplace platform settings',
+  })
   getSettings() {
     return this.settingsService.getSettings();
   }
 
   @Patch()
-  @ApiOperation({ summary: 'Update marketplace settings (Admin)', description: 'Persists marketplace settings updates and logs an administrative audit entry.' })
-  @ApiStandardResponse({ type: PlatformSettingsResponseDto, description: 'Updated marketplace settings' })
+  @ApiOperation({
+    summary: 'Update marketplace settings (Admin)',
+    description: 'Persists marketplace settings updates and logs an administrative audit entry.',
+  })
+  @ApiStandardResponse({
+    type: PlatformSettingsResponseDto,
+    description: 'Updated marketplace settings',
+  })
   async updateSettings(
     @Request() req: { user: { id: string; firstName?: string; lastName?: string } },
     @Body() dto: UpdateSettingsDto,

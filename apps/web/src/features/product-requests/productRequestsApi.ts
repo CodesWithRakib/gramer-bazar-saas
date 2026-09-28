@@ -60,7 +60,10 @@ export const productRequestsApi = api.injectEndpoints({
     }),
 
     // Admin endpoints
-    getAdminProductRequests: builder.query<{ data: ProductRequest[]; meta: PaginationMeta }, { status?: string; search?: string; page?: number; limit?: number } | void>({
+    getAdminProductRequests: builder.query<
+      { data: ProductRequest[]; meta: PaginationMeta },
+      { status?: string; search?: string; page?: number; limit?: number } | void
+    >({
       query: (params) => {
         let url = '/admin/product-requests';
         if (params) {
@@ -79,13 +82,19 @@ export const productRequestsApi = api.injectEndpoints({
       query: (id) => `/admin/product-requests/${id}`,
       providesTags: (result, error, id) => [{ type: 'ProductRequest', id }],
     }),
-    updateProductRequestStatus: builder.mutation<ProductRequest, { id: string; data: UpdateProductRequestStatusDto }>({
+    updateProductRequestStatus: builder.mutation<
+      ProductRequest,
+      { id: string; data: UpdateProductRequestStatusDto }
+    >({
       query: ({ id, data }) => ({
         url: `/admin/product-requests/${id}/status`,
         method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'ProductRequest', id }, 'ProductRequest'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'ProductRequest', id },
+        'ProductRequest',
+      ],
     }),
   }),
 });

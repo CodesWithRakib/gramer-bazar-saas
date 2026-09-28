@@ -15,7 +15,7 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    
+
     if (!user || !user.roles) {
       throw new ForbiddenException('Insufficient permissions');
     }

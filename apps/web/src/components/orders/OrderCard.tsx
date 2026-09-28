@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { enUS, bn } from 'date-fns/locale';
 import { Order } from '@/features/orders/ordersApi';
-import { Card, CardContent,  CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CustomImage } from '@/components/ui/CustomImage';
@@ -48,7 +48,11 @@ const getStatusLabel = (status: string, lang: string) => {
   };
 
   const lowerStatus = status.toLowerCase();
-  return statusMap[lowerStatus] ? (isBn ? statusMap[lowerStatus].bn : statusMap[lowerStatus].en) : status;
+  return statusMap[lowerStatus]
+    ? isBn
+      ? statusMap[lowerStatus].bn
+      : statusMap[lowerStatus].en
+    : status;
 };
 
 const getPaymentStatusBadge = (status: string | undefined, lang: string) => {
@@ -56,20 +60,29 @@ const getPaymentStatusBadge = (status: string | undefined, lang: string) => {
   const s = (status || '').toLowerCase();
   if (s === 'paid') {
     return (
-      <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium text-xs">
+      <Badge
+        variant="outline"
+        className="border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium text-xs"
+      >
         {isBn ? 'পরিশোধিত' : 'Paid'}
       </Badge>
     );
   }
   if (s === 'refunded') {
     return (
-      <Badge variant="outline" className="border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-400 font-medium text-xs">
+      <Badge
+        variant="outline"
+        className="border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-400 font-medium text-xs"
+      >
         {isBn ? 'রিফান্ড করা হয়েছে' : 'Refunded'}
       </Badge>
     );
   }
   return (
-    <Badge variant="outline" className="border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium text-xs">
+    <Badge
+      variant="outline"
+      className="border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium text-xs"
+    >
       {isBn ? 'বকেয়া' : 'Unpaid'}
     </Badge>
   );
@@ -78,11 +91,13 @@ const getPaymentStatusBadge = (status: string | undefined, lang: string) => {
 export function OrderCard({ order, lang }: OrderCardProps) {
   const isBn = lang === 'bn';
   const dateLocale = isBn ? bn : enUS;
-  const formattedDate = format(new Date(order.createdAt), 'MMM dd, yyyy - hh:mm a', { locale: dateLocale });
-  
+  const formattedDate = format(new Date(order.createdAt), 'MMM dd, yyyy - hh:mm a', {
+    locale: dateLocale,
+  });
+
   const rawItems = order?.items || (order as { orderItems?: unknown[] })?.orderItems;
   const items = Array.isArray(rawItems) ? rawItems : [];
-  
+
   // Show first 4 items maximum as thumbnails
   const displayItems = items.slice(0, 4);
   const remainingCount = Math.max(0, items.length - 4);
@@ -104,7 +119,9 @@ export function OrderCard({ order, lang }: OrderCardProps) {
         </div>
         <div className="text-right">
           <p className="text-sm md:text-base font-bold text-primary">৳{order.total}</p>
-          <p className="text-xs text-muted-foreground">{items.length} {isBn ? 'পণ্য' : 'Items'}</p>
+          <p className="text-xs text-muted-foreground">
+            {items.length} {isBn ? 'পণ্য' : 'Items'}
+          </p>
         </div>
       </CardHeader>
 
@@ -112,11 +129,19 @@ export function OrderCard({ order, lang }: OrderCardProps) {
         <div className="flex items-center gap-3 w-full overflow-x-auto hide-scrollbar">
           {displayItems.map((item, idx) => {
             const variant = item.sellerProduct?.productVariant;
-            const name = variant ? (isBn ? variant.nameBn || variant.product.nameBn : variant.nameEn || variant.product.nameEn) : 'Unknown Product';
+            const name = variant
+              ? isBn
+                ? variant.nameBn || variant.product.nameBn
+                : variant.nameEn || variant.product.nameEn
+              : 'Unknown Product';
             const image = variant?.images?.[0] || '/placeholder.jpg';
-            
+
             return (
-              <div key={item.id || idx} className="relative w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-md border overflow-hidden bg-muted/20" title={name}>
+              <div
+                key={item.id || idx}
+                className="relative w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-md border overflow-hidden bg-muted/20"
+                title={name}
+              >
                 <CustomImage src={image} alt={name} fill className="object-cover" />
                 <div className="absolute bottom-0 right-0 bg-background/80 backdrop-blur-sm text-[10px] font-bold px-1 rounded-tl-md">
                   x{item.quantity}
@@ -124,7 +149,7 @@ export function OrderCard({ order, lang }: OrderCardProps) {
               </div>
             );
           })}
-          
+
           {remainingCount > 0 && (
             <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-md border flex flex-col items-center justify-center bg-muted/30 text-muted-foreground">
               <Package className="w-5 h-5 mb-1 opacity-50" />
@@ -132,8 +157,12 @@ export function OrderCard({ order, lang }: OrderCardProps) {
             </div>
           )}
         </div>
-        
-        <Button variant="ghost" className="w-full md:w-auto mt-2 md:mt-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors" asChild>
+
+        <Button
+          variant="ghost"
+          className="w-full md:w-auto mt-2 md:mt-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors"
+          asChild
+        >
           <Link href={`/${lang}/customer/orders/${order.id}`}>
             {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
             <ChevronRight className="w-4 h-4 ml-1" />

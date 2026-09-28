@@ -37,7 +37,7 @@ class AnalyticsTracker {
       eventType,
       ...payload,
     });
-    
+
     // If the queue gets too large, flush immediately
     if (this.queue.length >= 50) {
       this.flush();
@@ -53,11 +53,11 @@ class AnalyticsTracker {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
       const token = localStorage.getItem('token');
-      
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      
+
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }

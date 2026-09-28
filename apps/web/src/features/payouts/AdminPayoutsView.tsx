@@ -5,7 +5,14 @@ import { getApiErrorMessage } from '@/lib/apiError';
 import React, { useState, useMemo } from 'react';
 import { useGetAllPayoutsQuery, useReviewPayoutMutation } from '@/features/payouts/payoutsApi';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,7 +24,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle, XCircle, Search, X, Check, Eye } from 'lucide-react';
@@ -30,13 +43,14 @@ export interface AdminPayoutsViewProps {
 
 export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
   const isBn = lang === 'bn';
-  
 
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>(
+    'ALL'
+  );
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  
+
   // Convert 'ALL' back to undefined for the API query
   const queryStatus = statusFilter === 'ALL' ? undefined : statusFilter;
   const { data: payouts = [], isLoading, refetch } = useGetAllPayoutsQuery(queryStatus);
@@ -112,7 +126,11 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
       case 'REJECTED':
         return <Badge variant="destructive">Rejected</Badge>;
       default:
-        return <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white">Pending</Badge>;
+        return (
+          <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white">
+            Pending
+          </Badge>
+        );
     }
   };
 
@@ -124,7 +142,9 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
             {isBn ? 'পেআউট অনুরোধসমূহ' : 'Payout Requests'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {isBn ? 'সেলারদের পেআউট অনুরোধ পর্যালোচনা করুন এবং উত্তোলন প্রক্রিয়া সম্পন্ন করুন।' : 'Review and process seller withdrawal requests.'}
+            {isBn
+              ? 'সেলারদের পেআউট অনুরোধ পর্যালোচনা করুন এবং উত্তোলন প্রক্রিয়া সম্পন্ন করুন।'
+              : 'Review and process seller withdrawal requests.'}
           </p>
         </div>
       </div>
@@ -144,7 +164,11 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                   setSearch(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder={isBn ? 'সেলার, ইমেইল বা মাধ্যম খুঁজুন...' : 'Search by seller name, email, or method...'}
+                placeholder={
+                  isBn
+                    ? 'সেলার, ইমেইল বা মাধ্যম খুঁজুন...'
+                    : 'Search by seller name, email, or method...'
+                }
                 className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
               />
               {search && (
@@ -196,20 +220,36 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                   <TableHead className="py-3.5 px-4">{isBn ? 'বিস্তারিত' : 'Details'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'অবস্থা' : 'Status'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">{isBn ? 'অ্যাকশন' : 'Actions'}</TableHead>
+                  <TableHead className="py-3.5 px-4 text-right">
+                    {isBn ? 'অ্যাকশন' : 'Actions'}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-gray-200 dark:divide-border text-sm">
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`} className="animate-pulse">
-                      <TableCell className="py-4 px-4"><div className="h-4 w-32 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-36 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-6 w-16 rounded-full bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4 text-right"><div className="ml-auto h-8 w-24 rounded bg-muted"></div></TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-32 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-20 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-20 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-36 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-24 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-6 w-16 rounded-full bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4 text-right">
+                        <div className="ml-auto h-8 w-24 rounded bg-muted"></div>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : paginatedPayouts.length === 0 ? (
@@ -224,26 +264,38 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || statusFilter !== 'ALL'
-                            ? (isBn ? 'আপনার অনুসন্ধানের ফিল্টারের সাথে কোনো অনুরোধ মেলেনি' : 'No requests match your search criteria.')
-                            : (isBn ? 'বর্তমানে কোনো পেআউট অনুরোধ নেই' : 'There are currently no payout requests.')}
+                            ? isBn
+                              ? 'আপনার অনুসন্ধানের ফিল্টারের সাথে কোনো অনুরোধ মেলেনি'
+                              : 'No requests match your search criteria.'
+                            : isBn
+                              ? 'বর্তমানে কোনো পেআউট অনুরোধ নেই'
+                              : 'There are currently no payout requests.'}
                         </p>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedPayouts.map((payout) => (
-                    <TableRow key={payout.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <TableRow
+                      key={payout.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <TableCell className="py-3.5 px-4">
                         <div className="font-semibold text-foreground">
                           {payout.seller?.firstName} {payout.seller?.lastName}
                         </div>
-                        <div className="text-xs text-muted-foreground font-mono">{payout.seller?.email}</div>
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {payout.seller?.email}
+                        </div>
                       </TableCell>
                       <TableCell className="py-3.5 px-4 font-bold text-emerald-600">
                         ৳ {payout.amount}
                       </TableCell>
                       <TableCell className="py-3.5 px-4 font-medium">{payout.method}</TableCell>
-                      <TableCell className="py-3.5 px-4 max-w-[200px] truncate text-muted-foreground" title={payout.accountDetails}>
+                      <TableCell
+                        className="py-3.5 px-4 max-w-[200px] truncate text-muted-foreground"
+                        title={payout.accountDetails}
+                      >
                         {payout.accountDetails}
                       </TableCell>
                       <TableCell className="py-3.5 px-4 whitespace-nowrap text-muted-foreground text-xs font-mono">
@@ -252,7 +304,10 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                       <TableCell className="py-3.5 px-4">
                         {getStatusBadge(payout.status)}
                         {payout.adminNote && (
-                          <p className="text-[10px] text-muted-foreground mt-0.5 truncate max-w-[150px]" title={payout.adminNote}>
+                          <p
+                            className="text-[10px] text-muted-foreground mt-0.5 truncate max-w-[150px]"
+                            title={payout.adminNote}
+                          >
                             {payout.adminNote}
                           </p>
                         )}
@@ -309,17 +364,24 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
         />
       </div>
 
-      <Dialog open={reviewDialog.isOpen} onOpenChange={(open) => !open && setReviewDialog(prev => ({ ...prev, isOpen: false }))}>
+      <Dialog
+        open={reviewDialog.isOpen}
+        onOpenChange={(open) => !open && setReviewDialog((prev) => ({ ...prev, isOpen: false }))}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {reviewDialog.status === 'APPROVED' 
-                ? (isBn ? 'পেআউট অনুমোদন করুন' : 'Approve Payout') 
-                : (isBn ? 'পেআউট বাতিল করুন' : 'Reject Payout')}
+              {reviewDialog.status === 'APPROVED'
+                ? isBn
+                  ? 'পেআউট অনুমোদন করুন'
+                  : 'Approve Payout'
+                : isBn
+                  ? 'পেআউট বাতিল করুন'
+                  : 'Reject Payout'}
             </DialogTitle>
             <DialogDescription>
-              {isBn 
-                ? 'আপনি কি নিশ্চিত যে আপনি এই পেআউট অনুরোধটি পর্যালোচনা করতে চান?' 
+              {isBn
+                ? 'আপনি কি নিশ্চিত যে আপনি এই পেআউট অনুরোধটি পর্যালোচনা করতে চান?'
                 : 'Are you sure you want to change the status of this payout request?'}
             </DialogDescription>
           </DialogHeader>
@@ -331,7 +393,11 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
               </Label>
               <Input
                 id="adminNote"
-                placeholder={isBn ? 'যেমন: ট্রানজ্যাকশন আইডি বা কারণ...' : 'e.g., Transaction ID or reason for rejection'}
+                placeholder={
+                  isBn
+                    ? 'যেমন: ট্রানজ্যাকশন আইডি বা কারণ...'
+                    : 'e.g., Transaction ID or reason for rejection'
+                }
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
                 className="rounded-lg"
@@ -342,7 +408,7 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setReviewDialog(prev => ({ ...prev, isOpen: false }))}
+              onClick={() => setReviewDialog((prev) => ({ ...prev, isOpen: false }))}
               disabled={isReviewing}
               className="rounded-full"
             >

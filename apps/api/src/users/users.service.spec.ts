@@ -103,9 +103,7 @@ describe('UsersService', () => {
     it('throws when updating a missing user', async () => {
       userRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('ghost', { firstName: 'X' })).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.update('ghost', { firstName: 'X' })).rejects.toThrow(NotFoundException);
     });
   });
 

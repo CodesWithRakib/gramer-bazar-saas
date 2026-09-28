@@ -9,8 +9,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Loader2, Search, X } from 'lucide-react';
 import Link from 'next/link';
@@ -81,7 +94,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
         method,
         accountDetails,
       }).unwrap();
-      
+
       toast.success(isBn ? 'পেআউট অনুরোধ সফল হয়েছে' : 'Payout requested successfully');
       setAmount('');
       setMethod('');
@@ -98,7 +111,11 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
       case 'REJECTED':
         return <Badge variant="destructive">Rejected</Badge>;
       default:
-        return <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white">Pending</Badge>;
+        return (
+          <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white">
+            Pending
+          </Badge>
+        );
     }
   };
 
@@ -115,7 +132,9 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
             {isBn ? 'পেআউট অনুরোধ' : 'Request Payout'}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {isBn ? 'আপনার ব্যাংক বা মোবাইল ব্যাংকিং এ টাকা উত্তোলন করুন' : 'Withdraw funds to your bank or mobile banking account'}
+            {isBn
+              ? 'আপনার ব্যাংক বা মোবাইল ব্যাংকিং এ টাকা উত্তোলন করুন'
+              : 'Withdraw funds to your bank or mobile banking account'}
           </p>
         </div>
       </div>
@@ -125,7 +144,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
           <CardHeader>
             <CardTitle>{isBn ? 'নতুন অনুরোধ' : 'New Request'}</CardTitle>
             <CardDescription>
-              {isBn 
+              {isBn
                 ? `বর্তমান ব্যালেন্স: ৳ ${wallet?.balance || 0}`
                 : `Available Balance: ৳ ${wallet?.balance || 0}`}
             </CardDescription>
@@ -162,14 +181,14 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="details">
-                  {isBn ? 'অ্যাকাউন্ট বিস্তারিত' : 'Account Details'}
-                </Label>
+                <Label htmlFor="details">{isBn ? 'অ্যাকাউন্ট বিস্তারিত' : 'Account Details'}</Label>
                 <Input
                   id="details"
                   value={accountDetails}
                   onChange={(e) => setAccountDetails(e.target.value)}
-                  placeholder={method === 'BANK_TRANSFER' ? 'A/C Number, Bank Name, Branch' : 'Phone Number'}
+                  placeholder={
+                    method === 'BANK_TRANSFER' ? 'A/C Number, Bank Name, Branch' : 'Phone Number'
+                  }
                   className="rounded-lg"
                 />
               </div>
@@ -189,7 +208,9 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
               {isBn ? 'পেআউট ইতিহাস' : 'Payout History'}
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {isBn ? 'আপনার পূর্ববর্তী সকল উত্তোলনের ইতিহাস' : 'Track status of your previous withdrawal requests.'}
+              {isBn
+                ? 'আপনার পূর্ববর্তী সকল উত্তোলনের ইতিহাস'
+                : 'Track status of your previous withdrawal requests.'}
             </p>
           </div>
 
@@ -256,11 +277,21 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
                   {isPayoutsLoading ? (
                     Array.from({ length: 4 }).map((_, index) => (
                       <TableRow key={`skeleton-${index}`} className="animate-pulse">
-                        <TableCell className="py-3.5 px-3.5"><div className="h-4 w-20 rounded bg-muted"></div></TableCell>
-                        <TableCell className="py-3.5 px-3.5"><div className="h-4 w-16 rounded bg-muted"></div></TableCell>
-                        <TableCell className="py-3.5 px-3.5"><div className="h-4 w-16 rounded bg-muted"></div></TableCell>
-                        <TableCell className="py-3.5 px-3.5"><div className="h-4 w-28 rounded bg-muted"></div></TableCell>
-                        <TableCell className="py-3.5 px-3.5"><div className="h-5 w-16 rounded-full bg-muted"></div></TableCell>
+                        <TableCell className="py-3.5 px-3.5">
+                          <div className="h-4 w-20 rounded bg-muted"></div>
+                        </TableCell>
+                        <TableCell className="py-3.5 px-3.5">
+                          <div className="h-4 w-16 rounded bg-muted"></div>
+                        </TableCell>
+                        <TableCell className="py-3.5 px-3.5">
+                          <div className="h-4 w-16 rounded bg-muted"></div>
+                        </TableCell>
+                        <TableCell className="py-3.5 px-3.5">
+                          <div className="h-4 w-28 rounded bg-muted"></div>
+                        </TableCell>
+                        <TableCell className="py-3.5 px-3.5">
+                          <div className="h-5 w-16 rounded-full bg-muted"></div>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : paginatedPayouts.length === 0 ? (
@@ -290,7 +321,10 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
                     </TableRow>
                   ) : (
                     paginatedPayouts.map((payout) => (
-                      <TableRow key={payout.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                      <TableRow
+                        key={payout.id}
+                        className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                      >
                         <TableCell className="whitespace-nowrap py-3 px-3.5 font-mono text-[11px]">
                           {format(new Date(payout.createdAt), 'MMM dd, yyyy')}
                         </TableCell>
@@ -298,13 +332,19 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
                           ৳ {payout.amount}
                         </TableCell>
                         <TableCell className="py-3 px-3.5 font-medium">{payout.method}</TableCell>
-                        <TableCell className="max-w-[180px] truncate py-3 px-3.5 text-muted-foreground" title={payout.accountDetails}>
+                        <TableCell
+                          className="max-w-[180px] truncate py-3 px-3.5 text-muted-foreground"
+                          title={payout.accountDetails}
+                        >
                           {payout.accountDetails}
                         </TableCell>
                         <TableCell className="py-3 px-3.5">
                           {getStatusBadge(payout.status)}
                           {payout.adminNote && (
-                            <p className="text-[10px] text-muted-foreground mt-0.5 truncate max-w-[130px]" title={payout.adminNote}>
+                            <p
+                              className="text-[10px] text-muted-foreground mt-0.5 truncate max-w-[130px]"
+                              title={payout.adminNote}
+                            >
                               {payout.adminNote}
                             </p>
                           )}

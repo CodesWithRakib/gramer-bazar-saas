@@ -32,7 +32,10 @@ export class ProductVariantsService {
     return variant;
   }
 
-  async update(id: string, updateProductVariantDto: UpdateProductVariantDto): Promise<ProductVariant> {
+  async update(
+    id: string,
+    updateProductVariantDto: UpdateProductVariantDto,
+  ): Promise<ProductVariant> {
     const variant = await this.findOne(id);
     Object.assign(variant, updateProductVariantDto);
     return this.variantsRepository.save(variant);

@@ -17,7 +17,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useCreateAddressMutation, useUpdateAddressMutation, Address } from '@/features/addresses/addressApi';
+import {
+  useCreateAddressMutation,
+  useUpdateAddressMutation,
+  Address,
+} from '@/features/addresses/addressApi';
 import { LocationSelector } from '@/features/addresses/components/LocationSelector';
 import { toast } from 'sonner';
 import { Loader2, LocateFixed, CheckCircle2, MapPin } from 'lucide-react';
@@ -131,10 +135,10 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
             // Auto-detection failed — show manual input instead of an error
             setShowManualInput(true);
           },
-          { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 },
+          { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 }
         );
       },
-      { enableHighAccuracy: false, timeout: 1000, maximumAge: Infinity },
+      { enableHighAccuracy: false, timeout: 1000, maximumAge: Infinity }
     );
   };
 
@@ -142,7 +146,9 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
     const lat = parseFloat(manualLat);
     const lng = parseFloat(manualLng);
     if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-      toast.error(isBn ? 'সঠিক Latitude ও Longitude দিন' : 'Enter valid Latitude and Longitude values');
+      toast.error(
+        isBn ? 'সঠিক Latitude ও Longitude দিন' : 'Enter valid Latitude and Longitude values'
+      );
       return;
     }
     form.setValue('lat', parseFloat(lat.toFixed(8)));
@@ -171,14 +177,17 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
-
         {/* Title */}
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{isBn ? 'অ্যাড্রেস টাইটেল (যেমন: বাসা, অফিস)' : 'Address Title (e.g., Home, Office)'}</FormLabel>
+              <FormLabel>
+                {isBn
+                  ? 'অ্যাড্রেস টাইটেল (যেমন: বাসা, অফিস)'
+                  : 'Address Title (e.g., Home, Office)'}
+              </FormLabel>
               <FormControl>
                 <Input placeholder={isBn ? 'বাসা' : 'Home'} {...field} />
               </FormControl>
@@ -233,7 +242,10 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
             <FormItem>
               <FormLabel>{isBn ? 'বিস্তারিত ঠিকানা' : 'Street Address'}</FormLabel>
               <FormControl>
-                <Input placeholder={isBn ? 'বাড়ি/রোড নং, ল্যান্ডমার্ক' : 'House/Road No, Landmark'} {...field} />
+                <Input
+                  placeholder={isBn ? 'বাড়ি/রোড নং, ল্যান্ডমার্ক' : 'House/Road No, Landmark'}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -315,7 +327,11 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
                   onClick={handleGetLocation}
                   disabled={isGettingLocation}
                 >
-                  {isGettingLocation ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LocateFixed className="w-3.5 h-3.5" />}
+                  {isGettingLocation ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <LocateFixed className="w-3.5 h-3.5" />
+                  )}
                   {isBn ? 'আবার চেষ্টা' : 'Retry Auto'}
                 </Button>
               </div>
@@ -333,10 +349,11 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
                 onClick={handleGetLocation}
                 disabled={isGettingLocation}
               >
-                {isGettingLocation
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  : <LocateFixed className="w-3.5 h-3.5" />
-                }
+                {isGettingLocation ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <LocateFixed className="w-3.5 h-3.5" />
+                )}
                 {isBn ? 'আপডেট' : 'Update'}
               </Button>
             </div>
@@ -348,13 +365,18 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
               onClick={handleGetLocation}
               disabled={isGettingLocation}
             >
+              {isGettingLocation ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <LocateFixed className="w-4 h-4 mr-2" />
+              )}
               {isGettingLocation
-                ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                : <LocateFixed className="w-4 h-4 mr-2" />
-              }
-              {isGettingLocation
-                ? (isBn ? 'লোকেশন খোঁজা হচ্ছে...' : 'Getting location...')
-                : (isBn ? 'বর্তমান লোকেশন ব্যবহার করুন' : 'Use My Current Location')}
+                ? isBn
+                  ? 'লোকেশন খোঁজা হচ্ছে...'
+                  : 'Getting location...'
+                : isBn
+                  ? 'বর্তমান লোকেশন ব্যবহার করুন'
+                  : 'Use My Current Location'}
             </Button>
           )}
         </div>
@@ -366,11 +388,7 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
           render={({ field }) => (
             <FormItem className="flex items-center space-x-3 space-y-0 pt-1">
               <FormControl>
-                <Switch
-                  id="isDefault"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch id="isDefault" checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <FormLabel htmlFor="isDefault" className="font-normal cursor-pointer">
                 {isBn ? 'এটি আমার ডিফল্ট ঠিকানা হিসেবে সেট করুন' : 'Set as my default address'}
@@ -387,9 +405,12 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
           <Button type="submit" disabled={isSaving}>
             {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {initialData
-              ? (isBn ? 'আপডেট করুন' : 'Update Address')
-              : (isBn ? 'সেভ করুন' : 'Save Address')
-            }
+              ? isBn
+                ? 'আপডেট করুন'
+                : 'Update Address'
+              : isBn
+                ? 'সেভ করুন'
+                : 'Save Address'}
           </Button>
         </div>
       </form>

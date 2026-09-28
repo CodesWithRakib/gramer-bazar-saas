@@ -10,14 +10,7 @@ import {
   Query,
   BadRequestException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { DeliveriesService } from './deliveries.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
@@ -50,8 +43,7 @@ export class DeliveriesController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Admin: Get all deliveries',
-    description:
-      'Lists all system deliveries with pagination, search, and rider details.',
+    description: 'Lists all system deliveries with pagination, search, and rider details.',
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -76,8 +68,7 @@ export class DeliveriesController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Admin: Assign an order to a rider',
-    description:
-      'Assigns or re-assigns an order delivery to a specific registered rider.',
+    description: 'Assigns or re-assigns an order delivery to a specific registered rider.',
   })
   @ApiStandardResponse({
     type: DeliveryResponseDto,
@@ -92,8 +83,7 @@ export class DeliveriesController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Admin: Get list of riders',
-    description:
-      'Returns a summary list of all available active riders for dispatch assignment.',
+    description: 'Returns a summary list of all available active riders for dispatch assignment.',
   })
   @ApiStandardResponse({
     type: RiderSummaryDto,
@@ -110,8 +100,7 @@ export class DeliveriesController {
   @Roles(Role.RIDER)
   @ApiOperation({
     summary: 'Rider: Get aggregated dashboard metrics and deliveries trend',
-    description:
-      'Returns live rider assignments, completion stats, earnings, and 7-day trend.',
+    description: 'Returns live rider assignments, completion stats, earnings, and 7-day trend.',
   })
   @ApiStandardResponse({ description: 'Rider dashboard metrics' })
   getRiderDashboard(@Request() req: any) {
@@ -122,8 +111,7 @@ export class DeliveriesController {
   @Roles(Role.RIDER)
   @ApiOperation({
     summary: 'Rider: Get assigned deliveries',
-    description:
-      'Retrieves all deliveries assigned to the currently logged in rider.',
+    description: 'Retrieves all deliveries assigned to the currently logged in rider.',
   })
   @ApiStandardResponse({
     type: DeliveryResponseDto,
@@ -138,8 +126,7 @@ export class DeliveriesController {
   @Roles(Role.RIDER)
   @ApiOperation({
     summary: 'Rider: Get specific delivery details',
-    description:
-      'Retrieves details for a specific delivery assigned to the rider.',
+    description: 'Retrieves details for a specific delivery assigned to the rider.',
   })
   @ApiParam({ name: 'id', description: 'Delivery UUID' })
   @ApiStandardResponse({
@@ -168,23 +155,16 @@ export class DeliveriesController {
     @Body() dto: UpdateDeliveryStatusDto,
   ) {
     const isAdmin = req.user.roles?.some(
-      (r: any) =>
-        (r.name || r) === Role.ADMIN || (r.name || r) === Role.SUPER_ADMIN,
+      (r: any) => (r.name || r) === Role.ADMIN || (r.name || r) === Role.SUPER_ADMIN,
     );
-    return this.deliveriesService.updateDeliveryStatus(
-      req.user.id,
-      id,
-      dto,
-      isAdmin,
-    );
+    return this.deliveriesService.updateDeliveryStatus(req.user.id, id, dto, isAdmin);
   }
 
   @Patch('rider/:id/location')
   @Roles(Role.RIDER)
   @ApiOperation({
     summary: 'Rider: Update live GPS location',
-    description:
-      'Updates current geographic coordinates (lat/lng) of the delivery rider.',
+    description: 'Updates current geographic coordinates (lat/lng) of the delivery rider.',
   })
   @ApiParam({ name: 'id', description: 'Delivery UUID' })
   @ApiBody({ type: UpdateRiderLocationDto })
@@ -203,12 +183,7 @@ export class DeliveriesController {
     if (isNaN(parsedLat) || isNaN(parsedLng)) {
       throw new BadRequestException('lat and lng must be valid numbers');
     }
-    return this.deliveriesService.updateRiderLocation(
-      req.user.id,
-      id,
-      parsedLat,
-      parsedLng,
-    );
+    return this.deliveriesService.updateRiderLocation(req.user.id, id, parsedLat, parsedLng);
   }
 
   // --- CUSTOMER ENDPOINTS ---
@@ -217,8 +192,7 @@ export class DeliveriesController {
   @Roles(Role.CUSTOMER)
   @ApiOperation({
     summary: 'Customer: Get delivery tracking for an order',
-    description:
-      'Customer tracking view of the delivery status and rider location for an order.',
+    description: 'Customer tracking view of the delivery status and rider location for an order.',
   })
   @ApiParam({ name: 'orderId', description: 'Order UUID' })
   @ApiStandardResponse({

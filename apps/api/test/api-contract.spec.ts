@@ -34,7 +34,10 @@ describe('OpenAPI / Swagger Contract Validation', () => {
         if (op) {
           totalOperations++;
           // Must have summary
-          expect(op.summary, `Missing summary for ${method.toUpperCase()} ${routePath}`).toBeDefined();
+          expect(
+            op.summary,
+            `Missing summary for ${method.toUpperCase()} ${routePath}`,
+          ).toBeDefined();
           expect(typeof op.summary).toBe('string');
           expect(op.summary.length).toBeGreaterThan(0);
 
@@ -43,13 +46,24 @@ describe('OpenAPI / Swagger Contract Validation', () => {
           expect(op.tags.length).toBeGreaterThan(0);
 
           // Must have responses
-          expect(op.responses, `Missing responses for ${method.toUpperCase()} ${routePath}`).toBeDefined();
+          expect(
+            op.responses,
+            `Missing responses for ${method.toUpperCase()} ${routePath}`,
+          ).toBeDefined();
           const statusCodes = Object.keys(op.responses);
-          expect(statusCodes.length, `No response status codes for ${method.toUpperCase()} ${routePath}`).toBeGreaterThan(0);
+          expect(
+            statusCodes.length,
+            `No response status codes for ${method.toUpperCase()} ${routePath}`,
+          ).toBeGreaterThan(0);
 
           // Must document at least one 2xx or 3xx status
-          const hasSuccessStatus = statusCodes.some((code) => code.startsWith('2') || code.startsWith('3'));
-          expect(hasSuccessStatus, `No 2xx/3xx response for ${method.toUpperCase()} ${routePath}`).toBe(true);
+          const hasSuccessStatus = statusCodes.some(
+            (code) => code.startsWith('2') || code.startsWith('3'),
+          );
+          expect(
+            hasSuccessStatus,
+            `No 2xx/3xx response for ${method.toUpperCase()} ${routePath}`,
+          ).toBe(true);
         }
       }
     }
@@ -73,10 +87,7 @@ describe('OpenAPI / Swagger Contract Validation', () => {
           const match = val.match(/^#\/components\/schemas\/(.+)$/);
           if (match) {
             const schemaName = match[1];
-            expect(
-              schemas[schemaName],
-              `Broken reference ${val} at ${currentPath}`,
-            ).toBeDefined();
+            expect(schemas[schemaName], `Broken reference ${val} at ${currentPath}`).toBeDefined();
           }
         } else {
           checkRefs(val, `${currentPath}.${key}`);

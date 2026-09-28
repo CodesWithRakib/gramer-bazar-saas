@@ -8,11 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, RefreshCw, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 
-export default function CheckoutCancelPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function CheckoutCancelPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const searchParams = useSearchParams();
@@ -32,7 +28,7 @@ export default function CheckoutCancelPage({
     } catch (err: any) {
       setErrorMessage(
         err?.data?.message ||
-          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to restart payment session.'),
+          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to restart payment session.')
       );
     }
   };
@@ -59,7 +55,9 @@ export default function CheckoutCancelPage({
           {orderId && (
             <div className="rounded-2xl bg-muted/40 p-4 border border-border/50 text-sm flex justify-between items-center">
               <span className="text-muted-foreground">{isBn ? 'অর্ডার আইডি' : 'Order ID'}</span>
-              <span className="font-mono font-semibold text-primary">{orderId.slice(0, 13).toUpperCase()}...</span>
+              <span className="font-mono font-semibold text-primary">
+                {orderId.slice(0, 13).toUpperCase()}...
+              </span>
             </div>
           )}
 
@@ -79,8 +77,12 @@ export default function CheckoutCancelPage({
               >
                 <RefreshCw className={`w-4 h-4 ${isRetrying ? 'animate-spin' : ''}`} />
                 {isRetrying
-                  ? (isBn ? 'রিডাইরেক্ট হচ্ছে...' : 'Redirecting...')
-                  : (isBn ? 'আবার পেমেন্ট করুন' : 'Resume Payment')}
+                  ? isBn
+                    ? 'রিডাইরেক্ট হচ্ছে...'
+                    : 'Redirecting...'
+                  : isBn
+                    ? 'আবার পেমেন্ট করুন'
+                    : 'Resume Payment'}
               </Button>
             )}
             <Button asChild variant="outline" size="lg" className="flex-1 rounded-xl h-12 gap-2">

@@ -15,7 +15,10 @@ export function CategoryCard({ category, lang }: CategoryCardProps) {
   const rawImage = category.image || '';
 
   const isImageUrl = (val: string) =>
-    val.startsWith('http://') || val.startsWith('https://') || val.startsWith('/') || val.startsWith('/uploads/');
+    val.startsWith('http://') ||
+    val.startsWith('https://') ||
+    val.startsWith('/') ||
+    val.startsWith('/uploads/');
 
   const imageSrc = isImageUrl(rawImage) ? rawImage : isImageUrl(rawIcon) ? rawIcon : null;
   const emojiIcon = !imageSrc ? rawIcon || '🛍️' : null;
@@ -39,7 +42,9 @@ export function CategoryCard({ category, lang }: CategoryCardProps) {
               </span>
             )}
           </div>
-          <span className="text-[11px] md:text-xs font-semibold line-clamp-2 leading-tight">{name}</span>
+          <span className="text-[11px] md:text-xs font-semibold line-clamp-2 leading-tight">
+            {name}
+          </span>
         </CardContent>
       </Card>
     </Link>

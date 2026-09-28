@@ -18,7 +18,9 @@ export class Inventory {
   @Column({ name: 'seller_product_id' })
   sellerProductId: string;
 
-  @OneToOne(() => SellerProduct, (sellerProduct) => sellerProduct.inventory, { onDelete: 'CASCADE' })
+  @OneToOne(() => SellerProduct, (sellerProduct) => sellerProduct.inventory, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'seller_product_id' })
   sellerProduct: Relation<SellerProduct>;
 

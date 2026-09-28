@@ -13,26 +13,30 @@ export interface AdminDeliveriesViewProps {
 }
 
 export function AdminDeliveriesView({ lang = 'en' }: AdminDeliveriesViewProps) {
-  
-
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  
+
   const { data, isLoading, isError, refetch } = useGetAdminDeliveriesQuery({ page, limit, search });
 
   const columns: ColumnDef<Delivery>[] = [
     {
       accessorKey: 'id',
       header: 'Delivery ID',
-      cell: ({ row }) => <span className="font-mono">{String(row.getValue('id')).substring(0, 8)}...</span>
+      cell: ({ row }) => (
+        <span className="font-mono">{String(row.getValue('id')).substring(0, 8)}...</span>
+      ),
     },
     {
       accessorKey: 'order',
       header: 'Order',
       cell: ({ row }) => {
         const order = row.getValue('order') as { id: string } | null;
-        return order ? <span className="font-mono">{String(order.id).substring(0, 8)}...</span> : '-';
+        return order ? (
+          <span className="font-mono">{String(order.id).substring(0, 8)}...</span>
+        ) : (
+          '-'
+        );
       },
     },
     {
@@ -55,9 +59,9 @@ export function AdminDeliveriesView({ lang = 'en' }: AdminDeliveriesViewProps) {
         if (status === 'UNASSIGNED') variant = 'secondary';
         else if (status === 'DELIVERED') variant = 'default';
         else if (status === 'CANCELLED' || status === 'FAILED') variant = 'destructive';
-        
+
         return <Badge variant={variant}>{status}</Badge>;
-      }
+      },
     },
     {
       accessorKey: 'createdAt',
@@ -76,9 +80,9 @@ export function AdminDeliveriesView({ lang = 'en' }: AdminDeliveriesViewProps) {
           </p>
         </div>
       </div>
-      
-      <DataTable 
-        columns={columns} 
+
+      <DataTable
+        columns={columns}
         data={data?.data || []}
         pageCount={data?.meta?.totalPages ?? -1}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
@@ -100,7 +104,9 @@ export function AdminDeliveriesView({ lang = 'en' }: AdminDeliveriesViewProps) {
           setSearch(val);
           setPage(1);
         }}
-        searchPlaceholder={lang === 'bn' ? 'ডেলিভারি আইডি দিয়ে খুঁজুন...' : 'Search delivery ID...'}
+        searchPlaceholder={
+          lang === 'bn' ? 'ডেলিভারি আইডি দিয়ে খুঁজুন...' : 'Search delivery ID...'
+        }
         totalItems={data?.meta?.total}
         itemsPerPage={limit}
         currentPage={page}

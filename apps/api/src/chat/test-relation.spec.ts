@@ -14,4 +14,3 @@ describe('class-transformer behavior on Conversation', () => {
     expect(plain).toHaveProperty('lastMessage');
   });
 });
-

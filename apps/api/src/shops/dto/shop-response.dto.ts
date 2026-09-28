@@ -22,10 +22,16 @@ export class ShopResponseDto {
   @ApiPropertyOptional({ example: 'Detailed description of shop operations...', nullable: true })
   description: string | null;
 
-  @ApiPropertyOptional({ example: 'https://storage.gramerbazar.com/shops/logo.png', nullable: true })
+  @ApiPropertyOptional({
+    example: 'https://storage.gramerbazar.com/shops/logo.png',
+    nullable: true,
+  })
   logo: string | null;
 
-  @ApiPropertyOptional({ example: 'https://storage.gramerbazar.com/shops/banner.jpg', nullable: true })
+  @ApiPropertyOptional({
+    example: 'https://storage.gramerbazar.com/shops/banner.jpg',
+    nullable: true,
+  })
   banner: string | null;
 
   @ApiPropertyOptional({ example: '01712345678', nullable: true })

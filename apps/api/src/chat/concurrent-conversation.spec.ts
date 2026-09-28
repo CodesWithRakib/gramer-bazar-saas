@@ -10,7 +10,9 @@ describe('Concurrent conversation creation and canonical identity', () => {
     const keyBA = getDirectCanonicalKey(sellerId, customerId);
 
     expect(keyAB).toEqual(keyBA);
-    expect(keyAB).toBe(`direct:${[customerId, sellerId].sort()[0]}:${[customerId, sellerId].sort()[1]}`);
+    expect(keyAB).toBe(
+      `direct:${[customerId, sellerId].sort()[0]}:${[customerId, sellerId].sort()[1]}`,
+    );
   });
 
   it('safely handles concurrent creation race condition and resolves to the same single conversation', async () => {
@@ -37,7 +39,9 @@ describe('Concurrent conversation creation and canonical identity', () => {
       create: vi.fn((data) => ({ ...data, id: 'canonical-conv-1001' })),
       save: vi.fn(async (conv) => {
         if (mockRepo.save.mock.calls.length > 1) {
-          const duplicateError: any = new Error('duplicate key value violates unique constraint "idx_conversations_canonical_key"');
+          const duplicateError: any = new Error(
+            'duplicate key value violates unique constraint "idx_conversations_canonical_key"',
+          );
           duplicateError.code = '23505';
           throw duplicateError;
         }

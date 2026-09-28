@@ -38,6 +38,7 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { StartChatButton } from '@/components/chat/StartChatButton';
+import { getUserRoles } from '@/lib/roles';
 
 export function ProductDetailsClient({
   products,
@@ -71,7 +72,11 @@ export function ProductDetailsClient({
   const { data: relatedProducts } = useGetRelatedProductsQuery(slug as string, {
     skip: !slug,
   });
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const userRoles = getUserRoles(user);
+  const isStaffOrSeller = userRoles.some((r: string) =>
+    ['SELLER', 'RIDER', 'ADMIN', 'SUPER_ADMIN'].includes(r)
+  );
   const { data: wishlist } = useGetUserWishlistQuery(undefined, {
     skip: !isAuthenticated,
   });
@@ -92,7 +97,9 @@ export function ProductDetailsClient({
         </p>
         <div className="flex justify-center gap-4">
           <Button variant="outline" asChild>
-            <Link href={`/${lang}/search`}>{isBn ? 'অন্য পণ্য খুঁজুন' : 'Search other products'}</Link>
+            <Link href={`/${lang}/search`}>
+              {isBn ? 'অন্য পণ্য খুঁজুন' : 'Search other products'}
+            </Link>
           </Button>
           <ProductRequestModal lang={lang} />
         </div>
@@ -171,7 +178,15 @@ export function ProductDetailsClient({
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (): boolean => {
+    if (isStaffOrSeller) {
+      toast.info(
+        isBn
+          ? 'কার্ট ও পণ্য ক্রয় শুধুমাত্র কাস্টমার অ্যাকাউন্টের জন্য প্রযোজ্য।'
+          : 'Shopping and cart actions are reserved for customer accounts.'
+      );
+      return false;
+    }
     dispatch(
       addToCart({
         sellerProductId: product.id,
@@ -183,14 +198,18 @@ export function ProductDetailsClient({
         sellerNameEn: product.shop.nameEn,
         sellerNameBn: product.shop.nameBn,
         maxQuantity: stock,
+        slug: masterProduct.slug,
       })
     );
     toast.success(isBn ? 'কার্টে যোগ করা হয়েছে' : 'Added to cart');
+    return true;
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
-    router.push(`/${lang}/customer/checkout`);
+    const success = handleAddToCart();
+    if (success) {
+      router.push(`/${lang}/customer/checkout`);
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -344,7 +363,15 @@ export function ProductDetailsClient({
                         toggleWishlist();
                       }}
                       disabled={isAddingWishlist || isRemovingWishlist}
-                      title={isWishlisted ? (isBn ? 'উইশলিস্ট থেকে সরান' : 'Remove from wishlist') : (isBn ? 'উইশলিস্টে যোগ করুন' : 'Add to wishlist')}
+                      title={
+                        isWishlisted
+                          ? isBn
+                            ? 'উইশলিস্ট থেকে সরান'
+                            : 'Remove from wishlist'
+                          : isBn
+                            ? 'উইশলিস্টে যোগ করুন'
+                            : 'Add to wishlist'
+                      }
                     >
                       <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
                     </Button>
@@ -357,13 +384,22 @@ export function ProductDetailsClient({
             <div className="bg-card rounded-3xl p-6 shadow-xs border border-border/80">
               <Tabs defaultValue="details" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 mb-6 h-11 bg-muted/60 rounded-xl p-1">
-                  <TabsTrigger value="details" className="rounded-lg text-xs md:text-sm font-semibold">
+                  <TabsTrigger
+                    value="details"
+                    className="rounded-lg text-xs md:text-sm font-semibold"
+                  >
                     {isBn ? 'বিস্তারিত বিবরণ' : 'Description'}
                   </TabsTrigger>
-                  <TabsTrigger value="specs" className="rounded-lg text-xs md:text-sm font-semibold">
+                  <TabsTrigger
+                    value="specs"
+                    className="rounded-lg text-xs md:text-sm font-semibold"
+                  >
                     {isBn ? 'স্পেসিফিকেশন' : 'Specifications'}
                   </TabsTrigger>
-                  <TabsTrigger value="reviews" className="rounded-lg text-xs md:text-sm font-semibold">
+                  <TabsTrigger
+                    value="reviews"
+                    className="rounded-lg text-xs md:text-sm font-semibold"
+                  >
                     {isBn ? `রিভিউ (${totalReviews})` : `Reviews (${totalReviews})`}
                   </TabsTrigger>
                 </TabsList>
@@ -379,7 +415,9 @@ export function ProductDetailsClient({
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground italic">
-                      {isBn ? 'এই পণ্যের কোন বিস্তারিত বিবরণ যোগ করা হয়নি।' : 'No full description provided for this product.'}
+                      {isBn
+                        ? 'এই পণ্যের কোন বিস্তারিত বিবরণ যোগ করা হয়নি।'
+                        : 'No full description provided for this product.'}
                     </p>
                   )}
                 </TabsContent>
@@ -391,43 +429,71 @@ export function ProductDetailsClient({
                   </h3>
                   <div className="border border-border/70 rounded-2xl overflow-hidden divide-y divide-border/60">
                     <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
-                      <span className="font-semibold text-muted-foreground">{isBn ? 'পণ্য' : 'Product'}</span>
+                      <span className="font-semibold text-muted-foreground">
+                        {isBn ? 'পণ্য' : 'Product'}
+                      </span>
                       <span className="col-span-2 font-medium text-foreground">{productName}</span>
                     </div>
                     {category && (
                       <div className="grid grid-cols-3 p-3 text-xs md:text-sm">
-                        <span className="font-semibold text-muted-foreground">{isBn ? 'ক্যাটাগরি' : 'Category'}</span>
-                        <span className="col-span-2 font-medium text-foreground">{isBn ? category.nameBn : category.nameEn}</span>
+                        <span className="font-semibold text-muted-foreground">
+                          {isBn ? 'ক্যাটাগরি' : 'Category'}
+                        </span>
+                        <span className="col-span-2 font-medium text-foreground">
+                          {isBn ? category.nameBn : category.nameEn}
+                        </span>
                       </div>
                     )}
                     {subCategory && (
                       <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
-                        <span className="font-semibold text-muted-foreground">{isBn ? 'উপ-ক্যাটাগরি' : 'Subcategory'}</span>
-                        <span className="col-span-2 font-medium text-foreground">{isBn ? subCategory.nameBn : subCategory.nameEn}</span>
+                        <span className="font-semibold text-muted-foreground">
+                          {isBn ? 'উপ-ক্যাটাগরি' : 'Subcategory'}
+                        </span>
+                        <span className="col-span-2 font-medium text-foreground">
+                          {isBn ? subCategory.nameBn : subCategory.nameEn}
+                        </span>
                       </div>
                     )}
                     {brand && (
                       <div className="grid grid-cols-3 p-3 text-xs md:text-sm">
-                        <span className="font-semibold text-muted-foreground">{isBn ? 'ব্র্যান্ড' : 'Brand'}</span>
-                        <span className="col-span-2 font-medium text-foreground">{isBn ? brand.nameBn : brand.nameEn}</span>
+                        <span className="font-semibold text-muted-foreground">
+                          {isBn ? 'ব্র্যান্ড' : 'Brand'}
+                        </span>
+                        <span className="col-span-2 font-medium text-foreground">
+                          {isBn ? brand.nameBn : brand.nameEn}
+                        </span>
                       </div>
                     )}
                     {unit && (
                       <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
-                        <span className="font-semibold text-muted-foreground">{isBn ? 'পরিমাপ ইউনিট' : 'Unit'}</span>
+                        <span className="font-semibold text-muted-foreground">
+                          {isBn ? 'পরিমাপ ইউনিট' : 'Unit'}
+                        </span>
                         <span className="col-span-2 font-medium text-foreground">{unit}</span>
                       </div>
                     )}
                     <div className="grid grid-cols-3 p-3 text-xs md:text-sm">
-                      <span className="font-semibold text-muted-foreground">{isBn ? 'স্টক প্রাপ্যতা' : 'Availability'}</span>
+                      <span className="font-semibold text-muted-foreground">
+                        {isBn ? 'স্টক প্রাপ্যতা' : 'Availability'}
+                      </span>
                       <span className="col-span-2 font-medium text-foreground">
-                        {isOutOfStock ? (isBn ? 'স্টক শেষ' : 'Out of Stock') : isBn ? `${stock} টি স্টকে আছে` : `${stock} units available`}
+                        {isOutOfStock
+                          ? isBn
+                            ? 'স্টক শেষ'
+                            : 'Out of Stock'
+                          : isBn
+                            ? `${stock} টি স্টকে আছে`
+                            : `${stock} units available`}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
-                      <span className="font-semibold text-muted-foreground">{isBn ? 'উৎপত্তি' : 'Origin'}</span>
+                      <span className="font-semibold text-muted-foreground">
+                        {isBn ? 'উৎপত্তি' : 'Origin'}
+                      </span>
                       <span className="col-span-2 font-medium text-foreground">
-                        {isBn ? 'বাংলাদেশি গ্রামীণ খামার ও বাজার' : 'Local Rural Farms & Artisan Markets, Bangladesh'}
+                        {isBn
+                          ? 'বাংলাদেশি গ্রামীণ খামার ও বাজার'
+                          : 'Local Rural Farms & Artisan Markets, Bangladesh'}
                       </span>
                     </div>
                   </div>
@@ -499,9 +565,11 @@ export function ProductDetailsClient({
               {/* Rating & Review Counter */}
               <div className="flex items-center gap-3 pb-4 mb-4 border-b border-border/60">
                 <div className="flex items-center text-amber-500">
-                  <Star className={`h-4 w-4 ${avgRating > 0 ? 'fill-current' : 'text-muted-foreground/30'}`} />
+                  <Star
+                    className={`h-4 w-4 ${avgRating > 0 ? 'fill-current' : 'text-muted-foreground/30'}`}
+                  />
                   <span className="text-sm font-bold text-foreground ml-1.5">
-                    {avgRating > 0 ? avgRating.toFixed(1) : (isBn ? 'নতুন' : 'New')}
+                    {avgRating > 0 ? avgRating.toFixed(1) : isBn ? 'নতুন' : 'New'}
                   </span>
                 </div>
                 <span className="text-muted-foreground text-xs">•</span>
@@ -515,15 +583,21 @@ export function ProductDetailsClient({
                     isOutOfStock
                       ? 'bg-destructive/10 text-destructive'
                       : stock <= 5
-                      ? 'bg-amber-500/10 text-amber-600'
-                      : 'bg-emerald-500/10 text-emerald-600'
+                        ? 'bg-amber-500/10 text-amber-600'
+                        : 'bg-emerald-500/10 text-emerald-600'
                   }`}
                 >
                   {isOutOfStock
-                    ? isBn ? 'স্টক শেষ' : 'Out of Stock'
+                    ? isBn
+                      ? 'স্টক শেষ'
+                      : 'Out of Stock'
                     : stock <= 5
-                    ? isBn ? `মাত্র ${stock}টি বাকি!` : `Only ${stock} left!`
-                    : isBn ? 'স্টকে আছে' : 'In Stock'}
+                      ? isBn
+                        ? `মাত্র ${stock}টি বাকি!`
+                        : `Only ${stock} left!`
+                      : isBn
+                        ? 'স্টকে আছে'
+                        : 'In Stock'}
                 </span>
               </div>
 
@@ -539,9 +613,7 @@ export function ProductDetailsClient({
                     </span>
                   )}
                   {unit && (
-                    <span className="text-xs text-muted-foreground font-medium">
-                      / {unit}
-                    </span>
+                    <span className="text-xs text-muted-foreground font-medium">/ {unit}</span>
                   )}
                   {discountPercent !== null && discountPercent > 0 && (
                     <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md ml-auto">
@@ -581,12 +653,12 @@ export function ProductDetailsClient({
                               : 'border-border/70 hover:border-primary/40 bg-card'
                           }`}
                         >
-                          <span className={`text-xs font-semibold truncate ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                          <span
+                            className={`text-xs font-semibold truncate ${isSelected ? 'text-primary' : 'text-foreground'}`}
+                          >
                             {pName}
                           </span>
-                          <span className="text-xs font-bold text-foreground mt-1">
-                            ৳{pPrice}
-                          </span>
+                          <span className="text-xs font-bold text-foreground mt-1">৳{pPrice}</span>
                         </button>
                       );
                     })}
@@ -723,7 +795,12 @@ export function ProductDetailsClient({
               </div>
 
               <div className="flex items-center gap-2">
-                <Button asChild variant="outline" size="sm" className="flex-1 text-xs rounded-xl h-8">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 text-xs rounded-xl h-8"
+                >
                   <Link href={`/${lang}/shops/${product.shop.id}`}>
                     <Store className="h-3.5 w-3.5 mr-1" />
                     <span>{isBn ? 'দোকান ভিজিট করুন' : 'Visit Shop'}</span>
@@ -748,7 +825,9 @@ export function ProductDetailsClient({
       {/* Mobile Sticky Bottom Floating Order Bar */}
       <div className="lg:hidden fixed bottom-[56px] md:bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur-md border-t border-border shadow-lg z-40 flex items-center justify-between gap-3">
         <div className="flex flex-col pl-1">
-          <span className="text-[10px] text-muted-foreground font-semibold">{isBn ? 'মোট মূল্য' : 'Total'}</span>
+          <span className="text-[10px] text-muted-foreground font-semibold">
+            {isBn ? 'মোট মূল্য' : 'Total'}
+          </span>
           <span className="text-base font-black text-primary">৳{currentPrice * quantity}</span>
         </div>
         <div className="flex items-center gap-2">

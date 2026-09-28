@@ -77,7 +77,7 @@ export function TableSkeleton({ rows = 5, columns = 4 }: { rows?: number; column
                 <Skeleton
                   key={cIdx}
                   className="h-4 flex-1"
-                  style={{ width: `${Math.max(30, (cIdx * 25 + rIdx * 15) % 80 + 20)}%` }}
+                  style={{ width: `${Math.max(30, ((cIdx * 25 + rIdx * 15) % 80) + 20)}%` }}
                 />
               ))}
             </div>

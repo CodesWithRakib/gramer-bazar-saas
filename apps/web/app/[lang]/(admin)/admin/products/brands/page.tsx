@@ -1,10 +1,6 @@
-import { AdminBrandsView } from "@/features/admin/products";
+import { AdminBrandsView } from '@/features/admin/products';
 
-export default async function BrandsPage({
-  params,
-}: {
-  params: Promise<{ lang: "ar" | "en" }>;
-}) {
+export default async function BrandsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   return <AdminBrandsView lang={lang} namespace="admin" />;
 }

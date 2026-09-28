@@ -10,7 +10,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, MapPin, Receipt, Phone, User, AlertCircle, Ban, Undo2, Star, CreditCard } from 'lucide-react';
+import {
+  ArrowLeft,
+  MapPin,
+  Receipt,
+  Phone,
+  User,
+  AlertCircle,
+  Ban,
+  Undo2,
+  Star,
+  CreditCard,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { AddReviewModal } from '@/components/reviews/AddReviewModal';
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
@@ -44,7 +55,8 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
     } catch (err: unknown) {
       const msg = (err as { data?: { message?: string } })?.data?.message;
       toast.error(
-        msg || (isBn ? 'পেমেন্ট গেটওয়েতে যেতে ব্যর্থ হয়েছে' : 'Failed to redirect to payment gateway'),
+        msg ||
+          (isBn ? 'পেমেন্ট গেটওয়েতে যেতে ব্যর্থ হয়েছে' : 'Failed to redirect to payment gateway')
       );
     }
   };
@@ -104,7 +116,12 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => router.push(`/${lang}/customer/orders`)} className="shrink-0 rounded-full hover:bg-muted">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push(`/${lang}/customer/orders`)}
+            className="shrink-0 rounded-full hover:bg-muted"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
@@ -119,10 +136,14 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
             </p>
           </div>
         </div>
-        
+
         <div className="flex gap-2">
           {canCancel && (
-            <Button variant="destructive" onClick={() => setShowCancelDialog(true)} disabled={isCancelling}>
+            <Button
+              variant="destructive"
+              onClick={() => setShowCancelDialog(true)}
+              disabled={isCancelling}
+            >
               <Ban className="w-4 h-4 mr-2" />
               {isBn ? 'অর্ডার বাতিল করুন' : 'Cancel Order'}
             </Button>
@@ -147,10 +168,10 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <OrderTrackingTimeline 
-            statusHistory={order.statusHistory || []} 
-            currentStatus={order.status} 
-            lang={lang} 
+          <OrderTrackingTimeline
+            statusHistory={order.statusHistory || []}
+            currentStatus={order.status}
+            lang={lang}
           />
         </CardContent>
       </Card>
@@ -160,29 +181,42 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
         <div className="md:col-span-2 space-y-6">
           <Card className="border-border shadow-sm">
             <CardHeader className="bg-muted/20 border-b">
-              <CardTitle className="text-lg">{isBn ? 'অর্ডার করা পণ্য' : 'Ordered Items'}</CardTitle>
+              <CardTitle className="text-lg">
+                {isBn ? 'অর্ডার করা পণ্য' : 'Ordered Items'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-border">
                 {order.items.map((item) => {
                   const variant = item.sellerProduct?.productVariant;
-                  const name = variant ? (isBn ? variant.nameBn || variant.product.nameBn : variant.nameEn || variant.product.nameEn) : 'Unknown Product';
+                  const name = variant
+                    ? isBn
+                      ? variant.nameBn || variant.product.nameBn
+                      : variant.nameEn || variant.product.nameEn
+                    : 'Unknown Product';
                   const image = variant?.images?.[0] || '/placeholder.jpg';
-                  
+
                   return (
-                    <div key={item.id} className="flex gap-4 p-4 md:p-6 hover:bg-muted/10 transition-colors">
+                    <div
+                      key={item.id}
+                      className="flex gap-4 p-4 md:p-6 hover:bg-muted/10 transition-colors"
+                    >
                       <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden border bg-muted/20 shrink-0">
                         <CustomImage src={image} alt={name} fill className="object-cover" />
                       </div>
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
                           <h4 className="font-semibold text-sm md:text-base line-clamp-2 mb-1">
-                            <Link href={`/${lang}/products/${variant?.product.slug}`} className="hover:underline">
+                            <Link
+                              href={`/${lang}/products/${variant?.product.slug}`}
+                              className="hover:underline"
+                            >
                               {name}
                             </Link>
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            {isBn ? 'পরিমাণ:' : 'Qty:'} <span className="font-medium text-foreground">{item.quantity}</span>
+                            {isBn ? 'পরিমাণ:' : 'Qty:'}{' '}
+                            <span className="font-medium text-foreground">{item.quantity}</span>
                           </p>
                         </div>
                         <div className="flex justify-between items-end mt-2">
@@ -223,7 +257,9 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
                 <span className="font-medium">৳{order.subtotal}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{isBn ? 'ডেলিভারি চার্জ' : 'Delivery Fee'}</span>
+                <span className="text-muted-foreground">
+                  {isBn ? 'ডেলিভারি চার্জ' : 'Delivery Fee'}
+                </span>
                 <span className="font-medium">৳{order.deliveryFee}</span>
               </div>
               {Number(order.discount) > 0 && (
@@ -236,14 +272,26 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
                 <span className="font-bold text-base">{isBn ? 'সর্বমোট' : 'Total'}</span>
                 <span className="font-bold text-xl text-primary">৳{order.total}</span>
               </div>
-              
+
               <div className="bg-muted/30 p-3 rounded-lg border mt-4 flex items-center justify-between">
-                <span className="text-muted-foreground">{isBn ? 'পেমেন্ট পদ্ধতি' : 'Payment Method'}</span>
-                <Badge variant="secondary" className="uppercase">{order.paymentMethod}</Badge>
+                <span className="text-muted-foreground">
+                  {isBn ? 'পেমেন্ট পদ্ধতি' : 'Payment Method'}
+                </span>
+                <Badge variant="secondary" className="uppercase">
+                  {order.paymentMethod}
+                </Badge>
               </div>
               <div className="bg-muted/30 p-3 rounded-lg border mt-2 flex items-center justify-between">
-                <span className="text-muted-foreground">{isBn ? 'পেমেন্ট স্ট্যাটাস' : 'Payment Status'}</span>
-                <Badge className={order.paymentStatus === 'PAID' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-600'}>
+                <span className="text-muted-foreground">
+                  {isBn ? 'পেমেন্ট স্ট্যাটাস' : 'Payment Status'}
+                </span>
+                <Badge
+                  className={
+                    order.paymentStatus === 'PAID'
+                      ? 'bg-emerald-500 hover:bg-emerald-600'
+                      : 'bg-amber-500 hover:bg-amber-600'
+                  }
+                >
                   {order.paymentStatus}
                 </Badge>
               </div>
@@ -256,8 +304,12 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
                 >
                   <CreditCard className="w-4 h-4" />
                   {isRetrying
-                    ? (isBn ? 'রিডাইরেক্ট করা হচ্ছে...' : 'Redirecting...')
-                    : (isBn ? 'অনলাইনে পে করুন (SSLCOMMERZ)' : 'Pay with SSLCOMMERZ')}
+                    ? isBn
+                      ? 'রিডাইরেক্ট করা হচ্ছে...'
+                      : 'Redirecting...'
+                    : isBn
+                      ? 'অনলাইনে পে করুন (SSLCOMMERZ)'
+                      : 'Pay with SSLCOMMERZ'}
                 </Button>
               )}
             </CardContent>
@@ -274,7 +326,9 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
               <div className="flex items-start gap-3">
                 <User className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">{order.address?.contactName || `${order.user.firstName} ${order.user.lastName}`}</p>
+                  <p className="font-medium text-sm">
+                    {order.address?.contactName || `${order.user.firstName} ${order.user.lastName}`}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -298,7 +352,7 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
           </Card>
         </div>
       </div>
-      
+
       {reviewProductId && (
         <AddReviewModal
           isOpen={!!reviewProductId}

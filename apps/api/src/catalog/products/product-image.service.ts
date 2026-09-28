@@ -53,16 +53,24 @@ export class ProductImageService {
       const file = files[i];
 
       if (file.size > maxFileSize) {
-        throw new BadRequestException(`File ${file.originalname} exceeds max allowed size of ${maxFileSize / (1024 * 1024)}MB`);
+        throw new BadRequestException(
+          `File ${file.originalname} exceeds max allowed size of ${maxFileSize / (1024 * 1024)}MB`,
+        );
       }
 
       const validation = this.storageService.validateImageBuffer(file.buffer);
       if (!validation.isValid) {
-        throw new BadRequestException(`File ${file.originalname} is not a valid JPEG, PNG, or WebP image`);
+        throw new BadRequestException(
+          `File ${file.originalname} is not a valid JPEG, PNG, or WebP image`,
+        );
       }
 
       const imageId = randomUUID();
-      const storagePath = this.storageService.getProductImagePath(productId, imageId, validation.ext);
+      const storagePath = this.storageService.getProductImagePath(
+        productId,
+        imageId,
+        validation.ext,
+      );
       const filename = `${imageId}${validation.ext}`;
 
       const { publicUrl } = await this.storageService.uploadImage(
@@ -163,10 +171,7 @@ export class ProductImageService {
    */
   async reorderImages(productId: string, imageIds: string[]): Promise<ProductImage[]> {
     for (let i = 0; i < imageIds.length; i++) {
-      await this.imageRepository.update(
-        { id: imageIds[i], productId },
-        { sortOrder: i },
-      );
+      await this.imageRepository.update({ id: imageIds[i], productId }, { sortOrder: i });
     }
 
     await this.syncVariantImages(productId);
@@ -252,4 +257,3 @@ export class ProductImageService {
     return saved;
   }
 }
-

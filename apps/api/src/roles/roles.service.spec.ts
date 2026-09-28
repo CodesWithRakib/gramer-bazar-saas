@@ -20,10 +20,7 @@ describe('RolesService', () => {
     vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        RolesService,
-        { provide: getRepositoryToken(RoleEntity), useValue: repository },
-      ],
+      providers: [RolesService, { provide: getRepositoryToken(RoleEntity), useValue: repository }],
     }).compile();
 
     service = module.get<RolesService>(RolesService);

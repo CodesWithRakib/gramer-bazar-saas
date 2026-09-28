@@ -29,7 +29,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'রহিম ট্রেডার্স',
     slug: 'rahim-traders',
     shortDescription: 'Fresh groceries, authentic rice, lentils, and pure mustard oil.',
-    description: 'রহিম ট্রেডার্স দেবীগঞ্জ বাজারের অন্যতম প্রাচীন ও বিশ্বস্ত পাইকারি ও খুচরা চাল, ডাল এবং ভোজ্য তেলের দোকান।',
+    description:
+      'রহিম ট্রেডার্স দেবীগঞ্জ বাজারের অন্যতম প্রাচীন ও বিশ্বস্ত পাইকারি ও খুচরা চাল, ডাল এবং ভোজ্য তেলের দোকান।',
     phone: '+8801700000003',
     whatsapp: '+8801700000003',
     email: 'rahim.traders@gramerbazar.com',
@@ -49,7 +50,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'করিম গ্রোসারিজ',
     slug: 'karim-groceries',
     shortDescription: 'All packaged food, spices, tea, and daily household items.',
-    description: 'দৈনন্দিন রান্নার সকল মসলা, চা পাতা, চিনি, লবণ ও সুস্বাদু নাস্তার প্যাকেট সামগ্রী সুলভ মূল্যে পাওয়া যায়।',
+    description:
+      'দৈনন্দিন রান্নার সকল মসলা, চা পাতা, চিনি, লবণ ও সুস্বাদু নাস্তার প্যাকেট সামগ্রী সুলভ মূল্যে পাওয়া যায়।',
     phone: '+8801700000004',
     whatsapp: '+8801700000004',
     email: 'karim.groceries@gramerbazar.com',
@@ -69,7 +71,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'সোনার বাংলা ভ্যারাইটি স্টোর',
     slug: 'sonar-bangla-variety-store',
     shortDescription: 'School stationery, books, cleaning essentials, and home utilities.',
-    description: 'ছাত্র-ছাত্রীদের খাতা-কলম, জ্যামিতি বক্স এবং গৃহস্থালীর পরিষ্কার-পরিচ্ছন্নতার নিত্যপ্রয়োজনীয় সামগ্রী।',
+    description:
+      'ছাত্র-ছাত্রীদের খাতা-কলম, জ্যামিতি বক্স এবং গৃহস্থালীর পরিষ্কার-পরিচ্ছন্নতার নিত্যপ্রয়োজনীয় সামগ্রী।',
     phone: '+8801711000001',
     email: 'sonarbangla@gramerbazar.com',
     address: 'College Road, Boda Bazar',
@@ -86,7 +89,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'ভাই ভাই ফার্মেসি',
     slug: 'bhai-bhai-pharmacy',
     shortDescription: 'Genuine medicines, first aid kits, antiseptic solutions, and baby care.',
-    description: 'রেজিস্টার্ড ফার্মাসিস্ট দ্বারা পরিচালিত সরকারি অনুমোদনপ্রাপ্ত নিরাপদ ওষুধের নির্ভরযোগ্য ফার্মেসি।',
+    description:
+      'রেজিস্টার্ড ফার্মাসিস্ট দ্বারা পরিচালিত সরকারি অনুমোদনপ্রাপ্ত নিরাপদ ওষুধের নির্ভরযোগ্য ফার্মেসি।',
     phone: '+8801711000002',
     whatsapp: '+8801711000002',
     email: 'bhaibhai.pharmacy@gramerbazar.com',
@@ -96,7 +100,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     latitude: 26.1215,
     longitude: 88.7584,
     openingHours: '24 Hours Emergency Service',
-    deliveryInfo: 'জরুরি ওষুধ দেবীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্সের আশেপাশে ২০ মিনিটে পৌঁছে দেওয়া হয়।',
+    deliveryInfo:
+      'জরুরি ওষুধ দেবীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্সের আশেপাশে ২০ মিনিটে পৌঁছে দেওয়া হয়।',
   },
   {
     sellerEmail: 'seller5@gramerbazar.com',
@@ -121,7 +126,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'গ্রামীণ ফ্যাশন ও বস্ত্রালয়',
     slug: 'gramin-fashion-clothing',
     shortDescription: 'Traditional lungis, cotton sarees, punjabis, and comfortable kids wear.',
-    description: 'টাঙ্গাইলের সুতি শাড়ি, দেশি তাঁতের লুঙ্গি, পাঞ্জাবি ও ছোট বাচ্চাদের আরামদায়ক সুতি পোশাকের সমাহার।',
+    description:
+      'টাঙ্গাইলের সুতি শাড়ি, দেশি তাঁতের লুঙ্গি, পাঞ্জাবি ও ছোট বাচ্চাদের আরামদায়ক সুতি পোশাকের সমাহার।',
     phone: '+8801711000004',
     email: 'gramin.fashion@gramerbazar.com',
     address: 'Cloth Market, Debiganj High School Gate',
@@ -138,7 +144,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'ডিজিটাল ইলেকট্রনিক্স ও মোবাইল হাব',
     slug: 'digital-electronics-mobile-hub',
     shortDescription: 'Chargers, data cables, earphone, powerbanks, LED lights and torches.',
-    description: 'মোবাইল এক্সেসরিজ, অরিজিনাল চার্জার, পাওয়ার ব্যাংক এবং বাসা-বাড়ির এলইডি লাইট ও বৈদ্যুতিক সরঞ্জাম।',
+    description:
+      'মোবাইল এক্সেসরিজ, অরিজিনাল চার্জার, পাওয়ার ব্যাংক এবং বাসা-বাড়ির এলইডি লাইট ও বৈদ্যুতিক সরঞ্জাম।',
     phone: '+8801711000005',
     whatsapp: '+8801711000005',
     email: 'digitalelectronics@gramerbazar.com',
@@ -156,7 +163,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'উত্তরা সুইটস অ্যান্ড কনফেকশনারি',
     slug: 'uttara-sweets-confectionery',
     shortDescription: 'Traditional Bogra curd, pure milk roshogolla, chomchom and ghee sweets.',
-    description: 'খাঁটি গরুর দুধের ছানার রসগোল্লা, চমচম, সুস্বাদু ক্ষীর ও বিখ্যাত মিষ্টি দইয়ের নির্ভরযোগ্য প্রতিষ্ঠান।',
+    description:
+      'খাঁটি গরুর দুধের ছানার রসগোল্লা, চমচম, সুস্বাদু ক্ষীর ও বিখ্যাত মিষ্টি দইয়ের নির্ভরযোগ্য প্রতিষ্ঠান।',
     phone: '+8801711000006',
     email: 'uttarasweets@gramerbazar.com',
     address: 'Old Cinema Hall Road, Debiganj',
@@ -190,7 +198,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'দেশি মসলা ও খাঁটি তেল বিতান',
     slug: 'deshi-spices-pure-oil-store',
     shortDescription: 'Cold-pressed mustard oil, whole spices, sundarban honey, and ghee.',
-    description: 'কাঠের ঘানিতে ভাঙা ১০০% খাঁটি ঝাঁঝালো সরিষার তেল, সুন্দরবনের প্রাকৃতিক মধু ও খাঁটি গাওয়া ঘি।',
+    description:
+      'কাঠের ঘানিতে ভাঙা ১০০% খাঁটি ঝাঁঝালো সরিষার তেল, সুন্দরবনের প্রাকৃতিক মধু ও খাঁটি গাওয়া ঘি।',
     phone: '+8801711000008',
     email: 'deshispices@gramerbazar.com',
     address: 'Oil Mill Patty, Debiganj Bazar',
@@ -207,7 +216,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'পঞ্চগড় টি অ্যান্ড অর্গানিক মার্ট',
     slug: 'panchagarh-tea-organic-mart',
     shortDescription: 'Direct garden organic black tea, green tea, kalijira oil, and chia seeds.',
-    description: 'পঞ্চগড়ের সমতলের চা বাগান থেকে সরাসরি প্যাকেটজাত প্রিমিয়াম কাঁচা পাতার চা ও অর্গানিক খাবার।',
+    description:
+      'পঞ্চগড়ের সমতলের চা বাগান থেকে সরাসরি প্যাকেটজাত প্রিমিয়াম কাঁচা পাতার চা ও অর্গানিক খাবার।',
     phone: '+8801711000009',
     whatsapp: '+8801711000009',
     email: 'panchagarhtea@gramerbazar.com',
@@ -225,7 +235,8 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'আল-মদিনা এন্টারপ্রাইজ',
     slug: 'al-madina-enterprise',
     shortDescription: 'Household plasticware, cleaning chemicals, water jugs, and tools.',
-    description: 'ঘরের দরকারি প্লাস্টিক সামগ্রী, বালতি, মগ, ফ্লোর ক্লিনার ও গৃহস্থালি পরিষ্কারের সকল অনুষঙ্গ।',
+    description:
+      'ঘরের দরকারি প্লাস্টিক সামগ্রী, বালতি, মগ, ফ্লোর ক্লিনার ও গৃহস্থালি পরিষ্কারের সকল অনুষঙ্গ।',
     phone: '+8801711000010',
     email: 'almadina@gramerbazar.com',
     address: 'Hardware Patty, Debiganj',
@@ -276,14 +287,15 @@ export const SEED_SHOPS: SeedShopData[] = [
     nameBn: 'তাজা নদীর মাছের আড়ৎ',
     slug: 'fresh-fish-river-catch',
     shortDescription: 'Fresh local Rui, Katla, Hilsa, and live indigenous freshwater fish.',
-    description: 'করতোয়া ও তিস্তা নদীর তাজা রুই, কাতল, শিং, পাবদা এবং জীবন্ত দেশি মাছ। পরিষ্কার করে কেটে সরবরাহ করা হয়।',
+    description:
+      'করতোয়া ও তিস্তা নদীর তাজা রুই, কাতল, শিং, পাবদা এবং জীবন্ত দেশি মাছ। পরিষ্কার করে কেটে সরবরাহ করা হয়।',
     phone: '+8801711000013',
     email: 'freshfish@gramerbazar.com',
     address: 'Fish Market Shed, Debiganj',
     district: 'Panchagarh',
     upazila: 'Debiganj',
-    latitude: 26.1190,
-    longitude: 88.7540,
+    latitude: 26.119,
+    longitude: 88.754,
     openingHours: '6:00 AM - 12:00 PM, 4:00 PM - 9:00 PM',
     deliveryInfo: 'বরফমুক্ত টাটকা মাছ কাটার পর তাৎক্ষণিক হোম ডেলিভারি।',
   },

@@ -11,7 +11,10 @@ import { Role } from '../roles/enums/role.enum.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
 import { Shop } from '../shops/entities/shop.entity.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
-import { NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
+import {
+  NotificationType,
+  NotificationPriority,
+} from '../notifications/entities/notification.entity.js';
 
 @Injectable()
 export class ApplicationsService {
@@ -31,7 +34,10 @@ export class ApplicationsService {
 
   // ==================== SELLER APPLICATION ====================
 
-  async submitSellerApplication(userId: string, dto: CreateSellerApplicationDto): Promise<SellerApplication> {
+  async submitSellerApplication(
+    userId: string,
+    dto: CreateSellerApplicationDto,
+  ): Promise<SellerApplication> {
     const user = await this.usersService.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -52,7 +58,9 @@ export class ApplicationsService {
     // Check slug collision
     const existingShop = await this.shopRepo.findOne({ where: { slug: dto.shopSlug } });
     if (existingShop) {
-      throw new BadRequestException(`Shop slug "${dto.shopSlug}" is already taken. Please choose another.`);
+      throw new BadRequestException(
+        `Shop slug "${dto.shopSlug}" is already taken. Please choose another.`,
+      );
     }
 
     const application = this.sellerAppRepo.create({
@@ -105,7 +113,8 @@ export class ApplicationsService {
   }
 
   async getAllSellerApplications(status?: ApplicationStatus, page = 1, limit = 10) {
-    const query = this.sellerAppRepo.createQueryBuilder('app')
+    const query = this.sellerAppRepo
+      .createQueryBuilder('app')
       .leftJoinAndSelect('app.user', 'user')
       .leftJoinAndSelect('app.reviewer', 'reviewer')
       .orderBy('app.createdAt', 'DESC');
@@ -141,7 +150,11 @@ export class ApplicationsService {
     return app;
   }
 
-  async approveSellerApplication(id: string, reviewerId: string, notes?: string): Promise<SellerApplication> {
+  async approveSellerApplication(
+    id: string,
+    reviewerId: string,
+    notes?: string,
+  ): Promise<SellerApplication> {
     const app = await this.getSellerApplicationById(id);
     if (app.status === ApplicationStatus.APPROVED) {
       throw new BadRequestException('Application is already approved.');
@@ -211,7 +224,11 @@ export class ApplicationsService {
     }
   }
 
-  async rejectSellerApplication(id: string, reviewerId: string, notes?: string): Promise<SellerApplication> {
+  async rejectSellerApplication(
+    id: string,
+    reviewerId: string,
+    notes?: string,
+  ): Promise<SellerApplication> {
     const app = await this.getSellerApplicationById(id);
     if (app.status === ApplicationStatus.APPROVED) {
       throw new BadRequestException('Cannot reject an already approved application.');
@@ -240,7 +257,10 @@ export class ApplicationsService {
 
   // ==================== RIDER APPLICATION ====================
 
-  async submitRiderApplication(userId: string, dto: CreateRiderApplicationDto): Promise<RiderApplication> {
+  async submitRiderApplication(
+    userId: string,
+    dto: CreateRiderApplicationDto,
+  ): Promise<RiderApplication> {
     const user = await this.usersService.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -286,7 +306,8 @@ export class ApplicationsService {
     });
 
     // Notify admins
-    const riderName = dto.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Applicant';
+    const riderName =
+      dto.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Applicant';
     void this.notificationsService.notifyRole(Role.ADMIN, {
       type: NotificationType.RIDER_APPLICATION_SUBMITTED,
       title: 'New Rider Application',
@@ -308,7 +329,8 @@ export class ApplicationsService {
   }
 
   async getAllRiderApplications(status?: ApplicationStatus, page = 1, limit = 10) {
-    const query = this.riderAppRepo.createQueryBuilder('app')
+    const query = this.riderAppRepo
+      .createQueryBuilder('app')
       .leftJoinAndSelect('app.user', 'user')
       .leftJoinAndSelect('app.reviewer', 'reviewer')
       .orderBy('app.createdAt', 'DESC');
@@ -344,7 +366,11 @@ export class ApplicationsService {
     return app;
   }
 
-  async approveRiderApplication(id: string, reviewerId: string, notes?: string): Promise<RiderApplication> {
+  async approveRiderApplication(
+    id: string,
+    reviewerId: string,
+    notes?: string,
+  ): Promise<RiderApplication> {
     const app = await this.getRiderApplicationById(id);
     if (app.status === ApplicationStatus.APPROVED) {
       throw new BadRequestException('Application is already approved.');
@@ -379,7 +405,8 @@ export class ApplicationsService {
       void this.notificationsService.notifyUser(app.userId, {
         type: NotificationType.RIDER_APPLICATION_APPROVED,
         title: 'Application Approved',
-        message: 'Congratulations! Your rider application has been approved. You can now accept deliveries.',
+        message:
+          'Congratulations! Your rider application has been approved. You can now accept deliveries.',
         titleKey: 'notifications.rider_application_approved.title',
         messageKey: 'notifications.rider_application_approved.message',
         priority: NotificationPriority.HIGH,
@@ -395,7 +422,11 @@ export class ApplicationsService {
     }
   }
 
-  async rejectRiderApplication(id: string, reviewerId: string, notes?: string): Promise<RiderApplication> {
+  async rejectRiderApplication(
+    id: string,
+    reviewerId: string,
+    notes?: string,
+  ): Promise<RiderApplication> {
     const app = await this.getRiderApplicationById(id);
     if (app.status === ApplicationStatus.APPROVED) {
       throw new BadRequestException('Cannot reject an already approved application.');

@@ -26,9 +26,19 @@ export interface Address {
   updatedAt: string;
 }
 
-export type CreateAddressRequest = Omit<Address, 'id' | 'createdAt' | 'updatedAt' | 'country' | 'division' | 'district' | 'upazila' | 'union' | 'area'>;
+export type CreateAddressRequest = Omit<
+  Address,
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'country'
+  | 'division'
+  | 'district'
+  | 'upazila'
+  | 'union'
+  | 'area'
+>;
 export type UpdateAddressRequest = Partial<CreateAddressRequest>;
-
 
 export const addressApi = api.injectEndpoints({
   endpoints: (builder) => ({

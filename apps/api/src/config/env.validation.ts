@@ -2,9 +2,7 @@ import { z } from 'zod';
 
 export const envValidationSchema = z
   .object({
-    NODE_ENV: z
-      .enum(['development', 'production', 'test', 'provision'])
-      .default('development'),
+    NODE_ENV: z.enum(['development', 'production', 'test', 'provision']).default('development'),
     PORT: z.coerce.number().default(4000),
     DATABASE_URL: z.string({ message: 'DATABASE_URL is required' }),
     JWT_SECRET: z.string().optional(),
@@ -68,10 +66,7 @@ export const envValidationSchema = z
   .transform((data) => {
     const accessSecret = data.JWT_ACCESS_SECRET || data.JWT_SECRET!;
     const refreshSecret = data.JWT_REFRESH_SECRET || data.JWT_SECRET!;
-    const backendUrl =
-      data.BACKEND_URL ||
-      data.API_URL ||
-      `http://localhost:${data.PORT || 4000}`;
+    const backendUrl = data.BACKEND_URL || data.API_URL || `http://localhost:${data.PORT || 4000}`;
     const corsOrigins = data.CORS_ORIGIN || data.CORS_ORIGINS;
     return {
       ...data,

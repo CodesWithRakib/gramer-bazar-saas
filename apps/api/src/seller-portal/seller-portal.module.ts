@@ -11,14 +11,7 @@ import { ProductVariant } from '../catalog/entities/product-variant.entity.js';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Shop,
-      SellerProduct,
-      Inventory,
-      Order,
-      OrderItem,
-      ProductVariant,
-    ]),
+    TypeOrmModule.forFeature([Shop, SellerProduct, Inventory, Order, OrderItem, ProductVariant]),
   ],
   controllers: [SellerPortalController],
   providers: [SellerPortalService],

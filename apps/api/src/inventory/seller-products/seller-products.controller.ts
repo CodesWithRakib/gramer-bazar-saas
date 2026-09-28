@@ -39,7 +39,8 @@ export class SellerProductsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Create a new seller product listing offer',
-    description: 'Requires SELLER, ADMIN, or SUPER_ADMIN role. Links seller store to master product variant with custom price and initial stock.',
+    description:
+      'Requires SELLER, ADMIN, or SUPER_ADMIN role. Links seller store to master product variant with custom price and initial stock.',
   })
   @ApiStandardResponse({
     type: SellerProductResponseDto,
@@ -74,7 +75,8 @@ export class SellerProductsController {
   @CacheTTL(60000)
   @ApiOperation({
     summary: 'Retrieve single seller product offer by UUID',
-    description: 'Cached for 60s. Returns vendor product listing details with inventory quantities.',
+    description:
+      'Cached for 60s. Returns vendor product listing details with inventory quantities.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'SellerProduct UUID' })
   @ApiStandardResponse({
@@ -115,7 +117,8 @@ export class SellerProductsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Delete a seller product offer',
-    description: 'Requires owner SELLER or ADMIN role. Removes merchant product listing and associated inventory.',
+    description:
+      'Requires owner SELLER or ADMIN role. Removes merchant product listing and associated inventory.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'SellerProduct UUID' })
   @ApiStandardMessageResponse({

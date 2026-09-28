@@ -1,47 +1,40 @@
-"use client";
+'use client';
 
-import React, { Suspense, use } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
+import React, { Suspense, use } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import {
   useSearchProductsQuery,
   useGetPublicCategoriesQuery,
   useGetPublicBrandsQuery,
-} from "@/features/catalog/catalogApi";
-import { ProductGrid } from "@/components/catalog/ProductGrid";
-import { ProductRequestModal } from "@/components/catalog/ProductRequestModal";
-import { Button } from "@/components/ui/button";
-import { ProductFilterSidebar } from "@/components/catalog/ProductFilterSidebar";
-import { ProductSortSelect } from "@/components/catalog/ProductSortSelect";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  SlidersHorizontal,
-  X,
-  Package,
-} from "lucide-react";
+} from '@/features/catalog/catalogApi';
+import { ProductGrid } from '@/components/catalog/ProductGrid';
+import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
+import { Button } from '@/components/ui/button';
+import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
+import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
+import { ChevronLeft, ChevronRight, Home, SlidersHorizontal, X, Package } from 'lucide-react';
 
 function ProductsPageContent({ lang }: { lang: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
-  const q = searchParams.get("q") || "";
-  const categoryId = searchParams.get("categoryId") || "";
-  const categorySlug = searchParams.get("categorySlug") || "";
-  const subCategoryId = searchParams.get("subCategoryId") || "";
-  const subCategorySlug = searchParams.get("subCategorySlug") || "";
-  const brandId = searchParams.get("brandId") || "";
-  const sort = searchParams.get("sort") || "newest";
-  const minPrice = searchParams.get("minPrice") || "";
-  const maxPrice = searchParams.get("maxPrice") || "";
-  const inStock = searchParams.get("inStock") === "true" ? true : undefined;
-  const minRating = searchParams.get("minRating")
-    ? Number(searchParams.get("minRating"))
+  const q = searchParams.get('q') || '';
+  const categoryId = searchParams.get('categoryId') || '';
+  const categorySlug = searchParams.get('categorySlug') || '';
+  const subCategoryId = searchParams.get('subCategoryId') || '';
+  const subCategorySlug = searchParams.get('subCategorySlug') || '';
+  const brandId = searchParams.get('brandId') || '';
+  const sort = searchParams.get('sort') || 'newest';
+  const minPrice = searchParams.get('minPrice') || '';
+  const maxPrice = searchParams.get('maxPrice') || '';
+  const inStock = searchParams.get('inStock') === 'true' ? true : undefined;
+  const minRating = searchParams.get('minRating')
+    ? Number(searchParams.get('minRating'))
     : undefined;
-  const page = parseInt(searchParams.get("page") || "1", 10);
+  const page = parseInt(searchParams.get('page') || '1', 10);
 
   const { data: categories } = useGetPublicCategoriesQuery();
   const { data: brands } = useGetPublicBrandsQuery();
@@ -68,13 +61,13 @@ function ProductsPageContent({ lang }: { lang: string }) {
 
   const updateUrl = (key: string, value: string | number | null) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value !== null && value !== undefined && value !== "") {
+    if (value !== null && value !== undefined && value !== '') {
       params.set(key, value.toString());
     } else {
       params.delete(key);
     }
-    if (key !== "page") {
-      params.delete("page");
+    if (key !== 'page') {
+      params.delete('page');
     }
     router.push(`${pathname}?${params.toString()}`);
   };
@@ -87,9 +80,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
   const meta = searchResults?.meta;
 
   // Selected category & brand labels for badge display
-  const selectedCategory = categories?.find(
-    (c) => c.id === categoryId || c.slug === categorySlug,
-  );
+  const selectedCategory = categories?.find((c) => c.id === categoryId || c.slug === categorySlug);
   const selectedBrand = brands?.find((b) => b.id === brandId);
 
   const hasActiveFilters = Boolean(
@@ -102,7 +93,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
     minPrice ||
     maxPrice ||
     inStock ||
-    minRating,
+    minRating
   );
 
   return (
@@ -117,26 +108,22 @@ function ProductsPageContent({ lang }: { lang: string }) {
           className="hover:text-primary transition-colors flex items-center gap-1"
         >
           <Home className="h-3.5 w-3.5" />
-          <span>{isBn ? "হোম" : "Home"}</span>
+          <span>{isBn ? 'হোম' : 'Home'}</span>
         </Link>
         <span>/</span>
-        <span className="font-semibold text-foreground">
-          {isBn ? "সকল পণ্য" : "All Products"}
-        </span>
+        <span className="font-semibold text-foreground">{isBn ? 'সকল পণ্য' : 'All Products'}</span>
       </nav>
 
       {/* Main Title & Description */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border/40 pb-5">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
-            {isBn
-              ? "পণ্য ব্রাউজ ও ফিল্টার করুন"
-              : "Explore Marketplace Products"}
+            {isBn ? 'পণ্য ব্রাউজ ও ফিল্টার করুন' : 'Explore Marketplace Products'}
           </h1>
           <p className="text-xs md:text-sm text-muted-foreground mt-1">
             {isBn
-              ? "সরাসরি স্থানীয় বিশ্বস্ত বিক্রেতা ও খামারিদের পণ্য মূল্য, ক্যাটাগরি এবং রেটিং অনুযায়ী খুঁজে নিন।"
-              : "Browse farm-fresh groceries, vegetables, and everyday products from trusted local shops."}
+              ? 'সরাসরি স্থানীয় বিশ্বস্ত বিক্রেতা ও খামারিদের পণ্য মূল্য, ক্যাটাগরি এবং রেটিং অনুযায়ী খুঁজে নিন।'
+              : 'Browse farm-fresh groceries, vegetables, and everyday products from trusted local shops.'}
           </p>
         </div>
 
@@ -144,7 +131,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
         {meta && (
           <div className="text-xs md:text-sm text-muted-foreground font-medium shrink-0">
             {isLoading ? (
-              <span>{isBn ? "লোড হচ্ছে..." : "Loading..."}</span>
+              <span>{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</span>
             ) : (
               <span>
                 {isBn
@@ -171,7 +158,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
                 <ProductFilterSidebar lang={lang} isMobile />
               </div>
               <span className="hidden sm:inline-block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {isBn ? "সর্ট করুন" : "Sort By"}
+                {isBn ? 'সর্ট করুন' : 'Sort By'}
               </span>
             </div>
 
@@ -185,14 +172,14 @@ function ProductsPageContent({ lang }: { lang: string }) {
             <div className="flex flex-wrap items-center gap-2 mb-6 p-3 rounded-lg bg-muted/40 border border-border/50 text-xs">
               <span className="font-semibold text-muted-foreground flex items-center gap-1 mr-1">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
-                {isBn ? "ফিল্টারসমূহ:" : "Active Filters:"}
+                {isBn ? 'ফিল্টারসমূহ:' : 'Active Filters:'}
               </span>
 
               {q && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                   <span>{isBn ? `অনুসন্ধান: "${q}"` : `Keyword: "${q}"`}</span>
                   <button
-                    onClick={() => updateUrl("q", null)}
+                    onClick={() => updateUrl('q', null)}
                     className="hover:text-primary/70 ml-1"
                     aria-label="Remove search filter"
                   >
@@ -203,13 +190,11 @@ function ProductsPageContent({ lang }: { lang: string }) {
 
               {selectedCategory && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                  <span>
-                    {isBn ? selectedCategory.nameBn : selectedCategory.nameEn}
-                  </span>
+                  <span>{isBn ? selectedCategory.nameBn : selectedCategory.nameEn}</span>
                   <button
                     onClick={() => {
-                      updateUrl("categoryId", null);
-                      updateUrl("categorySlug", null);
+                      updateUrl('categoryId', null);
+                      updateUrl('categorySlug', null);
                     }}
                     className="hover:text-primary/70 ml-1"
                     aria-label="Remove category filter"
@@ -221,11 +206,9 @@ function ProductsPageContent({ lang }: { lang: string }) {
 
               {selectedBrand && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                  <span>
-                    {isBn ? selectedBrand.nameBn : selectedBrand.nameEn}
-                  </span>
+                  <span>{isBn ? selectedBrand.nameBn : selectedBrand.nameEn}</span>
                   <button
-                    onClick={() => updateUrl("brandId", null)}
+                    onClick={() => updateUrl('brandId', null)}
                     className="hover:text-primary/70 ml-1"
                     aria-label="Remove brand filter"
                   >
@@ -237,13 +220,12 @@ function ProductsPageContent({ lang }: { lang: string }) {
               {(minPrice || maxPrice) && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                   <span>
-                    ৳{minPrice || "0"} -{" "}
-                    {maxPrice ? `৳${maxPrice}` : isBn ? "যেকোন" : "Any"}
+                    ৳{minPrice || '0'} - {maxPrice ? `৳${maxPrice}` : isBn ? 'যেকোন' : 'Any'}
                   </span>
                   <button
                     onClick={() => {
-                      updateUrl("minPrice", null);
-                      updateUrl("maxPrice", null);
+                      updateUrl('minPrice', null);
+                      updateUrl('maxPrice', null);
                     }}
                     className="hover:text-primary/70 ml-1"
                     aria-label="Remove price filter"
@@ -255,9 +237,9 @@ function ProductsPageContent({ lang }: { lang: string }) {
 
               {inStock && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                  <span>{isBn ? "ইন-স্টক পণ্য" : "In Stock Only"}</span>
+                  <span>{isBn ? 'ইন-স্টক পণ্য' : 'In Stock Only'}</span>
                   <button
-                    onClick={() => updateUrl("inStock", null)}
+                    onClick={() => updateUrl('inStock', null)}
                     className="hover:text-primary/70 ml-1"
                     aria-label="Remove in-stock filter"
                   >
@@ -270,7 +252,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                   <span>★ {minRating}+</span>
                   <button
-                    onClick={() => updateUrl("minRating", null)}
+                    onClick={() => updateUrl('minRating', null)}
                     className="hover:text-primary/70 ml-1"
                     aria-label="Remove rating filter"
                   >
@@ -285,7 +267,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
                 onClick={clearAllFilters}
                 className="text-xs h-7 px-2 text-muted-foreground hover:text-foreground underline ml-auto"
               >
-                {isBn ? "সব মুছুন" : "Reset all"}
+                {isBn ? 'সব মুছুন' : 'Reset all'}
               </Button>
             </div>
           )}
@@ -295,15 +277,11 @@ function ProductsPageContent({ lang }: { lang: string }) {
             <div className="text-center py-16 px-4 bg-destructive/5 rounded-2xl border border-destructive/20 text-destructive space-y-3">
               <p className="font-semibold text-base">
                 {isBn
-                  ? "দুঃখিত, পণ্য লোড করতে সমস্যা হয়েছে।"
-                  : "Unable to load products at this moment."}
+                  ? 'দুঃখিত, পণ্য লোড করতে সমস্যা হয়েছে।'
+                  : 'Unable to load products at this moment.'}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.location.reload()}
-              >
-                {isBn ? "পুনরায় চেষ্টা করুন" : "Retry"}
+              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                {isBn ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
               </Button>
             </div>
           ) : isEmpty && !isLoading ? (
@@ -313,26 +291,26 @@ function ProductsPageContent({ lang }: { lang: string }) {
               </div>
               <div className="space-y-1 max-w-md mx-auto">
                 <h3 className="text-lg font-bold text-foreground">
-                  {isBn ? "কোনো পণ্য পাওয়া যায়নি" : "No products found"}
+                  {isBn ? 'কোনো পণ্য পাওয়া যায়নি' : 'No products found'}
                 </h3>
                 <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
                   {isBn
-                    ? "আপনার বর্তমান ফিল্টারের সাথে মিলে এমন কোনো পণ্য এই মুহূর্তে নেই। ফিল্টার শিথিল করুন অথবা নতুন পণ্যের অনুরোধ করুন।"
-                    : "No products matched your selected filters. Try broadening your criteria or submit a product request."}
+                    ? 'আপনার বর্তমান ফিল্টারের সাথে মিলে এমন কোনো পণ্য এই মুহূর্তে নেই। ফিল্টার শিথিল করুন অথবা নতুন পণ্যের অনুরোধ করুন।'
+                    : 'No products matched your selected filters. Try broadening your criteria or submit a product request.'}
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 {hasActiveFilters && (
                   <Button variant="outline" size="sm" onClick={clearAllFilters}>
-                    {isBn ? "ফিল্টার মুছুন" : "Clear filters"}
+                    {isBn ? 'ফিল্টার মুছুন' : 'Clear filters'}
                   </Button>
                 )}
                 <ProductRequestModal
                   lang={lang}
                   trigger={
                     <Button size="sm" className="font-medium">
-                      {isBn ? "পণ্য অনুরোধ করুন" : "Request Product"}
+                      {isBn ? 'পণ্য অনুরোধ করুন' : 'Request Product'}
                     </Button>
                   }
                 />
@@ -340,11 +318,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
             </div>
           ) : (
             <>
-              <ProductGrid
-                products={searchResults?.data}
-                isLoading={isLoading}
-                lang={lang}
-              />
+              <ProductGrid products={searchResults?.data} isLoading={isLoading} lang={lang} />
 
               {/* URL-driven Pagination */}
               {meta && meta.totalPages > 1 && (
@@ -353,11 +327,11 @@ function ProductsPageContent({ lang }: { lang: string }) {
                     variant="outline"
                     size="sm"
                     disabled={page <= 1}
-                    onClick={() => updateUrl("page", page - 1)}
+                    onClick={() => updateUrl('page', page - 1)}
                     className="font-medium"
                   >
                     <ChevronLeft className="w-4 h-4 mr-1" />
-                    {isBn ? "পূর্ববর্তী" : "Prev"}
+                    {isBn ? 'পূর্ববর্তী' : 'Prev'}
                   </Button>
                   <span className="text-xs md:text-sm font-semibold text-muted-foreground px-2">
                     {page} / {meta.totalPages}
@@ -366,10 +340,10 @@ function ProductsPageContent({ lang }: { lang: string }) {
                     variant="outline"
                     size="sm"
                     disabled={page >= meta.totalPages}
-                    onClick={() => updateUrl("page", page + 1)}
+                    onClick={() => updateUrl('page', page + 1)}
                     className="font-medium"
                   >
-                    {isBn ? "পরবর্তী" : "Next"}
+                    {isBn ? 'পরবর্তী' : 'Next'}
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </div>
@@ -382,18 +356,14 @@ function ProductsPageContent({ lang }: { lang: string }) {
   );
 }
 
-export default function ProductsPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function ProductsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
 
   return (
     <Suspense
       fallback={
         <div className="container mx-auto px-4 py-16 text-center text-sm text-muted-foreground">
-          {lang === "bn" ? "পণ্য লোড হচ্ছে..." : "Loading products..."}
+          {lang === 'bn' ? 'পণ্য লোড হচ্ছে...' : 'Loading products...'}
         </div>
       }
     >

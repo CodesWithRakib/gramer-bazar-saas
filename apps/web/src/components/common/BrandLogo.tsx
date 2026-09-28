@@ -28,12 +28,7 @@ export function BrandLogo({
 }: BrandLogoProps) {
   const isBn = lang === 'bn';
 
-  const logoSrc =
-    variant === 'icon'
-      ? '/icon.svg'
-      : isBn
-      ? '/logo-bn.svg'
-      : '/logo-en.svg';
+  const logoSrc = variant === 'icon' ? '/icon.svg' : isBn ? '/logo-bn.svg' : '/logo-en.svg';
 
   const defaultWidth = variant === 'icon' ? 36 : 140;
   const defaultHeight = variant === 'icon' ? 36 : 42;
@@ -53,7 +48,11 @@ export function BrandLogo({
 
   if (href) {
     return (
-      <Link href={href} onClick={onClick} className="inline-flex items-center focus-visible:outline-hidden">
+      <Link
+        href={href}
+        onClick={onClick}
+        className="inline-flex items-center focus-visible:outline-hidden"
+      >
         {content}
       </Link>
     );

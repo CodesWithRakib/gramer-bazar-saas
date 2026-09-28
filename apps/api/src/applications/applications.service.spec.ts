@@ -109,7 +109,10 @@ describe('ApplicationsService', () => {
 
     it('rejects if a pending application already exists', async () => {
       usersService.findById.mockResolvedValue({ id: 'u1', roles: [{ name: Role.CUSTOMER }] });
-      sellerAppRepo.findOne.mockResolvedValue({ id: 'existing-app', status: ApplicationStatus.PENDING });
+      sellerAppRepo.findOne.mockResolvedValue({
+        id: 'existing-app',
+        status: ApplicationStatus.PENDING,
+      });
       await expect(
         service.submitSellerApplication('u1', {
           shopNameEn: 'Shop',

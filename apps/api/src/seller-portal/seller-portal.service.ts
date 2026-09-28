@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { Shop } from '../shops/entities/shop.entity.js';
@@ -48,9 +44,7 @@ export class SellerPortalService {
       .createQueryBuilder('inv')
       .innerJoin('inv.sellerProduct', 'sp')
       .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere(
-        '(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold',
-      )
+      .andWhere('(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold')
       .getCount();
 
     // Pending/Active orders count (orders that have items from this shop and are not delivered/cancelled)
@@ -60,11 +54,7 @@ export class SellerPortalService {
       .innerJoin('item.order', 'order')
       .where('sp.shopId = :shopId', { shopId: shop.id })
       .andWhere('order.status NOT IN (:...statuses)', {
-        statuses: [
-          OrderStatus.DELIVERED,
-          OrderStatus.CANCELLED,
-          OrderStatus.FAILED,
-        ],
+        statuses: [OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.FAILED],
       })
       .select('order.id')
       .distinct(true)
@@ -193,9 +183,7 @@ export class SellerPortalService {
       .innerJoin('sp.productVariant', 'pv')
       .innerJoin('pv.product', 'p')
       .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere(
-        '(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold',
-      )
+      .andWhere('(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold')
       .select('sp.id', 'id')
       .addSelect('p.nameEn', 'nameEn')
       .addSelect('p.nameBn', 'nameBn')
@@ -281,8 +269,7 @@ export class SellerPortalService {
       const existing = await manager.findOne(SellerProduct, {
         where: { shopId: shop.id, productVariantId: dto.productVariantId },
       });
-      if (existing)
-        throw new BadRequestException('Product already exists in your shop');
+      if (existing) throw new BadRequestException('Product already exists in your shop');
 
       const sellerProduct = new SellerProduct();
       sellerProduct.shopId = shop.id;
@@ -309,11 +296,7 @@ export class SellerPortalService {
     });
   }
 
-  async updateProduct(
-    sellerId: string,
-    id: string,
-    dto: UpdateSellerProductDto,
-  ) {
+  async updateProduct(sellerId: string, id: string, dto: UpdateSellerProductDto) {
     const shop = await this.getShopForSeller(sellerId);
 
     return this.dataSource.transaction(async (manager) => {
@@ -322,12 +305,10 @@ export class SellerPortalService {
         relations: ['inventory'],
       });
 
-      if (!sellerProduct)
-        throw new NotFoundException('Seller product not found');
+      if (!sellerProduct) throw new NotFoundException('Seller product not found');
 
       if (dto.price !== undefined) sellerProduct.price = dto.price;
-      if (dto.discountPrice !== undefined)
-        sellerProduct.discountPrice = dto.discountPrice;
+      if (dto.discountPrice !== undefined) sellerProduct.discountPrice = dto.discountPrice;
       if (dto.isActive !== undefined) sellerProduct.isActive = dto.isActive;
 
       await manager.save(SellerProduct, sellerProduct);
@@ -394,16 +375,11 @@ export class SellerPortalService {
       .getOne();
 
     if (!order) {
-      throw new NotFoundException(
-        'Order not found or contains no items from your shop',
-      );
+      throw new NotFoundException('Order not found or contains no items from your shop');
     }
 
     // Adjust the order total to reflect only this seller's items
-    const sellerSubtotal = order.items.reduce(
-      (sum, item) => sum + Number(item.subtotal),
-      0,
-    );
+    const sellerSubtotal = order.items.reduce((sum, item) => sum + Number(item.subtotal), 0);
     // (Note: delivery fee and discounts are complex to split. For a multi-vendor cart, it should be handled explicitly.
     // Here we'll just expose the items and subtotal to the seller)
 

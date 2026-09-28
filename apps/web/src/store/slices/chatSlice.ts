@@ -33,12 +33,8 @@ export const chatSlice = createSlice({
   },
 });
 
-export const {
-  openChatWidget,
-  closeChatWidget,
-  setActiveConversation,
-  toggleChatWidget,
-} = chatSlice.actions;
+export const { openChatWidget, closeChatWidget, setActiveConversation, toggleChatWidget } =
+  chatSlice.actions;
 
 export const selectIsWidgetOpen = (state: RootState) => state.chat.isWidgetOpen;
 export const selectActiveConversationId = (state: RootState) => state.chat.activeConversationId;

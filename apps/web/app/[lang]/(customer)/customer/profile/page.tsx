@@ -1,9 +1,9 @@
-import { CustomerProfileView } from "@/features/customer/profile";
+import { CustomerProfileView } from '@/features/customer/profile';
 
 export default async function CustomerProfilePage({
   params,
 }: {
-  params: Promise<{ lang: "ar" | "en" }>;
+  params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
   return <CustomerProfileView lang={lang} />;

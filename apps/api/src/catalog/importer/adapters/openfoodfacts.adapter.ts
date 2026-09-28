@@ -67,9 +67,10 @@ export class OpenFoodFactsAdapter implements ProductSourceAdapter {
       else if (lowerQ.includes('pack')) unit = 'pack';
     }
 
-    const category = raw.categories_tags && raw.categories_tags.length > 0
-      ? raw.categories_tags[0].replace(/^en:/, '')
-      : fallbackCategory;
+    const category =
+      raw.categories_tags && raw.categories_tags.length > 0
+        ? raw.categories_tags[0].replace(/^en:/, '')
+        : fallbackCategory;
 
     return {
       source: this.sourceName,

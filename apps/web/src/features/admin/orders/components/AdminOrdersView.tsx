@@ -73,7 +73,10 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
 
   // Reason Confirmation Modal State
   const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
-  const [targetTransition, setTargetTransition] = useState<{ orderId: string; targetStatus: OrderStatus } | null>(null);
+  const [targetTransition, setTargetTransition] = useState<{
+    orderId: string;
+    targetStatus: OrderStatus;
+  } | null>(null);
   const [transitionReason, setTransitionReason] = useState('');
 
   // Filter State
@@ -109,7 +112,11 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
 
   const handleActionClick = (orderId: string, targetStatus: OrderStatus) => {
     // For cancellation or refund, require/allow a reason modal
-    if (targetStatus === OrderStatus.CANCELLED || targetStatus === OrderStatus.REFUNDED || targetStatus === OrderStatus.FAILED) {
+    if (
+      targetStatus === OrderStatus.CANCELLED ||
+      targetStatus === OrderStatus.REFUNDED ||
+      targetStatus === OrderStatus.FAILED
+    ) {
       setTargetTransition({ orderId, targetStatus });
       setTransitionReason('');
       setIsReasonModalOpen(true);
@@ -136,7 +143,9 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
     {
       accessorKey: 'id',
       header: 'Order ID',
-      cell: ({ row }) => <span className="font-mono">{String(row.getValue('id')).substring(0, 8)}...</span>,
+      cell: ({ row }) => (
+        <span className="font-mono">{String(row.getValue('id')).substring(0, 8)}...</span>
+      ),
     },
     {
       accessorKey: 'user',
@@ -178,7 +187,12 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
         const order = row.original;
         const currentStatus = order.status as OrderStatus;
         const validNextStatuses = VALID_ORDER_TRANSITIONS[currentStatus] || [];
-        const canAssignRider = ['CONFIRMED', 'PROCESSING', 'READY_FOR_PICKUP', 'ASSIGNED_TO_RIDER'].includes(currentStatus);
+        const canAssignRider = [
+          'CONFIRMED',
+          'PROCESSING',
+          'READY_FOR_PICKUP',
+          'ASSIGNED_TO_RIDER',
+        ].includes(currentStatus);
 
         return (
           <DropdownMenu>
@@ -204,14 +218,17 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuLabel className="text-xs text-muted-foreground">Valid Transitions</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Valid Transitions
+              </DropdownMenuLabel>
               {validNextStatuses.length === 0 ? (
                 <div className="px-2 py-1.5 text-xs text-muted-foreground italic">
                   No further transitions
                 </div>
               ) : (
                 validNextStatuses.map((nextStatus) => {
-                  const isDestructive = nextStatus === OrderStatus.CANCELLED || nextStatus === OrderStatus.FAILED;
+                  const isDestructive =
+                    nextStatus === OrderStatus.CANCELLED || nextStatus === OrderStatus.FAILED;
                   return (
                     <DropdownMenuItem
                       key={nextStatus}
@@ -356,10 +373,7 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
             <Button variant="outline" onClick={() => setIsAssignModalOpen(false)}>
               Cancel
             </Button>
-            <Button
-              onClick={handleAssignRiderSubmit}
-              disabled={!selectedRiderId || isAssigning}
-            >
+            <Button onClick={handleAssignRiderSubmit} disabled={!selectedRiderId || isAssigning}>
               {isAssigning ? 'Assigning...' : 'Assign'}
             </Button>
           </DialogFooter>
@@ -372,8 +386,10 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
             <DialogTitle>Confirm Status Transition</DialogTitle>
             <DialogDescription>
               You are transitioning Order #{targetTransition?.orderId.substring(0, 8)} to{' '}
-              <span className="font-semibold text-foreground">{targetTransition?.targetStatus}</span>.
-              Please provide a reason or note for this transition.
+              <span className="font-semibold text-foreground">
+                {targetTransition?.targetStatus}
+              </span>
+              . Please provide a reason or note for this transition.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -388,14 +404,20 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
               Cancel
             </Button>
             <Button
-              variant={targetTransition?.targetStatus === OrderStatus.CANCELLED || targetTransition?.targetStatus === OrderStatus.FAILED ? 'destructive' : 'default'}
+              variant={
+                targetTransition?.targetStatus === OrderStatus.CANCELLED ||
+                targetTransition?.targetStatus === OrderStatus.FAILED
+                  ? 'destructive'
+                  : 'default'
+              }
               disabled={isTransitioning}
               onClick={() => {
                 if (targetTransition) {
                   executeTransition(
                     targetTransition.orderId,
                     targetTransition.targetStatus,
-                    transitionReason || `Transitioned to ${targetTransition.targetStatus} by ${namespace}`,
+                    transitionReason ||
+                      `Transitioned to ${targetTransition.targetStatus} by ${namespace}`
                   );
                 }
               }}

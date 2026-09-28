@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, type Relation } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  type Relation,
+} from 'typeorm';
 import { ProductRequest } from './product-request.entity.js';
 import { ProductRequestStatus } from '../enums/product-request-status.enum.js';
 import { User } from '../../users/entities/user.entity.js';
@@ -11,7 +19,7 @@ export class ProductRequestHistory {
   @Column({ name: 'product_request_id', type: 'uuid' })
   productRequestId: string;
 
-  @ManyToOne(() => ProductRequest, request => request.statusHistory, { onDelete: 'CASCADE' })
+  @ManyToOne(() => ProductRequest, (request) => request.statusHistory, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'product_request_id' })
   productRequest: Relation<ProductRequest>;
 

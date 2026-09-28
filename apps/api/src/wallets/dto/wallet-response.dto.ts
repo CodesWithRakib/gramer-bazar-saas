@@ -34,7 +34,10 @@ export class WalletResponseDto {
   @ApiProperty({ example: 12500.5, description: 'Available liquid balance in BDT' })
   balance: number;
 
-  @ApiProperty({ example: 3200.0, description: 'Funds from recent orders awaiting delivery clearance' })
+  @ApiProperty({
+    example: 3200.0,
+    description: 'Funds from recent orders awaiting delivery clearance',
+  })
   pendingClearance: number;
 
   @ApiProperty({ example: 85000.0, description: 'Lifetime gross earnings in BDT' })

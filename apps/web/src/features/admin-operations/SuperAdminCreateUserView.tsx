@@ -53,14 +53,12 @@ export function SuperAdminCreateUserView({ lang = 'en' }: SuperAdminCreateUserVi
         role: formData.role,
       }).unwrap();
 
-      toast.success(
-        isBn
-          ? 'নতুন ব্যবহারকারী সফলভাবে তৈরি হয়েছে'
-          : 'User created successfully'
-      );
+      toast.success(isBn ? 'নতুন ব্যবহারকারী সফলভাবে তৈরি হয়েছে' : 'User created successfully');
       router.push(`/${lang}/super-admin/admins`);
     } catch (err) {
-      const msg = getApiErrorMessage(err) || (isBn ? 'ব্যবহারকারী তৈরি ব্যর্থ হয়েছে' : 'Failed to create user');
+      const msg =
+        getApiErrorMessage(err) ||
+        (isBn ? 'ব্যবহারকারী তৈরি ব্যর্থ হয়েছে' : 'Failed to create user');
       setErrorMsg(msg);
       toast.error(msg);
     }
@@ -195,7 +193,13 @@ export function SuperAdminCreateUserView({ lang = 'en' }: SuperAdminCreateUserVi
               {isBn ? 'বাতিল' : 'Cancel'}
             </Button>
             <Button type="submit" className="w-1/2 rounded-xl" disabled={isLoading}>
-              {isLoading ? (isBn ? 'তৈরি হচ্ছে...' : 'Creating...') : (isBn ? 'ব্যবহারকারী তৈরি করুন' : 'Create User')}
+              {isLoading
+                ? isBn
+                  ? 'তৈরি হচ্ছে...'
+                  : 'Creating...'
+                : isBn
+                  ? 'ব্যবহারকারী তৈরি করুন'
+                  : 'Create User'}
             </Button>
           </div>
         </form>

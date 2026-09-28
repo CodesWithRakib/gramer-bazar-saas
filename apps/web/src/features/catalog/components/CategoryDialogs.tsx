@@ -5,12 +5,32 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 import {
   useCreateAdminCategoryMutation,
@@ -193,7 +213,11 @@ export function AddCategoryDialog() {
                 <FormItem>
                   <FormLabel>Icon (Emoji or Icon Name)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. 🥬" value={field.value || ''} onChange={field.onChange} />
+                    <Input
+                      placeholder="e.g. 🥬"
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -207,7 +231,12 @@ export function AddCategoryDialog() {
                 <FormItem>
                   <FormLabel>Description (English)</FormLabel>
                   <FormControl>
-                    <Textarea rows={2} placeholder="Optional category description" value={field.value || ''} onChange={field.onChange} />
+                    <Textarea
+                      rows={2}
+                      placeholder="Optional category description"
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -221,7 +250,12 @@ export function AddCategoryDialog() {
                 <FormItem>
                   <FormLabel>Description (Bangla)</FormLabel>
                   <FormControl>
-                    <Textarea rows={2} placeholder="ঐচ্ছিক ক্যাটাগরি বিবরণ" value={field.value || ''} onChange={field.onChange} />
+                    <Textarea
+                      rows={2}
+                      placeholder="ঐচ্ছিক ক্যাটাগরি বিবরণ"
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -32,7 +32,10 @@ export const flashSalesApi = api.injectEndpoints({
       query: (id) => `/flash-sales/${id}`,
       providesTags: (result, error, id) => [{ type: 'FlashSale', id }],
     }),
-    getAdminFlashSales: builder.query<{ data: FlashSale[]; meta: PaginationMeta }, { page?: number; limit?: number }>({
+    getAdminFlashSales: builder.query<
+      { data: FlashSale[]; meta: PaginationMeta },
+      { page?: number; limit?: number }
+    >({
       query: (params) => ({
         url: '/flash-sales',
         params,

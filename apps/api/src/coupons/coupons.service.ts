@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Coupon } from './entities/coupon.entity.js';
@@ -22,7 +18,9 @@ export class CouponsService {
   ) {}
 
   async create(createDto: CreateCouponDto) {
-    const existing = await this.couponRepository.findOne({ where: { code: createDto.code.toUpperCase() } });
+    const existing = await this.couponRepository.findOne({
+      where: { code: createDto.code.toUpperCase() },
+    });
     if (existing) {
       throw new BadRequestException('Coupon code already exists');
     }
@@ -80,7 +78,7 @@ export class CouponsService {
         if (existing) throw new BadRequestException('Coupon code already exists');
       }
     }
-    
+
     Object.assign(coupon, updateDto);
     return this.couponRepository.save(coupon);
   }
@@ -110,7 +108,7 @@ export class CouponsService {
   // Pure validation for the customer frontend to calculate before checkout
   async validateCoupon(code: string, userId: string, subtotal: number) {
     const coupon = await this.couponRepository.findOne({ where: { code: code.toUpperCase() } });
-    
+
     if (!coupon) {
       throw new BadRequestException('Invalid coupon code');
     }
@@ -132,7 +130,9 @@ export class CouponsService {
     }
 
     if (subtotal < (coupon.minOrderAmount || 0)) {
-      throw new BadRequestException(`Minimum order amount of ${coupon.minOrderAmount} BDT is required to use this coupon`);
+      throw new BadRequestException(
+        `Minimum order amount of ${coupon.minOrderAmount} BDT is required to use this coupon`,
+      );
     }
 
     // Check user limits
@@ -170,7 +170,8 @@ export class CouponsService {
 
   async findActiveCouponsByShop(shopId: string) {
     const now = new Date();
-    return this.couponRepository.createQueryBuilder('coupon')
+    return this.couponRepository
+      .createQueryBuilder('coupon')
       .where('coupon.shopId = :shopId', { shopId })
       .andWhere('coupon.isActive = :isActive', { isActive: true })
       .andWhere('(coupon.startDate IS NULL OR coupon.startDate <= :now)', { now })
@@ -181,7 +182,8 @@ export class CouponsService {
 
   async findActivePublicCoupons() {
     const now = new Date();
-    return this.couponRepository.createQueryBuilder('coupon')
+    return this.couponRepository
+      .createQueryBuilder('coupon')
       .where('coupon.isActive = :isActive', { isActive: true })
       .andWhere('(coupon.startDate IS NULL OR coupon.startDate <= :now)', { now })
       .andWhere('(coupon.endDate IS NULL OR coupon.endDate >= :now)', { now })

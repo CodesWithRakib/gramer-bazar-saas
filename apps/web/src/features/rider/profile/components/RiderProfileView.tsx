@@ -20,7 +20,7 @@ export function RiderProfileView({ lang = 'en' }: RiderProfileViewProps) {
   const isBn = lang === 'bn';
   const dispatch = useDispatch();
   const router = useRouter();
-  
+
   const { user } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () => {
@@ -52,7 +52,11 @@ export function RiderProfileView({ lang = 'en' }: RiderProfileViewProps) {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>{isBn ? 'পুরো নাম' : 'Full Name'}</Label>
-            <Input value={`${user?.firstName || ''} ${user?.lastName || ''}`} readOnly className="bg-muted" />
+            <Input
+              value={`${user?.firstName || ''} ${user?.lastName || ''}`}
+              readOnly
+              className="bg-muted"
+            />
           </div>
           <div className="space-y-2">
             <Label>{isBn ? 'ইমেইল' : 'Email'}</Label>
@@ -80,9 +84,7 @@ export function RiderProfileView({ lang = 'en' }: RiderProfileViewProps) {
             <Label>{isBn ? 'লাইসেন্স প্লেট' : 'License Plate'}</Label>
             <Input defaultValue="DHAKA-H-12-3456" />
           </div>
-          <Button className="w-full mt-2">
-            {isBn ? 'সংরক্ষণ করুন' : 'Save Details'}
-          </Button>
+          <Button className="w-full mt-2">{isBn ? 'সংরক্ষণ করুন' : 'Save Details'}</Button>
         </CardContent>
       </Card>
 
@@ -101,7 +103,11 @@ export function RiderProfileView({ lang = 'en' }: RiderProfileViewProps) {
         </CardContent>
       </Card>
 
-      <Button variant="destructive" className="w-full flex items-center gap-2 mt-8" onClick={handleLogout}>
+      <Button
+        variant="destructive"
+        className="w-full flex items-center gap-2 mt-8"
+        onClick={handleLogout}
+      >
         <LogOut className="w-4 h-4" />
         {isBn ? 'লগ আউট' : 'Log Out'}
       </Button>

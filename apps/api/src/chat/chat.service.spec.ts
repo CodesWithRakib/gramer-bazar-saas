@@ -1,7 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ChatService, getDirectCanonicalKey, isUserAdmin, isUserSuperAdmin, canUserAccessConversation } from './chat.service.js';
+import {
+  ChatService,
+  getDirectCanonicalKey,
+  isUserAdmin,
+  isUserSuperAdmin,
+  canUserAccessConversation,
+} from './chat.service.js';
 import { Conversation } from './entities/conversation.entity.js';
 import { Message } from './entities/message.entity.js';
 import { UsersService } from '../users/users.service.js';
@@ -29,7 +35,9 @@ describe('ChatService', () => {
     mockMsgRepo = {
       findOne: vi.fn(),
       create: vi.fn((dto) => ({ id: 'new-msg-uuid', ...dto, createdAt: new Date() })),
-      save: vi.fn((entity) => Promise.resolve({ id: 'saved-msg-uuid', ...entity, createdAt: new Date() })),
+      save: vi.fn((entity) =>
+        Promise.resolve({ id: 'saved-msg-uuid', ...entity, createdAt: new Date() }),
+      ),
       createQueryBuilder: vi.fn(),
     };
 

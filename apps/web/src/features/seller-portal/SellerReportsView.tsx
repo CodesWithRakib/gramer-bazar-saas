@@ -10,7 +10,6 @@ export interface SellerReportsViewProps {
 }
 
 export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
-  
   const isBn = lang === 'bn';
 
   const { data: metrics, isLoading } = useGetSellerDashboardQuery();
@@ -26,7 +25,9 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
           {isBn ? 'রিপোর্ট এবং বিশ্লেষণ' : 'Reports & Analytics'}
         </h1>
         <p className="text-muted-foreground mt-2">
-          {isBn ? 'আপনার ব্যবসার মূল মেট্রিক্স এবং পারফরম্যান্স দেখুন' : 'View key metrics and performance of your business.'}
+          {isBn
+            ? 'আপনার ব্যবসার মূল মেট্রিক্স এবং পারফরম্যান্স দেখুন'
+            : 'View key metrics and performance of your business.'}
         </p>
       </div>
 
@@ -39,13 +40,13 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">৳{metrics?.totalSales?.toLocaleString() || '0'}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {isBn ? 'এই মাসে' : 'This month'}
-            </p>
+            <div className="text-2xl font-bold">
+              ৳{metrics?.totalSales?.toLocaleString() || '0'}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">{isBn ? 'এই মাসে' : 'This month'}</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -60,7 +61,7 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -81,7 +82,9 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
         <CardHeader>
           <CardTitle>{isBn ? 'মাসিক বিক্রয় ওভারভিউ' : 'Monthly Sales Overview'}</CardTitle>
           <CardDescription>
-            {isBn ? 'আপনার দোকানের পারফরম্যান্সের গ্রাফিকাল ভিউ' : 'Graphical view of your store performance'}
+            {isBn
+              ? 'আপনার দোকানের পারফরম্যান্সের গ্রাফিকাল ভিউ'
+              : 'Graphical view of your store performance'}
           </CardDescription>
         </CardHeader>
         <CardContent className="h-64 flex items-center justify-center bg-muted/20 border rounded-md m-6 border-dashed">

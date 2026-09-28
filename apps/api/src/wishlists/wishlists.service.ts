@@ -41,7 +41,8 @@ export class WishlistsService {
       total_available: string | number;
       min_price: string | number | null;
       min_regular_price: string | number | null;
-    }> = await this.dataSource.query(`
+    }> = await this.dataSource.query(
+      `
       SELECT 
         p.id as product_id,
         COALESCE(SUM(i.quantity - i.reserved_quantity), 0)::int as total_available,
@@ -53,7 +54,9 @@ export class WishlistsService {
       LEFT JOIN inventory i ON i.seller_product_id = sp.id
       WHERE p.id = ANY($1) AND sp.is_active = true AND pv.is_active = true
       GROUP BY p.id
-    `, [productIds]);
+    `,
+      [productIds],
+    );
 
     const sellerMap = new Map(stockAndPricing.map((s) => [s.product_id, s]));
 
@@ -62,7 +65,8 @@ export class WishlistsService {
       product_id: string;
       total_reviews: string | number;
       average_rating: string | number;
-    }> = await this.dataSource.query(`
+    }> = await this.dataSource.query(
+      `
       SELECT 
         product_id, 
         COUNT(id)::int as total_reviews, 
@@ -70,7 +74,9 @@ export class WishlistsService {
       FROM reviews
       WHERE product_id = ANY($1) AND is_approved = true
       GROUP BY product_id
-    `, [productIds]);
+    `,
+      [productIds],
+    );
 
     const ratingsMap = new Map(ratings.map((r) => [r.product_id, r]));
 
@@ -78,18 +84,22 @@ export class WishlistsService {
       const sellerData = sellerMap.get(item.productId);
       const ratingData = ratingsMap.get(item.productId);
 
-      const totalStock = sellerData ? Number(sellerData.total_available) : (item.product.stock || 0);
+      const totalStock = sellerData ? Number(sellerData.total_available) : item.product.stock || 0;
       const isAvailable = totalStock > 0;
 
-      const price = item.product.price != null
-        ? Number(item.product.price)
-        : (sellerData?.min_price != null ? Number(sellerData.min_price) : 0);
+      const price =
+        item.product.price != null
+          ? Number(item.product.price)
+          : sellerData?.min_price != null
+            ? Number(sellerData.min_price)
+            : 0;
 
-      const compareAtPrice = item.product.compareAtPrice != null
-        ? Number(item.product.compareAtPrice)
-        : (sellerData?.min_regular_price != null && Number(sellerData.min_regular_price) > price
+      const compareAtPrice =
+        item.product.compareAtPrice != null
+          ? Number(item.product.compareAtPrice)
+          : sellerData?.min_regular_price != null && Number(sellerData.min_regular_price) > price
             ? Number(sellerData.min_regular_price)
-            : null);
+            : null;
 
       const images = (item.product.images || []).sort((a, b) => {
         if (a.isPrimary && !b.isPrimary) return -1;

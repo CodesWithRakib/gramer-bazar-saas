@@ -4,7 +4,11 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Resend } from 'resend';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Notification, NotificationType, NotificationPriority } from './entities/notification.entity.js';
+import {
+  Notification,
+  NotificationType,
+  NotificationPriority,
+} from './entities/notification.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { CreateNotificationDto, NotifyRoleOptions } from './dto/create-notification.dto.js';
@@ -26,7 +30,8 @@ export class NotificationsService {
     private readonly userRepo: Repository<User>,
   ) {
     const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
-    this.defaultFromEmail = this.configService.get<string>('RESEND_FROM_EMAIL') || 'onboarding@resend.dev';
+    this.defaultFromEmail =
+      this.configService.get<string>('RESEND_FROM_EMAIL') || 'onboarding@resend.dev';
     this.fromName = this.configService.get<string>('RESEND_FROM_NAME') || 'Gramer Bazar';
 
     if (resendApiKey) {
@@ -72,7 +77,10 @@ export class NotificationsService {
       return saved;
     } catch (err: unknown) {
       const error = err as Error;
-      this.logger.error(`Failed to create notification for user ${dto.userId}: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to create notification for user ${dto.userId}: ${error.message}`,
+        error.stack,
+      );
       throw err;
     }
   }
@@ -200,7 +208,10 @@ export class NotificationsService {
   /**
    * Retrieves notifications for a user, ordered newest first with optional pagination/filtering.
    */
-  async getUserNotifications(userId: string, query?: QueryNotificationsDto): Promise<Notification[]> {
+  async getUserNotifications(
+    userId: string,
+    query?: QueryNotificationsDto,
+  ): Promise<Notification[]> {
     const limit = query?.limit ? Math.min(Math.max(Number(query.limit), 1), 100) : 50;
     const page = query?.page ? Math.max(Number(query.page), 1) : 1;
     const skip = (page - 1) * limit;
@@ -269,9 +280,14 @@ export class NotificationsService {
 
   // --- Email Notifications ---
 
-  async sendOrderConfirmationEmail(to: string, orderDetails: { id: string; total?: number | string }) {
+  async sendOrderConfirmationEmail(
+    to: string,
+    orderDetails: { id: string; total?: number | string },
+  ) {
     if (!this.resend) {
-      this.logger.warn(`Skipping order confirmation email for ${to} because Resend is not configured.`);
+      this.logger.warn(
+        `Skipping order confirmation email for ${to} because Resend is not configured.`,
+      );
       return false;
     }
 

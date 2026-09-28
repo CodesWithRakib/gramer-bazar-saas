@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, type Relation } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  type Relation,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
 import { Country } from '../../locations/entities/country.entity.js';
 import { Division } from '../../locations/entities/division.entity.js';

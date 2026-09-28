@@ -10,11 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { UseGuards, UseFilters, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import {
-  ChatService,
-  canUserAccessConversation,
-  isUserAdmin,
-} from './chat.service.js';
+import { ChatService, canUserAccessConversation, isUserAdmin } from './chat.service.js';
 import { WsJwtGuard } from '../common/guards/ws-jwt.guard.js';
 import { AllWsExceptionsFilter } from '../common/filters/ws-exception.filter.js';
 import { JoinConversationDto, SendMessageDto } from './dto/chat-gateway.dto.js';
@@ -59,9 +55,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (isUserAdmin(user)) {
         void client.join('admin_room');
       }
-      const roleNames = (user.roles || []).map((r: any) =>
-        typeof r === 'string' ? r : r?.name,
-      );
+      const roleNames = (user.roles || []).map((r: any) => (typeof r === 'string' ? r : r?.name));
       if (roleNames.includes('SELLER')) {
         void client.join('seller_room');
       }
@@ -139,9 +133,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(room).emit('new_message', message);
 
       // Notify individual participants so their conversation list and unread counts update
-      const conversation = await this.chatService[
-        'conversationRepository'
-      ].findOne({
+      const conversation = await this.chatService['conversationRepository'].findOne({
         where: { id: data.conversationId },
         relations: ['participants'],
       });
@@ -164,9 +156,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return message;
     } catch (err: unknown) {
       const error = err as Error;
-      this.logger.error(
-        'Error in handleMessage: ' + (error.message || String(err)),
-      );
+      this.logger.error('Error in handleMessage: ' + (error.message || String(err)));
       throw err;
     }
   }
@@ -183,17 +173,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = await this.usersService.findById(userId).catch(() => null);
     if (!user) return;
 
-    await this.chatService
-      .markAsRead(data.conversationId, user)
-      .catch(() => null);
+    await this.chatService.markAsRead(data.conversationId, user).catch(() => null);
 
     // Notify room that messages were read
-    this.server
-      .to(`conversation_${data.conversationId}`)
-      .emit('messages_read', {
-        conversationId: data.conversationId,
-        readBy: userId,
-      });
+    this.server.to(`conversation_${data.conversationId}`).emit('messages_read', {
+      conversationId: data.conversationId,
+      readBy: userId,
+    });
 
     return { success: true };
   }
@@ -219,9 +205,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // 1. Notify Customer
     if (payload.userId) {
-      this.server
-        .to(`user_${payload.userId}`)
-        .emit('order.status.updated', eventPayload);
+      this.server.to(`user_${payload.userId}`).emit('order.status.updated', eventPayload);
     }
 
     // 2. Notify Admins and Super Admins
@@ -229,17 +213,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // 3. Notify Assigned Rider if any
     if (payload.riderUserId) {
-      this.server
-        .to(`user_${payload.riderUserId}`)
-        .emit('order.status.updated', eventPayload);
+      this.server.to(`user_${payload.riderUserId}`).emit('order.status.updated', eventPayload);
     }
 
     // 4. Notify Sellers associated with items in this order
     if (payload.sellerUserIds && payload.sellerUserIds.length > 0) {
       for (const sellerId of payload.sellerUserIds) {
-        this.server
-          .to(`user_${sellerId}`)
-          .emit('order.status.updated', eventPayload);
+        this.server.to(`user_${sellerId}`).emit('order.status.updated', eventPayload);
       }
     }
   }
@@ -270,8 +250,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent('notification.all_read')
   handleNotificationAllRead(payload: { userId: string }) {
     if (!this.server) return;
-    this.server
-      .to(`user_${payload.userId}`)
-      .emit('notification:all_read', payload);
+    this.server.to(`user_${payload.userId}`).emit('notification:all_read', payload);
   }
 }

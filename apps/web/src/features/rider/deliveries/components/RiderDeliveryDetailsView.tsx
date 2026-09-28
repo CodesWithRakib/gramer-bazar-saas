@@ -1,12 +1,24 @@
 'use client';
 
 import React, { use, useState, useEffect, useRef } from 'react';
-import { useGetRiderDeliveryDetailsQuery, useUpdateDeliveryStatusMutation, DeliveryStatus } from '@/features/deliveries/deliveriesApi';
+import {
+  useGetRiderDeliveryDetailsQuery,
+  useUpdateDeliveryStatusMutation,
+  DeliveryStatus,
+} from '@/features/deliveries/deliveriesApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Phone, MapPin, Package, ArrowLeft, CheckCircle2, AlertTriangle, Truck } from 'lucide-react';
+import {
+  Phone,
+  MapPin,
+  Package,
+  ArrowLeft,
+  CheckCircle2,
+  AlertTriangle,
+  Truck,
+} from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { StartChatButton } from '@/components/chat/StartChatButton';
@@ -14,10 +26,14 @@ import dynamic from 'next/dynamic';
 import { useUpdateRiderLocationMutation } from '@/features/deliveries/deliveriesApi';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
-const LiveTrackingMap = dynamic(
-  () => import('@/components/map/LiveTrackingMap'),
-  { ssr: false, loading: () => <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-muted/20 animate-pulse rounded-md border"><span className="text-muted-foreground">Loading Map...</span></div> }
-);
+const LiveTrackingMap = dynamic(() => import('@/components/map/LiveTrackingMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-muted/20 animate-pulse rounded-md border">
+      <span className="text-muted-foreground">Loading Map...</span>
+    </div>
+  ),
+});
 
 export interface RiderDeliveryDetailsViewProps {
   lang?: string;
@@ -39,7 +55,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
       ? isBn
         ? 'আপনার ব্রাউজার জিপিএস সাপোর্ট করে না'
         : 'Geolocation is not supported by your browser'
-      : null,
+      : null
   );
 
   // Keep a stable ref to updateLocation so the watchPosition effect doesn't
@@ -67,7 +83,9 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
         // Use ref to always call the latest updateLocation without adding it to deps
         updateLocationRef.current({ id, lat: latitude, lng: longitude }).catch((err) => {
           console.error('Failed to update location to server', err);
-          toast.error(isBn ? 'সার্ভারে লোকেশন আপডেট ব্যর্থ হয়েছে' : 'Failed to sync location with server');
+          toast.error(
+            isBn ? 'সার্ভারে লোকেশন আপডেট ব্যর্থ হয়েছে' : 'Failed to sync location with server'
+          );
         });
       },
       (error) => {
@@ -75,20 +93,20 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
         setTrackingError(
           isBn
             ? 'লোকেশন ট্র্যাক করা যাচ্ছে না। দয়া করে জিপিএস পারমিশন দিন।'
-            : 'Cannot track location. Please allow GPS permissions.',
+            : 'Cannot track location. Please allow GPS permissions.'
         );
       },
       {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0,
-      },
+      }
     );
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [delivery?.status, id, isBn]);
 
   const handleUpdateStatus = async (status: DeliveryStatus) => {
@@ -102,14 +120,21 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
   };
 
   if (isLoading) {
-    return <div className="p-4 space-y-4"><Skeleton className="h-40 w-full" /><Skeleton className="h-64 w-full" /></div>;
+    return (
+      <div className="p-4 space-y-4">
+        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
   }
 
   if (!delivery) {
     return (
       <div className="p-4 text-center">
         <p>{isBn ? 'ডেলিভারি পাওয়া যায়নি' : 'Delivery not found'}</p>
-        <Button asChild className="mt-4"><Link href={`/${lang}/rider`}>{isBn ? 'ফিরে যান' : 'Go back'}</Link></Button>
+        <Button asChild className="mt-4">
+          <Link href={`/${lang}/rider`}>{isBn ? 'ফিরে যান' : 'Go back'}</Link>
+        </Button>
       </div>
     );
   }
@@ -124,16 +149,24 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </Button>
-        <h1 className="font-semibold text-lg">{isBn ? 'ডেলিভারি বিস্তারিত' : 'Delivery Details'}</h1>
+        <h1 className="font-semibold text-lg">
+          {isBn ? 'ডেলিভারি বিস্তারিত' : 'Delivery Details'}
+        </h1>
       </div>
 
       <Card>
         <CardHeader className="pb-3 border-b">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-mono text-muted-foreground">#{order.id.slice(-8).toUpperCase()}</span>
-            <Badge variant="outline" className="uppercase">{delivery.status.replace(/_/g, ' ')}</Badge>
+            <span className="text-sm font-mono text-muted-foreground">
+              #{order.id.slice(-8).toUpperCase()}
+            </span>
+            <Badge variant="outline" className="uppercase">
+              {delivery.status.replace(/_/g, ' ')}
+            </Badge>
           </div>
-          <CardTitle className="text-xl pt-2">{order.user?.firstName} {order.user?.lastName}</CardTitle>
+          <CardTitle className="text-xl pt-2">
+            {order.user?.firstName} {order.user?.lastName}
+          </CardTitle>
         </CardHeader>
         <CardContent className="pt-4 space-y-4">
           <div className="flex items-start gap-3">
@@ -146,31 +179,31 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
               </p>
             </div>
           </div>
-          
-            <div className="flex items-center gap-3 pt-2">
-              <Phone className="h-5 w-5 text-muted-foreground" />
-              <div className="flex-grow flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-sm">{order.user?.phone}</p>
-                  <a href={`tel:${order.user?.phone}`} className="text-sm text-primary underline">
-                    {isBn ? 'কল করুন' : 'Call Customer'}
-                  </a>
-                </div>
-                {order.user?.id && (
-                  <StartChatButton
-                    participantId={order.user.id}
-                    lang={lang}
-                    referenceId={order.id}
-                    referenceType="DELIVERY"
-                    buttonText={isBn ? 'মেসেজ দিন' : 'Message'}
-                    redirectPath={`/${lang}/rider/messages`}
-                    size="sm"
-                    variant="outline"
-                  />
-                )}
+
+          <div className="flex items-center gap-3 pt-2">
+            <Phone className="h-5 w-5 text-muted-foreground" />
+            <div className="flex-grow flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">{order.user?.phone}</p>
+                <a href={`tel:${order.user?.phone}`} className="text-sm text-primary underline">
+                  {isBn ? 'কল করুন' : 'Call Customer'}
+                </a>
               </div>
+              {order.user?.id && (
+                <StartChatButton
+                  participantId={order.user.id}
+                  lang={lang}
+                  referenceId={order.id}
+                  referenceType="DELIVERY"
+                  buttonText={isBn ? 'মেসেজ দিন' : 'Message'}
+                  redirectPath={`/${lang}/rider/messages`}
+                  size="sm"
+                  variant="outline"
+                />
+              )}
             </div>
-          </CardContent>
+          </div>
+        </CardContent>
       </Card>
 
       <Card>
@@ -185,7 +218,9 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             {order.items?.map((item) => (
               <li key={item.id} className="flex justify-between text-sm">
                 <span className="text-muted-foreground line-clamp-1">
-                  {item.quantity}x {item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn}
+                  {item.quantity}x{' '}
+                  {item.sellerProduct?.productVariant?.nameEn ||
+                    item.sellerProduct?.productVariant?.product?.nameEn}
                 </span>
               </li>
             ))}
@@ -195,7 +230,9 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             <span>৳{Number(order.total).toFixed(2)}</span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {isBn ? 'পেমেন্ট মেথড:' : 'Payment Method:'} <span className="uppercase font-medium text-foreground">{order.paymentMethod}</span> ({order.paymentStatus})
+            {isBn ? 'পেমেন্ট মেথড:' : 'Payment Method:'}{' '}
+            <span className="uppercase font-medium text-foreground">{order.paymentMethod}</span> (
+            {order.paymentStatus})
           </p>
         </CardContent>
       </Card>
@@ -216,9 +253,9 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
                 </div>
               )}
               {currentLat && currentLng ? (
-                <LiveTrackingMap 
-                  riderLat={currentLat} 
-                  riderLng={currentLng} 
+                <LiveTrackingMap
+                  riderLat={currentLat}
+                  riderLng={currentLng}
                   customerLat={Number(order.address?.lat) || undefined}
                   customerLng={Number(order.address?.lng) || undefined}
                 />
@@ -226,7 +263,9 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
                 <div className="w-full h-full flex items-center justify-center bg-muted/20">
                   <div className="flex flex-col items-center text-muted-foreground animate-pulse">
                     <MapPin className="h-8 w-8 mb-2" />
-                    <span className="text-sm">{isBn ? 'লোকেশন লোড হচ্ছে...' : 'Getting GPS Location...'}</span>
+                    <span className="text-sm">
+                      {isBn ? 'লোকেশন লোড হচ্ছে...' : 'Getting GPS Location...'}
+                    </span>
                   </div>
                 </div>
               )}
@@ -235,8 +274,8 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
         )}
 
         {delivery.status === DeliveryStatus.ASSIGNED && (
-          <Button 
-            className="w-full h-12 text-lg" 
+          <Button
+            className="w-full h-12 text-lg"
             onClick={() => handleUpdateStatus(DeliveryStatus.ACCEPTED)}
             disabled={isUpdating}
           >
@@ -244,10 +283,10 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             {isBn ? 'অ্যাক্সেপ্ট করুন' : 'Accept Assignment'}
           </Button>
         )}
-        
+
         {delivery.status === DeliveryStatus.ACCEPTED && (
-          <Button 
-            className="w-full h-12 text-lg" 
+          <Button
+            className="w-full h-12 text-lg"
             onClick={() => handleUpdateStatus(DeliveryStatus.PICKED_UP)}
             disabled={isUpdating}
           >
@@ -257,8 +296,8 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
         )}
 
         {delivery.status === DeliveryStatus.PICKED_UP && (
-          <Button 
-            className="w-full h-12 text-lg" 
+          <Button
+            className="w-full h-12 text-lg"
             onClick={() => handleUpdateStatus(DeliveryStatus.OUT_FOR_DELIVERY)}
             disabled={isUpdating}
           >
@@ -269,16 +308,16 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
 
         {delivery.status === DeliveryStatus.OUT_FOR_DELIVERY && (
           <div className="space-y-3">
-            <Button 
-              className="w-full h-14 text-lg rounded-xl shadow-xs" 
+            <Button
+              className="w-full h-14 text-lg rounded-xl shadow-xs"
               onClick={() => handleUpdateStatus(DeliveryStatus.DELIVERED)}
               disabled={isUpdating}
             >
               <CheckCircle2 className="mr-2 h-6 w-6" />
               {isBn ? 'ডেলিভারি সম্পন্ন' : 'Mark as Delivered'}
             </Button>
-            <Button 
-              className="w-full rounded-xl" 
+            <Button
+              className="w-full rounded-xl"
               variant="destructive"
               onClick={() => setShowFailedConfirm(true)}
               disabled={isUpdating}

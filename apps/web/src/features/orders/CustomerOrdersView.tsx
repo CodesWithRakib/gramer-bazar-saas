@@ -21,8 +21,8 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
   const filterOrders = (statusGroup: string) => {
     if (!orders) return [];
     if (statusGroup === 'all') return orders;
-    
-    return orders.filter(order => {
+
+    return orders.filter((order) => {
       const status = order.status.toLowerCase();
       switch (statusGroup) {
         case 'to-pay':
@@ -30,7 +30,9 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
         case 'to-ship':
           return status === 'confirmed' || status === 'processing';
         case 'to-receive':
-          return status === 'shipped' || status === 'out_for_delivery' || status === 'ready_for_pickup';
+          return (
+            status === 'shipped' || status === 'out_for_delivery' || status === 'ready_for_pickup'
+          );
         case 'completed':
           return status === 'delivered' || status === 'picked_up';
         case 'cancelled':
@@ -80,38 +82,38 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="w-full overflow-x-auto hide-scrollbar border-b pb-[1px] mb-6">
           <TabsList className="w-max sm:w-full justify-start sm:justify-between bg-transparent h-auto p-0 rounded-none border-b-0 space-x-2 md:space-x-0">
-            <TabsTrigger 
-              value="all" 
+            <TabsTrigger
+              value="all"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
             >
               {isBn ? 'সব' : 'All Orders'}
             </TabsTrigger>
-            <TabsTrigger 
-              value="to-pay" 
+            <TabsTrigger
+              value="to-pay"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
             >
               {isBn ? 'পেমেন্ট বাকি' : 'To Pay'}
             </TabsTrigger>
-            <TabsTrigger 
-              value="to-ship" 
+            <TabsTrigger
+              value="to-ship"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
             >
               {isBn ? 'শিপিং বাকি' : 'To Ship'}
             </TabsTrigger>
-            <TabsTrigger 
-              value="to-receive" 
+            <TabsTrigger
+              value="to-receive"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
             >
               {isBn ? 'রিসিভ বাকি' : 'To Receive'}
             </TabsTrigger>
-            <TabsTrigger 
-              value="completed" 
+            <TabsTrigger
+              value="completed"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
             >
               {isBn ? 'সম্পন্ন' : 'Completed'}
             </TabsTrigger>
-            <TabsTrigger 
-              value="cancelled" 
+            <TabsTrigger
+              value="cancelled"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
             >
               {isBn ? 'বাতিল' : 'Cancelled'}
@@ -119,10 +121,13 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
           </TabsList>
         </div>
 
-        <TabsContent value={activeTab} className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+        <TabsContent
+          value={activeTab}
+          className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+        >
           {filteredOrders.length > 0 ? (
             <div className="space-y-4">
-              {filteredOrders.map(order => (
+              {filteredOrders.map((order) => (
                 <OrderCard key={order.id} order={order} lang={lang} />
               ))}
             </div>
@@ -133,8 +138,8 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
                 {isBn ? 'কোনো অর্ডার পাওয়া যায়নি' : 'No orders found'}
               </h3>
               <p className="text-muted-foreground mb-6">
-                {isBn 
-                  ? 'এই বিভাগে আপনার কোনো অর্ডার নেই।' 
+                {isBn
+                  ? 'এই বিভাগে আপনার কোনো অর্ডার নেই।'
                   : "You don't have any orders in this category yet."}
               </p>
               <Button asChild>

@@ -14,7 +14,10 @@ export interface CustomerProductRequestDetailsViewProps {
   id: string;
 }
 
-export function CustomerProductRequestDetailsView({ lang = 'en', id }: CustomerProductRequestDetailsViewProps) {
+export function CustomerProductRequestDetailsView({
+  lang = 'en',
+  id,
+}: CustomerProductRequestDetailsViewProps) {
   const isBn = lang === 'bn';
   const { data: request, isLoading, isError } = useGetCustomerProductRequestByIdQuery(id);
 
@@ -23,26 +26,40 @@ export function CustomerProductRequestDetailsView({ lang = 'en', id }: CustomerP
   }
 
   if (isError || !request) {
-    return <div className="container py-8 text-center text-red-500">{isBn ? 'অনুরোধ খুঁজে পাওয়া যায়নি' : 'Request not found'}</div>;
+    return (
+      <div className="container py-8 text-center text-red-500">
+        {isBn ? 'অনুরোধ খুঁজে পাওয়া যায়নি' : 'Request not found'}
+      </div>
+    );
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PENDING': return 'bg-yellow-500';
-      case 'REVIEWING': return 'bg-blue-500';
-      case 'SEARCHING': return 'bg-purple-500';
-      case 'FOUND': return 'bg-orange-500';
+      case 'PENDING':
+        return 'bg-yellow-500';
+      case 'REVIEWING':
+        return 'bg-blue-500';
+      case 'SEARCHING':
+        return 'bg-purple-500';
+      case 'FOUND':
+        return 'bg-orange-500';
       case 'PRODUCT_ADDED':
-      case 'CUSTOMER_NOTIFIED': return 'bg-green-500';
+      case 'CUSTOMER_NOTIFIED':
+        return 'bg-green-500';
       case 'CLOSED':
-      case 'REJECTED': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case 'REJECTED':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
     }
   };
 
   return (
     <div className="w-full space-y-6">
-      <Link href={`/${lang}/customer/product-requests`} className="flex items-center text-sm text-primary hover:underline">
+      <Link
+        href={`/${lang}/customer/product-requests`}
+        className="flex items-center text-sm text-primary hover:underline"
+      >
         <ArrowLeft className="h-4 w-4 mr-1" />
         {isBn ? 'অনুরোধ তালিকায় ফিরে যান' : 'Back to Requests'}
       </Link>
@@ -52,7 +69,9 @@ export function CustomerProductRequestDetailsView({ lang = 'en', id }: CustomerP
           <h1 className="text-2xl font-bold">{request.requestedProductName}</h1>
           <p className="text-sm text-muted-foreground">ID: {request.id}</p>
         </div>
-        <Badge className={`${getStatusColor(request.status)} text-white hover:${getStatusColor(request.status)}`}>
+        <Badge
+          className={`${getStatusColor(request.status)} text-white hover:${getStatusColor(request.status)}`}
+        >
           {request.status}
         </Badge>
       </div>
@@ -69,8 +88,14 @@ export function CustomerProductRequestDetailsView({ lang = 'en', id }: CustomerP
                 {request.statusHistory?.map((history, index) => (
                   <div key={history.id} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className={`h-8 w-8 rounded-full flex items-center justify-center ${index === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                        {index === 0 ? <CheckCircle2 className="h-5 w-5" /> : <div className="h-2 w-2 rounded-full bg-current" />}
+                      <div
+                        className={`h-8 w-8 rounded-full flex items-center justify-center ${index === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
+                      >
+                        {index === 0 ? (
+                          <CheckCircle2 className="h-5 w-5" />
+                        ) : (
+                          <div className="h-2 w-2 rounded-full bg-current" />
+                        )}
                       </div>
                       {index !== (request.statusHistory?.length || 1) - 1 && (
                         <div className="w-0.5 h-full bg-border my-1" />
@@ -102,11 +127,18 @@ export function CustomerProductRequestDetailsView({ lang = 'en', id }: CustomerP
             <CardContent className="space-y-4 text-sm">
               <div>
                 <p className="text-muted-foreground">{isBn ? 'বিবরণ' : 'Description'}</p>
-                <p className="font-medium">{request.description || (isBn ? 'কোনো বিবরণ নেই' : 'No description provided')}</p>
+                <p className="font-medium">
+                  {request.description || (isBn ? 'কোনো বিবরণ নেই' : 'No description provided')}
+                </p>
               </div>
               <div>
-                <p className="text-muted-foreground">{isBn ? 'অন্যান্য তথ্য' : 'Preferred Information'}</p>
-                <p className="font-medium">{request.preferredInformation || (isBn ? 'কোনো তথ্য নেই' : 'No preferred information')}</p>
+                <p className="text-muted-foreground">
+                  {isBn ? 'অন্যান্য তথ্য' : 'Preferred Information'}
+                </p>
+                <p className="font-medium">
+                  {request.preferredInformation ||
+                    (isBn ? 'কোনো তথ্য নেই' : 'No preferred information')}
+                </p>
               </div>
             </CardContent>
             {request.linkedProductId && (

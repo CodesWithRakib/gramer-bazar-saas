@@ -49,13 +49,16 @@ export default function CategoryDetailsPage({
   }
 
   // Filters from URL
-  const subCategorySlugParam = searchParams.get('subCategory') || searchParams.get('subCategorySlug') || undefined;
+  const subCategorySlugParam =
+    searchParams.get('subCategory') || searchParams.get('subCategorySlug') || undefined;
   const subCategoryId = searchParams.get('subCategoryId') || undefined;
   const brandId = searchParams.get('brandId') || undefined;
   const minPrice = searchParams.get('minPrice');
   const maxPrice = searchParams.get('maxPrice');
   const inStock = searchParams.get('inStock') === 'true' ? true : undefined;
-  const minRating = searchParams.get('minRating') ? Number(searchParams.get('minRating')) : undefined;
+  const minRating = searchParams.get('minRating')
+    ? Number(searchParams.get('minRating'))
+    : undefined;
   const sort = searchParams.get('sort') || 'newest';
   const page = parseInt(searchParams.get('page') || '1', 10);
 
@@ -117,13 +120,21 @@ export default function CategoryDetailsPage({
   }
 
   const categoryName = isBn ? category.nameBn : category.nameEn;
-  const categoryDesc = isBn ? category.descriptionBn || category.descriptionEn : category.descriptionEn;
+  const categoryDesc = isBn
+    ? category.descriptionBn || category.descriptionEn
+    : category.descriptionEn;
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-10 max-w-7xl">
       {/* Breadcrumb Navigation (Phase 15) */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
-        <Link href={`/${lang}`} className="hover:text-primary transition-colors flex items-center gap-1">
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6"
+      >
+        <Link
+          href={`/${lang}`}
+          className="hover:text-primary transition-colors flex items-center gap-1"
+        >
           <Home className="h-3.5 w-3.5" />
           <span>{isBn ? 'হোম' : 'Home'}</span>
         </Link>
@@ -163,10 +174,12 @@ export default function CategoryDetailsPage({
                 )}
                 <p className="text-xs text-muted-foreground mt-1 font-medium">
                   {isProductsLoading
-                    ? (isBn ? 'লোড হচ্ছে...' : 'Loading products...')
-                    : (isBn
-                        ? `${meta?.total || 0} টি পণ্য পাওয়া গেছে`
-                        : `${meta?.total || 0} products available`)}
+                    ? isBn
+                      ? 'লোড হচ্ছে...'
+                      : 'Loading products...'
+                    : isBn
+                      ? `${meta?.total || 0} টি পণ্য পাওয়া গেছে`
+                      : `${meta?.total || 0} products available`}
                 </p>
               </div>
             </div>
@@ -190,20 +203,20 @@ export default function CategoryDetailsPage({
               <Link
                 href={`/${lang}/categories/${category.slug}`}
                 className={cn(
-                  "px-4 py-2 rounded-2xl text-xs md:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2",
+                  'px-4 py-2 rounded-2xl text-xs md:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2',
                   !subCategorySlugParam
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80"
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80'
                 )}
               >
                 <span>{isBn ? `সব ${categoryName}` : `All ${categoryName}`}</span>
                 {category.productCount !== undefined && category.productCount > 0 && (
                   <span
                     className={cn(
-                      "text-[11px] px-2 py-0.5 rounded-full font-bold",
+                      'text-[11px] px-2 py-0.5 rounded-full font-bold',
                       !subCategorySlugParam
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
+                        ? 'bg-primary-foreground/20 text-primary-foreground'
+                        : 'bg-muted text-muted-foreground'
                     )}
                   >
                     {category.productCount}
@@ -218,10 +231,10 @@ export default function CategoryDetailsPage({
                     key={sub.id}
                     href={`/${lang}/categories/${category.slug}/${sub.slug}`}
                     className={cn(
-                      "px-4 py-2 rounded-2xl text-xs md:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+                      'px-4 py-2 rounded-2xl text-xs md:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2',
                       isSelected
-                        ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                        : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80"
+                        ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                        : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80'
                     )}
                   >
                     {sub.icon && <span className="text-sm">{sub.icon}</span>}
@@ -229,10 +242,10 @@ export default function CategoryDetailsPage({
                     {sub.productCount !== undefined && sub.productCount > 0 && (
                       <span
                         className={cn(
-                          "text-[11px] px-2 py-0.5 rounded-full font-bold",
+                          'text-[11px] px-2 py-0.5 rounded-full font-bold',
                           isSelected
-                            ? "bg-primary-foreground/20 text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
+                            ? 'bg-primary-foreground/20 text-primary-foreground'
+                            : 'bg-muted text-muted-foreground'
                         )}
                       >
                         {sub.productCount}
@@ -249,7 +262,9 @@ export default function CategoryDetailsPage({
             <div className="text-center py-16 px-4 bg-card rounded-2xl border border-dashed border-border/80">
               <PackageSearch className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
               <h3 className="text-lg font-bold mb-2 text-foreground">
-                {isBn ? 'এই ক্যাটাগরিতে বর্তমানে কোনো পণ্য নেই' : 'No products available in this category yet'}
+                {isBn
+                  ? 'এই ক্যাটাগরিতে বর্তমানে কোনো পণ্য নেই'
+                  : 'No products available in this category yet'}
               </h3>
               <p className="text-muted-foreground text-xs md:text-sm max-w-md mx-auto mb-6">
                 {isBn
@@ -264,7 +279,11 @@ export default function CategoryDetailsPage({
             </div>
           ) : (
             <>
-              <ProductGrid products={productsData?.data} isLoading={isProductsLoading} lang={lang} />
+              <ProductGrid
+                products={productsData?.data}
+                isLoading={isProductsLoading}
+                lang={lang}
+              />
 
               {/* Server-side Pagination */}
               {meta && meta.totalPages > 1 && (

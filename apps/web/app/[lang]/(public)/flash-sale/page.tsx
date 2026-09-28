@@ -36,7 +36,9 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
       <div className="container max-w-7xl mx-auto px-4 py-16">
         <EmptyState
           icon={<Flame className="w-8 h-8 text-primary" />}
-          title={isBn ? 'এই মুহূর্তে কোনো ফ্ল্যাশ সেল সক্রিয় নেই' : 'No Active Flash Sales Right Now'}
+          title={
+            isBn ? 'এই মুহূর্তে কোনো ফ্ল্যাশ সেল সক্রিয় নেই' : 'No Active Flash Sales Right Now'
+          }
           description={
             isBn
               ? 'আমাদের পরবর্তী ফ্ল্যাশ সেল শুরু হলে দেখতে পাবেন। অন্যান্য ডিসকাউন্ট ও অফার দেখতে শপ ব্রাউজ করুন।'
@@ -56,13 +58,12 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
       {flashSales.map((sale) => (
         <div key={sale.id} className="space-y-6">
           {/* Flash Sale Hero Banner */}
-          <div className="relative rounded-2xl overflow-hidden shadow-md bg-gradient-to-r from-primary via-primary/95 to-primary/85 text-primary-foreground p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative rounded-2xl overflow-hidden shadow-md bg-primary text-primary-foreground p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
             {sale.bannerImage && (
               <div className="absolute inset-0 opacity-20 pointer-events-none">
                 <CustomImage src={sale.bannerImage} alt={sale.name} fill className="object-cover" />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
 
             <div className="relative z-10 flex items-center gap-4 text-center md:text-left">
               <div className="bg-primary-foreground/15 p-3.5 rounded-2xl backdrop-blur-md shrink-0 shadow-xs">
@@ -71,7 +72,10 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl md:text-3xl font-extrabold">{sale.name}</h1>
-                  <Badge variant="secondary" className="bg-primary-foreground text-primary font-bold text-xs">
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary-foreground text-primary font-bold text-xs"
+                  >
                     {isBn ? 'লাইভ অফার' : 'LIVE DEAL'}
                   </Badge>
                 </div>
@@ -114,13 +118,17 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
                     <div className="mt-2 px-1">
                       <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-orange-500 to-red-600 h-1.5 rounded-full"
+                          className="bg-orange-600 h-1.5 rounded-full"
                           style={{ width: `${soldPercent}%` }}
                         />
                       </div>
                       <div className="flex justify-between items-center mt-1 text-[10px] text-muted-foreground font-medium">
-                        <span>{isBn ? 'বিক্রি' : 'Sold'}: {item.quantitySold}</span>
-                        <span>{isBn ? 'অবশিষ্ট' : 'Left'}: {item.quantityAvailable}</span>
+                        <span>
+                          {isBn ? 'বিক্রি' : 'Sold'}: {item.quantitySold}
+                        </span>
+                        <span>
+                          {isBn ? 'অবশিষ্ট' : 'Left'}: {item.quantityAvailable}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -130,7 +138,11 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
           ) : (
             <div className="text-center py-12 bg-muted/20 rounded-2xl border border-dashed text-muted-foreground flex flex-col items-center gap-2">
               <PackageX className="w-8 h-8 text-muted-foreground/40" />
-              <span>{isBn ? 'এই সেলে বর্তমানে কোনো পণ্য অন্তর্ভুক্ত নেই' : 'No items listed in this sale'}</span>
+              <span>
+                {isBn
+                  ? 'এই সেলে বর্তমানে কোনো পণ্য অন্তর্ভুক্ত নেই'
+                  : 'No items listed in this sale'}
+              </span>
             </div>
           )}
         </div>

@@ -26,13 +26,22 @@ export class BrandsService {
     return this.brandsRepository.save(brand);
   }
 
-  async findAll(page?: number, limit?: number, search?: string, categoryId?: string, isActive?: boolean) {
-    const query = this.brandsRepository.createQueryBuilder('brand')
+  async findAll(
+    page?: number,
+    limit?: number,
+    search?: string,
+    categoryId?: string,
+    isActive?: boolean,
+  ) {
+    const query = this.brandsRepository
+      .createQueryBuilder('brand')
       .leftJoinAndSelect('brand.categories', 'category')
       .orderBy('brand.nameEn', 'ASC');
 
     if (search) {
-      query.andWhere('(brand.nameEn ILIKE :search OR brand.nameBn ILIKE :search)', { search: `%${search}%` });
+      query.andWhere('(brand.nameEn ILIKE :search OR brand.nameBn ILIKE :search)', {
+        search: `%${search}%`,
+      });
     }
 
     if (categoryId) {
@@ -75,7 +84,8 @@ export class BrandsService {
   }
 
   async findByCategory(categoryId: string): Promise<Brand[]> {
-    return this.brandsRepository.createQueryBuilder('brand')
+    return this.brandsRepository
+      .createQueryBuilder('brand')
       .innerJoin('brand.categories', 'category')
       .where('(category.id = :categoryId OR category.slug = :categoryId)', { categoryId })
       .andWhere('brand.isActive = true')

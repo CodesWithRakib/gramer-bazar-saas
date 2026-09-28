@@ -4,7 +4,11 @@ import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NotificationsService } from './notifications.service.js';
-import { Notification, NotificationType, NotificationPriority } from './entities/notification.entity.js';
+import {
+  Notification,
+  NotificationType,
+  NotificationPriority,
+} from './entities/notification.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 
@@ -17,7 +21,13 @@ describe('NotificationsService', () => {
   beforeEach(async () => {
     mockNotificationRepo = {
       create: vi.fn((dto) => ({ ...dto, id: 'notif-1', isRead: false, createdAt: new Date() })),
-      save: vi.fn((entity) => Promise.resolve(Array.isArray(entity) ? entity : { ...entity, id: entity.id || 'notif-1', createdAt: new Date() })),
+      save: vi.fn((entity) =>
+        Promise.resolve(
+          Array.isArray(entity)
+            ? entity
+            : { ...entity, id: entity.id || 'notif-1', createdAt: new Date() },
+        ),
+      ),
       find: vi.fn().mockResolvedValue([]),
       count: vi.fn().mockResolvedValue(3),
       findOne: vi.fn(),

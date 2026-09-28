@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Delivery } from './entities/delivery.entity.js';
@@ -11,11 +7,7 @@ import { Order } from '../orders/entities/order.entity.js';
 import { OrderStatusHistory } from '../orders/entities/order-status-history.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { DeliveryStatus } from './enums/delivery-status.enum.js';
-import {
-  OrderStatus,
-  PaymentStatus,
-  PaymentMethod,
-} from '../orders/enums/order-status.enum.js';
+import { OrderStatus, PaymentStatus, PaymentMethod } from '../orders/enums/order-status.enum.js';
 import {
   Notification,
   NotificationType,
@@ -137,8 +129,7 @@ export class DeliveriesService {
       // Notifications for the rider and customer
       const orderShortId = order.id.slice(0, 8).toUpperCase();
       const riderFullName =
-        `${rider.firstName || ''} ${rider.lastName || ''}`.trim() ||
-        'Delivery Rider';
+        `${rider.firstName || ''} ${rider.lastName || ''}`.trim() || 'Delivery Rider';
 
       void this.notificationsService.notifyUser(rider.id, {
         type: NotificationType.DELIVERY_ASSIGNED,
@@ -190,19 +181,13 @@ export class DeliveriesService {
       order: { updatedAt: 'DESC' },
     });
 
-    const assignedCount = deliveries.filter(
-      (d) => d.status === DeliveryStatus.ASSIGNED,
-    ).length;
+    const assignedCount = deliveries.filter((d) => d.status === DeliveryStatus.ASSIGNED).length;
     const activeCount = deliveries.filter((d) =>
-      [
-        DeliveryStatus.ACCEPTED,
-        DeliveryStatus.PICKED_UP,
-        DeliveryStatus.OUT_FOR_DELIVERY,
-      ].includes(d.status),
+      [DeliveryStatus.ACCEPTED, DeliveryStatus.PICKED_UP, DeliveryStatus.OUT_FOR_DELIVERY].includes(
+        d.status,
+      ),
     ).length;
-    const completedCount = deliveries.filter(
-      (d) => d.status === DeliveryStatus.DELIVERED,
-    ).length;
+    const completedCount = deliveries.filter((d) => d.status === DeliveryStatus.DELIVERED).length;
 
     const totalEarnings = deliveries
       .filter((d) => d.status === DeliveryStatus.DELIVERED)
@@ -256,8 +241,7 @@ export class DeliveriesService {
       ],
     });
 
-    if (!delivery)
-      throw new NotFoundException('Delivery not found or not assigned to you');
+    if (!delivery) throw new NotFoundException('Delivery not found or not assigned to you');
     return delivery;
   }
 
@@ -325,10 +309,7 @@ export class DeliveriesService {
         order.status = newOrderStatus;
 
         // Synchronize COD payment status
-        if (
-          newOrderStatus === OrderStatus.DELIVERED &&
-          order.paymentMethod === PaymentMethod.COD
-        ) {
+        if (newOrderStatus === OrderStatus.DELIVERED && order.paymentMethod === PaymentMethod.COD) {
           order.paymentStatus = PaymentStatus.PAID;
         }
 
@@ -402,28 +383,13 @@ export class DeliveriesService {
     });
   }
 
-  private validateStatusTransition(
-    current: DeliveryStatus,
-    next: DeliveryStatus,
-  ) {
+  private validateStatusTransition(current: DeliveryStatus, next: DeliveryStatus) {
     const transitions: Record<DeliveryStatus, DeliveryStatus[]> = {
       [DeliveryStatus.UNASSIGNED]: [DeliveryStatus.ASSIGNED],
-      [DeliveryStatus.ASSIGNED]: [
-        DeliveryStatus.ACCEPTED,
-        DeliveryStatus.CANCELLED,
-      ],
-      [DeliveryStatus.ACCEPTED]: [
-        DeliveryStatus.PICKED_UP,
-        DeliveryStatus.CANCELLED,
-      ],
-      [DeliveryStatus.PICKED_UP]: [
-        DeliveryStatus.OUT_FOR_DELIVERY,
-        DeliveryStatus.FAILED,
-      ],
-      [DeliveryStatus.OUT_FOR_DELIVERY]: [
-        DeliveryStatus.DELIVERED,
-        DeliveryStatus.FAILED,
-      ],
+      [DeliveryStatus.ASSIGNED]: [DeliveryStatus.ACCEPTED, DeliveryStatus.CANCELLED],
+      [DeliveryStatus.ACCEPTED]: [DeliveryStatus.PICKED_UP, DeliveryStatus.CANCELLED],
+      [DeliveryStatus.PICKED_UP]: [DeliveryStatus.OUT_FOR_DELIVERY, DeliveryStatus.FAILED],
+      [DeliveryStatus.OUT_FOR_DELIVERY]: [DeliveryStatus.DELIVERED, DeliveryStatus.FAILED],
       [DeliveryStatus.DELIVERED]: [],
       [DeliveryStatus.FAILED]: [],
       [DeliveryStatus.CANCELLED]: [],
@@ -431,28 +397,18 @@ export class DeliveriesService {
 
     const allowed = transitions[current] || [];
     if (!allowed.includes(next)) {
-      throw new BadRequestException(
-        `Cannot transition delivery from ${current} to ${next}`,
-      );
+      throw new BadRequestException(`Cannot transition delivery from ${current} to ${next}`);
     }
   }
 
-  async updateRiderLocation(
-    riderId: string,
-    id: string,
-    lat: number,
-    lng: number,
-  ) {
+  async updateRiderLocation(riderId: string, id: string, lat: number, lng: number) {
     const delivery = await this.deliveryRepository.findOne({
       where: { id, riderId },
     });
 
-    if (!delivery)
-      throw new NotFoundException('Delivery not found or not assigned to you');
+    if (!delivery) throw new NotFoundException('Delivery not found or not assigned to you');
     if (delivery.status !== DeliveryStatus.OUT_FOR_DELIVERY) {
-      throw new BadRequestException(
-        'Can only update location when OUT_FOR_DELIVERY',
-      );
+      throw new BadRequestException('Can only update location when OUT_FOR_DELIVERY');
     }
 
     delivery.currentLat = lat;
@@ -464,13 +420,9 @@ export class DeliveriesService {
     return {
       ...saved,
       currentLat:
-        saved.currentLat !== null
-          ? parseFloat(saved.currentLat as unknown as string)
-          : null,
+        saved.currentLat !== null ? parseFloat(saved.currentLat as unknown as string) : null,
       currentLng:
-        saved.currentLng !== null
-          ? parseFloat(saved.currentLng as unknown as string)
-          : null,
+        saved.currentLng !== null ? parseFloat(saved.currentLng as unknown as string) : null,
     };
   }
 

@@ -15,14 +15,14 @@ export const wishlistsApi = api.injectEndpoints({
       query: () => '/wishlists',
       providesTags: ['Wishlist'],
     }),
-    addProductToWishlist: builder.mutation<{ success: boolean, message: string }, string>({
+    addProductToWishlist: builder.mutation<{ success: boolean; message: string }, string>({
       query: (productId) => ({
         url: `/wishlists/${productId}`,
         method: 'POST',
       }),
       invalidatesTags: ['Wishlist'],
     }),
-    removeProductFromWishlist: builder.mutation<{ success: boolean, message: string }, string>({
+    removeProductFromWishlist: builder.mutation<{ success: boolean; message: string }, string>({
       query: (productId) => ({
         url: `/wishlists/${productId}`,
         method: 'DELETE',

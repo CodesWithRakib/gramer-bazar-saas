@@ -17,7 +17,13 @@ interface CouponInputProps {
   appliedCoupon: string | null;
 }
 
-export function CouponInput({ isBn, subtotal, onApply, onRemove, appliedCoupon }: CouponInputProps) {
+export function CouponInput({
+  isBn,
+  subtotal,
+  onApply,
+  onRemove,
+  appliedCoupon,
+}: CouponInputProps) {
   const [code, setCode] = useState('');
   const [validateCoupon, { isLoading }] = useValidateCouponMutation();
 
@@ -29,7 +35,10 @@ export function CouponInput({ isBn, subtotal, onApply, onRemove, appliedCoupon }
       onApply(result.discountAmount, result.code);
       toast.success(isBn ? 'কুপন সফলভাবে প্রয়োগ করা হয়েছে!' : 'Coupon applied successfully!');
     } catch (err) {
-      toast.error(getApiErrorMessage(err) || (isBn ? 'অকার্যকর বা মেয়াদোত্তীর্ণ কুপন' : 'Invalid or expired coupon'));
+      toast.error(
+        getApiErrorMessage(err) ||
+          (isBn ? 'অকার্যকর বা মেয়াদোত্তীর্ণ কুপন' : 'Invalid or expired coupon')
+      );
     }
   };
 
@@ -38,11 +47,13 @@ export function CouponInput({ isBn, subtotal, onApply, onRemove, appliedCoupon }
       <div className="flex items-center justify-between bg-green-50/50 border border-green-200 p-3 rounded-md">
         <div className="flex items-center gap-2 text-green-700">
           <CheckCircle2 className="h-5 w-5" />
-          <span className="font-medium">{appliedCoupon} {isBn ? 'প্রয়োগ করা হয়েছে' : 'Applied'}</span>
+          <span className="font-medium">
+            {appliedCoupon} {isBn ? 'প্রয়োগ করা হয়েছে' : 'Applied'}
+          </span>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onRemove}
           className="text-red-500 hover:text-red-600 hover:bg-red-50"
         >
@@ -72,12 +83,8 @@ export function CouponInput({ isBn, subtotal, onApply, onRemove, appliedCoupon }
           }}
         />
       </div>
-      <Button 
-        onClick={handleApply} 
-        disabled={isLoading || !code.trim()}
-        variant="secondary"
-      >
-        {isLoading ? (isBn ? 'যাচাই...' : 'Checking...') : (isBn ? 'প্রয়োগ করুন' : 'Apply')}
+      <Button onClick={handleApply} disabled={isLoading || !code.trim()} variant="secondary">
+        {isLoading ? (isBn ? 'যাচাই...' : 'Checking...') : isBn ? 'প্রয়োগ করুন' : 'Apply'}
       </Button>
     </div>
   );

@@ -43,7 +43,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
   const { data: disputes = [], isLoading: isDisputesLoading } = useGetCustomerDisputesQuery();
 
   const activeOrders = orders.filter(
-    (o) => !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(o.status.toUpperCase()),
+    (o) => !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(o.status.toUpperCase())
   );
 
   const hubCards = [
@@ -69,10 +69,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'আপনার পছন্দের পণ্যসমূহ সংরক্ষণ ও দ্রুত কিনুন',
       icon: Heart,
       href: `/${lang}/customer/wishlist`,
-      badge:
-        wishlist.length > 0
-          ? `${wishlist.length} ${isBn ? 'পণ্য' : 'Items'}`
-          : undefined,
+      badge: wishlist.length > 0 ? `${wishlist.length} ${isBn ? 'পণ্য' : 'Items'}` : undefined,
       badgeVariant: 'secondary' as const,
     },
     {
@@ -83,10 +80,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'বাসা, অফিস ও গ্রামের ডেলিভারি ঠিকানা যুক্ত ও পরিবর্তন করুন',
       icon: MapPin,
       href: `/${lang}/customer/addresses`,
-      badge:
-        addresses.length > 0
-          ? `${addresses.length} ${isBn ? 'ঠিকানা' : 'Saved'}`
-          : undefined,
+      badge: addresses.length > 0 ? `${addresses.length} ${isBn ? 'ঠিকানা' : 'Saved'}` : undefined,
       badgeVariant: 'secondary' as const,
     },
     {
@@ -255,7 +249,10 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
                       </div>
                       <div className="flex items-center gap-1.5">
                         {card.badge && (
-                          <Badge variant={card.badgeVariant} className="text-[10px] h-4 px-1.5 font-medium">
+                          <Badge
+                            variant={card.badgeVariant}
+                            className="text-[10px] h-4 px-1.5 font-medium"
+                          >
                             {card.badge}
                           </Badge>
                         )}

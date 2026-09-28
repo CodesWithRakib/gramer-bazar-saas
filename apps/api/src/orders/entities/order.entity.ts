@@ -11,11 +11,7 @@ import {
   type Relation,
 } from 'typeorm';
 
-import {
-  OrderStatus,
-  PaymentMethod,
-  PaymentStatus,
-} from '../enums/order-status.enum.js';
+import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/order-status.enum.js';
 import { OrderItem } from './order-item.entity.js';
 import { OrderStatusHistory } from './order-status-history.entity.js';
 import { User } from '../../users/entities/user.entity.js';

@@ -11,13 +11,7 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { BrandsService } from './brands.service.js';
 import { CreateBrandDto } from '../dto/create-brand.dto.js';
 import { UpdateBrandDto } from '../dto/update-brand.dto.js';
@@ -85,13 +79,7 @@ export class BrandsController {
     @Query('categoryId') categoryId?: string,
     @Query('isActive') isActive?: boolean,
   ) {
-    return this.brandsService.findAll(
-      page,
-      limit,
-      search,
-      categoryId,
-      isActive,
-    );
+    return this.brandsService.findAll(page, limit, search, categoryId, isActive);
   }
 
   @Get('by-category/:categoryId')
@@ -159,10 +147,7 @@ export class BrandsController {
     description: 'Brand updated successfully',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateBrandDto: UpdateBrandDto,
-  ) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateBrandDto: UpdateBrandDto) {
     return this.brandsService.update(id, updateBrandDto);
   }
 
@@ -172,8 +157,7 @@ export class BrandsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Delete a brand (Admin only)',
-    description:
-      'Requires ADMIN or SUPER_ADMIN role. Removes brand from directory.',
+    description: 'Requires ADMIN or SUPER_ADMIN role. Removes brand from directory.',
   })
   @ApiParam({
     name: 'id',

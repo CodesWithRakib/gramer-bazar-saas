@@ -1,13 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import { store, RootState } from "./store";
-import {
-  hydrateCart,
-  loadCartFromStorage,
-  saveCartToStorage,
-} from "./slices/cartSlice";
+import { useEffect } from 'react';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { store, RootState } from './store';
+import { hydrateCart, loadCartFromStorage, saveCartToStorage } from './slices/cartSlice';
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
@@ -16,7 +12,7 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
   // Mark hydration completion once mounted (used by E2E tests to avoid
   // interacting with the SSR page before React state is live).
   useEffect(() => {
-    document.documentElement.dataset.hydrated = "true";
+    document.documentElement.dataset.hydrated = 'true';
   }, []);
 
   // Hydrate the persisted cart once on mount (client only).

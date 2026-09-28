@@ -1,9 +1,9 @@
-import { AdminDisputeDetailsView } from "@/features/admin/disputes";
+import { AdminDisputeDetailsView } from '@/features/admin/disputes';
 
 export default async function AdminDisputeDetailsPage({
   params,
 }: {
-  params: Promise<{ lang: "ar" | "en"; id: string }>;
+  params: Promise<{ lang: string; id: string }>;
 }) {
   const { lang, id } = await params;
   return <AdminDisputeDetailsView lang={lang} id={id} />;

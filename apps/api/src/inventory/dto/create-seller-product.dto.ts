@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsUUID, IsNumber, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  IsUUID,
+  IsNumber,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateSellerProductDto {
@@ -28,7 +36,9 @@ export class CreateSellerProductDto {
   @IsString()
   sellerSku?: string;
 
-  @ApiPropertyOptional({ description: 'Whether the product is approved for regulated categories (Admin only)' })
+  @ApiPropertyOptional({
+    description: 'Whether the product is approved for regulated categories (Admin only)',
+  })
   @IsOptional()
   @IsBoolean()
   isRegulatedApproved?: boolean;

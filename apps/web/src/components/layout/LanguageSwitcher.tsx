@@ -1,36 +1,36 @@
-"use client";
+'use client';
 
-import React from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Globe, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Globe, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { locales, Locale } from "@/config/i18n";
+} from '@/components/ui/dropdown-menu';
+import { locales, Locale } from '@/config/i18n';
 
 interface LanguageSwitcherProps {
   currentLocale: string;
-  variant?: "default" | "ghost" | "outline";
-  size?: "default" | "sm" | "lg" | "icon";
+  variant?: 'default' | 'ghost' | 'outline';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
   showLabel?: boolean;
 }
 
 const LANGUAGES = [
-  { code: "bn", label: "বাংলা", shortLabel: "বাং", flag: "🇧🇩" },
-  { code: "en", label: "English", shortLabel: "EN", flag: "🇬🇧" },
+  { code: 'bn', label: 'বাংলা', shortLabel: 'বাং', flag: '🇧🇩' },
+  { code: 'en', label: 'English', shortLabel: 'EN', flag: '🇬🇧' },
 ];
 
 function persistLocalePreference(newLocale: string) {
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
     document.documentElement.lang = newLocale;
     try {
-      localStorage.setItem("gb_locale", newLocale);
+      localStorage.setItem('gb_locale', newLocale);
     } catch {
       // Ignore
     }
@@ -39,17 +39,16 @@ function persistLocalePreference(newLocale: string) {
 
 export function LanguageSwitcher({
   currentLocale,
-  variant = "ghost",
-  size = "sm",
-  className = "",
+  variant = 'ghost',
+  size = 'sm',
+  className = '',
   showLabel = true,
 }: LanguageSwitcherProps) {
   const router = useRouter();
-  const pathname = usePathname() || "";
+  const pathname = usePathname() || '';
   const searchParams = useSearchParams();
 
-  const activeLang =
-    LANGUAGES.find((l) => l.code === currentLocale) || LANGUAGES[0];
+  const activeLang = LANGUAGES.find((l) => l.code === currentLocale) || LANGUAGES[0];
 
   const handleLocaleChange = (newLocale: string) => {
     if (newLocale === currentLocale) return;
@@ -59,12 +58,12 @@ export function LanguageSwitcher({
 
     // 2. Compute target pathname preserving exact route namespace, dynamic slugs, and sub-paths
     let targetPath = pathname;
-    const segments = pathname.split("/");
+    const segments = pathname.split('/');
     if (segments.length > 1 && locales.includes(segments[1] as Locale)) {
       segments[1] = newLocale;
-      targetPath = segments.join("/");
+      targetPath = segments.join('/');
     } else {
-      targetPath = `/${newLocale}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+      targetPath = `/${newLocale}${pathname.startsWith('/') ? pathname : `/${pathname}`}`;
     }
 
     // 5. Retain all existing URL search parameters (filters, pagination, tabs, query, etc.)
@@ -86,16 +85,11 @@ export function LanguageSwitcher({
         >
           <Globe className="h-4 w-4 opacity-80 shrink-0" />
           {showLabel && (
-            <span className="text-xs uppercase font-semibold">
-              {activeLang.shortLabel}
-            </span>
+            <span className="text-xs uppercase font-semibold">{activeLang.shortLabel}</span>
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="w-36 p-1 rounded-xl shadow-lg border-muted"
-      >
+      <DropdownMenuContent align="end" className="w-36 p-1 rounded-xl shadow-lg border-muted">
         {LANGUAGES.map((lang) => {
           const isSelected = lang.code === currentLocale;
           return (
@@ -103,7 +97,7 @@ export function LanguageSwitcher({
               key={lang.code}
               onClick={() => handleLocaleChange(lang.code)}
               className={`flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer ${
-                isSelected ? "bg-primary/10 text-primary font-semibold" : ""
+                isSelected ? 'bg-primary/10 text-primary font-semibold' : ''
               }`}
             >
               <span className="flex items-center gap-2">

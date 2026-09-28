@@ -18,8 +18,7 @@ export class WsJwtGuard implements CanActivate {
       }
 
       const rawToken: unknown =
-        client.handshake.auth?.token ||
-        client.handshake.headers?.authorization;
+        client.handshake.auth?.token || client.handshake.headers?.authorization;
 
       let authToken: string | null = null;
       if (typeof rawToken === 'string') {
@@ -41,7 +40,7 @@ export class WsJwtGuard implements CanActivate {
           authToken = match[1];
         }
       }
-      
+
       if (!authToken) {
         return false;
       }
@@ -52,7 +51,7 @@ export class WsJwtGuard implements CanActivate {
           'super-secret-key-for-dev-only',
         ),
       });
-      
+
       client.user = payload;
       return true;
     } catch (err) {

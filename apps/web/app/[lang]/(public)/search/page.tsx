@@ -1,36 +1,38 @@
-"use client";
+'use client';
 
-import React, {  useState, Suspense, use } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import React, { useState, Suspense, use } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
   useSearchProductsQuery,
   useGetPublicCategoriesQuery,
   useGetPublicBrandsQuery,
-} from "@/features/catalog/catalogApi";
-import { ProductGrid } from "@/components/catalog/ProductGrid";
-import { ProductRequestModal } from "@/components/catalog/ProductRequestModal";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ProductFilterSidebar } from "@/components/catalog/ProductFilterSidebar";
-import { ProductSortSelect } from "@/components/catalog/ProductSortSelect";
-import { Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+} from '@/features/catalog/catalogApi';
+import { ProductGrid } from '@/components/catalog/ProductGrid';
+import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
+import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
+import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function SearchPageContent({ lang }: { lang: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
-  const q = searchParams.get("q") || "";
-  const categoryId = searchParams.get("categoryId") || "";
-  const categorySlug = searchParams.get("categorySlug") || "";
-  const brandId = searchParams.get("brandId") || "";
-  const sort = searchParams.get("sort") || "newest";
-  const minPrice = searchParams.get("minPrice") || "";
-  const maxPrice = searchParams.get("maxPrice") || "";
-  const inStock = searchParams.get("inStock") === "true" ? true : undefined;
-  const minRating = searchParams.get("minRating") ? Number(searchParams.get("minRating")) : undefined;
-  const page = parseInt(searchParams.get("page") || "1", 10);
+  const q = searchParams.get('q') || '';
+  const categoryId = searchParams.get('categoryId') || '';
+  const categorySlug = searchParams.get('categorySlug') || '';
+  const brandId = searchParams.get('brandId') || '';
+  const sort = searchParams.get('sort') || 'newest';
+  const minPrice = searchParams.get('minPrice') || '';
+  const maxPrice = searchParams.get('maxPrice') || '';
+  const inStock = searchParams.get('inStock') === 'true' ? true : undefined;
+  const minRating = searchParams.get('minRating')
+    ? Number(searchParams.get('minRating'))
+    : undefined;
+  const page = parseInt(searchParams.get('page') || '1', 10);
 
   const { data: categories } = useGetPublicCategoriesQuery();
   const { data: brands } = useGetPublicBrandsQuery();
@@ -62,7 +64,7 @@ function SearchPageContent({ lang }: { lang: string }) {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateUrl("q", localSearch);
+    updateUrl('q', localSearch);
   };
 
   const updateUrl = (key: string, value: string | number) => {
@@ -96,14 +98,14 @@ function SearchPageContent({ lang }: { lang: string }) {
                     ? `"${q}" এর জন্য ফলাফল`
                     : `Results for "${q}"`
                   : isBn
-                    ? "সব পণ্য"
-                    : "All Products"}
+                    ? 'সব পণ্য'
+                    : 'All Products'}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 {isSearchLoading
                   ? isBn
-                    ? "খোঁজা হচ্ছে..."
-                    : "Searching..."
+                    ? 'খোঁজা হচ্ছে...'
+                    : 'Searching...'
                   : isBn
                     ? `${searchResults?.meta.total || 0} টি পণ্য পাওয়া গেছে`
                     : `${searchResults?.meta.total || 0} products found`}
@@ -124,48 +126,53 @@ function SearchPageContent({ lang }: { lang: string }) {
               {categoryId && (
                 <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
                   <span className="font-medium text-primary">
-                    {isBn ? "ক্যাটাগরি" : "Category"}:
+                    {isBn ? 'ক্যাটাগরি' : 'Category'}:
                   </span>
                   <span>
-                    {isBn 
-                      ? categories?.find(c => c.id === categoryId)?.nameBn || "জানা নেই"
-                      : categories?.find(c => c.id === categoryId)?.nameEn || "Unknown"}
+                    {isBn
+                      ? categories?.find((c) => c.id === categoryId)?.nameBn || 'জানা নেই'
+                      : categories?.find((c) => c.id === categoryId)?.nameEn || 'Unknown'}
                   </span>
-                  <button onClick={() => updateUrl("categoryId", "")} className="ml-1 hover:text-foreground">
+                  <button
+                    onClick={() => updateUrl('categoryId', '')}
+                    className="ml-1 hover:text-foreground"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </div>
               )}
               {brandId && (
                 <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                  <span className="font-medium text-primary">
-                    {isBn ? "ব্র্যান্ড" : "Brand"}:
-                  </span>
+                  <span className="font-medium text-primary">{isBn ? 'ব্র্যান্ড' : 'Brand'}:</span>
                   <span>
-                    {isBn 
-                      ? brands?.find(b => b.id === brandId)?.nameBn || "জানা নেই"
-                      : brands?.find(b => b.id === brandId)?.nameEn || "Unknown"}
+                    {isBn
+                      ? brands?.find((b) => b.id === brandId)?.nameBn || 'জানা নেই'
+                      : brands?.find((b) => b.id === brandId)?.nameEn || 'Unknown'}
                   </span>
-                  <button onClick={() => updateUrl("brandId", "")} className="ml-1 hover:text-foreground">
+                  <button
+                    onClick={() => updateUrl('brandId', '')}
+                    className="ml-1 hover:text-foreground"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </div>
               )}
               {(minPrice || maxPrice) && (
                 <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                  <span className="font-medium text-primary">
-                    {isBn ? "দাম" : "Price"}:
-                  </span>
+                  <span className="font-medium text-primary">{isBn ? 'দাম' : 'Price'}:</span>
                   <span>
-                    ৳{minPrice || "0"} - {maxPrice ? `৳${maxPrice}` : (isBn ? "যেকোন" : "Any")}
+                    ৳{minPrice || '0'} - {maxPrice ? `৳${maxPrice}` : isBn ? 'যেকোন' : 'Any'}
                   </span>
-                  <button onClick={() => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.delete("minPrice");
-                    params.delete("maxPrice");
-                    params.delete("page");
-                    router.push(`${pathname}?${params.toString()}`);
-                  }} className="ml-1 hover:text-foreground">
+                  <button
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.delete('minPrice');
+                      params.delete('maxPrice');
+                      params.delete('page');
+                      router.push(`${pathname}?${params.toString()}`);
+                    }}
+                    className="ml-1 hover:text-foreground"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </div>
@@ -177,7 +184,7 @@ function SearchPageContent({ lang }: { lang: string }) {
             <form onSubmit={handleSearchSubmit} className="relative w-full">
               <Input
                 type="search"
-                placeholder={isBn ? "পণ্য খুঁজুন..." : "Search products..."}
+                placeholder={isBn ? 'পণ্য খুঁজুন...' : 'Search products...'}
                 className="w-full pr-10"
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
@@ -197,49 +204,36 @@ function SearchPageContent({ lang }: { lang: string }) {
             <div className="text-center py-12 text-destructive">
               <p>
                 {isBn
-                  ? "দুঃখিত, কোনো ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"
-                  : "Sorry, an error occurred. Please try again."}
+                  ? 'দুঃখিত, কোনো ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
+                  : 'Sorry, an error occurred. Please try again.'}
               </p>
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={() => window.location.reload()}
-              >
-                {isBn ? "পুনরায় চেষ্টা করুন" : "Retry"}
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                {isBn ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
               </Button>
             </div>
           ) : isEmpty && !isSearchLoading ? (
             <div className="text-center py-16 px-4 bg-muted/20 rounded-xl border border-dashed">
               <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                {isBn
-                  ? "দুঃখিত, কোনো পণ্য পাওয়া যায়নি"
-                  : "Sorry, no products found"}
+                {isBn ? 'দুঃখিত, কোনো পণ্য পাওয়া যায়নি' : 'Sorry, no products found'}
               </h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto text-sm">
                 {isBn
-                  ? "আপনার খোঁজা পণ্যটি আমাদের স্টকে নেই অথবা ফিল্টারের সাথে মিল নেই। তবে আপনি অনুরোধ করলে আমরা এটি সরবরাহ করার চেষ্টা করব।"
+                  ? 'আপনার খোঁজা পণ্যটি আমাদের স্টকে নেই অথবা ফিল্টারের সাথে মিল নেই। তবে আপনি অনুরোধ করলে আমরা এটি সরবরাহ করার চেষ্টা করব।'
                   : "The product you're looking for isn't in stock right now or doesn't match the filters. But you can request it and we'll try to source it."}
               </p>
               <ProductRequestModal
                 lang={lang}
                 trigger={
-                  <Button
-                    variant="secondary"
-                    className="rounded-full font-medium"
-                  >
-                    {isBn ? "পণ্য অনুরোধ করুন" : "Request Product"}
+                  <Button variant="secondary" className="rounded-full font-medium">
+                    {isBn ? 'পণ্য অনুরোধ করুন' : 'Request Product'}
                   </Button>
                 }
               />
             </div>
           ) : (
             <>
-              <ProductGrid
-                products={searchResults?.data}
-                isLoading={isSearchLoading}
-                lang={lang}
-              />
+              <ProductGrid products={searchResults?.data} isLoading={isSearchLoading} lang={lang} />
 
               {meta && meta.totalPages > 1 && (
                 <div className="mt-8 flex justify-center items-center gap-4">
@@ -247,10 +241,10 @@ function SearchPageContent({ lang }: { lang: string }) {
                     variant="outline"
                     size="sm"
                     disabled={page <= 1}
-                    onClick={() => updateUrl("page", page - 1)}
+                    onClick={() => updateUrl('page', page - 1)}
                   >
                     <ChevronLeft className="w-4 h-4 mr-1" />
-                    {isBn ? "পূর্ববর্তী" : "Prev"}
+                    {isBn ? 'পূর্ববর্তী' : 'Prev'}
                   </Button>
                   <span className="text-sm font-medium">
                     {page} / {meta.totalPages}
@@ -259,9 +253,9 @@ function SearchPageContent({ lang }: { lang: string }) {
                     variant="outline"
                     size="sm"
                     disabled={page >= meta.totalPages}
-                    onClick={() => updateUrl("page", page + 1)}
+                    onClick={() => updateUrl('page', page + 1)}
                   >
-                    {isBn ? "পরবর্তী" : "Next"}
+                    {isBn ? 'পরবর্তী' : 'Next'}
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </div>
@@ -274,11 +268,7 @@ function SearchPageContent({ lang }: { lang: string }) {
   );
 }
 
-export default function SearchPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function SearchPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
 
   return (

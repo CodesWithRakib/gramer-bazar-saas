@@ -15,15 +15,20 @@ export class ReviewsService {
   async getProductReviews(productId: string, page = 1, limit = 10) {
     const [items, total] = await this.reviewRepo.findAndCount({
       where: { productId, isApproved: true },
-      relations: ['user'], 
+      relations: ['user'],
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });
 
-    const sanitizedItems = items.map(review => ({
+    const sanitizedItems = items.map((review) => ({
       ...review,
-      user: review.user ? { name: `${review.user.firstName || ''} ${review.user.lastName || ''}`.trim() || 'Anonymous' } : null,
+      user: review.user
+        ? {
+            name:
+              `${review.user.firstName || ''} ${review.user.lastName || ''}`.trim() || 'Anonymous',
+          }
+        : null,
     }));
 
     return {
@@ -37,7 +42,13 @@ export class ReviewsService {
     };
   }
 
-  async addReview(userId: string, productId: string, rating: number, comment?: string, images?: string[]) {
+  async addReview(
+    userId: string,
+    productId: string,
+    rating: number,
+    comment?: string,
+    images?: string[],
+  ) {
     // 1. Duplicate check
     const existingReview = await this.reviewRepo.findOne({
       where: { userId, productId },
@@ -48,7 +59,8 @@ export class ReviewsService {
 
     // 2. Legitimate purchase validation
     // Find an order item that belongs to this user, is in a completed order, and matches the product ID
-    const purchaseQuery = await this.dataSource.query(`
+    const purchaseQuery = await this.dataSource.query(
+      `
       SELECT o.id 
       FROM orders o
       JOIN order_items oi ON oi.order_id = o.id
@@ -58,10 +70,14 @@ export class ReviewsService {
         AND o.status = $2 
         AND pv.product_id = $3
       LIMIT 1
-    `, [userId, OrderStatus.DELIVERED, productId]);
+    `,
+      [userId, OrderStatus.DELIVERED, productId],
+    );
 
     if (purchaseQuery.length === 0) {
-      throw new BadRequestException('You can only review products you have legitimately purchased and received.');
+      throw new BadRequestException(
+        'You can only review products you have legitimately purchased and received.',
+      );
     }
 
     // 3. Add review (auto-approved by default based on config)
@@ -94,7 +110,8 @@ export class ReviewsService {
       });
     }
 
-    const query = this.reviewRepo.createQueryBuilder('review')
+    const query = this.reviewRepo
+      .createQueryBuilder('review')
       .leftJoinAndSelect('review.user', 'user')
       .leftJoinAndSelect('review.product', 'product')
       .orderBy('review.createdAt', 'DESC');
@@ -102,7 +119,7 @@ export class ReviewsService {
     if (search) {
       query.andWhere(
         '(review.comment ILIKE :search OR user.firstName ILIKE :search OR product.nameEn ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 

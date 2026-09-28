@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+  OnModuleInit,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -30,7 +37,10 @@ export class UsersService implements OnModuleInit {
       let superAdminRole = await this.roleRepository.findOne({ where: { name: Role.SUPER_ADMIN } });
       if (!superAdminRole) {
         superAdminRole = await this.roleRepository.save(
-          this.roleRepository.create({ name: Role.SUPER_ADMIN, description: 'Super Administrator' }),
+          this.roleRepository.create({
+            name: Role.SUPER_ADMIN,
+            description: 'Super Administrator',
+          }),
         );
       }
       let adminRole = await this.roleRepository.findOne({ where: { name: Role.ADMIN } });
@@ -49,7 +59,9 @@ export class UsersService implements OnModuleInit {
       }
 
       if (!superAdmin) {
-        this.logger.log('Initializing Super Admin account (+8801767476724 / codeswithrakib@gmail.com)...');
+        this.logger.log(
+          'Initializing Super Admin account (+8801767476724 / codeswithrakib@gmail.com)...',
+        );
         superAdmin = this.userRepository.create({
           phone: '+8801767476724',
           email: 'codeswithrakib@gmail.com',
@@ -74,14 +86,18 @@ export class UsersService implements OnModuleInit {
           changed = true;
         }
         if (superAdmin.phone !== '+8801767476724') {
-          const phoneInUse = await this.userRepository.findOne({ where: { phone: '+8801767476724' } });
+          const phoneInUse = await this.userRepository.findOne({
+            where: { phone: '+8801767476724' },
+          });
           if (!phoneInUse) {
             superAdmin.phone = '+8801767476724';
             changed = true;
           }
         }
         if (superAdmin.email !== 'codeswithrakib@gmail.com') {
-          const emailInUse = await this.userRepository.findOne({ where: { email: 'codeswithrakib@gmail.com' } });
+          const emailInUse = await this.userRepository.findOne({
+            where: { email: 'codeswithrakib@gmail.com' },
+          });
           if (!emailInUse) {
             superAdmin.email = 'codeswithrakib@gmail.com';
             changed = true;
@@ -135,7 +151,9 @@ export class UsersService implements OnModuleInit {
           changed = true;
         }
         if (admin.phone !== '+8801952879249') {
-          const phoneInUse = await this.userRepository.findOne({ where: { phone: '+8801952879249' } });
+          const phoneInUse = await this.userRepository.findOne({
+            where: { phone: '+8801952879249' },
+          });
           if (!phoneInUse) {
             admin.phone = '+8801952879249';
             changed = true;
@@ -217,9 +235,15 @@ export class UsersService implements OnModuleInit {
 
   async findByEmail(email: string): Promise<User | null> {
     const trimmed = email.trim();
-    let user = await this.userRepository.findOne({ where: { email: trimmed }, relations: ['roles'] });
+    let user = await this.userRepository.findOne({
+      where: { email: trimmed },
+      relations: ['roles'],
+    });
     if (!user && trimmed !== trimmed.toLowerCase()) {
-      user = await this.userRepository.findOne({ where: { email: trimmed.toLowerCase() }, relations: ['roles'] });
+      user = await this.userRepository.findOne({
+        where: { email: trimmed.toLowerCase() },
+        relations: ['roles'],
+      });
     }
     return user;
   }
@@ -243,9 +267,10 @@ export class UsersService implements OnModuleInit {
   async create(userData: Partial<User> & { roleNames?: string[] }): Promise<User> {
     const { roleNames, ...rest } = userData;
     const user = this.userRepository.create(rest);
-    
+
     if (roleNames && roleNames.length > 0) {
-      const roles = await this.roleRepository.createQueryBuilder('role')
+      const roles = await this.roleRepository
+        .createQueryBuilder('role')
         .where('role.name IN (:...roleNames)', { roleNames })
         .getMany();
       user.roles = roles;
@@ -295,14 +320,15 @@ export class UsersService implements OnModuleInit {
   }
 
   async findAll(page = 1, limit = 10, search?: string, roleName?: string) {
-    const query = this.userRepository.createQueryBuilder('user')
+    const query = this.userRepository
+      .createQueryBuilder('user')
       .leftJoinAndSelect('user.roles', 'role')
       .orderBy('user.createdAt', 'DESC');
 
     if (search) {
       query.andWhere(
         '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.phone ILIKE :search OR user.email ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
@@ -329,24 +355,20 @@ export class UsersService implements OnModuleInit {
   async updateRoles(
     caller: { id: string; roles?: Array<{ name: string } | string> },
     id: string,
-    roleNames: string[]
+    roleNames: string[],
   ): Promise<User> {
     const isSuperAdmin = caller.roles?.some(
-      (r) => (typeof r === 'string' ? r : r.name) === Role.SUPER_ADMIN
+      (r) => (typeof r === 'string' ? r : r.name) === Role.SUPER_ADMIN,
     );
 
     const targetUser = await this.findById(id);
     const targetHasPrivilege = targetUser.roles?.some(
-      (r) => r.name === Role.ADMIN || r.name === Role.SUPER_ADMIN
+      (r) => r.name === Role.ADMIN || r.name === Role.SUPER_ADMIN,
     );
-    const attemptingPrivilege = roleNames.some(
-      (r) => r === Role.ADMIN || r === Role.SUPER_ADMIN
-    );
+    const attemptingPrivilege = roleNames.some((r) => r === Role.ADMIN || r === Role.SUPER_ADMIN);
 
     if (!isSuperAdmin && (targetHasPrivilege || attemptingPrivilege)) {
-      throw new ForbiddenException(
-        'Only Super Admins can manage Admin or Super Admin roles'
-      );
+      throw new ForbiddenException('Only Super Admins can manage Admin or Super Admin roles');
     }
 
     if (!roleNames || roleNames.length === 0) {

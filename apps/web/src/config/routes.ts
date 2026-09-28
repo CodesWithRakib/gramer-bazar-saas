@@ -1,6 +1,6 @@
 /**
  * Gramer Bazar - Centralized Route System
- * 
+ *
  * Provides type-safe definitions for all application routes across public,
  * customer, seller, rider, admin, and super-admin namespaces.
  */
@@ -173,9 +173,9 @@ export function getDefaultDashboardForRoles(roles: string[] = []): string {
 export function isPublicPath(pathname: string): boolean {
   // Strip locale prefix
   const cleanPath = pathname.replace(/^\/(?:en|bn)/, '') || '/';
-  
+
   if (cleanPath === '/' || cleanPath === '') return true;
-  
+
   const publicPrefixes = [
     '/products',
     '/categories',
@@ -195,5 +195,7 @@ export function isPublicPath(pathname: string): boolean {
     '/unauthorized',
   ];
 
-  return publicPrefixes.some(prefix => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`));
+  return publicPrefixes.some(
+    (prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`)
+  );
 }

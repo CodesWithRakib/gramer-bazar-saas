@@ -113,7 +113,7 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
       toast.error(
         isBn
           ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে'
-          : 'Password must be at least 6 characters long',
+          : 'Password must be at least 6 characters long'
       );
       return;
     }
@@ -125,13 +125,13 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
       }).unwrap();
 
       toast.success(
-        isBn ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে' : 'Password updated successfully',
+        isBn ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে' : 'Password updated successfully'
       );
       setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
       toast.error(
         getApiErrorMessage(err) ||
-          (isBn ? 'পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে' : 'Failed to update password'),
+          (isBn ? 'পাসওয়ার্ড পরিবর্তন করতে সমস্যা হয়েছে' : 'Failed to update password')
       );
     }
   };
@@ -142,13 +142,13 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
       toast.success(
         isBn
           ? 'একাউন্ট মুছে ফেলার অনুরোধ গ্রহণ করা হয়েছে'
-          : 'Account deletion requested successfully',
+          : 'Account deletion requested successfully'
       );
       dispatch(logout());
       router.push(`/${lang}`);
     } catch (err) {
       toast.error(
-        getApiErrorMessage(err) || (isBn ? 'সমস্যা হয়েছে' : 'Failed to request deletion'),
+        getApiErrorMessage(err) || (isBn ? 'সমস্যা হয়েছে' : 'Failed to request deletion')
       );
     } finally {
       setShowDeleteConfirm(false);
@@ -157,7 +157,9 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
 
   const handleExportData = () => {
     toast.info(
-      isBn ? 'ডেটা এক্সপোর্ট রিকোয়েস্ট অ্যাডমিনকে পাঠানো হয়েছে!' : 'Data export request sent to admin!',
+      isBn
+        ? 'ডেটা এক্সপোর্ট রিকোয়েস্ট অ্যাডমিনকে পাঠানো হয়েছে!'
+        : 'Data export request sent to admin!'
     );
   };
 
@@ -219,13 +221,17 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
         <CardHeader>
           <CardTitle>{isBn ? 'পাসওয়ার্ড পরিবর্তন' : 'Change Password'}</CardTitle>
           <CardDescription>
-            {isBn ? 'নতুন পাসওয়ার্ড সেট করতে আপনার বর্তমান পাসওয়ার্ড প্রয়োজন হবে।' : 'You will need your current password to set a new one.'}
+            {isBn
+              ? 'নতুন পাসওয়ার্ড সেট করতে আপনার বর্তমান পাসওয়ার্ড প্রয়োজন হবে।'
+              : 'You will need your current password to set a new one.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handlePasswordSubmit} className="space-y-5 max-w-md">
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">{isBn ? 'বর্তমান পাসওয়ার্ড' : 'Current Password'}</Label>
+              <Label htmlFor="currentPassword">
+                {isBn ? 'বর্তমান পাসওয়ার্ড' : 'Current Password'}
+              </Label>
               <Input
                 id="currentPassword"
                 name="currentPassword"
@@ -235,7 +241,7 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="newPassword">{isBn ? 'নতুন পাসওয়ার্ড' : 'New Password'}</Label>
               <Input
@@ -247,9 +253,11 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{isBn ? 'নতুন পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm New Password'}</Label>
+              <Label htmlFor="confirmPassword">
+                {isBn ? 'নতুন পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm New Password'}
+              </Label>
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -275,8 +283,8 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
             {isBn ? 'ডেটা ও প্রাইভেসি' : 'Data & Privacy'}
           </CardTitle>
           <CardDescription>
-            {isBn 
-              ? 'আপনার ডেটা এক্সপোর্ট করুন অথবা স্থায়ীভাবে একাউন্ট মুছে ফেলুন। একাউন্ট মুছে ফেললে আপনার সমস্ত তথ্য হারিয়ে যাবে।' 
+            {isBn
+              ? 'আপনার ডেটা এক্সপোর্ট করুন অথবা স্থায়ীভাবে একাউন্ট মুছে ফেলুন। একাউন্ট মুছে ফেললে আপনার সমস্ত তথ্য হারিয়ে যাবে।'
               : 'Export your data or permanently delete your account. Deleting your account will remove all your data.'}
           </CardDescription>
         </CardHeader>
@@ -284,7 +292,11 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
           <Button variant="outline" onClick={handleExportData}>
             {isBn ? 'ডেটা এক্সপোর্ট রিকোয়েস্ট' : 'Request Data Export'}
           </Button>
-          <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={isDeleting}>
+          <Button
+            variant="destructive"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={isDeleting}
+          >
             {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isBn ? 'একাউন্ট মুছে ফেলুন' : 'Delete Account'}
           </Button>

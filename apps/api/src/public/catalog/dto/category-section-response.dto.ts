@@ -6,6 +6,9 @@ export class CategorySectionResponseDto {
   @ApiProperty({ type: CategoryResponseDto, description: 'Category metadata' })
   category: CategoryResponseDto;
 
-  @ApiProperty({ type: [ProductResponseDto], description: 'Top curated products belonging to this category' })
+  @ApiProperty({
+    type: [ProductResponseDto],
+    description: 'Top curated products belonging to this category',
+  })
   products: ProductResponseDto[];
 }

@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { 
-  useGetSellerDisputeDetailsQuery, 
-  useAddSellerDisputeMessageMutation 
+import {
+  useGetSellerDisputeDetailsQuery,
+  useAddSellerDisputeMessageMutation,
 } from '@/features/disputes/disputesApi';
 import { Send, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
   const { data: dispute, isLoading } = useGetSellerDisputeDetailsQuery(id);
   const [addMessage, { isLoading: isSending }] = useAddSellerDisputeMessageMutation();
   const [message, setMessage] = useState('');
-  
+
   const user = useSelector((state: RootState) => state.auth.user);
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -34,7 +34,11 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
       setMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
-      toast.error(lang === 'bn' ? 'বার্তা পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Failed to send message. Please try again.');
+      toast.error(
+        lang === 'bn'
+          ? 'বার্তা পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+          : 'Failed to send message. Please try again.'
+      );
     }
   };
 
@@ -46,11 +50,15 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
     return <div className="p-8 text-center text-red-500">Dispute not found.</div>;
   }
 
-  const isResolved = dispute.status === 'RESOLVED_REFUNDED' || dispute.status === 'RESOLVED_REJECTED';
+  const isResolved =
+    dispute.status === 'RESOLVED_REFUNDED' || dispute.status === 'RESOLVED_REJECTED';
 
   return (
     <div className="w-full space-y-6">
-      <Link href={`/${lang}/seller/disputes`} className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+      <Link
+        href={`/${lang}/seller/disputes`}
+        className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+      >
         <ArrowLeft className="mr-2" /> Back to Disputes
       </Link>
 
@@ -61,7 +69,8 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
               Dispute for Order #{dispute.orderId.slice(0, 8)}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              <span className="font-semibold">Customer:</span> {dispute.customer?.firstName} {dispute.customer?.lastName}
+              <span className="font-semibold">Customer:</span> {dispute.customer?.firstName}{' '}
+              {dispute.customer?.lastName}
             </p>
             <p className="text-gray-600 dark:text-gray-400">
               <span className="font-semibold">Reason:</span> {dispute.reason.replace(/_/g, ' ')}
@@ -75,10 +84,10 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
               dispute.status === 'OPEN'
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
                 : dispute.status === 'UNDER_REVIEW'
-                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                : dispute.status === 'RESOLVED_REFUNDED'
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                  : dispute.status === 'RESOLVED_REFUNDED'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
             }`}
           >
             {dispute.status.replace(/_/g, ' ')}
@@ -93,7 +102,11 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
         {dispute.adminDecision && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-blue-800 dark:text-blue-300 flex items-center mb-2">
-              {dispute.status === 'RESOLVED_REFUNDED' ? <CheckCircle className="mr-2" /> : <AlertCircle className="mr-2" />}
+              {dispute.status === 'RESOLVED_REFUNDED' ? (
+                <CheckCircle className="mr-2" />
+              ) : (
+                <AlertCircle className="mr-2" />
+              )}
               Admin Decision
             </h3>
             <p className="text-blue-900 dark:text-blue-200">{dispute.adminDecision}</p>
@@ -111,28 +124,37 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
 
             return (
               <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                <div 
+                <div
                   className={`max-w-[80%] rounded-2xl px-5 py-3 ${
-                    isMe 
-                      ? 'bg-primary-600 text-white rounded-br-sm' 
+                    isMe
+                      ? 'bg-primary-600 text-white rounded-br-sm'
                       : isSystem
-                      ? 'bg-yellow-100 text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-100 rounded-bl-sm border border-yellow-200 dark:border-yellow-800/50'
-                      : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-bl-sm'
+                        ? 'bg-yellow-100 text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-100 rounded-bl-sm border border-yellow-200 dark:border-yellow-800/50'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-bl-sm'
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1 text-xs opacity-75">
-                    <span className="font-semibold">{isMe ? 'You' : isSystem ? 'Support Admin' : 'Customer'}</span>
+                    <span className="font-semibold">
+                      {isMe ? 'You' : isSystem ? 'Support Admin' : 'Customer'}
+                    </span>
                     <span>•</span>
-                    <span>{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span>
+                      {new Date(msg.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </div>
                   <p className="whitespace-pre-wrap">{msg.message}</p>
                 </div>
               </div>
             );
           })}
-          
+
           {(!dispute.messages || dispute.messages.length === 0) && (
-            <p className="text-center text-gray-500 italic py-4">No messages yet. Send a message to the customer or admin.</p>
+            <p className="text-center text-gray-500 italic py-4">
+              No messages yet. Send a message to the customer or admin.
+            </p>
           )}
         </div>
 

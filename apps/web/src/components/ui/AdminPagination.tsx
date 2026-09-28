@@ -47,7 +47,7 @@ export interface AdminPaginationProps {
 function getPageNumbers(
   currentPage: number,
   totalPages: number,
-  siblingCount: number,
+  siblingCount: number
 ): (number | 'ellipsis')[] {
   const totalNumbers = siblingCount * 2 + 5;
 
@@ -129,7 +129,7 @@ export function AdminPagination({
 
   const activePage = Math.max(
     1,
-    propCurrentPage ?? (Number(searchParams?.get(pageParamName)) || 1),
+    propCurrentPage ?? (Number(searchParams?.get(pageParamName)) || 1)
   );
   const totalPages = Math.max(1, Math.ceil(totalItems / currentLimit));
   const safeCurrentPage = Math.min(activePage, totalPages);
@@ -154,7 +154,7 @@ export function AdminPagination({
       });
       return params.toString();
     },
-    [searchParams],
+    [searchParams]
   );
 
   const rawFrom = totalItems === 0 ? 0 : (safeCurrentPage - 1) * currentLimit + 1;
@@ -177,7 +177,16 @@ export function AdminPagination({
 
       router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
-    [totalPages, safeCurrentPage, onPageChange, searchParams, createQueryString, pageParamName, router, pathname],
+    [
+      totalPages,
+      safeCurrentPage,
+      onPageChange,
+      searchParams,
+      createQueryString,
+      pageParamName,
+      router,
+      pathname,
+    ]
   );
 
   const handleLimitChange = React.useCallback(
@@ -201,12 +210,24 @@ export function AdminPagination({
 
       router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
-    [currentLimit, from, onLimitChange, safeCurrentPage, onPageChange, searchParams, createQueryString, limitParamName, pageParamName, router, pathname],
+    [
+      currentLimit,
+      from,
+      onLimitChange,
+      safeCurrentPage,
+      onPageChange,
+      searchParams,
+      createQueryString,
+      limitParamName,
+      pageParamName,
+      router,
+      pathname,
+    ]
   );
 
   const pages = React.useMemo(
     () => getPageNumbers(safeCurrentPage, totalPages, siblingCount),
-    [safeCurrentPage, totalPages, siblingCount],
+    [safeCurrentPage, totalPages, siblingCount]
   );
 
   if (totalItems === 0) return null;
@@ -214,8 +235,8 @@ export function AdminPagination({
   const defaultItemLabel = isBn
     ? { singular: 'আইটেম', plural: 'আইটেম' }
     : isRtl
-    ? { singular: 'عنصر', plural: 'عناصر' }
-    : { singular: 'item', plural: 'items' };
+      ? { singular: 'عنصر', plural: 'عناصر' }
+      : { singular: 'item', plural: 'items' };
 
   const label =
     totalItems === 1
@@ -229,7 +250,7 @@ export function AdminPagination({
       className={cn(
         'mt-4 flex flex-col gap-3',
         !isStacked && 'xl:flex-row xl:items-center xl:justify-between xl:gap-4',
-        className,
+        className
       )}
       dir={dir}
     >
@@ -237,7 +258,7 @@ export function AdminPagination({
       <div
         className={cn(
           'flex w-full flex-wrap items-center justify-between gap-2.5 text-xs text-gray-500 sm:gap-4 sm:text-sm dark:text-muted-foreground',
-          !isStacked && 'xl:w-auto xl:flex-nowrap xl:justify-start',
+          !isStacked && 'xl:w-auto xl:flex-nowrap xl:justify-start'
         )}
       >
         {showLimitSelector && (
@@ -253,7 +274,9 @@ export function AdminPagination({
             <Select value={String(currentLimit)} onValueChange={handleLimitChange}>
               <SelectTrigger
                 className="h-8 w-auto min-w-[76px] rounded-lg border-gray-200 bg-white px-2.5 font-medium text-gray-700 shadow-xs hover:bg-gray-50/80 focus:border-primary focus:ring-1 focus:ring-primary/20 dark:border-border dark:bg-card dark:text-foreground"
-                aria-label={isBn ? 'প্রতি পৃষ্ঠায় সংখ্যা' : isRtl ? 'عدد العناصر لكل صفحة' : 'Rows per page'}
+                aria-label={
+                  isBn ? 'প্রতি পৃষ্ঠায় সংখ্যা' : isRtl ? 'عدد العناصر لكل صفحة' : 'Rows per page'
+                }
               >
                 <SelectValue placeholder={String(currentLimit)} />
               </SelectTrigger>
@@ -274,16 +297,22 @@ export function AdminPagination({
         )}
 
         {showLimitSelector && !isStacked && (
-          <div className="hidden h-4 w-px shrink-0 bg-gray-200 dark:bg-border xl:block" aria-hidden />
+          <div
+            className="hidden h-4 w-px shrink-0 bg-gray-200 dark:bg-border xl:block"
+            aria-hidden
+          />
         )}
 
         {/* Summary text */}
         <div className="shrink-0 text-xs whitespace-nowrap text-gray-500 dark:text-muted-foreground sm:text-sm">
           {isBn ? (
             <>
-              মোট <span className="font-semibold text-gray-900 dark:text-foreground">{totalItems}</span> {label} এর মধ্যে{' '}
+              মোট{' '}
+              <span className="font-semibold text-gray-900 dark:text-foreground">{totalItems}</span>{' '}
+              {label} এর মধ্যে{' '}
               <span className="font-semibold text-gray-900 dark:text-foreground">{from}</span>–
-              <span className="font-semibold text-gray-900 dark:text-foreground">{to}</span> দেখানো হচ্ছে
+              <span className="font-semibold text-gray-900 dark:text-foreground">{to}</span> দেখানো
+              হচ্ছে
             </>
           ) : isRtl ? (
             <>
@@ -293,9 +322,11 @@ export function AdminPagination({
             </>
           ) : (
             <>
-              Showing <span className="font-semibold text-gray-900 dark:text-foreground">{from}</span>–
+              Showing{' '}
+              <span className="font-semibold text-gray-900 dark:text-foreground">{from}</span>–
               <span className="font-semibold text-gray-900 dark:text-foreground">{to}</span> of{' '}
-              <span className="font-semibold text-gray-900 dark:text-foreground">{totalItems}</span> {label}
+              <span className="font-semibold text-gray-900 dark:text-foreground">{totalItems}</span>{' '}
+              {label}
             </>
           )}
         </div>
@@ -305,7 +336,7 @@ export function AdminPagination({
       <div
         className={cn(
           'flex w-full shrink-0 flex-nowrap items-center justify-center gap-1 sm:gap-1.5',
-          !isStacked && 'xl:w-auto xl:justify-end',
+          !isStacked && 'xl:w-auto xl:justify-end'
         )}
       >
         <Button
@@ -333,7 +364,8 @@ export function AdminPagination({
           }
 
           const isCurrent = safeCurrentPage === page;
-          const isOuterSibling = !isCurrent && page !== 1 && page !== totalPages && pages.length >= 7;
+          const isOuterSibling =
+            !isCurrent && page !== 1 && page !== totalPages && pages.length >= 7;
 
           return (
             <Button
@@ -346,7 +378,7 @@ export function AdminPagination({
                 isOuterSibling && 'hidden sm:inline-flex',
                 isCurrent
                   ? 'bg-primary hover:bg-primary/90 border-primary font-semibold text-white shadow-xs'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:border-border dark:text-muted-foreground dark:hover:bg-muted',
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:border-border dark:text-muted-foreground dark:hover:bg-muted'
               )}
               aria-current={isCurrent ? 'page' : undefined}
             >

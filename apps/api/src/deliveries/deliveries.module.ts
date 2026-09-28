@@ -11,13 +11,7 @@ import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Delivery,
-      DeliveryHistory,
-      Order,
-      OrderStatusHistory,
-      User,
-    ]),
+    TypeOrmModule.forFeature([Delivery, DeliveryHistory, Order, OrderStatusHistory, User]),
     NotificationsModule,
   ],
   controllers: [DeliveriesController],

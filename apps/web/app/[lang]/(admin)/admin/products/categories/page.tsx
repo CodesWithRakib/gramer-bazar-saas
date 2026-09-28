@@ -1,10 +1,6 @@
-import { AdminCategoriesView } from "@/features/admin/products";
+import { AdminCategoriesView } from '@/features/admin/products';
 
-export default async function CategoriesPage({
-  params,
-}: {
-  params: Promise<{ lang: "ar" | "en" }>;
-}) {
+export default async function CategoriesPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   return <AdminCategoriesView lang={lang} namespace="admin" />;
 }

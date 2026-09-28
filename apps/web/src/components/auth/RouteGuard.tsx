@@ -16,12 +16,7 @@ interface RouteGuardProps {
   requireAuth?: boolean;
 }
 
-export function RouteGuard({
-  children,
-  allowedRoles,
-  lang,
-  requireAuth = true,
-}: RouteGuardProps) {
+export function RouteGuard({ children, allowedRoles, lang, requireAuth = true }: RouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const isBn = lang === 'bn';
@@ -66,7 +61,7 @@ export function RouteGuard({
   // 3. Role authorization check
   if (allowedRoles && allowedRoles.length > 0) {
     const hasPermission = userHasRole(user, ...allowedRoles);
-    
+
     // Super Admin has master access across all protected dashboards
     const isSuperAdmin = userHasRole(user, 'SUPER_ADMIN');
     const isAllowed = hasPermission || isSuperAdmin;
@@ -103,16 +98,12 @@ export function RouteGuard({
               )}
               {userRoles.includes('RIDER') && (
                 <Button className="w-full sm:w-auto" asChild>
-                  <Link href={`/${lang}/rider`}>
-                    {isBn ? 'রাইডার অ্যাপ' : 'Rider Portal'}
-                  </Link>
+                  <Link href={`/${lang}/rider`}>{isBn ? 'রাইডার অ্যাপ' : 'Rider Portal'}</Link>
                 </Button>
               )}
               {(userRoles.includes('ADMIN') || userRoles.includes('SUPER_ADMIN')) && (
                 <Button className="w-full sm:w-auto" asChild>
-                  <Link href={`/${lang}/admin`}>
-                    {isBn ? 'অ্যাডমিন প্যানেল' : 'Admin Portal'}
-                  </Link>
+                  <Link href={`/${lang}/admin`}>{isBn ? 'অ্যাডমিন প্যানেল' : 'Admin Portal'}</Link>
                 </Button>
               )}
             </div>

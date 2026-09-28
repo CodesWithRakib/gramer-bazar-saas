@@ -51,7 +51,9 @@ export function CustomerWishlistView({ lang = 'en' }: CustomerWishlistViewProps)
               {isBn ? 'আপনার উইশলিস্ট খালি' : 'Your wishlist is empty'}
             </h3>
             <p className="text-muted-foreground">
-              {isBn ? 'পছন্দের পণ্য সংরক্ষণ করতে হার্ট আইকনে ক্লিক করুন' : 'Click the heart icon to save products you like'}
+              {isBn
+                ? 'পছন্দের পণ্য সংরক্ষণ করতে হার্ট আইকনে ক্লিক করুন'
+                : 'Click the heart icon to save products you like'}
             </p>
           </div>
         ) : (
@@ -70,7 +72,7 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
   const [removeFromWishlist, { isLoading }] = useRemoveProductFromWishlistMutation();
 
   const handleRemove = async (e: React.MouseEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
     try {
       await removeFromWishlist(item.productId).unwrap();
       toast.success(isBn ? 'উইশলিস্ট থেকে সরানো হয়েছে' : 'Removed from wishlist');
@@ -85,16 +87,19 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
   const price = Number(item.product.price || 0);
   const compareAtPrice = item.product.compareAtPrice ? Number(item.product.compareAtPrice) : null;
   const isAvailable = item.product.isAvailable ?? true;
-  
+
   return (
-    <Link href={`/${lang}/products/${item.product.slug}`} className="group bg-card rounded-xl border shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col h-full relative">
+    <Link
+      href={`/${lang}/products/${item.product.slug}`}
+      className="group bg-card rounded-xl border shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col h-full relative"
+    >
       <div className="aspect-square relative overflow-hidden bg-muted">
-        <CustomImage 
-          src={image} 
-          alt={name} 
-          fill 
+        <CustomImage
+          src={image}
+          alt={name}
+          fill
           sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-300" 
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {!isAvailable ? (
@@ -103,7 +108,8 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
             </Badge>
           ) : compareAtPrice && compareAtPrice > price ? (
             <Badge className="bg-emerald-600 text-[10px] px-1.5 py-0.5 shadow-xs">
-              {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% {isBn ? 'ছাড়' : 'OFF'}
+              {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}%{' '}
+              {isBn ? 'ছাড়' : 'OFF'}
             </Badge>
           ) : null}
         </div>
@@ -129,20 +135,12 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
 
         {/* Price & Unit */}
         <div className="mt-2 flex items-baseline gap-1.5 flex-wrap">
-          {price > 0 ? (
-            <span className="font-bold text-base text-primary">
-              ৳{price}
-            </span>
-          ) : null}
+          {price > 0 ? <span className="font-bold text-base text-primary">৳{price}</span> : null}
           {compareAtPrice && compareAtPrice > price ? (
-            <span className="text-xs text-muted-foreground line-through">
-              ৳{compareAtPrice}
-            </span>
+            <span className="text-xs text-muted-foreground line-through">৳{compareAtPrice}</span>
           ) : null}
           {item.product.unit ? (
-            <span className="text-[11px] text-muted-foreground">
-              / {item.product.unit}
-            </span>
+            <span className="text-[11px] text-muted-foreground">/ {item.product.unit}</span>
           ) : null}
         </div>
 
@@ -152,7 +150,9 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
             <span className="font-medium">{item.product.averageRating.toFixed(1)}</span>
             {item.product.totalReviews ? (
-              <span className="text-[10px] text-muted-foreground">({item.product.totalReviews})</span>
+              <span className="text-[10px] text-muted-foreground">
+                ({item.product.totalReviews})
+              </span>
             ) : null}
           </div>
         ) : null}

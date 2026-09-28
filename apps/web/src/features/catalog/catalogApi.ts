@@ -1,4 +1,4 @@
-import { api } from "../../store/api";
+import { api } from '../../store/api';
 
 export interface PaginationMeta {
   total: number;
@@ -129,8 +129,8 @@ export interface CreateProductDto {
 export interface ImportLog {
   id: string;
   source: string;
-  mode: "DRY_RUN" | "IMPORT" | "RETRY_IMAGES";
-  status: "RUNNING" | "COMPLETED" | "FAILED";
+  mode: 'DRY_RUN' | 'IMPORT' | 'RETRY_IMAGES';
+  status: 'RUNNING' | 'COMPLETED' | 'FAILED';
   totalFetched: number;
   createdCount: number;
   updatedCount: number;
@@ -147,8 +147,8 @@ export interface ImportLog {
 }
 
 export interface RunImportDto {
-  source: "dummyjson" | "openfoodfacts";
-  mode?: "DRY_RUN" | "IMPORT" | "RETRY_IMAGES";
+  source: 'dummyjson' | 'openfoodfacts';
+  mode?: 'DRY_RUN' | 'IMPORT' | 'RETRY_IMAGES';
   limit?: number;
   category?: string;
   updateExisting?: boolean;
@@ -288,172 +288,156 @@ export interface HomepageData {
 }
 
 export const catalogApi = api
-  .enhanceEndpoints({ addTagTypes: ["Catalog", "Category"] })
+  .enhanceEndpoints({ addTagTypes: ['Catalog', 'Category'] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getHomepageData: builder.query<HomepageData, void>({
-        query: () => "/public/catalog/homepage",
-        providesTags: ["Catalog", "Category"],
+        query: () => '/public/catalog/homepage',
+        providesTags: ['Catalog', 'Category'],
       }),
       getRecentlyAddedProducts: builder.query<SearchResponse, number | void>({
         query: (limit = 8) => `/public/catalog/recently-added?limit=${limit}`,
-        providesTags: ["Catalog"],
+        providesTags: ['Catalog'],
       }),
       getPublicCategories: builder.query<Category[], void>({
-        query: () => "/public/categories",
-        providesTags: ["Category"],
+        query: () => '/public/categories',
+        providesTags: ['Category'],
       }),
       getPublicCategoryTree: builder.query<Category[], void>({
-        query: () => "/public/categories/tree",
-        providesTags: ["Category"],
+        query: () => '/public/categories/tree',
+        providesTags: ['Category'],
       }),
       getCategorySections: builder.query<CategorySection[], void>({
-        query: () => "/public/catalog/category-sections",
-        providesTags: ["Catalog", "Category"],
+        query: () => '/public/catalog/category-sections',
+        providesTags: ['Catalog', 'Category'],
       }),
       getSearchSuggestions: builder.query<SearchSuggestions, string>({
         query: (q) => `/public/catalog/suggestions?q=${encodeURIComponent(q)}`,
       }),
       getPopularProducts: builder.query<SearchResponse, number | void>({
         query: (limit = 8) => `/public/catalog/popular?limit=${limit}`,
-        providesTags: ["Catalog"],
+        providesTags: ['Catalog'],
       }),
-      getPublicBrands: builder.query<
-        Brand[],
-        { categoryId?: string; search?: string } | void
-      >({
+      getPublicBrands: builder.query<Brand[], { categoryId?: string; search?: string } | void>({
         query: (params) => {
-          if (!params) return "/public/catalog/brands";
+          if (!params) return '/public/catalog/brands';
           const searchParams = new URLSearchParams();
-          if (params.categoryId)
-            searchParams.append("categoryId", params.categoryId);
-          if (params.search) searchParams.append("search", params.search);
+          if (params.categoryId) searchParams.append('categoryId', params.categoryId);
+          if (params.search) searchParams.append('search', params.search);
           const queryString = searchParams.toString();
-          return queryString
-            ? `/public/catalog/brands?${queryString}`
-            : "/public/catalog/brands";
+          return queryString ? `/public/catalog/brands?${queryString}` : '/public/catalog/brands';
         },
-        providesTags: ["Catalog"],
+        providesTags: ['Catalog'],
       }),
       getBrandsByCategory: builder.query<Brand[], string>({
         query: (categoryId) => `/brands/by-category/${categoryId}`,
-        providesTags: ["Catalog"],
+        providesTags: ['Catalog'],
       }),
       getAdminCategories: builder.query<
         { data: Category[]; meta: PaginationMeta },
         { page?: number; limit?: number; search?: string }
       >({
         query: (params) => ({
-          url: "/categories",
+          url: '/categories',
           params,
         }),
-        providesTags: ["Category"],
+        providesTags: ['Category'],
       }),
       getAdminBrands: builder.query<
         { data: Brand[]; meta: PaginationMeta },
         { page?: number; limit?: number; search?: string }
       >({
         query: (params) => ({
-          url: "/brands",
+          url: '/brands',
           params,
         }),
-        providesTags: ["Catalog"],
+        providesTags: ['Catalog'],
       }),
       getAdminProducts: builder.query<
         { data: Product[]; meta: PaginationMeta },
         { page?: number; limit?: number; search?: string }
       >({
         query: (params) => ({
-          url: "/products",
+          url: '/products',
           params,
         }),
-        providesTags: ["Catalog"],
+        providesTags: ['Catalog'],
       }),
       createAdminCategory: builder.mutation<Category, Partial<Category>>({
         query: (body) => ({
-          url: "/categories",
-          method: "POST",
+          url: '/categories',
+          method: 'POST',
           body,
         }),
-        invalidatesTags: ["Category"],
+        invalidatesTags: ['Category'],
       }),
-      updateAdminCategory: builder.mutation<
-        Category,
-        { id: string; data: Partial<Category> }
-      >({
+      updateAdminCategory: builder.mutation<Category, { id: string; data: Partial<Category> }>({
         query: ({ id, data }) => ({
           url: `/categories/${id}`,
-          method: "PATCH",
+          method: 'PATCH',
           body: data,
         }),
-        invalidatesTags: ["Category"],
+        invalidatesTags: ['Category'],
       }),
       createAdminBrand: builder.mutation<Brand, Partial<Brand>>({
         query: (body) => ({
-          url: "/brands",
-          method: "POST",
+          url: '/brands',
+          method: 'POST',
           body,
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
-      updateAdminBrand: builder.mutation<
-        Brand,
-        { id: string; data: Partial<Brand> }
-      >({
+      updateAdminBrand: builder.mutation<Brand, { id: string; data: Partial<Brand> }>({
         query: ({ id, data }) => ({
           url: `/brands/${id}`,
-          method: "PATCH",
+          method: 'PATCH',
           body: data,
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
       searchProducts: builder.query<SearchResponse, SearchParams>({
         query: (params) => {
           // Strip out undefined, null, or empty string values
           const cleanParams = Object.fromEntries(
-            Object.entries(params).filter(
-              ([, v]) => v !== undefined && v !== null && v !== "",
-            ),
+            Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
           );
           return {
-            url: "/public/catalog/search",
+            url: '/public/catalog/search',
             params: cleanParams as Record<string, string | number>,
           };
         },
-        providesTags: ["Catalog"],
+        providesTags: ['Catalog'],
       }),
       getFeaturedProducts: builder.query<SearchResponse, void>({
-        query: () => "/public/catalog/featured",
-        providesTags: ["Catalog"],
+        query: () => '/public/catalog/featured',
+        providesTags: ['Catalog'],
       }),
       getProductDetails: builder.query<SellerProduct[], string>({
         query: (slug) => `/public/catalog/${slug}`,
-        providesTags: (result, error, slug) => [{ type: "Catalog", id: slug }],
+        providesTags: (result, error, slug) => [{ type: 'Catalog', id: slug }],
       }),
       getRelatedProducts: builder.query<SellerProduct[], string>({
         query: (slug) => `/public/catalog/${slug}/related`,
-        providesTags: (result, error, slug) => [
-          { type: "Catalog", id: `related-${slug}` },
-        ],
+        providesTags: (result, error, slug) => [{ type: 'Catalog', id: `related-${slug}` }],
       }),
       getCategoriesTree: builder.query<Category[], void>({
-        query: () => "/categories/tree",
-        providesTags: ["Category"],
+        query: () => '/categories/tree',
+        providesTags: ['Category'],
       }),
       deleteAdminCategory: builder.mutation<void, string>({
         query: (id) => ({
           url: `/categories/${id}`,
-          method: "DELETE",
+          method: 'DELETE',
         }),
-        invalidatesTags: ["Category"],
+        invalidatesTags: ['Category'],
       }),
       createAdminProduct: builder.mutation<Product, CreateProductDto>({
         query: (body) => ({
-          url: "/products",
-          method: "POST",
+          url: '/products',
+          method: 'POST',
           body,
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
       updateAdminProduct: builder.mutation<
         Product,
@@ -461,17 +445,17 @@ export const catalogApi = api
       >({
         query: ({ id, data }) => ({
           url: `/products/${id}`,
-          method: "PATCH",
+          method: 'PATCH',
           body: data,
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
       deleteAdminProduct: builder.mutation<void, string>({
         query: (id) => ({
           url: `/products/${id}`,
-          method: "DELETE",
+          method: 'DELETE',
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
       uploadProductImages: builder.mutation<
         ProductImage[],
@@ -479,10 +463,10 @@ export const catalogApi = api
       >({
         query: ({ productId, formData }) => ({
           url: `/products/${productId}/images`,
-          method: "POST",
+          method: 'POST',
           body: formData,
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
       setPrimaryProductImage: builder.mutation<
         ProductImage,
@@ -490,48 +474,39 @@ export const catalogApi = api
       >({
         query: ({ productId, imageId }) => ({
           url: `/products/${productId}/images/${imageId}/primary`,
-          method: "PATCH",
+          method: 'PATCH',
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
-      deleteProductImage: builder.mutation<
-        void,
-        { productId: string; imageId: string }
-      >({
+      deleteProductImage: builder.mutation<void, { productId: string; imageId: string }>({
         query: ({ productId, imageId }) => ({
           url: `/products/${productId}/images/${imageId}`,
-          method: "DELETE",
+          method: 'DELETE',
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
-      reorderProductImages: builder.mutation<
-        void,
-        { productId: string; imageIds: string[] }
-      >({
+      reorderProductImages: builder.mutation<void, { productId: string; imageIds: string[] }>({
         query: ({ productId, imageIds }) => ({
           url: `/products/${productId}/images/reorder`,
-          method: "PATCH",
+          method: 'PATCH',
           body: { imageIds },
         }),
-        invalidatesTags: ["Catalog"],
+        invalidatesTags: ['Catalog'],
       }),
-      runProductImport: builder.mutation<
-        { success: boolean; log: ImportLog },
-        RunImportDto
-      >({
+      runProductImport: builder.mutation<{ success: boolean; log: ImportLog }, RunImportDto>({
         query: (body) => ({
-          url: "/admin/importer/run",
-          method: "POST",
+          url: '/admin/importer/run',
+          method: 'POST',
           body,
         }),
-        invalidatesTags: ["Catalog", "Category"],
+        invalidatesTags: ['Catalog', 'Category'],
       }),
       getImportLogs: builder.query<
         { items: ImportLog[]; meta: PaginationMeta },
         { page?: number; limit?: number }
       >({
         query: (params) => ({
-          url: "/admin/importer/logs",
+          url: '/admin/importer/logs',
           params,
         }),
       }),
@@ -540,8 +515,8 @@ export const catalogApi = api
         { items: { sellerProductId: string; quantity: number }[] }
       >({
         query: (body) => ({
-          url: "/public/cart/validate",
-          method: "POST",
+          url: '/public/cart/validate',
+          method: 'POST',
           body,
         }),
       }),

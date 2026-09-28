@@ -21,10 +21,10 @@ export class MaintenanceGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    
+
     // Non-HTTP contexts (e.g. WebSockets) let the specific guards handle auth/blocking
     if (!request || !request.url) return true;
-    
+
     const url = request.url;
 
     // Always allow auth routes so admins can log in
@@ -63,6 +63,8 @@ export class MaintenanceGuard implements CanActivate {
       }
     }
 
-    throw new ServiceUnavailableException('Site is currently under maintenance. Please try again later.');
+    throw new ServiceUnavailableException(
+      'Site is currently under maintenance. Please try again later.',
+    );
   }
 }

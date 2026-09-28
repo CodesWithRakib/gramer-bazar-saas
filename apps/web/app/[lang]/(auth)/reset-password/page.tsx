@@ -38,7 +38,9 @@ function ResetPasswordForm({ lang }: { lang: string }) {
       setErrorMsg('');
       setSuccessMsg(isBn ? 'নতুন ওটিপি কোড পাঠানো হয়েছে' : 'A new OTP code has been sent');
     } catch (err) {
-      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'কোড পুনরায় পাঠাতে ব্যর্থ' : 'Failed to resend code'));
+      setErrorMsg(
+        getApiErrorMessage(err) || (isBn ? 'কোড পুনরায় পাঠাতে ব্যর্থ' : 'Failed to resend code')
+      );
     }
   };
 
@@ -48,7 +50,9 @@ function ResetPasswordForm({ lang }: { lang: string }) {
     setSuccessMsg('');
 
     if (newPassword.length < 6) {
-      setErrorMsg(isBn ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'Password must be at least 6 characters');
+      setErrorMsg(
+        isBn ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'Password must be at least 6 characters'
+      );
       return;
     }
 
@@ -59,12 +63,19 @@ function ResetPasswordForm({ lang }: { lang: string }) {
 
     try {
       await resetPassword({ phone, otp, newPassword }).unwrap();
-      setSuccessMsg(isBn ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে! লগইন করুন।' : 'Password reset successfully! Please sign in.');
+      setSuccessMsg(
+        isBn
+          ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে! লগইন করুন।'
+          : 'Password reset successfully! Please sign in.'
+      );
       setTimeout(() => {
         router.push(`/${lang}/login`);
       }, 2000);
     } catch (err) {
-      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'পাসওয়ার্ড পরিবর্তন ব্যর্থ হয়েছে' : 'Failed to reset password. Check your OTP.'));
+      setErrorMsg(
+        getApiErrorMessage(err) ||
+          (isBn ? 'পাসওয়ার্ড পরিবর্তন ব্যর্থ হয়েছে' : 'Failed to reset password. Check your OTP.')
+      );
     }
   };
 
@@ -78,7 +89,9 @@ function ResetPasswordForm({ lang }: { lang: string }) {
           {isBn ? 'নতুন পাসওয়ার্ড নির্ধারণ' : 'Set New Password'}
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
-          {isBn ? 'ভেরিফিকেশন কোড ও নতুন পাসওয়ার্ড লিখুন' : 'Enter your verification code and choose a new password'}
+          {isBn
+            ? 'ভেরিফিকেশন কোড ও নতুন পাসওয়ার্ড লিখুন'
+            : 'Enter your verification code and choose a new password'}
         </p>
       </div>
 
@@ -157,7 +170,9 @@ function ResetPasswordForm({ lang }: { lang: string }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">{isBn ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}</Label>
+          <Label htmlFor="confirmPassword">
+            {isBn ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}
+          </Label>
           <Input
             id="confirmPassword"
             type={showPassword ? 'text' : 'password'}
@@ -170,10 +185,18 @@ function ResetPasswordForm({ lang }: { lang: string }) {
           />
         </div>
 
-        <Button type="submit" className="w-full mt-2 h-11 text-base font-semibold" disabled={isResetting}>
+        <Button
+          type="submit"
+          className="w-full mt-2 h-11 text-base font-semibold"
+          disabled={isResetting}
+        >
           {isResetting
-            ? (isBn ? 'পরিবর্তন করা হচ্ছে...' : 'Resetting Password...')
-            : (isBn ? 'পাসওয়ার্ড পরিবর্তন করুন' : 'Reset Password')}
+            ? isBn
+              ? 'পরিবর্তন করা হচ্ছে...'
+              : 'Resetting Password...'
+            : isBn
+              ? 'পাসওয়ার্ড পরিবর্তন করুন'
+              : 'Reset Password'}
         </Button>
       </form>
 
@@ -198,7 +221,10 @@ export default function ResetPasswordPage({ params }: { params: Promise<{ lang: 
     <div className="min-h-screen flex flex-col bg-muted/20">
       {/* Brand Top Bar */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card">
-        <Link href={`/${lang}`} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <Link
+          href={`/${lang}`}
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+        >
           <BrandLogo lang={lang} variant="full" width={140} height={38} />
         </Link>
         <LanguageSwitcher currentLocale={lang} />
@@ -206,11 +232,13 @@ export default function ResetPasswordPage({ params }: { params: Promise<{ lang: 
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <Suspense fallback={
-          <div className="w-full max-w-md bg-card border rounded-xl p-8 text-center text-muted-foreground">
-            Loading...
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="w-full max-w-md bg-card border rounded-xl p-8 text-center text-muted-foreground">
+              Loading...
+            </div>
+          }
+        >
           <ResetPasswordForm lang={lang} />
         </Suspense>
       </main>

@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Conversation } from './entities/conversation.entity.js';
@@ -6,7 +12,13 @@ import { Message } from './entities/message.entity.js';
 import { UsersService } from '../users/users.service.js';
 import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
-import { ConversationType, ConversationStatus, SupportPriority, MessageStatus, MessageType } from './enums/chat.enum.js';
+import {
+  ConversationType,
+  ConversationStatus,
+  SupportPriority,
+  MessageStatus,
+  MessageType,
+} from './enums/chat.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 import { CreateConversationDto, UpdateSupportCaseDto } from './dto/create-conversation.dto.js';
 
@@ -15,10 +27,7 @@ export function isUserAdmin(user: User): boolean {
   return user.roles.some((r: any) => {
     const name = typeof r === 'string' ? r : r?.name;
     return (
-      name === Role.ADMIN ||
-      name === Role.SUPER_ADMIN ||
-      name === 'ADMIN' ||
-      name === 'SUPER_ADMIN'
+      name === Role.ADMIN || name === Role.SUPER_ADMIN || name === 'ADMIN' || name === 'SUPER_ADMIN'
     );
   });
 }
@@ -35,7 +44,7 @@ export function canUserAccessConversation(conversation: Conversation, user: User
   if (!user || !conversation) return false;
   if (isUserAdmin(user)) return true;
   if (conversation.assignedAdminId === user.id) return true;
-  return conversation.participants?.some(p => p?.id === user.id) ?? false;
+  return conversation.participants?.some((p) => p?.id === user.id) ?? false;
 }
 
 export function getDirectCanonicalKey(userAId: string, userBId: string): string {
@@ -78,15 +87,13 @@ export class ChatService {
       convQuery = convQuery.andWhere('conversation.type = :type', { type });
     }
 
-    const conversations = await convQuery
-      .orderBy('conversation.updatedAt', 'DESC')
-      .getMany();
+    const conversations = await convQuery.orderBy('conversation.updatedAt', 'DESC').getMany();
 
     if (conversations.length === 0) {
       return [];
     }
 
-    const conversationIds = conversations.map(c => c.id);
+    const conversationIds = conversations.map((c) => c.id);
 
     // Indexed unread counts query
     const unreadCountsRaw = await this.messageRepository
@@ -125,7 +132,7 @@ export class ChatService {
       }
     }
 
-    return conversations.map(conv => {
+    return conversations.map((conv) => {
       const lastMsg = lastMessageMap.get(conv.id) || null;
       return {
         ...conv,
@@ -136,12 +143,7 @@ export class ChatService {
     });
   }
 
-  async getConversationMessages(
-    conversationId: string,
-    user: User,
-    limit = 50,
-    before?: string,
-  ) {
+  async getConversationMessages(conversationId: string, user: User, limit = 50, before?: string) {
     const conversation = await this.conversationRepository.findOne({
       where: { id: conversationId },
       relations: ['participants', 'assignedAdmin'],
@@ -156,7 +158,7 @@ export class ChatService {
     }
 
     // Audit log if an admin views a conversation that they are not a participant in
-    const isParticipant = conversation.participants?.some(p => p?.id === user.id);
+    const isParticipant = conversation.participants?.some((p) => p?.id === user.id);
     if (isUserAdmin(user) && !isParticipant) {
       void this.auditLogsService.record({
         actorId: user.id,
@@ -164,7 +166,7 @@ export class ChatService {
         action: 'ADMIN_VIEWED_CONVERSATION',
         targetType: 'Conversation',
         targetId: conversation.id,
-        details: `Admin viewed conversation between participants: ${conversation.participants?.map(p => p.id).join(', ')}`,
+        details: `Admin viewed conversation between participants: ${conversation.participants?.map((p) => p.id).join(', ')}`,
       });
     }
 
@@ -232,7 +234,7 @@ export class ChatService {
 
     const isAdmin = isUserAdmin(user);
     const isSuperAdmin = isUserSuperAdmin(user);
-    const isParticipant = conversation.participants?.some(p => p?.id === senderId);
+    const isParticipant = conversation.participants?.some((p) => p?.id === senderId);
 
     // If an admin replies to a conversation they are not yet explicitly attached to, attach them
     if (isAdmin && !isParticipant) {
@@ -247,7 +249,9 @@ export class ChatService {
       senderRole = 'SUPER_ADMIN';
     } else if (isAdmin) {
       senderRole = 'ADMIN';
-    } else if (user.roles?.some((r: any) => (typeof r === 'string' ? r : r?.name) === Role.SELLER)) {
+    } else if (
+      user.roles?.some((r: any) => (typeof r === 'string' ? r : r?.name) === Role.SELLER)
+    ) {
       senderRole = 'SELLER';
     } else if (user.roles?.some((r: any) => (typeof r === 'string' ? r : r?.name) === Role.RIDER)) {
       senderRole = 'RIDER';
@@ -319,10 +323,10 @@ export class ChatService {
     }
 
     const users = await Promise.all(
-      uniqueParticipants.map(id => this.usersService.findById(id).catch(() => null))
+      uniqueParticipants.map((id) => this.usersService.findById(id).catch(() => null)),
     );
 
-    if (users.some(u => !u)) {
+    if (users.some((u) => !u)) {
       throw new NotFoundException('One or more users not found');
     }
 
@@ -340,7 +344,10 @@ export class ChatService {
     if (existingConv) {
       // If referenceId is provided (e.g. user opens chat from a specific order/product),
       // update the reference pointer so UI reflects the current context without creating duplicate conversations
-      if (referenceId && (existingConv.referenceId !== referenceId || existingConv.referenceType !== referenceType)) {
+      if (
+        referenceId &&
+        (existingConv.referenceId !== referenceId || existingConv.referenceType !== referenceType)
+      ) {
         existingConv.referenceId = referenceId;
         existingConv.referenceType = referenceType || null;
         await this.conversationRepository.save(existingConv);
@@ -378,10 +385,7 @@ export class ChatService {
     }
   }
 
-  async getOrCreateSupportConversation(
-    requestingUser: User,
-    dto: CreateConversationDto,
-  ) {
+  async getOrCreateSupportConversation(requestingUser: User, dto: CreateConversationDto) {
     // 1. Look for existing ongoing support conversation for this user that is still OPEN or IN_PROGRESS
     const existing = await this.conversationRepository
       .createQueryBuilder('conv')
@@ -390,7 +394,11 @@ export class ChatService {
       .leftJoinAndSelect('conv.assignedAdmin', 'assignedAdmin')
       .where('conv.type = :type', { type: ConversationType.SUPPORT })
       .andWhere('conv.status IN (:...activeStatuses)', {
-        activeStatuses: [ConversationStatus.OPEN, ConversationStatus.IN_PROGRESS, ConversationStatus.ACTIVE],
+        activeStatuses: [
+          ConversationStatus.OPEN,
+          ConversationStatus.IN_PROGRESS,
+          ConversationStatus.ACTIVE,
+        ],
       })
       .orderBy('conv.updatedAt', 'DESC')
       .getOne();
@@ -400,7 +408,9 @@ export class ChatService {
     }
 
     // 2. Create new Support conversation with case tracking
-    const count = await this.conversationRepository.count({ where: { type: ConversationType.SUPPORT } });
+    const count = await this.conversationRepository.count({
+      where: { type: ConversationType.SUPPORT },
+    });
     const supportCaseNumber = `SUP-${1000 + count + 1}`;
     const canonicalKey = `support:${requestingUser.id}:${Date.now()}`;
 
@@ -429,7 +439,9 @@ export class ChatService {
 
     void this.auditLogsService.record({
       actorId: requestingUser.id,
-      actorName: `${requestingUser.firstName || ''} ${requestingUser.lastName || ''}`.trim() || requestingUser.phone,
+      actorName:
+        `${requestingUser.firstName || ''} ${requestingUser.lastName || ''}`.trim() ||
+        requestingUser.phone,
       action: 'SUPPORT_CASE_CREATED',
       targetType: 'Conversation',
       targetId: saved.id,
@@ -511,9 +523,7 @@ export class ChatService {
 
     const unreadCount = await query.getCount();
 
-    const unreadConversations = await query
-      .select('COUNT(DISTINCT c.id)', 'count')
-      .getRawOne();
+    const unreadConversations = await query.select('COUNT(DISTINCT c.id)', 'count').getRawOne();
 
     return {
       unreadCount,
@@ -579,11 +589,7 @@ export class ChatService {
     };
   }
 
-  async updateSupportCase(
-    caseId: string,
-    adminUser: User,
-    dto: UpdateSupportCaseDto,
-  ) {
+  async updateSupportCase(caseId: string, adminUser: User, dto: UpdateSupportCaseDto) {
     if (!isUserAdmin(adminUser)) {
       throw new ForbiddenException('Admin access required');
     }
@@ -621,7 +627,8 @@ export class ChatService {
 
     void this.auditLogsService.record({
       actorId: adminUser.id,
-      actorName: `${adminUser.firstName || ''} ${adminUser.lastName || ''}`.trim() || adminUser.phone,
+      actorName:
+        `${adminUser.firstName || ''} ${adminUser.lastName || ''}`.trim() || adminUser.phone,
       action: 'SUPPORT_CASE_UPDATED',
       targetType: 'Conversation',
       targetId: conversation.id,

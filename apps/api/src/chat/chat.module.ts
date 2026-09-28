@@ -9,11 +9,7 @@ import { UsersModule } from '../users/users.module.js';
 import { AuthModule } from '../auth/auth.module.js';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Conversation, Message]),
-    UsersModule,
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Conversation, Message]), UsersModule, AuthModule],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],
   exports: [ChatService],

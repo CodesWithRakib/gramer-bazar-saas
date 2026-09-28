@@ -7,18 +7,30 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
-import { 
-  useGetAdminFlashSalesQuery, 
-  useCreateFlashSaleMutation, 
-  useUpdateFlashSaleMutation, 
+import {
+  useGetAdminFlashSalesQuery,
+  useCreateFlashSaleMutation,
+  useUpdateFlashSaleMutation,
   useDeleteFlashSaleMutation,
   FlashSale,
 } from '@/features/flash-sales/flashSalesApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Flame, Plus, Trash2, Calendar, Edit, Image as ImageIcon, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -33,17 +45,20 @@ export interface AdminFlashSalesViewProps {
 export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
-  
+
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
-  const { data, isLoading } = useGetAdminFlashSalesQuery({ page, limit }, {
-    skip: !isAuthenticated,
-  });
+  const { data, isLoading } = useGetAdminFlashSalesQuery(
+    { page, limit },
+    {
+      skip: !isAuthenticated,
+    }
+  );
 
   const [createFlashSale] = useCreateFlashSaleMutation();
   const [updateFlashSale] = useUpdateFlashSaleMutation();
@@ -53,7 +68,7 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [flashSaleToDelete, setFlashSaleToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   // Form State
   const [formData, setFormData] = useState({
     id: '',
@@ -64,7 +79,7 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
   });
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.roles?.some(r => r === 'ADMIN' || r === 'SUPER_ADMIN')) {
+    if (!isAuthenticated || !user?.roles?.some((r) => r === 'ADMIN' || r === 'SUPER_ADMIN')) {
       router.push(`/${lang}/login`);
     }
   }, [isAuthenticated, user, router, lang]);
@@ -74,13 +89,16 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
 
   const filteredSales = useMemo(() => {
     return rawSales.filter((sale) => {
-      const matchesSearch = !search.trim() || sale.name.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = statusFilter === 'ALL' || (statusFilter === 'ACTIVE' ? sale.isActive : !sale.isActive);
+      const matchesSearch =
+        !search.trim() || sale.name.toLowerCase().includes(search.toLowerCase());
+      const matchesStatus =
+        statusFilter === 'ALL' || (statusFilter === 'ACTIVE' ? sale.isActive : !sale.isActive);
       return matchesSearch && matchesStatus;
     });
   }, [rawSales, search, statusFilter]);
 
-  if (!isAuthenticated || !user?.roles?.some(r => r === 'ADMIN' || r === 'SUPER_ADMIN')) return null;
+  if (!isAuthenticated || !user?.roles?.some((r) => r === 'ADMIN' || r === 'SUPER_ADMIN'))
+    return null;
 
   const handleOpenCreateModal = () => {
     setIsEditing(false);
@@ -131,12 +149,16 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const payload = {
       name: formData.name,
       bannerImage: formData.bannerImage || undefined,
-      startDate: formData.startDate ? new Date(formData.startDate).toISOString() : new Date().toISOString(),
-      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : new Date().toISOString(),
+      startDate: formData.startDate
+        ? new Date(formData.startDate).toISOString()
+        : new Date().toISOString(),
+      endDate: formData.endDate
+        ? new Date(formData.endDate).toISOString()
+        : new Date().toISOString(),
     };
 
     try {
@@ -162,7 +184,9 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
             {isBn ? 'ফ্ল্যাশ সেল ম্যানেজমেন্ট' : 'Flash Sale Management'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {isBn ? 'সীমিত সময়ের ক্যাম্পেইন ও বিশেষ মূল্যছাড় নিয়ন্ত্রণ করুন।' : 'Configure time-limited flash sale promotions and items.'}
+            {isBn
+              ? 'সীমিত সময়ের ক্যাম্পেইন ও বিশেষ মূল্যছাড় নিয়ন্ত্রণ করুন।'
+              : 'Configure time-limited flash sale promotions and items.'}
           </p>
         </div>
       </div>
@@ -182,7 +206,9 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder={isBn ? 'ক্যাম্পেইনের নাম দিয়ে খুঁজুন...' : 'Search by campaign name...'}
+                placeholder={
+                  isBn ? 'ক্যাম্পেইনের নাম দিয়ে খুঁজুন...' : 'Search by campaign name...'
+                }
                 className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
               />
               {search && (
@@ -222,52 +248,65 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
           {/* Action Slot */}
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleOpenCreateModal} className="rounded-full px-6 h-11 whitespace-nowrap">
+              <Button
+                onClick={handleOpenCreateModal}
+                className="rounded-full px-6 h-11 whitespace-nowrap"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 {isBn ? 'নতুন ফ্ল্যাশ সেল' : 'Create Flash Sale'}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>{isEditing ? (isBn ? 'ফ্ল্যাশ সেল এডিট করুন' : 'Edit Flash Sale') : (isBn ? 'নতুন ফ্ল্যাশ সেল' : 'New Flash Sale')}</DialogTitle>
+                <DialogTitle>
+                  {isEditing
+                    ? isBn
+                      ? 'ফ্ল্যাশ সেল এডিট করুন'
+                      : 'Edit Flash Sale'
+                    : isBn
+                      ? 'নতুন ফ্ল্যাশ সেল'
+                      : 'New Flash Sale'}
+                </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label>{isBn ? 'নাম' : 'Name'}</Label>
-                  <Input 
-                    required 
-                    value={formData.name} 
-                    onChange={e => setFormData({...formData, name: e.target.value})} 
+                  <Input
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Ramadan Super Sale"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label>{isBn ? 'ব্যানার ইমেজ URL (ঐচ্ছিক)' : 'Banner Image URL (Optional)'}</Label>
-                  <Input 
-                    value={formData.bannerImage} 
-                    onChange={e => setFormData({...formData, bannerImage: e.target.value})} 
+                  <Label>
+                    {isBn ? 'ব্যানার ইমেজ URL (ঐচ্ছিক)' : 'Banner Image URL (Optional)'}
+                  </Label>
+                  <Input
+                    value={formData.bannerImage}
+                    onChange={(e) => setFormData({ ...formData, bannerImage: e.target.value })}
                     placeholder="https://example.com/banner.jpg"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label>{isBn ? 'শুরুর তারিখ' : 'Start Date'}</Label>
-                  <Input 
-                    type="datetime-local" 
+                  <Input
+                    type="datetime-local"
                     required
-                    value={formData.startDate} 
-                    onChange={e => setFormData({...formData, startDate: e.target.value})} 
+                    value={formData.startDate}
+                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label>{isBn ? 'শেষের তারিখ' : 'End Date'}</Label>
-                  <Input 
-                    type="datetime-local" 
+                  <Input
+                    type="datetime-local"
                     required
-                    value={formData.endDate} 
-                    onChange={e => setFormData({...formData, endDate: e.target.value})} 
+                    value={formData.endDate}
+                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                   />
                 </div>
 
@@ -296,11 +335,21 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, index) => (
                     <tr key={`skeleton-${index}`} className="animate-pulse">
-                      <td className="py-4 px-4"><div className="h-4 w-32 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-36 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-8 w-24 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-6 w-12 rounded-full bg-muted"></div></td>
-                      <td className="py-4 px-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-32 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-36 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-8 w-24 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-6 w-12 rounded-full bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      </td>
                     </tr>
                   ))
                 ) : filteredSales.length === 0 ? (
@@ -315,30 +364,45 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || statusFilter !== 'ALL'
-                            ? (isBn ? 'আপনার ফিল্টারের সাথে কোনো ফ্ল্যাশ সেল মেলেনি' : 'No flash sales match your search or filter.')
-                            : (isBn ? 'বর্তমানে কোনো ফ্ল্যাশ সেল ক্যাম্পেইন নেই' : 'No active flash sales campaigns.')}
+                            ? isBn
+                              ? 'আপনার ফিল্টারের সাথে কোনো ফ্ল্যাশ সেল মেলেনি'
+                              : 'No flash sales match your search or filter.'
+                            : isBn
+                              ? 'বর্তমানে কোনো ফ্ল্যাশ সেল ক্যাম্পেইন নেই'
+                              : 'No active flash sales campaigns.'}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   filteredSales.map((sale) => (
-                    <tr key={sale.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <tr
+                      key={sale.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <td className="py-3.5 px-4 font-semibold text-foreground">
                         <div className="flex items-center gap-2">
-                          {sale.bannerImage && <ImageIcon className="h-4 w-4 text-muted-foreground shrink-0" />}
+                          {sale.bannerImage && (
+                            <ImageIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                          )}
                           <span>{sale.name}</span>
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex flex-col text-xs gap-0.5 text-muted-foreground">
-                          <span><Calendar className="h-3 w-3 inline mr-1 text-muted-foreground"/> Start: {new Date(sale.startDate).toLocaleDateString()}</span>
-                          <span><Calendar className="h-3 w-3 inline mr-1 text-muted-foreground"/> End: {new Date(sale.endDate).toLocaleDateString()}</span>
+                          <span>
+                            <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" />{' '}
+                            Start: {new Date(sale.startDate).toLocaleDateString()}
+                          </span>
+                          <span>
+                            <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" /> End:{' '}
+                            {new Date(sale.endDate).toLocaleDateString()}
+                          </span>
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           className="h-8 rounded-full text-xs"
                           onClick={() => router.push(`/${lang}/admin/flash-sales/${sale.id}/items`)}
@@ -347,17 +411,27 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                         </Button>
                       </td>
                       <td className="py-3.5 px-4">
-                        <Switch 
-                          checked={sale.isActive} 
+                        <Switch
+                          checked={sale.isActive}
                           onCheckedChange={(val: boolean) => handleToggleActive(sale.id, val)}
                         />
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleOpenEditModal(sale)} className="h-8 w-8 rounded-full">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleOpenEditModal(sale)}
+                            className="h-8 w-8 rounded-full"
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setFlashSaleToDelete(sale.id)} className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setFlashSaleToDelete(sale.id)}
+                            className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>

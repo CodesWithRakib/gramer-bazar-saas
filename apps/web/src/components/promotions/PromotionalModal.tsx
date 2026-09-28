@@ -80,7 +80,11 @@ export function PromotionalModal({ lang }: { lang: string }) {
             </Badge>
 
             <DialogTitle className="text-2xl font-black tracking-tight text-white leading-tight">
-              {activeSale ? activeSale.name : isBn ? 'গ্রামের বাজার মেগা অফার!' : 'Gramer Bazar Mega Deals!'}
+              {activeSale
+                ? activeSale.name
+                : isBn
+                  ? 'গ্রামের বাজার মেগা অফার!'
+                  : 'Gramer Bazar Mega Deals!'}
             </DialogTitle>
 
             <DialogDescription className="text-white/90 text-xs line-clamp-1">
@@ -119,7 +123,7 @@ export function PromotionalModal({ lang }: { lang: string }) {
           <div className="flex items-center gap-3 pt-2">
             <Button
               asChild
-              className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl shadow-md h-11 text-sm font-bold"
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs h-11 text-sm font-bold"
               onClick={handleClose}
             >
               <Link href={activeSale ? `/${lang}/flash-sale` : `/${lang}/offers`}>
@@ -141,4 +145,3 @@ export function PromotionalModal({ lang }: { lang: string }) {
     </Dialog>
   );
 }
-

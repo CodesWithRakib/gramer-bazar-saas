@@ -12,10 +12,16 @@ export class OrderItemResponseDto {
   @ApiProperty({ example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e', description: 'Order UUID' })
   orderId: string;
 
-  @ApiProperty({ example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f', description: 'SellerProduct UUID' })
+  @ApiProperty({
+    example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f',
+    description: 'SellerProduct UUID',
+  })
   sellerProductId: string;
 
-  @ApiPropertyOptional({ type: () => SellerProductResponseDto, description: 'Seller product details' })
+  @ApiPropertyOptional({
+    type: () => SellerProductResponseDto,
+    description: 'Seller product details',
+  })
   sellerProduct?: SellerProductResponseDto;
 
   @ApiProperty({ example: 2, description: 'Quantity purchased' })
@@ -52,13 +58,19 @@ export class OrderResponseDto {
   @ApiProperty({ example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', description: 'Order UUID' })
   id: string;
 
-  @ApiProperty({ example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e', description: 'Customer User UUID' })
+  @ApiProperty({
+    example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e',
+    description: 'Customer User UUID',
+  })
   userId: string;
 
   @ApiPropertyOptional({ type: () => UserResponseDto, description: 'Customer user details' })
   user?: UserResponseDto;
 
-  @ApiProperty({ example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f', description: 'Delivery Address UUID' })
+  @ApiProperty({
+    example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f',
+    description: 'Delivery Address UUID',
+  })
   addressId: string;
 
   @ApiPropertyOptional({ type: () => AddressResponseDto, description: 'Delivery address snapshot' })
@@ -76,22 +88,41 @@ export class OrderResponseDto {
   @ApiProperty({ example: 440, description: 'Net final payable total in BDT' })
   total: number;
 
-  @ApiProperty({ enum: OrderStatus, example: OrderStatus.PENDING, description: 'Order lifecycle fulfillment status' })
+  @ApiProperty({
+    enum: OrderStatus,
+    example: OrderStatus.PENDING,
+    description: 'Order lifecycle fulfillment status',
+  })
   status: OrderStatus;
 
-  @ApiProperty({ enum: PaymentMethod, example: PaymentMethod.ONLINE, description: 'Payment method chosen by customer' })
+  @ApiProperty({
+    enum: PaymentMethod,
+    example: PaymentMethod.ONLINE,
+    description: 'Payment method chosen by customer',
+  })
   paymentMethod: PaymentMethod;
 
-  @ApiProperty({ enum: PaymentStatus, example: PaymentStatus.PAID, description: 'Payment transaction settlement status' })
+  @ApiProperty({
+    enum: PaymentStatus,
+    example: PaymentStatus.PAID,
+    description: 'Payment transaction settlement status',
+  })
   paymentStatus: PaymentStatus;
 
-  @ApiPropertyOptional({ example: 'GBZ_20260926_1234', nullable: true, description: 'Unique payment gateway transaction identifier' })
+  @ApiPropertyOptional({
+    example: 'GBZ_20260926_1234',
+    nullable: true,
+    description: 'Unique payment gateway transaction identifier',
+  })
   transactionId: string | null;
 
   @ApiProperty({ type: [OrderItemResponseDto], description: 'List of order line items' })
   items: OrderItemResponseDto[];
 
-  @ApiPropertyOptional({ type: [OrderStatusHistoryResponseDto], description: 'Audit trail of order lifecycle status changes' })
+  @ApiPropertyOptional({
+    type: [OrderStatusHistoryResponseDto],
+    description: 'Audit trail of order lifecycle status changes',
+  })
   statusHistory?: OrderStatusHistoryResponseDto[];
 
   @ApiProperty({ example: '2026-09-26T10:00:00.000Z' })
@@ -105,12 +136,20 @@ export class CheckoutResponseDto {
   @ApiProperty({ type: OrderResponseDto, description: 'Created order record' })
   order: OrderResponseDto;
 
-  @ApiPropertyOptional({ example: 'https://sandbox.sslcommerz.com/gwprocess/v4/gw.php?Q=...', nullable: true, description: 'Redirect URL for payment gateway (null for Cash on Delivery)' })
+  @ApiPropertyOptional({
+    example: 'https://sandbox.sslcommerz.com/gwprocess/v4/gw.php?Q=...',
+    nullable: true,
+    description: 'Redirect URL for payment gateway (null for Cash on Delivery)',
+  })
   paymentUrl: string | null;
 }
 
 export class UpdateOrderStatusDto {
-  @ApiProperty({ enum: OrderStatus, example: OrderStatus.CONFIRMED, description: 'Target order status' })
+  @ApiProperty({
+    enum: OrderStatus,
+    example: OrderStatus.CONFIRMED,
+    description: 'Target order status',
+  })
   @IsNotEmpty()
   @IsEnum(OrderStatus)
   status: OrderStatus;

@@ -28,13 +28,7 @@ import {
   useGetImportLogsQuery,
   ImportLog,
 } from '@/features/catalog/catalogApi';
-import {
-  DownloadCloud,
-  CheckCircle2,
-  AlertTriangle,
-  RefreshCw,
-  Clock,
-} from 'lucide-react';
+import { DownloadCloud, CheckCircle2, AlertTriangle, RefreshCw, Clock } from 'lucide-react';
 
 export function ProductImporterModal() {
   const [open, setOpen] = useState(false);
@@ -120,7 +114,8 @@ export function ProductImporterModal() {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Legitimate public source adapter with strict duplicate check and local image download.
+                  Legitimate public source adapter with strict duplicate check and local image
+                  download.
                 </p>
               </div>
 
@@ -140,9 +135,7 @@ export function ProductImporterModal() {
                     <SelectItem value="IMPORT">
                       Actual Import (Save to DB & Download Local Images)
                     </SelectItem>
-                    <SelectItem value="RETRY_IMAGES">
-                      Retry Failed Images
-                    </SelectItem>
+                    <SelectItem value="RETRY_IMAGES">Retry Failed Images</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
@@ -154,10 +147,7 @@ export function ProductImporterModal() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Batch Limit</Label>
-                <Select
-                  value={limit.toString()}
-                  onValueChange={(val) => setLimit(Number(val))}
-                >
+                <Select value={limit.toString()} onValueChange={(val) => setLimit(Number(val))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -184,7 +174,8 @@ export function ProductImporterModal() {
               <div className="space-y-0.5">
                 <Label>Update Existing Records</Label>
                 <p className="text-xs text-muted-foreground">
-                  If enabled, existing products matching barcode/SKU will be updated. Default preserves manual edits.
+                  If enabled, existing products matching barcode/SKU will be updated. Default
+                  preserves manual edits.
                 </p>
               </div>
               <Switch checked={updateExisting} onCheckedChange={setUpdateExisting} />
@@ -219,9 +210,7 @@ export function ProductImporterModal() {
                   <Badge
                     variant={lastResult.status === 'COMPLETED' ? 'default' : 'secondary'}
                     className={
-                      lastResult.status === 'COMPLETED'
-                        ? 'bg-emerald-600'
-                        : 'bg-amber-600'
+                      lastResult.status === 'COMPLETED' ? 'bg-emerald-600' : 'bg-amber-600'
                     }
                   >
                     {lastResult.status} ({lastResult.mode})
@@ -236,17 +225,13 @@ export function ProductImporterModal() {
                     <div className="text-xs text-muted-foreground mt-0.5">Total Fetched</div>
                   </div>
                   <div className="p-3 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 rounded-lg">
-                    <div className="text-2xl font-bold">
-                      {lastResult.createdCount}
-                    </div>
+                    <div className="text-2xl font-bold">{lastResult.createdCount}</div>
                     <div className="text-xs mt-0.5">
                       {lastResult.mode === 'DRY_RUN' ? 'To Create' : 'Created in DB'}
                     </div>
                   </div>
                   <div className="p-3 bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-lg">
-                    <div className="text-2xl font-bold">
-                      {lastResult.duplicatesCount}
-                    </div>
+                    <div className="text-2xl font-bold">{lastResult.duplicatesCount}</div>
                     <div className="text-xs mt-0.5">Duplicates Skipped</div>
                   </div>
                   <div className="p-3 bg-destructive/10 text-destructive rounded-lg">

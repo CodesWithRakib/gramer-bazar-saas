@@ -8,7 +8,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { SeederService } from './seeder.service.js';
-import { ApiStandardResponse, ApiCommonErrors } from '../common/decorators/api-standard-response.decorator.js';
+import {
+  ApiStandardResponse,
+  ApiCommonErrors,
+} from '../common/decorators/api-standard-response.decorator.js';
 import { SeederResponseDto } from './dto/seeder-response.dto.js';
 
 @ApiTags('System')
@@ -21,13 +24,15 @@ export class SeederController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Seed database with sample data (Development only)', description: 'Populates database with sample users, categories, products, shops, and inventory in non-production environments.' })
+  @ApiOperation({
+    summary: 'Seed database with sample data (Development only)',
+    description:
+      'Populates database with sample users, categories, products, shops, and inventory in non-production environments.',
+  })
   @ApiStandardResponse({ type: SeederResponseDto, description: 'Seeder completed successfully' })
   async seedDatabase() {
     if (process.env.NODE_ENV === 'production') {
-      throw new InternalServerErrorException(
-        'Seeder cannot be run in production',
-      );
+      throw new InternalServerErrorException('Seeder cannot be run in production');
     }
 
     try {
@@ -41,9 +46,7 @@ export class SeederController {
       };
     } catch (error: any) {
       this.logger.error('Failed to seed database', error);
-      throw new InternalServerErrorException(
-        `Seeding failed: ${error.message}`,
-      );
+      throw new InternalServerErrorException(`Seeding failed: ${error.message}`);
     }
   }
 }

@@ -28,8 +28,10 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'প্রিমিয়াম মিনিকেট চাল (৫০ কেজি বস্তা)',
     shortDescriptionEn: 'Slender, polished miniket rice from Dinajpur mills.',
     shortDescriptionBn: 'দিনাজপুরের বিখ্যাত মিল থেকে সংগৃহীত চিকন ও ঝরঝরে মিনিকেট চাল।',
-    descriptionEn: 'Premium quality Miniket rice ideal for daily family meals. Polished, clean and stone-free.',
-    descriptionBn: 'পরিবারের প্রতিদিনের রান্নার জন্য সেরা মানের মিনিকেট চাল। পরিষ্কার এবং পাথর ও ধুলামুক্ত।',
+    descriptionEn:
+      'Premium quality Miniket rice ideal for daily family meals. Polished, clean and stone-free.',
+    descriptionBn:
+      'পরিবারের প্রতিদিনের রান্নার জন্য সেরা মানের মিনিকেট চাল। পরিষ্কার এবং পাথর ও ধুলামুক্ত।',
     price: 3400,
     compareAtPrice: 3600,
     unit: 'bag',
@@ -120,7 +122,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'তীর সয়াবিন তেল (৫ লিটার ক্যান)',
     shortDescriptionEn: 'Vitamin A enriched healthy refined soybean oil.',
     shortDescriptionBn: 'ভিটামিন এ সমৃদ্ধ বিশুদ্ধ তীর পরিশোধিত সয়াবিন তেল।',
-    descriptionEn: 'Fortified cooking oil certified by BSTI. Ideal for all daily frying and cooking.',
+    descriptionEn:
+      'Fortified cooking oil certified by BSTI. Ideal for all daily frying and cooking.',
     descriptionBn: 'বিএসটিআই অনুমোদিত ভিটামিন এ সমৃদ্ধ স্বাস্থ্যকর রান্নার তেল।',
     price: 840,
     compareAtPrice: 870,
@@ -177,7 +180,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'রাঁধুনী হলুদ গুঁড়া (২০০ গ্রাম)',
     shortDescriptionEn: 'Bright golden turmeric powder with intense aroma.',
     shortDescriptionBn: 'উজ্জ্বল সোনালী রঙের খাঁটি রাঁধুনী হলুদের গুঁড়া।',
-    descriptionEn: 'Made from select turmeric fingers. Gives bright natural color and authentic taste.',
+    descriptionEn:
+      'Made from select turmeric fingers. Gives bright natural color and authentic taste.',
     descriptionBn: 'বাছাইকৃত খাঁটি হলুদ থেকে তৈরি। তরকারিতে আনে মনোরম বর্ণ ও স্বাদ।',
     price: 85,
     compareAtPrice: 90,
@@ -196,7 +200,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'রাঁধুনী মরিচ গুঁড়া (২০০ গ্রাম)',
     shortDescriptionEn: 'Fiery hot red chili powder from dry northern chillies.',
     shortDescriptionBn: 'উত্তরাঞ্চলের কড়া ঝাল খাঁটি শুকনো মরিচের গুঁড়া।',
-    descriptionEn: 'Intense red color and sharp pungency. Enhances any Bengali meat, fish, or vegetable recipe.',
+    descriptionEn:
+      'Intense red color and sharp pungency. Enhances any Bengali meat, fish, or vegetable recipe.',
     descriptionBn: 'রান্নায় আনে লোভনীয় লাল রং ও সুস্বাদু ঝাল।',
     price: 110,
     compareAtPrice: 120,
@@ -364,7 +369,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'দেশি লাল গোল আলু (৫ কেজি নেট ব্যাগ)',
     shortDescriptionEn: 'Freshly harvested northern red potatoes.',
     shortDescriptionBn: 'মাটি থেকে সদ্য তোলা টাটকা দেশি লাল গোল আলু।',
-    descriptionEn: 'Great taste, smooth skin, firm texture suitable for curries and mashed aloo bhorta.',
+    descriptionEn:
+      'Great taste, smooth skin, firm texture suitable for curries and mashed aloo bhorta.',
     descriptionBn: 'ভর্তা ও ঝোলের জন্য সবচেয়ে উপযোগী সুস্বাদু দেশি আলু।',
     price: 185,
     compareAtPrice: 210,
@@ -476,7 +482,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'আমানত শাহ সুতি তাঁতের লুঙ্গি',
     shortDescriptionEn: 'Pure combed cotton durable comfortable stitched lungi.',
     shortDescriptionBn: '১০০% সুতি আরামদায়ক পাকা রঙের সেলাই করা লুঙ্গি।',
-    descriptionEn: 'Traditional woven check design, color-fast, soft texture ideal for warm climate.',
+    descriptionEn:
+      'Traditional woven check design, color-fast, soft texture ideal for warm climate.',
     descriptionBn: 'দৈনন্দিন পরার জন্য অত্যন্ত আরামদায়ক ও টেকসই সুতি লুঙ্গি।',
     price: 420,
     compareAtPrice: 480,
@@ -495,7 +502,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'সুতি ক্লাসিক সাদা পাঞ্জাবি',
     shortDescriptionEn: 'Formal pure cotton lightweight summer panjabi with chest embroidery.',
     shortDescriptionBn: 'হালকা সূচিকর্ম করা আরামদায়ক সাদা সুতি পাঞ্জাবি।',
-    descriptionEn: 'Breathable, elegant neckline design, perfect for Friday prayers and family occasions.',
+    descriptionEn:
+      'Breathable, elegant neckline design, perfect for Friday prayers and family occasions.',
     descriptionBn: 'জুমার নামাজ ও উৎসবের উপযোগী মার্জিত সুতি পাঞ্জাবি।',
     price: 750,
     compareAtPrice: 890,
@@ -553,7 +561,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'ফাস্ট চার্জিং টাইপ-সি ক্যাবল (১ মিটার)',
     shortDescriptionEn: 'Tough braided 3A fast charging data sync cable.',
     shortDescriptionBn: 'মজবুত ব্রেইডেড ৩ অ্যাম্পিয়ার ফাস্ট চার্জিং ক্যাবল।',
-    descriptionEn: 'Reinforced stress points prevent tearing. Supports fast charging on all modern smartphones.',
+    descriptionEn:
+      'Reinforced stress points prevent tearing. Supports fast charging on all modern smartphones.',
     descriptionBn: 'সহজে নষ্ট হয় না এমন টেকসই মোবাইল চার্জিং ক্যাবল।',
     price: 140,
     compareAtPrice: 180,
@@ -591,7 +600,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'ঐতিহ্যবাহী বগুড়ার মিষ্টি দই (১ কেজি মাটির হাঁড়ি)',
     shortDescriptionEn: 'Authentic clay pot fermented caramelized sweet yogurt.',
     shortDescriptionBn: 'খাঁটি ঘন দুধের সুস্বাদু মাটির হাঁড়ির মিষ্টি দই।',
-    descriptionEn: 'Slowly cooked cow milk yogurt in earthen handi for rich creamy caramelized taste.',
+    descriptionEn:
+      'Slowly cooked cow milk yogurt in earthen handi for rich creamy caramelized taste.',
     descriptionBn: 'বগুড়ার অভিজ্ঞ কারিগর দ্বারা প্রস্তুত অতুলনীয় স্বাদের মিষ্টি দই।',
     price: 260,
     compareAtPrice: 280,
@@ -689,7 +699,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'সুন্দরবনের প্রাকৃতিক মধু (৫০০ গ্রাম)',
     shortDescriptionEn: 'Unfiltered natural wild forest honey collected by traditional Mowals.',
     shortDescriptionBn: 'মৌয়ালদের সংগ্রহ করা সুন্দরবনের ১০০% খাঁটি প্রাকৃতিক মধু।',
-    descriptionEn: 'Raw forest honey packed with natural enzymes, pollen, and immune-boosting nutrients.',
+    descriptionEn:
+      'Raw forest honey packed with natural enzymes, pollen, and immune-boosting nutrients.',
     descriptionBn: 'সর্দি-কাশি ও রোগ প্রতিরোধ ক্ষমতা বৃদ্ধিতে প্রাকৃতিক ঔষধি গুণসম্পন্ন।',
     price: 490,
     compareAtPrice: 550,
@@ -768,7 +779,8 @@ export const SEED_PRODUCTS: SeedProductItem[] = [
     nameBn: 'প্যারাস্যুট খাঁটি নারিকেল তেল (২০০ মি.লি.)',
     shortDescriptionEn: 'Deep nourishing pure coconut oil for healthy scalp and hair.',
     shortDescriptionBn: 'চুলের গভীর পুষ্টি ও মজবুত করতে খাঁটি নারিকেল তেল।',
-    descriptionEn: 'Extracted from handpicked sun-dried coconuts. Non-sticky and deeply nourishing.',
+    descriptionEn:
+      'Extracted from handpicked sun-dried coconuts. Non-sticky and deeply nourishing.',
     descriptionBn: 'চুল পড়া রোধে ও ঘন করতে যুগ যুগ ধরে বিশ্বস্ত নারিকেল তেল।',
     price: 155,
     compareAtPrice: 170,

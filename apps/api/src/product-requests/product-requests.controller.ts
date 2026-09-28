@@ -99,7 +99,8 @@ export class ProductRequestsController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
     summary: 'List all product requests for fulfillment (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Returns paginated customer product procurement requests.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Returns paginated customer product procurement requests.',
   })
   @ApiQuery({ name: 'status', required: false, enum: ProductRequestStatus })
   @ApiQuery({ name: 'search', required: false, type: String })
@@ -143,7 +144,8 @@ export class ProductRequestsController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Update product request fulfillment status (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Advances request status (e.g. IN_REVIEW, SOURCED, FULFILLED, REJECTED) and optionally links master catalog product.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Advances request status (e.g. IN_REVIEW, SOURCED, FULFILLED, REJECTED) and optionally links master catalog product.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Product request UUID' })
   @ApiStandardResponse({
@@ -157,11 +159,7 @@ export class ProductRequestsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDto: UpdateProductRequestStatusDto,
   ) {
-    const result = await this.productRequestsService.updateStatus(
-      id,
-      req.user.id,
-      updateDto,
-    );
+    const result = await this.productRequestsService.updateStatus(id, req.user.id, updateDto);
     await this.auditLogsService.record({
       actorId: req.user?.id,
       actorName: `${req.user?.firstName ?? ''} ${req.user?.lastName ?? ''}`.trim() || null,

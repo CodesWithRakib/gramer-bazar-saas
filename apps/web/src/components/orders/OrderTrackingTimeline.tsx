@@ -10,7 +10,11 @@ interface OrderTrackingTimelineProps {
   lang: string;
 }
 
-export function OrderTrackingTimeline({ statusHistory, currentStatus, lang }: OrderTrackingTimelineProps) {
+export function OrderTrackingTimeline({
+  statusHistory,
+  currentStatus,
+  lang,
+}: OrderTrackingTimelineProps) {
   const isBn = lang === 'bn';
   const dateLocale = isBn ? bn : enUS;
 
@@ -28,10 +32,11 @@ export function OrderTrackingTimeline({ statusHistory, currentStatus, lang }: Or
   const isReturned = currentStatusUpper === 'RETURNED';
 
   // Find the index of the current status in the normal flow
-  const currentFlowIndex = flow.findIndex(f => 
-    f.id === currentStatusUpper || 
-    (f.id === 'SHIPPED' && currentStatusUpper === 'OUT_FOR_DELIVERY') ||
-    (f.id === 'DELIVERED' && currentStatusUpper === 'PICKED_UP')
+  const currentFlowIndex = flow.findIndex(
+    (f) =>
+      f.id === currentStatusUpper ||
+      (f.id === 'SHIPPED' && currentStatusUpper === 'OUT_FOR_DELIVERY') ||
+      (f.id === 'DELIVERED' && currentStatusUpper === 'PICKED_UP')
   );
 
   return (
@@ -56,7 +61,9 @@ export function OrderTrackingTimeline({ statusHistory, currentStatus, lang }: Or
           )}
           {statusHistory.length > 0 && (
             <p className="text-sm text-muted-foreground mt-2">
-              {format(new Date(statusHistory[statusHistory.length - 1].createdAt), 'PPP p', { locale: dateLocale })}
+              {format(new Date(statusHistory[statusHistory.length - 1].createdAt), 'PPP p', {
+                locale: dateLocale,
+              })}
             </p>
           )}
         </div>
@@ -66,25 +73,30 @@ export function OrderTrackingTimeline({ statusHistory, currentStatus, lang }: Or
       <div className="relative flex flex-col md:flex-row justify-between w-full">
         {/* Horizontal Line for Desktop */}
         <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-[2px] bg-muted -z-10" />
-        
+
         {/* Vertical Line for Mobile */}
         <div className="block md:hidden absolute left-6 top-6 bottom-6 w-[2px] bg-muted -z-10" />
 
         {flow.map((step, index) => {
           // A step is completed if it exists in history OR if the current flow index is past this step
-          const historyItem = statusHistory.find(h => 
-            h.status === step.id || 
-            (step.id === 'SHIPPED' && h.status === 'OUT_FOR_DELIVERY') ||
-            (step.id === 'DELIVERED' && h.status === 'PICKED_UP')
+          const historyItem = statusHistory.find(
+            (h) =>
+              h.status === step.id ||
+              (step.id === 'SHIPPED' && h.status === 'OUT_FOR_DELIVERY') ||
+              (step.id === 'DELIVERED' && h.status === 'PICKED_UP')
           );
-          
-          const isCompleted = !!historyItem || (currentFlowIndex !== -1 && index <= currentFlowIndex);
+
+          const isCompleted =
+            !!historyItem || (currentFlowIndex !== -1 && index <= currentFlowIndex);
           const isCurrent = currentFlowIndex === index && !isCancelled && !isReturned;
-          
+
           const Icon = step.icon;
 
           return (
-            <div key={step.id} className="relative flex md:flex-col items-start md:items-center gap-4 md:gap-3 mb-8 md:mb-0 w-full md:w-1/5 group">
+            <div
+              key={step.id}
+              className="relative flex md:flex-col items-start md:items-center gap-4 md:gap-3 mb-8 md:mb-0 w-full md:w-1/5 group"
+            >
               {/* Desktop Progress Line Fill */}
               {index > 0 && isCompleted && (
                 <div className="hidden md:block absolute top-6 right-[50%] w-full h-[2px] bg-primary -z-10" />
@@ -94,22 +106,28 @@ export function OrderTrackingTimeline({ statusHistory, currentStatus, lang }: Or
                 <div className="block md:hidden absolute left-6 bottom-[50%] h-full w-[2px] bg-primary -z-10" />
               )}
 
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 transition-colors duration-300 z-10
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center border-4 transition-colors duration-300 z-10
                 ${isCompleted ? 'bg-primary border-primary/20 text-primary-foreground' : 'bg-background border-muted text-muted-foreground'}
                 ${isCurrent ? 'ring-4 ring-primary/20 scale-110' : ''}
                 ${(isCancelled || isReturned) && isCompleted && !historyItem ? 'opacity-50 grayscale' : ''}
-              `}>
+              `}
+              >
                 <Icon className="w-5 h-5" />
               </div>
-              
+
               <div className="flex flex-col md:items-center text-left md:text-center mt-1">
-                <span className={`font-semibold text-sm md:text-base ${isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}>
+                <span
+                  className={`font-semibold text-sm md:text-base ${isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}
+                >
                   {isBn ? step.label.bn : step.label.en}
                 </span>
-                
+
                 {historyItem && (
                   <span className="text-xs text-muted-foreground mt-1 whitespace-nowrap">
-                    {format(new Date(historyItem.createdAt), 'MMM dd, hh:mm a', { locale: dateLocale })}
+                    {format(new Date(historyItem.createdAt), 'MMM dd, hh:mm a', {
+                      locale: dateLocale,
+                    })}
                   </span>
                 )}
               </div>

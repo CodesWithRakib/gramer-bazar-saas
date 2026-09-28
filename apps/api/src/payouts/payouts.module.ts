@@ -7,11 +7,7 @@ import { WalletsModule } from '../wallets/wallets.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([PayoutRequest]),
-    WalletsModule,
-    NotificationsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([PayoutRequest]), WalletsModule, NotificationsModule],
   controllers: [PayoutsController],
   providers: [PayoutsService],
   exports: [PayoutsService],

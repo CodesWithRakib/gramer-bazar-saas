@@ -4,7 +4,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { LocationSelector } from './LocationSelector';
 import { useCreateAddressMutation, useUpdateAddressMutation, Address } from '../addressApi';
@@ -119,10 +126,10 @@ export function AddressForm({ initialData, onSuccess }: AddressFormProps) {
             setIsGettingLocation(false);
             setShowManualInput(true); // show manual input instead of error
           },
-          { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 },
+          { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 }
         );
       },
-      { enableHighAccuracy: false, timeout: 1000, maximumAge: Infinity },
+      { enableHighAccuracy: false, timeout: 1000, maximumAge: Infinity }
     );
   };
 
@@ -237,7 +244,8 @@ export function AddressForm({ initialData, onSuccess }: AddressFormProps) {
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Pin your exact GPS coordinates so the rider can navigate directly to your door with live tracking.
+            Pin your exact GPS coordinates so the rider can navigate directly to your door with live
+            tracking.
           </p>
 
           {showManualInput ? (
@@ -289,7 +297,11 @@ export function AddressForm({ initialData, onSuccess }: AddressFormProps) {
                   onClick={handleGetLocation}
                   disabled={isGettingLocation}
                 >
-                  {isGettingLocation ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LocateFixed className="w-3.5 h-3.5" />}
+                  {isGettingLocation ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <LocateFixed className="w-3.5 h-3.5" />
+                  )}
                   Retry Auto
                 </Button>
               </div>
@@ -307,7 +319,11 @@ export function AddressForm({ initialData, onSuccess }: AddressFormProps) {
                 onClick={handleGetLocation}
                 disabled={isGettingLocation}
               >
-                {isGettingLocation ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LocateFixed className="w-3.5 h-3.5" />}
+                {isGettingLocation ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <LocateFixed className="w-3.5 h-3.5" />
+                )}
                 Update
               </Button>
             </div>

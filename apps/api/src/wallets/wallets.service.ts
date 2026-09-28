@@ -45,7 +45,7 @@ export class WalletsService {
 
       wallet.balance = Number(wallet.balance) + parsedAmount;
       wallet.totalEarned = Number(wallet.totalEarned) + parsedAmount;
-      
+
       await queryRunner.manager.save(wallet);
 
       const tx = this.transactionsRepository.create({
@@ -78,7 +78,7 @@ export class WalletsService {
 
     wallet.balance = Number(wallet.balance) - parsedAmount;
     wallet.pendingClearance = Number(wallet.pendingClearance) + parsedAmount;
-    
+
     return await this.walletsRepository.save(wallet);
   }
 
@@ -95,7 +95,7 @@ export class WalletsService {
       // Deduct from pending, add to total withdrawn
       wallet.pendingClearance = Number(wallet.pendingClearance) - parsedAmount;
       wallet.totalWithdrawn = Number(wallet.totalWithdrawn) + parsedAmount;
-      
+
       await queryRunner.manager.save(wallet);
 
       const tx = this.transactionsRepository.create({
@@ -124,7 +124,7 @@ export class WalletsService {
 
     wallet.pendingClearance = Number(wallet.pendingClearance) - parsedAmount;
     wallet.balance = Number(wallet.balance) + parsedAmount;
-    
+
     return await this.walletsRepository.save(wallet);
   }
 }

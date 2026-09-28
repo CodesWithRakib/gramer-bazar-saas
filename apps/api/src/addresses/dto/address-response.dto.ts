@@ -18,7 +18,10 @@ export class AddressResponseDto {
   @ApiProperty({ example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e', description: 'User UUID owner' })
   userId: string;
 
-  @ApiProperty({ example: 'Home', description: 'Label/Title of the address (e.g. Home, Work, Farm)' })
+  @ApiProperty({
+    example: 'Home',
+    description: 'Label/Title of the address (e.g. Home, Work, Farm)',
+  })
   title: string;
 
   @ApiProperty({ example: 'Rahim Uddin', description: 'Recipient contact name' })
@@ -63,7 +66,10 @@ export class AddressResponseDto {
   @ApiPropertyOptional({ type: LocationReferenceDto, nullable: true })
   area?: LocationReferenceDto | null;
 
-  @ApiProperty({ example: 'House 12, Village Bhabki, Khansama', description: 'Detailed street and landmark address' })
+  @ApiProperty({
+    example: 'House 12, Village Bhabki, Khansama',
+    description: 'Detailed street and landmark address',
+  })
   streetAddress: string;
 
   @ApiPropertyOptional({ example: 25.7439, nullable: true, description: 'Latitude coordinate' })

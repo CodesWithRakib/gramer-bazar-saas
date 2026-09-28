@@ -6,15 +6,15 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { setCartOpen, updateQuantity, removeFromCart, applyCoupon, removeCoupon } from '@/store/slices/cartSlice';
-import { useValidateCouponMutation } from '@/features/coupons/couponsApi';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from '@/components/ui/sheet';
+  setCartOpen,
+  updateQuantity,
+  removeFromCart,
+  applyCoupon,
+  removeCoupon,
+} from '@/store/slices/cartSlice';
+import { useValidateCouponMutation } from '@/features/coupons/couponsApi';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, ShoppingBag, Plus, Minus, Tag, X } from 'lucide-react';
@@ -28,22 +28,25 @@ export function CartDrawer({ lang }: { lang: string }) {
   const [couponCode, setCouponCode] = useState('');
   const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation();
 
-
-  const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
   const total = appliedCoupon ? subtotal - appliedCoupon.discountAmount : subtotal;
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
     try {
       const result = await validateCoupon({ code: couponCode, subtotal }).unwrap();
-      dispatch(applyCoupon({
-        code: result.code,
-        discountAmount: result.discountAmount,
-        couponId: result.couponId,
-      }));
+      dispatch(
+        applyCoupon({
+          code: result.code,
+          discountAmount: result.discountAmount,
+          couponId: result.couponId,
+        })
+      );
       setCouponCode('');
       toast.success(isBn ? 'কুপন প্রয়োগ করা হয়েছে' : 'Coupon applied', {
-        description: isBn ? `আপনি ৳${result.discountAmount} ছাড় পেয়েছেন` : `You got a discount of ৳${result.discountAmount}`,
+        description: isBn
+          ? `আপনি ৳${result.discountAmount} ছাড় পেয়েছেন`
+          : `You got a discount of ৳${result.discountAmount}`,
       });
     } catch (error) {
       toast.error(isBn ? 'কুপন প্রয়োগে ত্রুটি' : 'Coupon Error', {
@@ -58,7 +61,7 @@ export function CartDrawer({ lang }: { lang: string }) {
         <SheetHeader className="pb-4 border-b">
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
-            {isBn ? 'আপনার কার্ট' : 'Your Cart'} 
+            {isBn ? 'আপনার কার্ট' : 'Your Cart'}
             <span className="text-muted-foreground text-sm font-normal">
               ({items.length} {isBn ? 'টি আইটেম' : 'items'})
             </span>
@@ -71,7 +74,9 @@ export function CartDrawer({ lang }: { lang: string }) {
               <ShoppingBag className="h-8 w-8 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-medium text-lg">{isBn ? 'আপনার কার্ট খালি' : 'Your cart is empty'}</p>
+              <p className="font-medium text-lg">
+                {isBn ? 'আপনার কার্ট খালি' : 'Your cart is empty'}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">
                 {isBn ? 'কেনাকাটা শুরু করতে পণ্য যোগ করুন' : 'Add products to start shopping'}
               </p>
@@ -85,14 +90,17 @@ export function CartDrawer({ lang }: { lang: string }) {
             <div className="flex-1 -mx-6 px-6 py-4 overflow-y-auto">
               <div className="space-y-6">
                 {items.map((item) => (
-                  <div key={item.sellerProductId} className="flex gap-4 py-2 border-b last:border-0 border-muted/50">
+                  <div
+                    key={item.sellerProductId}
+                    className="flex gap-4 py-2 border-b last:border-0 border-muted/50"
+                  >
                     <div className="h-20 w-20 bg-muted/30 rounded-xl overflow-hidden flex-shrink-0 border p-1 relative">
-                      <CustomImage 
-                        src={item.image} 
-                        alt={isBn ? item.nameBn : item.nameEn} 
+                      <CustomImage
+                        src={item.image}
+                        alt={isBn ? item.nameBn : item.nameEn}
                         fill
                         sizes="80px"
-                        className="object-contain p-1 mix-blend-multiply rounded-lg" 
+                        className="object-contain p-1 mix-blend-multiply rounded-lg"
                       />
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-1">
@@ -106,7 +114,10 @@ export function CartDrawer({ lang }: { lang: string }) {
                       </div>
                       <div className="flex items-end justify-between mt-2">
                         <div className="font-bold text-primary">
-                          ৳{item.price} <span className="text-xs text-muted-foreground font-normal">x {item.quantity}</span>
+                          ৳{item.price}{' '}
+                          <span className="text-xs text-muted-foreground font-normal">
+                            x {item.quantity}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="flex items-center bg-muted/50 rounded-lg p-1">
@@ -114,25 +125,45 @@ export function CartDrawer({ lang }: { lang: string }) {
                               variant="ghost"
                               size="icon"
                               className="h-9 w-9 rounded-md"
-                              onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: Math.max(1, item.quantity - 1) }))}
+                              onClick={() =>
+                                dispatch(
+                                  updateQuantity({
+                                    sellerProductId: item.sellerProductId,
+                                    quantity: Math.max(1, item.quantity - 1),
+                                  })
+                                )
+                              }
                               disabled={item.quantity <= 1}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
-                            <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                            <span className="w-8 text-center text-sm font-medium">
+                              {item.quantity}
+                            </span>
                             <Button
                               variant="ghost"
                               size="icon"
                               className="h-9 w-9 rounded-md"
-                              onClick={() => dispatch(updateQuantity({ sellerProductId: item.sellerProductId, quantity: item.maxQuantity ? Math.min(item.maxQuantity, item.quantity + 1) : item.quantity + 1 }))}
-                              disabled={item.maxQuantity ? item.quantity >= item.maxQuantity : false}
+                              onClick={() =>
+                                dispatch(
+                                  updateQuantity({
+                                    sellerProductId: item.sellerProductId,
+                                    quantity: item.maxQuantity
+                                      ? Math.min(item.maxQuantity, item.quantity + 1)
+                                      : item.quantity + 1,
+                                  })
+                                )
+                              }
+                              disabled={
+                                item.maxQuantity ? item.quantity >= item.maxQuantity : false
+                              }
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="h-10 w-10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded-lg transition-colors"
                             onClick={() => dispatch(removeFromCart(item.sellerProductId))}
                           >
@@ -157,21 +188,26 @@ export function CartDrawer({ lang }: { lang: string }) {
                     </div>
                     <div className="flex items-center gap-2 text-primary font-medium text-sm">
                       -৳{appliedCoupon.discountAmount.toFixed(2)}
-                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-primary/20 text-primary" onClick={() => dispatch(removeCoupon())}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 rounded-full hover:bg-primary/20 text-primary"
+                        onClick={() => dispatch(removeCoupon())}
+                      >
                         <X className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <div className="flex gap-2">
-                    <Input 
-                      placeholder={isBn ? "প্রোমো কোড" : "Promo Code"} 
+                    <Input
+                      placeholder={isBn ? 'প্রোমো কোড' : 'Promo Code'}
                       className="flex-1"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                     />
-                    <Button 
-                      variant="secondary" 
+                    <Button
+                      variant="secondary"
                       onClick={handleApplyCoupon}
                       disabled={!couponCode.trim() || isValidating}
                     >
@@ -199,18 +235,26 @@ export function CartDrawer({ lang }: { lang: string }) {
               </div>
 
               <p className="text-xs text-muted-foreground text-center bg-muted/30 p-2 rounded-lg">
-                {isBn ? 'ডেলিভারি চার্জ চেকআউটে হিসাব করা হবে' : 'Delivery fee calculated at checkout'}
+                {isBn
+                  ? 'ডেলিভারি চার্জ চেকআউটে হিসাব করা হবে'
+                  : 'Delivery fee calculated at checkout'}
               </p>
               <div className="flex w-full gap-3 mt-2">
-                <Button variant="secondary" className="flex-1 font-medium" asChild onClick={() => dispatch(setCartOpen(false))}>
-                  <Link href={`/${lang}/cart`}>
-                    {isBn ? 'কার্ট দেখুন' : 'View Cart'}
-                  </Link>
+                <Button
+                  variant="secondary"
+                  className="flex-1 font-medium"
+                  asChild
+                  onClick={() => dispatch(setCartOpen(false))}
+                >
+                  <Link href={`/${lang}/cart`}>{isBn ? 'কার্ট দেখুন' : 'View Cart'}</Link>
                 </Button>
-                <Button className="flex-1 font-medium shadow-md" size="lg" asChild onClick={() => dispatch(setCartOpen(false))}>
-                  <Link href={`/${lang}/customer/checkout`}>
-                    {isBn ? 'চেকআউট' : 'Checkout'}
-                  </Link>
+                <Button
+                  className="flex-1 font-medium shadow-md"
+                  size="lg"
+                  asChild
+                  onClick={() => dispatch(setCartOpen(false))}
+                >
+                  <Link href={`/${lang}/customer/checkout`}>{isBn ? 'চেকআউট' : 'Checkout'}</Link>
                 </Button>
               </div>
             </SheetFooter>

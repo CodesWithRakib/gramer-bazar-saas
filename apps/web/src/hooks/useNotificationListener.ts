@@ -4,10 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSocket } from '@/lib/socket';
-import {
-  notificationsApi,
-  useMarkAsReadMutation,
-} from '@/features/notifications/notificationsApi';
+import { notificationsApi, useMarkAsReadMutation } from '@/features/notifications/notificationsApi';
 import {
   AppNotification,
   NotificationPriority,

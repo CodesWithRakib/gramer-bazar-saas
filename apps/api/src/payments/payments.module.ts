@@ -9,11 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Payment, Order, User]),
-    ConfigModule,
-    NotificationsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Payment, Order, User]), ConfigModule, NotificationsModule],
   controllers: [PaymentsController],
   providers: [PaymentsService],
   exports: [PaymentsService],

@@ -135,10 +135,7 @@ export function getNotificationActionUrl(
   const isAdmin = roles.includes('admin') || roles.includes('super-admin');
 
   // Orders
-  if (
-    notification.type.includes('ORDER') ||
-    notification.type === NotificationType.ORDER_UPDATE
-  ) {
+  if (notification.type.includes('ORDER') || notification.type === NotificationType.ORDER_UPDATE) {
     if (data.orderId) {
       if (isAdmin) {
         return `/${lang}/admin/orders/${data.orderId}`;

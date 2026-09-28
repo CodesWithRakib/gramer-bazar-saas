@@ -10,7 +10,9 @@ export class AppRootResponseDto {
   @ApiProperty({ example: '1.0.0' })
   version: string;
 
-  @ApiProperty({ example: 'Hyperlocal Multi-Vendor Agri-Marketplace & Enterprise SaaS Backend Engine' })
+  @ApiProperty({
+    example: 'Hyperlocal Multi-Vendor Agri-Marketplace & Enterprise SaaS Backend Engine',
+  })
   description: string;
 
   @ApiProperty({ example: 'online' })

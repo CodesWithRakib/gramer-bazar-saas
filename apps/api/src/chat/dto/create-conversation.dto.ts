@@ -3,7 +3,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ConversationType, SupportPriority } from '../enums/chat.enum.js';
 
 export class CreateConversationDto {
-  @ApiPropertyOptional({ example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', description: 'Required for DIRECT conversations' })
+  @ApiPropertyOptional({
+    example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
+    description: 'Required for DIRECT conversations',
+  })
   @IsString()
   @IsOptional()
   participantId?: string;

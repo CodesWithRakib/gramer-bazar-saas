@@ -58,9 +58,7 @@ describe('AuditLogsService', () => {
     it('swallows persistence failures so callers never break', async () => {
       repository.save.mockRejectedValue(new Error('db down'));
 
-      await expect(
-        service.record({ action: 'X', actorId: 'u1' }),
-      ).resolves.toBeUndefined();
+      await expect(service.record({ action: 'X', actorId: 'u1' })).resolves.toBeUndefined();
     });
   });
 

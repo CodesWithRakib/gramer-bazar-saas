@@ -17,13 +17,21 @@ export default function CategoriesPage({ params }: { params: Promise<{ lang: str
   return (
     <div className="container mx-auto px-4 py-6 md:py-10 max-w-7xl">
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
-        <Link href={`/${lang}`} className="hover:text-primary transition-colors flex items-center gap-1">
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6"
+      >
+        <Link
+          href={`/${lang}`}
+          className="hover:text-primary transition-colors flex items-center gap-1"
+        >
           <Home className="h-3.5 w-3.5" />
           <span>{isBn ? 'হোম' : 'Home'}</span>
         </Link>
         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
-        <span className="text-foreground font-medium">{isBn ? 'সকল ক্যাটাগরি' : 'All Categories'}</span>
+        <span className="text-foreground font-medium">
+          {isBn ? 'সকল ক্যাটাগরি' : 'All Categories'}
+        </span>
       </nav>
 
       {/* Header */}
@@ -36,8 +44,8 @@ export default function CategoriesPage({ params }: { params: Promise<{ lang: str
           {isBn ? 'সকল পণ্য ক্যাটাগরি' : 'All Categories'}
         </h1>
         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          {isBn 
-            ? 'খাঁটি গ্রাম্য খাবার, তাজা শাকসবজি, নিত্যপ্রয়োজনীয় মুদি সামগ্রী ও অন্যান্য পণ্য আপনার পছন্দের ক্যাটাগরি থেকে ব্রাউজ করুন।' 
+          {isBn
+            ? 'খাঁটি গ্রাম্য খাবার, তাজা শাকসবজি, নিত্যপ্রয়োজনীয় মুদি সামগ্রী ও অন্যান্য পণ্য আপনার পছন্দের ক্যাটাগরি থেকে ব্রাউজ করুন।'
             : 'Explore fresh farm produce, pure grocery essentials, local foods, cosmetics and health products from our curated categories.'}
         </p>
       </div>
@@ -52,7 +60,9 @@ export default function CategoriesPage({ params }: { params: Promise<{ lang: str
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => {
             const categoryName = isBn ? category.nameBn : category.nameEn;
-            const categoryDesc = isBn ? category.descriptionBn || category.descriptionEn : category.descriptionEn;
+            const categoryDesc = isBn
+              ? category.descriptionBn || category.descriptionEn
+              : category.descriptionEn;
 
             return (
               <div
@@ -98,9 +108,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ lang: str
                           >
                             <span>{isBn ? sub.nameBn : sub.nameEn}</span>
                             {sub.productCount !== undefined && sub.productCount > 0 && (
-                              <span className="text-[10px] opacity-75">
-                                ({sub.productCount})
-                              </span>
+                              <span className="text-[10px] opacity-75">({sub.productCount})</span>
                             )}
                           </Link>
                         ))}

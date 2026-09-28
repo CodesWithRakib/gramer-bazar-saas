@@ -24,14 +24,20 @@ export function CustomerProductRequestsView({ lang = 'en' }: CustomerProductRequ
     switch (status) {
       case 'PENDING':
         return (
-          <Badge variant="outline" className="border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium text-xs">
+          <Badge
+            variant="outline"
+            className="border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium text-xs"
+          >
             {isBn ? 'অপেক্ষমাণ' : 'Pending'}
           </Badge>
         );
       case 'REVIEWING':
       case 'SEARCHING':
         return (
-          <Badge variant="outline" className="border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400 font-medium text-xs">
+          <Badge
+            variant="outline"
+            className="border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400 font-medium text-xs"
+          >
             {isBn ? 'খোঁজা হচ্ছে' : 'Searching'}
           </Badge>
         );
@@ -39,14 +45,20 @@ export function CustomerProductRequestsView({ lang = 'en' }: CustomerProductRequ
       case 'PRODUCT_ADDED':
       case 'CUSTOMER_NOTIFIED':
         return (
-          <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium text-xs">
+          <Badge
+            variant="outline"
+            className="border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium text-xs"
+          >
             {isBn ? 'পণ্য যুক্ত হয়েছে' : 'Product Added'}
           </Badge>
         );
       case 'CLOSED':
       case 'REJECTED':
         return (
-          <Badge variant="outline" className="border-destructive/20 bg-destructive/10 text-destructive font-medium text-xs">
+          <Badge
+            variant="outline"
+            className="border-destructive/20 bg-destructive/10 text-destructive font-medium text-xs"
+          >
             {isBn ? 'বাতিল' : 'Rejected'}
           </Badge>
         );
@@ -178,7 +190,12 @@ export function CustomerProductRequestsView({ lang = 'en' }: CustomerProductRequ
                       <p className="text-sm text-foreground/80 line-clamp-2">{req.description}</p>
                     )}
                   </div>
-                  <Button asChild variant="outline" size="sm" className="rounded-xl shrink-0 shadow-xs">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl shrink-0 shadow-xs"
+                  >
                     <Link href={`/${lang}/product-requests/${req.id}`}>
                       <span>{isBn ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
                       <ChevronRight className="w-4 h-4 ml-1" />

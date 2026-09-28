@@ -18,15 +18,15 @@ export class CartService {
   async validateCart(items: CartValidateItem[]) {
     if (!items || items.length === 0) return { items: [], total: 0 };
 
-    const sellerProductIds = items.map(item => item.sellerProductId);
+    const sellerProductIds = items.map((item) => item.sellerProductId);
     const dbProducts = await this.sellerProductRepo.find({
       where: { id: In(sellerProductIds), isActive: true },
       relations: ['inventory', 'productVariant', 'productVariant.product'],
     });
 
-    const validatedItems = items.map(item => {
-      const dbProduct = dbProducts.find(p => p.id === item.sellerProductId);
-      
+    const validatedItems = items.map((item) => {
+      const dbProduct = dbProducts.find((p) => p.id === item.sellerProductId);
+
       if (!dbProduct) {
         return {
           ...item,
@@ -54,13 +54,13 @@ export class CartService {
     });
 
     const total = validatedItems
-      .filter(item => item.isValid)
+      .filter((item) => item.isValid)
       .reduce((sum, item) => sum + item.currentPrice * item.quantity, 0);
 
     return {
       items: validatedItems,
       total,
-      isValid: validatedItems.every(item => item.isValid),
+      isValid: validatedItems.every((item) => item.isValid),
     };
   }
 }

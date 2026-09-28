@@ -44,7 +44,10 @@ import { Notification, NotificationType } from '../notifications/entities/notifi
 import { Conversation } from '../chat/entities/conversation.entity.js';
 import { Message } from '../chat/entities/message.entity.js';
 import { Wallet } from '../wallets/entities/wallet.entity.js';
-import { WalletTransaction, TransactionType } from '../wallets/entities/wallet-transaction.entity.js';
+import {
+  WalletTransaction,
+  TransactionType,
+} from '../wallets/entities/wallet-transaction.entity.js';
 import { DemandEvent } from '../analytics/entities/demand-event.entity.js';
 import { DemandEventType } from '../analytics/enums/demand-event.enum.js';
 import { PermissionEntity } from '../permissions/entities/permission.entity.js';
@@ -59,13 +62,22 @@ import { DisputeMessage } from '../disputes/entities/dispute-message.entity.js';
 import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
 import { Otp } from '../otp/entities/otp.entity.js';
 
-import { SEED_ADMINS, SEED_SELLERS, SEED_CUSTOMERS, SEED_RIDERS, SeedUserData } from './data/seed-users.data.js';
+import {
+  SEED_ADMINS,
+  SEED_SELLERS,
+  SEED_CUSTOMERS,
+  SEED_RIDERS,
+  SeedUserData,
+} from './data/seed-users.data.js';
 import { SEED_SHOPS } from './data/seed-shops.data.js';
 import { SEED_PRODUCTS, SeedProductItem } from './data/seed-products.data.js';
 import { SEED_ADDRESSES } from './data/seed-addresses.data.js';
 import { SEED_PERMISSIONS, ROLE_PERMISSION_NAMES } from './data/seed-permissions.data.js';
 import { BRAND_CATEGORY_SLUG_MAP } from './data/seed-category-brands.data.js';
-import { SEED_SELLER_APPLICATIONS, SEED_RIDER_APPLICATIONS } from './data/seed-applications.data.js';
+import {
+  SEED_SELLER_APPLICATIONS,
+  SEED_RIDER_APPLICATIONS,
+} from './data/seed-applications.data.js';
 import { SEED_PRODUCT_REQUESTS } from './data/seed-product-requests.data.js';
 import { SEED_DISPUTES } from './data/seed-disputes.data.js';
 import { SEED_PAYOUT_REQUESTS } from './data/seed-payouts.data.js';
@@ -99,7 +111,8 @@ export class SeederService {
     @InjectRepository(Address) private addressRepo: Repository<Address>,
     @InjectRepository(Order) private orderRepo: Repository<Order>,
     @InjectRepository(OrderItem) private orderItemRepo: Repository<OrderItem>,
-    @InjectRepository(OrderStatusHistory) private orderStatusHistoryRepo: Repository<OrderStatusHistory>,
+    @InjectRepository(OrderStatusHistory)
+    private orderStatusHistoryRepo: Repository<OrderStatusHistory>,
     @InjectRepository(Payment) private paymentRepo: Repository<Payment>,
     @InjectRepository(Delivery) private deliveryRepo: Repository<Delivery>,
     @InjectRepository(DeliveryHistory) private deliveryHistoryRepo: Repository<DeliveryHistory>,
@@ -116,7 +129,8 @@ export class SeederService {
     @InjectRepository(SellerApplication) private sellerAppRepo: Repository<SellerApplication>,
     @InjectRepository(RiderApplication) private riderAppRepo: Repository<RiderApplication>,
     @InjectRepository(ProductRequest) private productRequestRepo: Repository<ProductRequest>,
-    @InjectRepository(ProductRequestHistory) private productRequestHistoryRepo: Repository<ProductRequestHistory>,
+    @InjectRepository(ProductRequestHistory)
+    private productRequestHistoryRepo: Repository<ProductRequestHistory>,
     @InjectRepository(Dispute) private disputeRepo: Repository<Dispute>,
     @InjectRepository(DisputeMessage) private disputeMessageRepo: Repository<DisputeMessage>,
     @InjectRepository(PayoutRequest) private payoutRequestRepo: Repository<PayoutRequest>,
@@ -133,15 +147,30 @@ export class SeederService {
     const shops = await this.seedShops(users.sellers);
     const catalog = await this.seedCatalog();
     await this.seedCategoryBrands(catalog.categories);
-    const sellerProducts = await this.seedInventory(shops, catalog.products, catalog.productVariants);
+    const sellerProducts = await this.seedInventory(
+      shops,
+      catalog.products,
+      catalog.productVariants,
+    );
     const coupons = await this.seedCoupons();
-    const orders = await this.seedOrdersAndDeliveries(users.customers, users.riders, shops, sellerProducts);
+    const orders = await this.seedOrdersAndDeliveries(
+      users.customers,
+      users.riders,
+      shops,
+      sellerProducts,
+    );
     await this.seedCouponUsages(coupons, users.customers, orders);
     await this.seedReviews(users.customers, orders);
     await this.seedWishlists(users.customers, catalog.products);
     await this.seedWallets(users.customers, users.sellers);
     await this.seedPayoutRequests(users.sellers);
-    await this.seedApplications(users.superAdmin, users.admin, users.sellers, users.riders, users.customers);
+    await this.seedApplications(
+      users.superAdmin,
+      users.admin,
+      users.sellers,
+      users.riders,
+      users.customers,
+    );
     await this.seedProductRequests(users.customers, users.admin, catalog.products);
     await this.seedDisputes(orders, users.admin);
     await this.seedNotifications(users.customers, users.sellers, orders);
@@ -200,12 +229,15 @@ export class SeederService {
     this.logger.log('Checking location data...');
     const divisionCount = await this.divisionRepo.count();
     if (divisionCount > 0) {
-      this.logger.log(`Locations already seeded (${divisionCount} divisions found). Skipping to preserve data.`);
+      this.logger.log(
+        `Locations already seeded (${divisionCount} divisions found). Skipping to preserve data.`,
+      );
       return;
     }
 
     this.logger.log('Seeding Bangladesh locations...');
-    const { bdDivisions, bdDistricts, bdUpazilas, bdUnions } = await import('./data/locations.data.js');
+    const { bdDivisions, bdDistricts, bdUpazilas, bdUnions } =
+      await import('./data/locations.data.js');
 
     let country = await this.countryRepo.findOne({ where: { nameEn: 'Bangladesh' } });
     if (!country) {
@@ -361,7 +393,11 @@ export class SeederService {
     };
   }
 
-  private async upsertUser(data: SeedUserData, roleEntity: RoleEntity, passwordHash: string): Promise<User> {
+  private async upsertUser(
+    data: SeedUserData,
+    roleEntity: RoleEntity,
+    passwordHash: string,
+  ): Promise<User> {
     const existing = await this.userRepo.findOne({
       where: [{ email: data.email }, { phone: data.phone }],
       relations: ['roles'],
@@ -427,7 +463,8 @@ export class SeederService {
       const customer = customers.find(
         (c) =>
           c.email === seedAddr.customerEmail ||
-          (seedAddr.customerEmail === 'customer1@gramerbazar.com' && c.email === 'customer1@gramerbazar.example'),
+          (seedAddr.customerEmail === 'customer1@gramerbazar.com' &&
+            c.email === 'customer1@gramerbazar.example'),
       );
       if (!customer) continue;
 
@@ -633,12 +670,19 @@ export class SeederService {
     const defaultCat = categoryMap.get('grocery') || categoriesList[0];
 
     for (const p of productItemsToSeed) {
-      const pSlug = p.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const pSlug = p.nameEn
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
       let prod = await this.productRepo.findOne({ where: [{ slug: pSlug }, { sku: p.sku }] });
 
       const targetCategory = categoryMap.get(p.categorySlug) || defaultCat;
-      const subCat = p.subCategorySlug ? categoryMap.get(`${p.categorySlug}/${p.subCategorySlug}`) || categoryMap.get(p.subCategorySlug) : undefined;
-      const brand = brandMap.get(p.brand) || brandMap.get('Local Farmer') || (await this.brandRepo.find())[0];
+      const subCat = p.subCategorySlug
+        ? categoryMap.get(`${p.categorySlug}/${p.subCategorySlug}`) ||
+          categoryMap.get(p.subCategorySlug)
+        : undefined;
+      const brand =
+        brandMap.get(p.brand) || brandMap.get('Local Farmer') || (await this.brandRepo.find())[0];
 
       if (!prod) {
         prod = await this.productRepo.save(
@@ -705,7 +749,9 @@ export class SeederService {
       allProducts.push(prod);
     }
 
-    this.logger.log(`Catalog ready with ${allProducts.length} products and ${allVariants.length} variants.`);
+    this.logger.log(
+      `Catalog ready with ${allProducts.length} products and ${allVariants.length} variants.`,
+    );
     return {
       categories: Array.from(categoryMap.values()),
       brands: Array.from(brandMap.values()),
@@ -714,7 +760,11 @@ export class SeederService {
     };
   }
 
-  async seedInventory(shops: Shop[], products: Product[], variants: ProductVariant[]): Promise<SellerProduct[]> {
+  async seedInventory(
+    shops: Shop[],
+    products: Product[],
+    variants: ProductVariant[],
+  ): Promise<SellerProduct[]> {
     this.logger.log('Seeding seller products and live stock inventory across shops...');
     const sellerProducts: SellerProduct[] = [];
     const shopMap = new Map<string, Shop>();
@@ -722,7 +772,9 @@ export class SeederService {
 
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
-      const prod = products.find((p) => p.id === variant.product?.id || p.sku === variant.sku) || products[i % products.length];
+      const prod =
+        products.find((p) => p.id === variant.product?.id || p.sku === variant.sku) ||
+        products[i % products.length];
 
       // Match product to its authentic shop or distribute
       const seedItem = SEED_PRODUCTS.find((sp) => sp.sku === variant.sku);
@@ -838,7 +890,9 @@ export class SeederService {
     this.logger.log('Seeding realistic order history, payments, and delivery assignments...');
     const existingCount = await this.orderRepo.count();
     if (existingCount >= 40) {
-      this.logger.log(`Orders already populated (${existingCount} orders found). Skipping to preserve data.`);
+      this.logger.log(
+        `Orders already populated (${existingCount} orders found). Skipping to preserve data.`,
+      );
       return await this.orderRepo.find({ relations: ['user', 'items', 'items.sellerProduct'] });
     }
 
@@ -875,7 +929,12 @@ export class SeederService {
       const selectedSps = shopProducts.slice(0, itemCount);
 
       let subtotal = 0;
-      const orderItemsToCreate: { sellerProduct: SellerProduct; quantity: number; unitPrice: number; subtotal: number }[] = [];
+      const orderItemsToCreate: {
+        sellerProduct: SellerProduct;
+        quantity: number;
+        unitPrice: number;
+        subtotal: number;
+      }[] = [];
 
       for (let j = 0; j < selectedSps.length; j++) {
         const sp = selectedSps[j];
@@ -901,7 +960,10 @@ export class SeederService {
       const orderDate = new Date(now - daysAgo * dayMs);
 
       const status = statusProgression[i % statusProgression.length];
-      const isPaid = status === OrderStatus.DELIVERED || status === OrderStatus.OUT_FOR_DELIVERY || status === OrderStatus.PROCESSING;
+      const isPaid =
+        status === OrderStatus.DELIVERED ||
+        status === OrderStatus.OUT_FOR_DELIVERY ||
+        status === OrderStatus.PROCESSING;
       const paymentMethod = i % 3 === 0 ? PaymentMethod.ONLINE : PaymentMethod.COD;
       const paymentStatus = isPaid ? PaymentStatus.PAID : PaymentStatus.PENDING;
       const tranId = `GBZ-TRX-${orderDate.getFullYear()}${String(orderDate.getMonth() + 1).padStart(2, '0')}-${String(i + 1000)}`;
@@ -974,7 +1036,10 @@ export class SeederService {
           orderId: order.id,
           user: customer,
           userId: customer.id,
-          provider: paymentMethod === PaymentMethod.ONLINE ? PaymentProvider.SSLCOMMERZ : PaymentProvider.COD,
+          provider:
+            paymentMethod === PaymentMethod.ONLINE
+              ? PaymentProvider.SSLCOMMERZ
+              : PaymentProvider.COD,
           transactionId: tranId,
           amount: total,
           currency: 'BDT',
@@ -988,7 +1053,8 @@ export class SeederService {
         const rider = riders[i % riders.length];
         let deliveryStatus = DeliveryStatus.ASSIGNED;
         if (status === OrderStatus.DELIVERED) deliveryStatus = DeliveryStatus.DELIVERED;
-        else if (status === OrderStatus.OUT_FOR_DELIVERY) deliveryStatus = DeliveryStatus.OUT_FOR_DELIVERY;
+        else if (status === OrderStatus.OUT_FOR_DELIVERY)
+          deliveryStatus = DeliveryStatus.OUT_FOR_DELIVERY;
 
         const delivery = await this.deliveryRepo.save(
           this.deliveryRepo.create({
@@ -998,8 +1064,14 @@ export class SeederService {
             riderId: rider.id,
             status: deliveryStatus,
             assignedAt: orderDate,
-            pickupTime: status === OrderStatus.DELIVERED ? new Date(orderDate.getTime() + 2 * 3600 * 1000) : null,
-            deliveryTime: status === OrderStatus.DELIVERED ? new Date(orderDate.getTime() + 4 * 3600 * 1000) : null,
+            pickupTime:
+              status === OrderStatus.DELIVERED
+                ? new Date(orderDate.getTime() + 2 * 3600 * 1000)
+                : null,
+            deliveryTime:
+              status === OrderStatus.DELIVERED
+                ? new Date(orderDate.getTime() + 4 * 3600 * 1000)
+                : null,
             notes: 'গ্রামের বাজার দ্রুত হোম ডেলিভারি',
             createdAt: orderDate,
           }),
@@ -1046,7 +1118,11 @@ export class SeederService {
       const order = deliveredOrders[i];
       const items = await this.orderItemRepo.find({
         where: { orderId: order.id },
-        relations: ['sellerProduct', 'sellerProduct.productVariant', 'sellerProduct.productVariant.product'],
+        relations: [
+          'sellerProduct',
+          'sellerProduct.productVariant',
+          'sellerProduct.productVariant.product',
+        ],
       });
 
       for (const item of items) {
@@ -1187,7 +1263,8 @@ export class SeederService {
           userId: customer.id,
           user: customer,
           title: 'অর্ডার সফলভাবে ডেলিভারি হয়েছে',
-          message: 'আপনার অর্ডারটি নিরাপদে আপনার ঠিকানায় পৌঁছে দেওয়া হয়েছে। পণ্যটি ভালো লাগলে রিভিউ দিন।',
+          message:
+            'আপনার অর্ডারটি নিরাপদে আপনার ঠিকানায় পৌঁছে দেওয়া হয়েছে। পণ্যটি ভালো লাগলে রিভিউ দিন।',
           type: NotificationType.ORDER_UPDATE,
           isRead: i % 2 === 0,
         }),
@@ -1250,7 +1327,8 @@ export class SeederService {
           sender: seller,
           senderId: seller.id,
           senderRole: 'SELLER',
-          content: 'ওয়ালাইকুম আসসালাম। জী ভাই, কাঠের ঘানিতে ভাঙা ১০০% খাঁটি ঝাঁঝালো তেল। নিশ্চিত মনে নিতে পারেন।',
+          content:
+            'ওয়ালাইকুম আসসালাম। জী ভাই, কাঠের ঘানিতে ভাঙা ১০০% খাঁটি ঝাঁঝালো তেল। নিশ্চিত মনে নিতে পারেন।',
           isRead: true,
         }),
       ]);
@@ -1262,7 +1340,11 @@ export class SeederService {
     const eventCount = await this.demandEventRepo.count();
     if (eventCount >= 30) return;
 
-    const eventTypes = [DemandEventType.VIEW, DemandEventType.ADD_TO_CART, DemandEventType.PURCHASE];
+    const eventTypes = [
+      DemandEventType.VIEW,
+      DemandEventType.ADD_TO_CART,
+      DemandEventType.PURCHASE,
+    ];
     const events: DemandEvent[] = [];
 
     for (let i = 0; i < 45; i++) {
@@ -1289,14 +1371,16 @@ export class SeederService {
       await this.bannerRepo.save([
         this.bannerRepo.create({
           title: 'Organic Food Mega Sale',
-          imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1920&q=80',
+          imageUrl:
+            'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1920&q=80',
           linkUrl: '/products',
           isActive: true,
           displayOrder: 1,
         }),
         this.bannerRepo.create({
           title: 'Pure Honey & Organic Tea Fest',
-          imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1920&q=80',
+          imageUrl:
+            'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1920&q=80',
           linkUrl: '/categories/honey',
           isActive: true,
           displayOrder: 2,
@@ -1312,7 +1396,8 @@ export class SeederService {
           startDate: new Date(),
           endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           isActive: true,
-          bannerImage: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1920&q=80',
+          bannerImage:
+            'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1920&q=80',
         }),
       );
 
@@ -1365,7 +1450,9 @@ export class SeederService {
         await this.roleRepo.save(role);
       }
     }
-    this.logger.log(`Permissions & Role_Permissions ready (${permMap.size} permissions assigned across roles).`);
+    this.logger.log(
+      `Permissions & Role_Permissions ready (${permMap.size} permissions assigned across roles).`,
+    );
   }
 
   async seedCategoryBrands(categories: Category[]) {
@@ -1418,8 +1505,15 @@ export class SeederService {
       });
 
       if (!existing) {
-        const reviewer = app.status === ApplicationStatus.APPROVED ? superAdmin : app.status === ApplicationStatus.REJECTED ? admin : null;
-        const reviewedAt = app.reviewedDaysAgo ? new Date(Date.now() - app.reviewedDaysAgo * 24 * 60 * 60 * 1000) : null;
+        const reviewer =
+          app.status === ApplicationStatus.APPROVED
+            ? superAdmin
+            : app.status === ApplicationStatus.REJECTED
+              ? admin
+              : null;
+        const reviewedAt = app.reviewedDaysAgo
+          ? new Date(Date.now() - app.reviewedDaysAgo * 24 * 60 * 60 * 1000)
+          : null;
 
         await this.sellerAppRepo.save(
           this.sellerAppRepo.create({
@@ -1454,8 +1548,15 @@ export class SeederService {
       });
 
       if (!existing) {
-        const reviewer = app.status === ApplicationStatus.APPROVED ? superAdmin : app.status === ApplicationStatus.REJECTED ? admin : null;
-        const reviewedAt = app.reviewedDaysAgo ? new Date(Date.now() - app.reviewedDaysAgo * 24 * 60 * 60 * 1000) : null;
+        const reviewer =
+          app.status === ApplicationStatus.APPROVED
+            ? superAdmin
+            : app.status === ApplicationStatus.REJECTED
+              ? admin
+              : null;
+        const reviewedAt = app.reviewedDaysAgo
+          ? new Date(Date.now() - app.reviewedDaysAgo * 24 * 60 * 60 * 1000)
+          : null;
 
         await this.riderAppRepo.save(
           this.riderAppRepo.create({
@@ -1499,7 +1600,10 @@ export class SeederService {
       });
 
       if (!req) {
-        const linkedProduct = reqItem.status === ProductRequestStatus.PRODUCT_ADDED && products.length > 0 ? products[0] : null;
+        const linkedProduct =
+          reqItem.status === ProductRequestStatus.PRODUCT_ADDED && products.length > 0
+            ? products[0]
+            : null;
 
         req = await this.productRequestRepo.save(
           this.productRequestRepo.create({
@@ -1553,7 +1657,8 @@ export class SeederService {
           relations: ['sellerProduct', 'sellerProduct.shop', 'sellerProduct.shop.seller'],
         });
 
-        const customer = order.user || (await this.userRepo.findOne({ where: { id: order.userId } })) || admin;
+        const customer =
+          order.user || (await this.userRepo.findOne({ where: { id: order.userId } })) || admin;
         const seller = orderItems[0]?.sellerProduct?.shop?.seller || admin;
 
         const dispute = await this.disputeRepo.save(
@@ -1606,7 +1711,10 @@ export class SeederService {
 
     for (let i = 0; i < Math.min(discountedOrders.length, 10); i++) {
       const order = discountedOrders[i];
-      const customer = order.user || (await this.userRepo.findOne({ where: { id: order.userId } })) || customers[i % customers.length];
+      const customer =
+        order.user ||
+        (await this.userRepo.findOne({ where: { id: order.userId } })) ||
+        customers[i % customers.length];
       const coupon = coupons[i % coupons.length] || primaryCoupon;
 
       const existing = await this.couponUsageRepo.findOne({

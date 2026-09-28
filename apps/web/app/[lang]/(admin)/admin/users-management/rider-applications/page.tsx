@@ -1,9 +1,9 @@
-import { AdminRiderApplicationsView } from "@/features/admin/users-management";
+import { AdminRiderApplicationsView } from '@/features/admin/users-management';
 
 export default async function AdminRiderApplicationsPage({
   params,
 }: {
-  params: Promise<{ lang: "ar" | "en" }>;
+  params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
   return <AdminRiderApplicationsView lang={lang} namespace="admin" />;

@@ -1,4 +1,4 @@
-import { api } from "../../store/api";
+import { api } from '../../store/api';
 
 export interface ChatMessage {
   id: string;
@@ -54,38 +54,35 @@ export const chatApi = api.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     getUnreadCount: builder.query<UnreadCountResponse, void>({
-      query: () => "/chat/unread-count",
-      providesTags: ["Conversation"],
+      query: () => '/chat/unread-count',
+      providesTags: ['Conversation'],
     }),
     getConversations: builder.query<Conversation[], void>({
-      query: () => "/chat/conversations",
-      providesTags: ["Conversation"],
+      query: () => '/chat/conversations',
+      providesTags: ['Conversation'],
     }),
-    createConversation: builder.mutation<
-      Conversation,
-      CreateConversationPayload
-    >({
+    createConversation: builder.mutation<Conversation, CreateConversationPayload>({
       query: (body) => ({
-        url: "/chat/conversations",
-        method: "POST",
+        url: '/chat/conversations',
+        method: 'POST',
         body,
       }),
-      invalidatesTags: ["Conversation"],
+      invalidatesTags: ['Conversation'],
     }),
     getMessages: builder.query<ChatMessage[], string | GetMessagesParams>({
       query: (arg) => {
-        if (typeof arg === "string") {
+        if (typeof arg === 'string') {
           return `/chat/conversations/${arg}/messages`;
         }
         const params = new URLSearchParams();
-        if (arg.limit) params.set("limit", String(arg.limit));
-        if (arg.before) params.set("before", arg.before);
+        if (arg.limit) params.set('limit', String(arg.limit));
+        if (arg.before) params.set('before', arg.before);
         const qs = params.toString();
-        return `/chat/conversations/${arg.conversationId}/messages${qs ? `?${qs}` : ""}`;
+        return `/chat/conversations/${arg.conversationId}/messages${qs ? `?${qs}` : ''}`;
       },
       providesTags: (result, error, arg) => {
-        const id = typeof arg === "string" ? arg : arg.conversationId;
-        return [{ type: "Message", id }];
+        const id = typeof arg === 'string' ? arg : arg.conversationId;
+        return [{ type: 'Message', id }];
       },
     }),
     sendMessageRest: builder.mutation<
@@ -94,20 +91,20 @@ export const chatApi = api.injectEndpoints({
     >({
       query: ({ conversationId, content, messageType }) => ({
         url: `/chat/conversations/${conversationId}/messages`,
-        method: "POST",
+        method: 'POST',
         body: { content, messageType },
       }),
       invalidatesTags: (result, error, { conversationId }) => [
-        { type: "Message", id: conversationId },
-        "Conversation",
+        { type: 'Message', id: conversationId },
+        'Conversation',
       ],
     }),
     markMessagesAsRead: builder.mutation<{ success: boolean }, string>({
       query: (conversationId) => ({
         url: `/chat/conversations/${conversationId}/read`,
-        method: "PATCH",
+        method: 'PATCH',
       }),
-      invalidatesTags: ["Conversation", "Message"],
+      invalidatesTags: ['Conversation', 'Message'],
     }),
   }),
 });

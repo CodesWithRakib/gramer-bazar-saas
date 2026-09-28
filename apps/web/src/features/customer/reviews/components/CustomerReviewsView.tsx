@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import { useGetUserReviewsQuery } from '@/features/reviews/reviewsApi';
-import { Card, CardContent, } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Star, MessageSquareQuote, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 
@@ -17,8 +17,10 @@ export interface CustomerReviewsViewProps {
 export function CustomerReviewsView({ lang = 'en' }: CustomerReviewsViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
-  
-  const { user, isAuthenticated, isAuthInitialized } = useSelector((state: RootState) => state.auth);
+
+  const { user, isAuthenticated, isAuthInitialized } = useSelector(
+    (state: RootState) => state.auth
+  );
   const { data: reviews, isLoading } = useGetUserReviewsQuery(undefined, {
     skip: !isAuthenticated,
   });
@@ -35,17 +37,22 @@ export function CustomerReviewsView({ lang = 'en' }: CustomerReviewsViewProps) {
   return (
     <div className="w-full space-y-6">
       <h1 className="text-2xl font-bold">{isBn ? 'আমার রিভিউসমূহ' : 'My Reviews'}</h1>
-      
+
       {isLoading ? (
         <div className="text-center py-12 text-muted-foreground">Loading your reviews...</div>
       ) : !reviews || reviews.length === 0 ? (
         <div className="text-center py-16 bg-card border rounded-2xl">
           <MessageSquareQuote className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-semibold mb-2">{isBn ? 'কোনো রিভিউ পাওয়া যায়নি' : 'No reviews found'}</h3>
+          <h3 className="text-lg font-semibold mb-2">
+            {isBn ? 'কোনো রিভিউ পাওয়া যায়নি' : 'No reviews found'}
+          </h3>
           <p className="text-muted-foreground mb-6">
-            {isBn ? 'আপনি এখনও কোনো পণ্যের রিভিউ দেননি।' : 'You haven\'t reviewed any products yet.'}
+            {isBn ? 'আপনি এখনও কোনো পণ্যের রিভিউ দেননি।' : "You haven't reviewed any products yet."}
           </p>
-          <Link href={`/${lang}/customer/orders`} className="text-primary hover:underline font-medium">
+          <Link
+            href={`/${lang}/customer/orders`}
+            className="text-primary hover:underline font-medium"
+          >
             {isBn ? 'অর্ডার হিস্ট্রি দেখুন' : 'View your orders'}
           </Link>
         </div>
@@ -67,10 +74,12 @@ export function CustomerReviewsView({ lang = 'en' }: CustomerReviewsViewProps) {
                         </p>
                       </Link>
                     ) : (
-                      <span className="text-muted-foreground">{isBn ? 'অজানা প্রোডাক্ট' : 'Unknown Product'}</span>
+                      <span className="text-muted-foreground">
+                        {isBn ? 'অজানা প্রোডাক্ট' : 'Unknown Product'}
+                      </span>
                     )}
                   </div>
-                  
+
                   {/* Review Content */}
                   <div className="p-6 md:w-2/3 flex flex-col justify-between">
                     <div>
@@ -97,16 +106,23 @@ export function CustomerReviewsView({ lang = 'en' }: CustomerReviewsViewProps) {
                           )}
                         </div>
                       </div>
-                      
+
                       {review.comment ? (
-                        <p className="text-foreground text-sm italic">&ldquo;{review.comment}&rdquo;</p>
+                        <p className="text-foreground text-sm italic">
+                          &ldquo;{review.comment}&rdquo;
+                        </p>
                       ) : (
-                        <p className="text-muted-foreground text-sm italic">{isBn ? 'কোনো মন্তব্য নেই' : 'No comment provided'}</p>
+                        <p className="text-muted-foreground text-sm italic">
+                          {isBn ? 'কোনো মন্তব্য নেই' : 'No comment provided'}
+                        </p>
                       )}
                     </div>
-                    
+
                     <div className="mt-4 pt-4 border-t text-xs text-muted-foreground">
-                      {isBn ? 'রিভিউ দেওয়া হয়েছে:' : 'Reviewed on:'} {new Intl.DateTimeFormat(isBn ? 'bn-BD' : 'en-US', { dateStyle: 'long' }).format(new Date(review.createdAt))}
+                      {isBn ? 'রিভিউ দেওয়া হয়েছে:' : 'Reviewed on:'}{' '}
+                      {new Intl.DateTimeFormat(isBn ? 'bn-BD' : 'en-US', {
+                        dateStyle: 'long',
+                      }).format(new Date(review.createdAt))}
                     </div>
                   </div>
                 </div>

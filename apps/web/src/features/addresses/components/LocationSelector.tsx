@@ -4,7 +4,13 @@
 import { useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   useGetCountriesQuery,
   useGetDivisionsQuery,
@@ -26,10 +32,18 @@ export function LocationSelector({ form }: LocationSelectorProps) {
   const unionId = form.watch('unionId');
 
   const { data: countries, isLoading: isLoadingCountries } = useGetCountriesQuery();
-  const { data: divisions, isLoading: isLoadingDivisions } = useGetDivisionsQuery(countryId, { skip: !countryId });
-  const { data: districts, isLoading: isLoadingDistricts } = useGetDistrictsQuery(divisionId, { skip: !divisionId });
-  const { data: upazilas, isLoading: isLoadingUpazilas } = useGetUpazilasQuery(districtId, { skip: !districtId });
-  const { data: unions, isLoading: isLoadingUnions } = useGetUnionsQuery(upazilaId, { skip: !upazilaId });
+  const { data: divisions, isLoading: isLoadingDivisions } = useGetDivisionsQuery(countryId, {
+    skip: !countryId,
+  });
+  const { data: districts, isLoading: isLoadingDistricts } = useGetDistrictsQuery(divisionId, {
+    skip: !divisionId,
+  });
+  const { data: upazilas, isLoading: isLoadingUpazilas } = useGetUpazilasQuery(districtId, {
+    skip: !districtId,
+  });
+  const { data: unions, isLoading: isLoadingUnions } = useGetUnionsQuery(upazilaId, {
+    skip: !upazilaId,
+  });
   const { data: areas, isLoading: isLoadingAreas } = useGetAreasQuery(unionId, { skip: !unionId });
 
   // Auto-select first country if none selected and data is loaded (Khansama-first default)
@@ -48,7 +62,11 @@ export function LocationSelector({ form }: LocationSelectorProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Division</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingDivisions || !divisions?.length}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value || ''}
+              disabled={isLoadingDivisions || !divisions?.length}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Division" />
@@ -56,7 +74,9 @@ export function LocationSelector({ form }: LocationSelectorProps) {
               </FormControl>
               <SelectContent>
                 {divisions?.map((div) => (
-                  <SelectItem key={div.id} value={div.id}>{div.nameEn}</SelectItem>
+                  <SelectItem key={div.id} value={div.id}>
+                    {div.nameEn}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -72,7 +92,11 @@ export function LocationSelector({ form }: LocationSelectorProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>District</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingDistricts || !districts?.length}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value || ''}
+              disabled={isLoadingDistricts || !districts?.length}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select District" />
@@ -80,7 +104,9 @@ export function LocationSelector({ form }: LocationSelectorProps) {
               </FormControl>
               <SelectContent>
                 {districts?.map((dist) => (
-                  <SelectItem key={dist.id} value={dist.id}>{dist.nameEn}</SelectItem>
+                  <SelectItem key={dist.id} value={dist.id}>
+                    {dist.nameEn}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -96,7 +122,11 @@ export function LocationSelector({ form }: LocationSelectorProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Upazila</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingUpazilas || !upazilas?.length}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value || ''}
+              disabled={isLoadingUpazilas || !upazilas?.length}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Upazila" />
@@ -104,7 +134,9 @@ export function LocationSelector({ form }: LocationSelectorProps) {
               </FormControl>
               <SelectContent>
                 {upazilas?.map((upa) => (
-                  <SelectItem key={upa.id} value={upa.id}>{upa.nameEn}</SelectItem>
+                  <SelectItem key={upa.id} value={upa.id}>
+                    {upa.nameEn}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -120,7 +152,11 @@ export function LocationSelector({ form }: LocationSelectorProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Union</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingUnions || !unions?.length}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value || ''}
+              disabled={isLoadingUnions || !unions?.length}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Union" />
@@ -128,7 +164,9 @@ export function LocationSelector({ form }: LocationSelectorProps) {
               </FormControl>
               <SelectContent>
                 {unions?.map((uni) => (
-                  <SelectItem key={uni.id} value={uni.id}>{uni.nameEn}</SelectItem>
+                  <SelectItem key={uni.id} value={uni.id}>
+                    {uni.nameEn}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -144,7 +182,11 @@ export function LocationSelector({ form }: LocationSelectorProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Area / Village</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoadingAreas || !areas?.length}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value || ''}
+              disabled={isLoadingAreas || !areas?.length}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Area" />

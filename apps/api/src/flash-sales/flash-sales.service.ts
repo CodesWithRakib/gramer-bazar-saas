@@ -27,10 +27,12 @@ export class FlashSalesService {
     const savedFlashSale = await this.flashSaleRepository.save(flashSale);
 
     if (createDto.items && createDto.items.length > 0) {
-      const items = createDto.items.map(item => this.flashSaleItemRepository.create({
-        ...item,
-        flashSaleId: savedFlashSale.id,
-      }));
+      const items = createDto.items.map((item) =>
+        this.flashSaleItemRepository.create({
+          ...item,
+          flashSaleId: savedFlashSale.id,
+        }),
+      );
       await this.flashSaleItemRepository.save(items);
     }
 
@@ -85,7 +87,7 @@ export class FlashSalesService {
 
   async update(id: string, updateDto: UpdateFlashSaleDto) {
     const flashSale = await this.findOne(id);
-    
+
     if (updateDto.name !== undefined) flashSale.name = updateDto.name;
     if (updateDto.startDate !== undefined) flashSale.startDate = new Date(updateDto.startDate);
     if (updateDto.endDate !== undefined) flashSale.endDate = new Date(updateDto.endDate);
@@ -96,7 +98,7 @@ export class FlashSalesService {
 
     // Simplistic handling of items: delete old, insert new. Or just handle items separately.
     // In a real scenario, you'd want a separate endpoint to add/remove items to avoid deleting sales stats.
-    
+
     return this.findOne(id);
   }
 

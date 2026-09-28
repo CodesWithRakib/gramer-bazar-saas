@@ -50,12 +50,9 @@ describe('AuthController (e2e)', () => {
 
   it('Full Auth Flow: Send OTP -> Verify -> Get Me -> Logout', async () => {
     const phone = '01711000001';
-    
+
     // 1. Send OTP
-    await request(app.getHttpServer())
-      .post('/api/v1/auth/send-otp')
-      .send({ phone })
-      .expect(200);
+    await request(app.getHttpServer()).post('/api/v1/auth/send-otp').send({ phone }).expect(200);
 
     // Get the OTP directly from the DB
     const otpRecord = await dataSource.query(`SELECT code FROM otps WHERE phone = $1`, [phone]);
@@ -91,7 +88,10 @@ describe('AuthController (e2e)', () => {
   it('Refresh Token - rejects forged signatures', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/v1/auth/refresh')
-      .send({ refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c' })
+      .send({
+        refreshToken:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      })
       .expect(401);
 
     expect(response.body.message).toBe('Invalid refresh token');

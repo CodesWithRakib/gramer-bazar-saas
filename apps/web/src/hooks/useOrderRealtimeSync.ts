@@ -61,7 +61,7 @@ export const useOrderRealtimeSync = () => {
             draft.statusHistory = [];
           }
           const exists = draft.statusHistory.some(
-            (h) => h.status === payload.currentStatus && h.createdAt === payload.updatedAt,
+            (h) => h.status === payload.currentStatus && h.createdAt === payload.updatedAt
           );
           if (!exists) {
             const newHistoryItem: OrderStatusHistoryItem = {
@@ -74,16 +74,11 @@ export const useOrderRealtimeSync = () => {
             };
             draft.statusHistory.push(newHistoryItem);
           }
-        }),
+        })
       );
 
       // 2. Selectively invalidate order tags (order detail + list)
-      dispatch(
-        ordersApi.util.invalidateTags([
-          { type: 'Order', id: payload.orderId },
-          'Order',
-        ]),
-      );
+      dispatch(ordersApi.util.invalidateTags([{ type: 'Order', id: payload.orderId }, 'Order']));
     };
 
     socket.on('order.status.updated', handleOrderStatusUpdated);

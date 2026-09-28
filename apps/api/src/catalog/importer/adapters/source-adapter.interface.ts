@@ -22,5 +22,9 @@ export interface NormalizedProduct {
 
 export interface ProductSourceAdapter {
   readonly sourceName: string;
-  fetchProducts(options?: { limit?: number; skip?: number; category?: string }): Promise<NormalizedProduct[]>;
+  fetchProducts(options?: {
+    limit?: number;
+    skip?: number;
+    category?: string;
+  }): Promise<NormalizedProduct[]>;
 }

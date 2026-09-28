@@ -1,16 +1,22 @@
-import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
-import { setCredentials, logout } from "./slices/authSlice";
+import {
+  createApi,
+  fetchBaseQuery,
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from '@reduxjs/toolkit/query/react';
+import { setCredentials, logout } from './slices/authSlice';
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1",
-  credentials: "include",
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1',
+  credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     let token = (getState() as { auth?: { accessToken?: string } }).auth?.accessToken;
     if (!token && typeof window !== 'undefined') {
       token = localStorage.getItem('access_token') || undefined;
     }
     if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
+      headers.set('Authorization', `Bearer ${token}`);
     }
     return headers;
   },
@@ -53,7 +59,9 @@ const isPublicPath = (pathname: string): boolean => {
   ];
 
   return publicPrefixes.some((prefix) =>
-    prefix === '/' ? pathWithoutLocale === '/' : pathWithoutLocale === prefix || pathWithoutLocale.startsWith(`${prefix}/`)
+    prefix === '/'
+      ? pathWithoutLocale === '/'
+      : pathWithoutLocale === prefix || pathWithoutLocale.startsWith(`${prefix}/`)
   );
 };
 
@@ -110,7 +118,13 @@ const customBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryEr
               if (newRefreshToken && typeof window !== 'undefined') {
                 localStorage.setItem('refresh_token', newRefreshToken);
               }
-              api.dispatch(setCredentials({ accessToken: newAccessToken, refreshToken: newRefreshToken || undefined, user }));
+              api.dispatch(
+                setCredentials({
+                  accessToken: newAccessToken,
+                  refreshToken: newRefreshToken || undefined,
+                  user,
+                })
+              );
               isRefreshing = false;
               onRefreshed(newAccessToken);
 
@@ -150,7 +164,12 @@ const customBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryEr
   }
 
   // Unwrap the globally formatted response: { success: true, data: { ... } }
-  if (result.data && typeof result.data === 'object' && 'success' in result.data && 'data' in result.data) {
+  if (
+    result.data &&
+    typeof result.data === 'object' &&
+    'success' in result.data &&
+    'data' in result.data
+  ) {
     result.data = (result.data as { data: unknown }).data;
   }
 
@@ -158,35 +177,35 @@ const customBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryEr
 };
 
 export const api = createApi({
-  reducerPath: "api",
+  reducerPath: 'api',
   baseQuery: customBaseQuery,
   tagTypes: [
-    "Cart",
-    "Wishlist",
-    "Catalog",
-    "Reviews",
-    "User",
-    "Address",
-    "Location",
-    "Order",
-    "ProductRequest",
-    "Review",
-    "Notification",
-    "Coupon",
-    "Conversation",
-    "Message",
-    "Shop",
-    "Banner",
-    "Wallet",
-    "WalletTransaction",
-    "Payout",
-    "Dispute",
-    "FlashSale",
-    "AuditLog",
-    "Settings",
-    "SellerApplication",
-    "RiderApplication",
-    "Payment",
+    'Cart',
+    'Wishlist',
+    'Catalog',
+    'Reviews',
+    'User',
+    'Address',
+    'Location',
+    'Order',
+    'ProductRequest',
+    'Review',
+    'Notification',
+    'Coupon',
+    'Conversation',
+    'Message',
+    'Shop',
+    'Banner',
+    'Wallet',
+    'WalletTransaction',
+    'Payout',
+    'Dispute',
+    'FlashSale',
+    'AuditLog',
+    'Settings',
+    'SellerApplication',
+    'RiderApplication',
+    'Payment',
   ],
   endpoints: () => ({}),
 });

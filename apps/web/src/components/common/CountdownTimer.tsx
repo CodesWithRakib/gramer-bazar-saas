@@ -31,7 +31,12 @@ function calculateTimeRemaining(target: Date): TimeRemaining {
   return { days, hours, minutes, seconds, isExpired: false };
 }
 
-export function CountdownTimer({ targetDate, lang = 'en', className = '', onExpire }: CountdownTimerProps) {
+export function CountdownTimer({
+  targetDate,
+  lang = 'en',
+  className = '',
+  onExpire,
+}: CountdownTimerProps) {
   const isBn = lang === 'bn';
   const target = new Date(targetDate);
   const [timeLeft, setTimeLeft] = useState<TimeRemaining>(() => calculateTimeRemaining(target));
@@ -60,7 +65,9 @@ export function CountdownTimer({ targetDate, lang = 'en', className = '', onExpi
   const pad = (n: number) => n.toString().padStart(2, '0');
 
   return (
-    <div className={`flex items-center gap-1.5 font-mono text-xs md:text-sm font-bold ${className}`}>
+    <div
+      className={`flex items-center gap-1.5 font-mono text-xs md:text-sm font-bold ${className}`}
+    >
       {timeLeft.days > 0 && (
         <div className="flex flex-col items-center">
           <span className="bg-background text-foreground border border-border px-2 py-1 rounded shadow-xs">

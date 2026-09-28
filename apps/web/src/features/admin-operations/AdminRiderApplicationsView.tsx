@@ -62,7 +62,9 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
     try {
       if (reviewAction === 'approve') {
         await approveApp({ id: selectedApp.id, adminNotes }).unwrap();
-        toast.success(isBn ? 'রাইডার আবেদন অনুমোদিত হয়েছে' : 'Rider application approved successfully');
+        toast.success(
+          isBn ? 'রাইডার আবেদন অনুমোদিত হয়েছে' : 'Rider application approved successfully'
+        );
       } else {
         await rejectApp({ id: selectedApp.id, adminNotes }).unwrap();
         toast.success(isBn ? 'রাইডার আবেদন বাতিল করা হয়েছে' : 'Rider application rejected');
@@ -128,7 +130,10 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
           );
         }
         return (
-          <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 gap-1 font-semibold">
+          <Badge
+            variant="outline"
+            className="bg-amber-50 text-amber-700 border-amber-300 gap-1 font-semibold"
+          >
             <Clock className="w-3 h-3" />
             {isBn ? 'অপেক্ষমাণ' : 'Pending'}
           </Badge>
@@ -361,10 +366,7 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
       </Dialog>
 
       {/* Review Action Confirmation Dialog */}
-      <Dialog
-        open={!!reviewAction}
-        onOpenChange={(open) => !open && setReviewAction(null)}
-      >
+      <Dialog open={!!reviewAction} onOpenChange={(open) => !open && setReviewAction(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
@@ -373,8 +375,8 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
                   ? 'রাইডার আবেদন অনুমোদন'
                   : 'Approve Rider Application'
                 : isBn
-                ? 'রাইডার আবেদন বাতিল'
-                : 'Reject Rider Application'}
+                  ? 'রাইডার আবেদন বাতিল'
+                  : 'Reject Rider Application'}
             </DialogTitle>
             <DialogDescription>
               {reviewAction === 'approve'
@@ -382,8 +384,8 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
                   ? 'অনুমোদন করলে ব্যবহারকারী রাইডার ভূমিকা পাবেন এবং ডেলিভারি গ্রহণ করতে পারবেন।'
                   : 'Approving will grant the RIDER role to the user and authorize delivery orders.'
                 : isBn
-                ? 'বাতিল করার কারণ উল্লেখ করুন যাতে আবেদনকারী প্রয়োজনীয় সংশোধন করতে পারেন।'
-                : 'Please state the reason for rejecting this application.'}
+                  ? 'বাতিল করার কারণ উল্লেখ করুন যাতে আবেদনকারী প্রয়োজনীয় সংশোধন করতে পারেন।'
+                  : 'Please state the reason for rejecting this application.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -395,8 +397,8 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
                     ? 'মন্তব্য (ঐচ্ছিক)'
                     : 'Notes (Optional)'
                   : isBn
-                  ? 'বাতিলের কারণ'
-                  : 'Rejection Reason'}
+                    ? 'বাতিলের কারণ'
+                    : 'Rejection Reason'}
               </Label>
               <Textarea
                 id="riderAdminNotes"
@@ -423,19 +425,21 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
                 variant={reviewAction === 'approve' ? 'default' : 'destructive'}
                 onClick={handleReviewSubmit}
                 disabled={isApproving || isRejecting}
-                className={reviewAction === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}
+                className={
+                  reviewAction === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''
+                }
               >
                 {isApproving || isRejecting
                   ? isBn
                     ? 'প্রক্রিয়াকরণ হচ্ছে...'
                     : 'Processing...'
                   : reviewAction === 'approve'
-                  ? isBn
-                    ? 'অনুমোদন নিশ্চিত করুন'
-                    : 'Confirm Approval'
-                  : isBn
-                  ? 'বাতিল নিশ্চিত করুন'
-                  : 'Confirm Rejection'}
+                    ? isBn
+                      ? 'অনুমোদন নিশ্চিত করুন'
+                      : 'Confirm Approval'
+                    : isBn
+                      ? 'বাতিল নিশ্চিত করুন'
+                      : 'Confirm Rejection'}
               </Button>
             </div>
           </div>

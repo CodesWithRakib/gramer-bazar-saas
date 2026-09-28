@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
+import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   useGetAdminProductRequestByIdQuery,
   useUpdateProductRequestStatusMutation,
-} from "@/features/product-requests/productRequestsApi";
-import { Button } from "@/components/ui/button";
+} from '@/features/product-requests/productRequestsApi';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -14,64 +14,56 @@ import {
   CardTitle,
   CardFooter,
   CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/select';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
 
 export interface AdminProductRequestDetailsViewProps {
   lang?: string;
   id: string;
 }
 
-export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProductRequestDetailsViewProps) {
-  const isBn = lang === "bn";
+export function AdminProductRequestDetailsView({
+  lang = 'en',
+  id,
+}: AdminProductRequestDetailsViewProps) {
+  const isBn = lang === 'bn';
 
-  const {
-    data: request,
-    isLoading,
-    isError,
-  } = useGetAdminProductRequestByIdQuery(id);
-  const [updateStatus, { isLoading: isUpdating }] =
-    useUpdateProductRequestStatusMutation();
+  const { data: request, isLoading, isError } = useGetAdminProductRequestByIdQuery(id);
+  const [updateStatus, { isLoading: isUpdating }] = useUpdateProductRequestStatusMutation();
 
-  const [status, setStatus] = useState<string>("");
-  const [adminNotes, setAdminNotes] = useState<string>("");
-  const [linkedProductId, setLinkedProductId] = useState<string>("");
-  const [remark, setRemark] = useState<string>("");
+  const [status, setStatus] = useState<string>('');
+  const [adminNotes, setAdminNotes] = useState<string>('');
+  const [linkedProductId, setLinkedProductId] = useState<string>('');
+  const [remark, setRemark] = useState<string>('');
 
-  const [prevRequestId, setPrevRequestId] = useState<string | undefined>(
-    undefined,
-  );
+  const [prevRequestId, setPrevRequestId] = useState<string | undefined>(undefined);
   if (request && request.id !== prevRequestId) {
     setPrevRequestId(request.id);
     setStatus(request.status);
-    setAdminNotes(request.adminNotes || "");
-    setLinkedProductId(request.linkedProductId || "");
+    setAdminNotes(request.adminNotes || '');
+    setLinkedProductId(request.linkedProductId || '');
   }
 
   if (isLoading) {
-    return (
-      <div className="py-8 text-center">
-        {isBn ? "লোড হচ্ছে..." : "Loading..."}
-      </div>
-    );
+    return <div className="py-8 text-center">{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</div>;
   }
 
   if (isError || !request) {
     return (
       <div className="py-8 text-center text-red-500">
-        {isBn ? "অনুরোধ খুঁজে পাওয়া যায়নি" : "Request not found"}
+        {isBn ? 'অনুরোধ খুঁজে পাওয়া যায়নি' : 'Request not found'}
       </div>
     );
   }
@@ -88,35 +80,31 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
         },
       }).unwrap();
 
-      toast.success(
-        isBn ? "স্থিতি আপডেট করা হয়েছে" : "Status updated successfully",
-      );
-      setRemark(""); // Clear remark after submit
+      toast.success(isBn ? 'স্থিতি আপডেট করা হয়েছে' : 'Status updated successfully');
+      setRemark(''); // Clear remark after submit
     } catch {
-      toast.error(
-        isBn ? "আপডেট করতে ত্রুটি হয়েছে" : "Failed to update status",
-      );
+      toast.error(isBn ? 'আপডেট করতে ত্রুটি হয়েছে' : 'Failed to update status');
     }
   };
 
   const getStatusColor = (s: string) => {
     switch (s) {
-      case "PENDING":
-        return "bg-yellow-500";
-      case "REVIEWING":
-        return "bg-blue-500";
-      case "SEARCHING":
-        return "bg-purple-500";
-      case "FOUND":
-        return "bg-orange-500";
-      case "PRODUCT_ADDED":
-      case "CUSTOMER_NOTIFIED":
-        return "bg-green-500";
-      case "CLOSED":
-      case "REJECTED":
-        return "bg-red-500";
+      case 'PENDING':
+        return 'bg-yellow-500';
+      case 'REVIEWING':
+        return 'bg-blue-500';
+      case 'SEARCHING':
+        return 'bg-purple-500';
+      case 'FOUND':
+        return 'bg-orange-500';
+      case 'PRODUCT_ADDED':
+      case 'CUSTOMER_NOTIFIED':
+        return 'bg-green-500';
+      case 'CLOSED':
+      case 'REJECTED':
+        return 'bg-red-500';
       default:
-        return "bg-gray-500";
+        return 'bg-gray-500';
     }
   };
 
@@ -127,7 +115,7 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
         className="flex items-center text-sm text-primary hover:underline w-fit"
       >
         <ArrowLeft className="h-4 w-4 mr-1" />
-        {isBn ? "অনুরোধ তালিকায় ফিরে যান" : "Back to Requests"}
+        {isBn ? 'অনুরোধ তালিকায় ফিরে যান' : 'Back to Requests'}
       </Link>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -150,20 +138,16 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">
-                    {isBn ? "গ্রাহক" : "Customer"}
-                  </p>
+                  <p className="text-muted-foreground">{isBn ? 'গ্রাহক' : 'Customer'}</p>
                   <p className="font-medium">{request.user?.name}</p>
                   <p className="text-muted-foreground">{request.user?.phone}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">
-                    {isBn ? "তারিখ" : "Date"}
-                  </p>
+                  <p className="text-muted-foreground">{isBn ? 'তারিখ' : 'Date'}</p>
                   <p className="font-medium">
-                    {new Intl.DateTimeFormat(isBn ? "bn-BD" : "en-US", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
+                    {new Intl.DateTimeFormat(isBn ? 'bn-BD' : 'en-US', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
                     }).format(new Date(request.createdAt))}
                   </p>
                 </div>
@@ -171,19 +155,17 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
 
               <div className="pt-4 border-t">
                 <p className="text-muted-foreground text-sm mb-1">
-                  {isBn ? "বিবরণ" : "Description"}
+                  {isBn ? 'বিবরণ' : 'Description'}
                 </p>
-                <p className="text-sm bg-muted/50 p-3 rounded-md">
-                  {request.description || "N/A"}
-                </p>
+                <p className="text-sm bg-muted/50 p-3 rounded-md">{request.description || 'N/A'}</p>
               </div>
 
               <div>
                 <p className="text-muted-foreground text-sm mb-1">
-                  {isBn ? "অন্যান্য তথ্য" : "Preferred Information"}
+                  {isBn ? 'অন্যান্য তথ্য' : 'Preferred Information'}
                 </p>
                 <p className="text-sm bg-muted/50 p-3 rounded-md">
-                  {request.preferredInformation || "N/A"}
+                  {request.preferredInformation || 'N/A'}
                 </p>
               </div>
             </CardContent>
@@ -191,11 +173,11 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
 
           <Card>
             <CardHeader>
-              <CardTitle>{isBn ? "পরিচালনা করুন" : "Manage Request"}</CardTitle>
+              <CardTitle>{isBn ? 'পরিচালনা করুন' : 'Manage Request'}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>{isBn ? "বর্তমান স্থিতি" : "Current Status"}</Label>
+                <Label>{isBn ? 'বর্তমান স্থিতি' : 'Current Status'}</Label>
                 <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Status" />
@@ -206,22 +188,18 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
                     <SelectItem value="SEARCHING">SEARCHING</SelectItem>
                     <SelectItem value="FOUND">FOUND</SelectItem>
                     <SelectItem value="PRODUCT_ADDED">PRODUCT_ADDED</SelectItem>
-                    <SelectItem value="CUSTOMER_NOTIFIED">
-                      CUSTOMER_NOTIFIED
-                    </SelectItem>
+                    <SelectItem value="CUSTOMER_NOTIFIED">CUSTOMER_NOTIFIED</SelectItem>
                     <SelectItem value="CLOSED">CLOSED</SelectItem>
                     <SelectItem value="REJECTED">REJECTED</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              {(status === "PRODUCT_ADDED" ||
-                status === "CUSTOMER_NOTIFIED" ||
-                status === "FOUND") && (
+              {(status === 'PRODUCT_ADDED' ||
+                status === 'CUSTOMER_NOTIFIED' ||
+                status === 'FOUND') && (
                 <div className="space-y-2">
-                  <Label>
-                    {isBn ? "লিঙ্ক করা প্রোডাক্ট আইডি" : "Linked Product ID"}
-                  </Label>
+                  <Label>{isBn ? 'লিঙ্ক করা প্রোডাক্ট আইডি' : 'Linked Product ID'}</Label>
                   <Input
                     placeholder="UUID of the product in catalog"
                     value={linkedProductId}
@@ -229,23 +207,19 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
                   />
                   <p className="text-xs text-muted-foreground">
                     {isBn
-                      ? "ক্যাটালগ থেকে প্রোডাক্টের আইডি এখানে দিন।"
-                      : "Provide the ID of the product from the catalog."}
+                      ? 'ক্যাটালগ থেকে প্রোডাক্টের আইডি এখানে দিন।'
+                      : 'Provide the ID of the product from the catalog.'}
                   </p>
                 </div>
               )}
 
               <div className="space-y-2">
                 <Label>
-                  {isBn
-                    ? "গ্রাহকের জন্য মন্তব্য (ঐচ্ছিক)"
-                    : "Remark for Customer (Optional)"}
+                  {isBn ? 'গ্রাহকের জন্য মন্তব্য (ঐচ্ছিক)' : 'Remark for Customer (Optional)'}
                 </Label>
                 <Input
                   placeholder={
-                    isBn
-                      ? "গ্রাহক এই মেসেজটি দেখতে পাবেন..."
-                      : "Customer will see this message..."
+                    isBn ? 'গ্রাহক এই মেসেজটি দেখতে পাবেন...' : 'Customer will see this message...'
                   }
                   value={remark}
                   onChange={(e) => setRemark(e.target.value)}
@@ -253,15 +227,9 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
               </div>
 
               <div className="space-y-2">
-                <Label>
-                  {isBn ? "অ্যাডমিন নোট (গোপন)" : "Admin Notes (Internal)"}
-                </Label>
+                <Label>{isBn ? 'অ্যাডমিন নোট (গোপন)' : 'Admin Notes (Internal)'}</Label>
                 <Textarea
-                  placeholder={
-                    isBn
-                      ? "শুধুমাত্র অ্যাডমিনদের জন্য..."
-                      : "For admin use only..."
-                  }
+                  placeholder={isBn ? 'শুধুমাত্র অ্যাডমিনদের জন্য...' : 'For admin use only...'}
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={4}
@@ -269,18 +237,14 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
               </div>
             </CardContent>
             <CardFooter>
-              <Button
-                onClick={handleUpdate}
-                disabled={isUpdating}
-                className="w-full"
-              >
+              <Button onClick={handleUpdate} disabled={isUpdating} className="w-full">
                 {isUpdating
                   ? isBn
-                    ? "আপডেট হচ্ছে..."
-                    : "Updating..."
+                    ? 'আপডেট হচ্ছে...'
+                    : 'Updating...'
                   : isBn
-                    ? "আপডেট সেভ করুন"
-                    : "Save Update"}
+                    ? 'আপডেট সেভ করুন'
+                    : 'Save Update'}
               </Button>
             </CardFooter>
           </Card>
@@ -290,9 +254,7 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
         <div className="w-full md:w-80">
           <Card>
             <CardHeader>
-              <CardTitle>
-                {isBn ? "স্ট্যাটাস হিস্ট্রি" : "Status History"}
-              </CardTitle>
+              <CardTitle>{isBn ? 'স্ট্যাটাস হিস্ট্রি' : 'Status History'}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -300,7 +262,7 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
                   <div key={history.id} className="flex gap-4">
                     <div className="flex flex-col items-center">
                       <div
-                        className={`h-8 w-8 rounded-full flex items-center justify-center ${index === 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                        className={`h-8 w-8 rounded-full flex items-center justify-center ${index === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
                       >
                         {index === 0 ? (
                           <CheckCircle2 className="h-5 w-5" />
@@ -315,14 +277,12 @@ export function AdminProductRequestDetailsView({ lang = 'en', id }: AdminProduct
                     <div className="pb-4">
                       <p className="font-semibold text-sm">{history.status}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Intl.DateTimeFormat(isBn ? "bn-BD" : "en-US", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
+                        {new Intl.DateTimeFormat(isBn ? 'bn-BD' : 'en-US', {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
                         }).format(new Date(history.createdAt))}
                       </p>
-                      {history.remark && (
-                        <p className="text-xs mt-1">{history.remark}</p>
-                      )}
+                      {history.remark && <p className="text-xs mt-1">{history.remark}</p>}
                     </div>
                   </div>
                 ))}

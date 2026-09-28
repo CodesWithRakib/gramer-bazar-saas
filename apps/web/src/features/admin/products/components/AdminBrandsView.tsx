@@ -15,8 +15,6 @@ export interface AdminBrandsViewProps {
 }
 
 export function AdminBrandsView({ lang = 'en' }: AdminBrandsViewProps) {
-  
-
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -37,7 +35,9 @@ export function AdminBrandsView({ lang = 'en' }: AdminBrandsViewProps) {
     {
       accessorKey: 'slug',
       header: 'Slug',
-      cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original.slug}</span>,
+      cell: ({ row }) => (
+        <span className="font-mono text-xs text-muted-foreground">{row.original.slug}</span>
+      ),
     },
     {
       id: 'categories',

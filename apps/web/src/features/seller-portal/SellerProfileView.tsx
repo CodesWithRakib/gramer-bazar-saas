@@ -9,10 +9,7 @@ import {
   useGetSellerShopQuery,
   useUpdateSellerShopMutation,
 } from '@/features/seller-portal/sellerPortalApi';
-import {
-  useGetProfileQuery,
-  useUpdateProfileMutation,
-} from '@/features/auth/authApi';
+import { useGetProfileQuery, useUpdateProfileMutation } from '@/features/auth/authApi';
 import { useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store/store';
 import { Button } from '@/components/ui/button';
@@ -45,7 +42,6 @@ export interface SellerProfileViewProps {
 }
 
 export function SellerProfileView({ lang = 'en' }: SellerProfileViewProps) {
-  
   const isBn = lang === 'bn';
   const isAuthenticated = useAppSelector((s: RootState) => s.auth.isAuthenticated);
   const { data: shop, isLoading } = useGetSellerShopQuery();
@@ -85,7 +81,9 @@ export function SellerProfileView({ lang = 'en' }: SellerProfileViewProps) {
       await updateProfile(values).unwrap();
       toast.success(isBn ? 'অ্যাকাউন্ট তথ্য আপডেট হয়েছে' : 'Account info updated');
     } catch {
-      toast.error(isBn ? 'অ্যাকাউন্ট তথ্য আপডেট করতে ত্রুটি হয়েছে' : 'Failed to update account info');
+      toast.error(
+        isBn ? 'অ্যাকাউন্ট তথ্য আপডেট করতে ত্রুটি হয়েছে' : 'Failed to update account info'
+      );
     }
   };
 

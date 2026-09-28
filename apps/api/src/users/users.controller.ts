@@ -11,13 +11,7 @@ import {
   ParseUUIDPipe,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiQuery,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
@@ -47,12 +41,36 @@ export class UsersController {
   @Get()
   @ApiOperation({
     summary: 'List users with pagination, role filter, and keyword search',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Returns paginated user records without sensitive security hashes.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Returns paginated user records without sensitive security hashes.',
   })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1, description: 'Page number (default 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10, description: 'Items per page (default 10)' })
-  @ApiQuery({ name: 'search', required: false, type: String, example: 'Rahim', description: 'Search term for name, phone, or email' })
-  @ApiQuery({ name: 'role', required: false, enum: Role, description: 'Filter users by assigned role' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Page number (default 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Items per page (default 10)',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    example: 'Rahim',
+    description: 'Search term for name, phone, or email',
+  })
+  @ApiQuery({
+    name: 'role',
+    required: false,
+    enum: Role,
+    description: 'Filter users by assigned role',
+  })
   @ApiStandardPaginatedResponse(UserResponseDto, {
     description: 'Paginated user list retrieved successfully',
   })
@@ -69,7 +87,8 @@ export class UsersController {
   @Post()
   @ApiOperation({
     summary: 'Create a new staff or user account directly',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Dispatches administrative user onboarding with pre-assigned role.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Dispatches administrative user onboarding with pre-assigned role.',
   })
   @ApiStandardResponse({
     type: UserResponseDto,
@@ -77,10 +96,7 @@ export class UsersController {
     description: 'User created successfully',
   })
   @ApiCommonErrors([400, 401, 403, 409, 500])
-  async create(
-    @Request() req: any,
-    @Body() createUserDto: CreateUserDto,
-  ) {
+  async create(@Request() req: any, @Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.createByAdmin(req.user, createUserDto);
     await this.auditLogsService.record({
       actorId: req.user?.id,
@@ -96,7 +112,8 @@ export class UsersController {
   @Patch(':id/status')
   @ApiOperation({
     summary: 'Update account lifecycle status',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Sets user status (e.g. ACTIVE, INACTIVE, BLOCKED, PENDING).',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Sets user status (e.g. ACTIVE, INACTIVE, BLOCKED, PENDING).',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'User UUID identifier' })
   @ApiStandardResponse({
@@ -125,7 +142,8 @@ export class UsersController {
   @Patch(':id/roles')
   @ApiOperation({
     summary: 'Update user assigned roles',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Replaces the set of roles assigned to the user.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Replaces the set of roles assigned to the user.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'User UUID identifier' })
   @ApiStandardResponse({

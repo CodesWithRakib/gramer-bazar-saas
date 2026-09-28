@@ -62,7 +62,9 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
     try {
       if (reviewAction === 'approve') {
         await approveApp({ id: selectedApp.id, adminNotes }).unwrap();
-        toast.success(isBn ? 'সেলার আবেদন অনুমোদিত হয়েছে' : 'Seller application approved successfully');
+        toast.success(
+          isBn ? 'সেলার আবেদন অনুমোদিত হয়েছে' : 'Seller application approved successfully'
+        );
       } else {
         await rejectApp({ id: selectedApp.id, adminNotes }).unwrap();
         toast.success(isBn ? 'সেলার আবেদন বাতিল করা হয়েছে' : 'Seller application rejected');
@@ -94,7 +96,9 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
         const u = row.original.user;
         return (
           <div>
-            <div className="text-sm font-medium">{u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() : 'N/A'}</div>
+            <div className="text-sm font-medium">
+              {u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() : 'N/A'}
+            </div>
             <div className="text-xs text-muted-foreground">{row.original.phone}</div>
           </div>
         );
@@ -127,7 +131,10 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
           );
         }
         return (
-          <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 gap-1 font-semibold">
+          <Badge
+            variant="outline"
+            className="bg-amber-50 text-amber-700 border-amber-300 gap-1 font-semibold"
+          >
             <Clock className="w-3 h-3" />
             {isBn ? 'অপেক্ষমাণ' : 'Pending'}
           </Badge>
@@ -359,10 +366,7 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
       </Dialog>
 
       {/* Review Action Confirmation Dialog */}
-      <Dialog
-        open={!!reviewAction}
-        onOpenChange={(open) => !open && setReviewAction(null)}
-      >
+      <Dialog open={!!reviewAction} onOpenChange={(open) => !open && setReviewAction(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
@@ -371,8 +375,8 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
                   ? 'সেলার আবেদন অনুমোদন'
                   : 'Approve Seller Application'
                 : isBn
-                ? 'সেলার আবেদন বাতিল'
-                : 'Reject Seller Application'}
+                  ? 'সেলার আবেদন বাতিল'
+                  : 'Reject Seller Application'}
             </DialogTitle>
             <DialogDescription>
               {reviewAction === 'approve'
@@ -380,8 +384,8 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
                   ? 'অনুমোদন করলে ব্যবহারকারী সেলার ভূমিকা পাবেন এবং তার শপ অ্যাক্টিভ হবে।'
                   : 'Approving will grant the SELLER role to the user and provision their store.'
                 : isBn
-                ? 'বাতিল করার কারণ উল্লেখ করুন যাতে আবেদনকারী সংশোধন করতে পারেন।'
-                : 'Please state the reason for rejecting this application.'}
+                  ? 'বাতিল করার কারণ উল্লেখ করুন যাতে আবেদনকারী সংশোধন করতে পারেন।'
+                  : 'Please state the reason for rejecting this application.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -393,8 +397,8 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
                     ? 'মন্তব্য (ঐচ্ছিক)'
                     : 'Notes (Optional)'
                   : isBn
-                  ? 'বাতিলের কারণ'
-                  : 'Rejection Reason'}
+                    ? 'বাতিলের কারণ'
+                    : 'Rejection Reason'}
               </Label>
               <Textarea
                 id="adminNotes"
@@ -421,19 +425,21 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
                 variant={reviewAction === 'approve' ? 'default' : 'destructive'}
                 onClick={handleReviewSubmit}
                 disabled={isApproving || isRejecting}
-                className={reviewAction === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}
+                className={
+                  reviewAction === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''
+                }
               >
                 {isApproving || isRejecting
                   ? isBn
                     ? 'প্রক্রিয়াকরণ হচ্ছে...'
                     : 'Processing...'
                   : reviewAction === 'approve'
-                  ? isBn
-                    ? 'অনুমোদন নিশ্চিত করুন'
-                    : 'Confirm Approval'
-                  : isBn
-                  ? 'বাতিল নিশ্চিত করুন'
-                  : 'Confirm Rejection'}
+                    ? isBn
+                      ? 'অনুমোদন নিশ্চিত করুন'
+                      : 'Confirm Approval'
+                    : isBn
+                      ? 'বাতিল নিশ্চিত করুন'
+                      : 'Confirm Rejection'}
               </Button>
             </div>
           </div>

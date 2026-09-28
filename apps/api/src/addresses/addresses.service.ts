@@ -21,7 +21,7 @@ export class AddressesService {
       ...createAddressDto,
       userId,
     });
-    
+
     // If it's the first address, make it default
     const count = await this.addressRepository.count({ where: { userId } });
     if (count === 0) {
@@ -68,4 +68,3 @@ export class AddressesService {
     return { success: true };
   }
 }
-

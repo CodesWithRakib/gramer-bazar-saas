@@ -3,12 +3,7 @@
 import React, { useState } from 'react';
 import { useCreateUserMutation, Role } from '@/features/users/usersApi';
 import { getApiErrorMessage } from '@/lib/apiError';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

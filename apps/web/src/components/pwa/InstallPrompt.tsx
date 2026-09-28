@@ -11,14 +11,14 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function InstallPrompt({ lang }: { lang: string }) {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const isBn = lang === 'bn';
   const pathname = usePathname();
 
   // Don't show in admin, seller, or rider routes
-  const isProtected = pathname?.includes('/admin') || pathname?.includes('/seller') || pathname?.includes('/rider');
+  const isProtected =
+    pathname?.includes('/admin') || pathname?.includes('/seller') || pathname?.includes('/rider');
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -44,17 +44,17 @@ export function InstallPrompt({ lang }: { lang: string }) {
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
-    
+
     // Show the install prompt
     deferredPrompt.prompt();
-    
+
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
-    
+
     if (outcome === 'accepted') {
       setShowPrompt(false);
     }
-    
+
     setDeferredPrompt(null);
   };
 
@@ -76,14 +76,24 @@ export function InstallPrompt({ lang }: { lang: string }) {
             {isBn ? 'গ্রামের বাজার অ্যাপটি ইনস্টল করুন' : 'Install Gramer Bazar App'}
           </h3>
           <p className="text-xs text-primary-foreground/80">
-            {isBn ? 'অফলাইনে কেনাকাটা করতে এবং দ্রুত ব্রাউজ করতে' : 'For offline shopping and faster browsing'}
+            {isBn
+              ? 'অফলাইনে কেনাকাটা করতে এবং দ্রুত ব্রাউজ করতে'
+              : 'For offline shopping and faster browsing'}
           </p>
         </div>
         <div className="flex flex-col gap-2">
-          <Button size="sm" variant="secondary" onClick={handleInstall} className="h-8 text-xs px-3">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={handleInstall}
+            className="h-8 text-xs px-3"
+          >
             {isBn ? 'ইনস্টল' : 'Install'}
           </Button>
-          <button onClick={handleDismiss} className="absolute -top-2 -right-2 bg-background text-foreground rounded-full p-1 shadow-md border hover:bg-muted">
+          <button
+            onClick={handleDismiss}
+            className="absolute -top-2 -right-2 bg-background text-foreground rounded-full p-1 shadow-md border hover:bg-muted"
+          >
             <X className="h-3 w-3" />
           </button>
         </div>

@@ -73,7 +73,10 @@ export class SearchCatalogDto {
   @Type(() => Boolean)
   inStock?: boolean;
 
-  @ApiPropertyOptional({ description: 'Sort by field (e.g. price_asc, price_desc, newest)', default: 'newest' })
+  @ApiPropertyOptional({
+    description: 'Sort by field (e.g. price_asc, price_desc, newest)',
+    default: 'newest',
+  })
   @IsOptional()
   @IsString()
   sort: string = 'newest';

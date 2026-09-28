@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Loader2, ArrowRight, Tag, Layers, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useGetSearchSuggestionsQuery } from "@/features/catalog/catalogApi";
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, Loader2, ArrowRight, Tag, Layers, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useGetSearchSuggestionsQuery } from '@/features/catalog/catalogApi';
 
 interface SearchBarProps {
   lang: string;
@@ -21,7 +21,7 @@ interface SearchBarProps {
 export function SearchBar({ lang, className, id, placeholder, autoFocus }: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const qParam = searchParams.get("q") || "";
+  const qParam = searchParams.get('q') || '';
   const [searchTerm, setSearchTerm] = useState(qParam);
   const [debouncedTerm, setDebouncedTerm] = useState(qParam);
   const [prevQ, setPrevQ] = useState(qParam);
@@ -32,7 +32,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
   }
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
   // Debounce search query for live suggestions
   useEffect(() => {
@@ -42,10 +42,9 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const { data: suggestions, isFetching } = useGetSearchSuggestionsQuery(
-    debouncedTerm,
-    { skip: debouncedTerm.length < 2 }
-  );
+  const { data: suggestions, isFetching } = useGetSearchSuggestionsQuery(debouncedTerm, {
+    skip: debouncedTerm.length < 2,
+  });
 
   // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
@@ -55,15 +54,15 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
       }
     }
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -84,7 +83,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
       suggestions.brands.length > 0);
 
   return (
-    <div ref={containerRef} className={cn("relative w-full", className)}>
+    <div ref={containerRef} className={cn('relative w-full', className)}>
       <form onSubmit={handleSearch} className="relative flex w-full items-center">
         <Input
           id={id}
@@ -92,7 +91,9 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
           autoFocus={autoFocus}
           placeholder={
             placeholder ||
-            (isBn ? "পণ্য, ক্যাটাগরি বা ব্র্যান্ড খুঁজুন..." : "Search for products, categories or brands...")
+            (isBn
+              ? 'পণ্য, ক্যাটাগরি বা ব্র্যান্ড খুঁজুন...'
+              : 'Search for products, categories or brands...')
           }
           className="w-full pr-20 pl-4 py-2 text-sm rounded-full bg-muted/60 border-muted focus-visible:ring-2 focus-visible:ring-primary shadow-xs transition-all"
           value={searchTerm}
@@ -110,12 +111,12 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
           <button
             type="button"
             onClick={() => {
-              setSearchTerm("");
-              setDebouncedTerm("");
+              setSearchTerm('');
+              setDebouncedTerm('');
               setIsOpen(false);
             }}
             className="absolute right-12 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors"
-            aria-label={isBn ? "অনুসন্ধান মুছুন" : "Clear search"}
+            aria-label={isBn ? 'অনুসন্ধান মুছুন' : 'Clear search'}
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -131,7 +132,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
           ) : (
             <Search className="h-4 w-4" />
           )}
-          <span className="sr-only">{isBn ? "খুঁজুন" : "Search"}</span>
+          <span className="sr-only">{isBn ? 'খুঁজুন' : 'Search'}</span>
         </Button>
       </form>
 
@@ -141,7 +142,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
           {isFetching && !suggestions ? (
             <div className="p-4 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              {isBn ? "অনুসন্ধান করা হচ্ছে..." : "Searching..."}
+              {isBn ? 'অনুসন্ধান করা হচ্ছে...' : 'Searching...'}
             </div>
           ) : hasSuggestions ? (
             <div className="max-h-[380px] overflow-y-auto divide-y divide-border/50">
@@ -150,7 +151,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                 <div className="p-2">
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1 flex items-center gap-1.5">
                     <Layers className="h-3 w-3" />
-                    {isBn ? "ক্যাটাগরি" : "Categories"}
+                    {isBn ? 'ক্যাটাগরি' : 'Categories'}
                   </div>
                   <div className="space-y-0.5">
                     {suggestions.categories.map((cat) => (
@@ -175,7 +176,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                 <div className="p-2">
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1 flex items-center gap-1.5">
                     <Tag className="h-3 w-3" />
-                    {isBn ? "পণ্যসমূহ" : "Products"}
+                    {isBn ? 'পণ্যসমূহ' : 'Products'}
                   </div>
                   <div className="space-y-1">
                     {suggestions.products.map((item) => (
@@ -223,7 +224,11 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                   onClick={handleSearch}
                   className="w-full py-2 px-3 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <span>{isBn ? `"${searchTerm}" এর সব ফলাফল দেখুন` : `View all results for "${searchTerm}"`}</span>
+                  <span>
+                    {isBn
+                      ? `"${searchTerm}" এর সব ফলাফল দেখুন`
+                      : `View all results for "${searchTerm}"`}
+                  </span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -231,14 +236,16 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
           ) : (
             <div className="p-6 text-center">
               <p className="text-sm text-muted-foreground">
-                {isBn ? `"${debouncedTerm}" সম্পর্কিত কোনো ফলাফল পাওয়া যায়নি` : `No results found for "${debouncedTerm}"`}
+                {isBn
+                  ? `"${debouncedTerm}" সম্পর্কিত কোনো ফলাফল পাওয়া যায়নি`
+                  : `No results found for "${debouncedTerm}"`}
               </p>
               <button
                 type="button"
                 onClick={handleSearch}
                 className="mt-2 text-xs text-primary font-medium hover:underline inline-flex items-center gap-1"
               >
-                <span>{isBn ? "সার্চ পেজে সব দেখুন" : "Search in catalog"}</span>
+                <span>{isBn ? 'সার্চ পেজে সব দেখুন' : 'Search in catalog'}</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
             </div>

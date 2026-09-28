@@ -15,18 +15,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let isMounted = true;
 
     const initAuth = async () => {
-      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+      const storedToken =
+        typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
       // If we already have a user in state (hydrated from localStorage), mark initialized immediately
       if (user) {
         if (isMounted) dispatch(setAuthInitialized(true));
         // Background verify to sync latest profile data
         if (storedToken) {
-          getProfile().unwrap().then((profile) => {
-            if (isMounted && profile) dispatch(setUser(profile));
-          }).catch(() => {
-            // Don't log out prematurely on network hiccup; api.ts 401 handler handles true expiration
-          });
+          getProfile()
+            .unwrap()
+            .then((profile) => {
+              if (isMounted && profile) dispatch(setUser(profile));
+            })
+            .catch(() => {
+              // Don't log out prematurely on network hiccup; api.ts 401 handler handles true expiration
+            });
         }
         return;
       }
@@ -65,11 +69,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!e.newValue) {
           dispatch(logout());
         } else {
-          getProfile().unwrap().then((profile) => {
-            if (profile) dispatch(setUser(profile));
-          }).catch(() => {
-            // Let api.ts 401 handler manage logout
-          });
+          getProfile()
+            .unwrap()
+            .then((profile) => {
+              if (profile) dispatch(setUser(profile));
+            })
+            .catch(() => {
+              // Let api.ts 401 handler manage logout
+            });
         }
       }
     };

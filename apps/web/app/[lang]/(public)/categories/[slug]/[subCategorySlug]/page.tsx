@@ -45,25 +45,25 @@ export default function SubCategoryDetailsPage({
   const minPrice = searchParams.get('minPrice');
   const maxPrice = searchParams.get('maxPrice');
   const inStock = searchParams.get('inStock') === 'true' ? true : undefined;
-  const minRating = searchParams.get('minRating') ? Number(searchParams.get('minRating')) : undefined;
+  const minRating = searchParams.get('minRating')
+    ? Number(searchParams.get('minRating'))
+    : undefined;
   const sort = searchParams.get('sort') || 'newest';
   const page = parseInt(searchParams.get('page') || '1', 10);
 
   // Search products filtered by categorySlug AND subCategorySlug
-  const { data: productsData, isLoading: isProductsLoading } = useSearchProductsQuery(
-    {
-      categorySlug: slug,
-      subCategorySlug,
-      brandId,
-      minPrice: minPrice ? Number(minPrice) : undefined,
-      maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      inStock,
-      minRating,
-      sort,
-      page,
-      limit: 20,
-    }
-  );
+  const { data: productsData, isLoading: isProductsLoading } = useSearchProductsQuery({
+    categorySlug: slug,
+    subCategorySlug,
+    brandId,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    inStock,
+    minRating,
+    sort,
+    page,
+    limit: 20,
+  });
 
   const updateUrl = (key: string, value: string | number | null) => {
     const queryParams = new URLSearchParams(searchParams.toString());
@@ -105,14 +105,22 @@ export default function SubCategoryDetailsPage({
 
   const parentName = isBn ? parentCategory.nameBn : parentCategory.nameEn;
   const subCategoryName = subCategory
-    ? (isBn ? subCategory.nameBn : subCategory.nameEn)
+    ? isBn
+      ? subCategory.nameBn
+      : subCategory.nameEn
     : subCategorySlug.replace(/-/g, ' ');
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-10 max-w-7xl">
       {/* Breadcrumb Navigation (Phase 15) */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6 flex-wrap">
-        <Link href={`/${lang}`} className="hover:text-primary transition-colors flex items-center gap-1">
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6 flex-wrap"
+      >
+        <Link
+          href={`/${lang}`}
+          className="hover:text-primary transition-colors flex items-center gap-1"
+        >
           <Home className="h-3.5 w-3.5" />
           <span>{isBn ? 'হোম' : 'Home'}</span>
         </Link>
@@ -121,7 +129,10 @@ export default function SubCategoryDetailsPage({
           {isBn ? 'সকল ক্যাটাগরি' : 'All Categories'}
         </Link>
         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
-        <Link href={`/${lang}/categories/${parentCategory.slug}`} className="hover:text-primary transition-colors">
+        <Link
+          href={`/${lang}/categories/${parentCategory.slug}`}
+          className="hover:text-primary transition-colors"
+        >
           {parentName}
         </Link>
         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
@@ -131,11 +142,7 @@ export default function SubCategoryDetailsPage({
       <div className="flex flex-col md:flex-row gap-6 lg:gap-8">
         {/* Filters Sidebar (Phase 8 & 9) */}
         <div className="hidden md:block w-64 flex-shrink-0">
-          <ProductFilterSidebar
-            lang={lang}
-            categorySlug={slug}
-            subCategorySlug={subCategorySlug}
-          />
+          <ProductFilterSidebar lang={lang} categorySlug={slug} subCategorySlug={subCategorySlug} />
         </div>
 
         <div className="flex-1 min-w-0 space-y-6">
@@ -144,7 +151,10 @@ export default function SubCategoryDetailsPage({
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-1">
-                  <Link href={`/${lang}/categories/${parentCategory.slug}`} className="hover:underline flex items-center gap-1">
+                  <Link
+                    href={`/${lang}/categories/${parentCategory.slug}`}
+                    className="hover:underline flex items-center gap-1"
+                  >
                     <span>{parentCategory.icon || '📦'}</span>
                     <span>{parentName}</span>
                   </Link>
@@ -156,10 +166,12 @@ export default function SubCategoryDetailsPage({
                 </h1>
                 <p className="text-xs text-muted-foreground mt-1 font-medium">
                   {isProductsLoading
-                    ? (isBn ? 'লোড হচ্ছে...' : 'Loading products...')
-                    : (isBn
-                        ? `${meta?.total || 0} টি পণ্য পাওয়া গেছে`
-                        : `${meta?.total || 0} products available`)}
+                    ? isBn
+                      ? 'লোড হচ্ছে...'
+                      : 'Loading products...'
+                    : isBn
+                      ? `${meta?.total || 0} টি পণ্য পাওয়া গেছে`
+                      : `${meta?.total || 0} products available`}
                 </p>
               </div>
 
@@ -199,10 +211,10 @@ export default function SubCategoryDetailsPage({
                     key={sibling.id}
                     href={`/${lang}/categories/${parentCategory.slug}/${sibling.slug}`}
                     className={cn(
-                      "px-4 py-2 rounded-2xl text-xs md:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+                      'px-4 py-2 rounded-2xl text-xs md:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2',
                       isCurrent
-                        ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                        : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80"
+                        ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                        : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80'
                     )}
                   >
                     {sibling.icon && <span className="text-sm">{sibling.icon}</span>}
@@ -210,10 +222,10 @@ export default function SubCategoryDetailsPage({
                     {sibling.productCount !== undefined && sibling.productCount > 0 && (
                       <span
                         className={cn(
-                          "text-[11px] px-2 py-0.5 rounded-full font-bold",
+                          'text-[11px] px-2 py-0.5 rounded-full font-bold',
                           isCurrent
-                            ? "bg-primary-foreground/20 text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
+                            ? 'bg-primary-foreground/20 text-primary-foreground'
+                            : 'bg-muted text-muted-foreground'
                         )}
                       >
                         {sibling.productCount}
@@ -230,7 +242,9 @@ export default function SubCategoryDetailsPage({
             <div className="text-center py-16 px-4 bg-card rounded-2xl border border-dashed border-border/80">
               <PackageSearch className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
               <h3 className="text-lg font-bold mb-2 text-foreground">
-                {isBn ? 'এই উপ-ক্যাটাগরিতে বর্তমানে কোনো পণ্য নেই' : 'No products in this subcategory yet'}
+                {isBn
+                  ? 'এই উপ-ক্যাটাগরিতে বর্তমানে কোনো পণ্য নেই'
+                  : 'No products in this subcategory yet'}
               </h3>
               <p className="text-muted-foreground text-xs md:text-sm max-w-md mx-auto mb-6">
                 {isBn
@@ -253,7 +267,11 @@ export default function SubCategoryDetailsPage({
             </div>
           ) : (
             <>
-              <ProductGrid products={productsData?.data} isLoading={isProductsLoading} lang={lang} />
+              <ProductGrid
+                products={productsData?.data}
+                isLoading={isProductsLoading}
+                lang={lang}
+              />
 
               {/* Server-side Pagination */}
               {meta && meta.totalPages > 1 && (

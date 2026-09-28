@@ -45,9 +45,11 @@ export function LoginModal({ lang }: { lang: string }) {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    
+
     if (!phone || phone.length < 11) {
-      setErrorMsg(isBn ? 'দয়া করে একটি সঠিক মোবাইল নম্বর দিন' : 'Please enter a valid mobile number');
+      setErrorMsg(
+        isBn ? 'দয়া করে একটি সঠিক মোবাইল নম্বর দিন' : 'Please enter a valid mobile number'
+      );
       return;
     }
 
@@ -55,7 +57,9 @@ export function LoginModal({ lang }: { lang: string }) {
       await sendOtp({ phone }).unwrap();
       setStep('otp');
     } catch (err) {
-      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'ওটিপি পাঠাতে সমস্যা হয়েছে' : 'Failed to send OTP'));
+      setErrorMsg(
+        getApiErrorMessage(err) || (isBn ? 'ওটিপি পাঠাতে সমস্যা হয়েছে' : 'Failed to send OTP')
+      );
     }
   };
 
@@ -70,10 +74,12 @@ export function LoginModal({ lang }: { lang: string }) {
 
     try {
       const res = await verifyOtp({ phone, otp }).unwrap();
-      dispatch(setCredentials({ 
-        user: res.user,
-        accessToken: res.accessToken
-      }));
+      dispatch(
+        setCredentials({
+          user: res.user,
+          accessToken: res.accessToken,
+        })
+      );
       handleClose();
     } catch (err) {
       setErrorMsg(getApiErrorMessage(err) || (isBn ? 'ভুল ওটিপি' : 'Invalid OTP'));
@@ -84,22 +90,20 @@ export function LoginModal({ lang }: { lang: string }) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {isBn ? 'লগইন বা রেজিস্টার করুন' : 'Login or Register'}
-          </DialogTitle>
+          <DialogTitle>{isBn ? 'লগইন বা রেজিস্টার করুন' : 'Login or Register'}</DialogTitle>
           <DialogDescription>
             {step === 'phone'
-              ? (isBn ? 'আপনার মোবাইল নম্বর দিন' : 'Enter your mobile number to continue')
-              : (isBn ? `আমরা ${phone} নম্বরে একটি কোড পাঠিয়েছি` : `We sent a code to ${phone}`)}
+              ? isBn
+                ? 'আপনার মোবাইল নম্বর দিন'
+                : 'Enter your mobile number to continue'
+              : isBn
+                ? `আমরা ${phone} নম্বরে একটি কোড পাঠিয়েছি`
+                : `We sent a code to ${phone}`}
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
-          {errorMsg && (
-            <div className="mb-4 text-sm text-destructive font-medium">
-              {errorMsg}
-            </div>
-          )}
+          {errorMsg && <div className="mb-4 text-sm text-destructive font-medium">{errorMsg}</div>}
 
           {step === 'phone' ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
@@ -115,9 +119,13 @@ export function LoginModal({ lang }: { lang: string }) {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={isSending}>
-                {isSending 
-                  ? (isBn ? 'অপেক্ষা করুন...' : 'Sending...') 
-                  : (isBn ? 'পরবর্তী' : 'Continue')}
+                {isSending
+                  ? isBn
+                    ? 'অপেক্ষা করুন...'
+                    : 'Sending...'
+                  : isBn
+                    ? 'পরবর্তী'
+                    : 'Continue'}
               </Button>
             </form>
           ) : (
@@ -135,13 +143,17 @@ export function LoginModal({ lang }: { lang: string }) {
               </div>
               <div className="flex flex-col gap-2">
                 <Button type="submit" className="w-full" disabled={isVerifying}>
-                  {isVerifying 
-                    ? (isBn ? 'যাচাই করা হচ্ছে...' : 'Verifying...') 
-                    : (isBn ? 'যাচাই করুন' : 'Verify')}
+                  {isVerifying
+                    ? isBn
+                      ? 'যাচাই করা হচ্ছে...'
+                      : 'Verifying...'
+                    : isBn
+                      ? 'যাচাই করুন'
+                      : 'Verify'}
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="ghost" 
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={() => setStep('phone')}
                   disabled={isVerifying}
                 >
@@ -152,8 +164,8 @@ export function LoginModal({ lang }: { lang: string }) {
           )}
 
           <div className="mt-8 text-center border-t pt-4">
-            <a 
-              href={`/${lang}/login`} 
+            <a
+              href={`/${lang}/login`}
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               onClick={handleClose}
             >

@@ -58,7 +58,9 @@ describe('OrdersService', () => {
    * the entity class and whether the criteria targets the address/user/coupon,
    * so tests do not depend on call ordering.
    */
-  const givenFindOne = (mappings: { match: (where: Record<string, unknown>) => boolean; value: unknown }[]) => {
+  const givenFindOne = (
+    mappings: { match: (where: Record<string, unknown>) => boolean; value: unknown }[],
+  ) => {
     manager.findOne.mockImplementation(async (_entity, criteria) => {
       const where = (criteria?.where ?? {}) as Record<string, unknown>;
       const hit = mappings.find((m) => m.match(where));
@@ -68,7 +70,8 @@ describe('OrdersService', () => {
 
   const isAddressLookup = (where: Record<string, unknown>) => 'id' in where && 'userId' in where;
   const isCouponLookup = (where: Record<string, unknown>) => 'code' in where;
-  const isUserLookup = (where: Record<string, unknown>) => Object.keys(where).length === 1 && 'id' in where;
+  const isUserLookup = (where: Record<string, unknown>) =>
+    Object.keys(where).length === 1 && 'id' in where;
 
   const createService = async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -121,18 +124,18 @@ describe('OrdersService', () => {
     it('rejects an address that does not belong to the buyer', async () => {
       givenFindOne([{ match: isAddressLookup, value: null }]);
 
-      await expect(
-        service.checkout('user-1', checkoutBase, 'http://x'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.checkout('user-1', checkoutBase, 'http://x')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('rejects items whose product is missing or inactive', async () => {
       givenFindOne([{ match: isAddressLookup, value: address }]);
       manager.find.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
-      await expect(
-        service.checkout('user-1', checkoutBase, 'http://x'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.checkout('user-1', checkoutBase, 'http://x')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('rejects orders exceeding available stock', async () => {
@@ -161,9 +164,9 @@ describe('OrdersService', () => {
           } as Coupon,
         },
       ]);
-      manager.find.mockResolvedValueOnce([sellerProduct()]).mockResolvedValueOnce([
-        { sellerProductId: 'sp-1', quantity: 10 },
-      ]);
+      manager.find
+        .mockResolvedValueOnce([sellerProduct()])
+        .mockResolvedValueOnce([{ sellerProductId: 'sp-1', quantity: 10 }]);
 
       await expect(
         service.checkout('user-1', { ...checkoutBase, couponCode: 'OLD10' }, 'http://x'),
@@ -185,9 +188,9 @@ describe('OrdersService', () => {
           } as Coupon,
         },
       ]);
-      manager.find.mockResolvedValueOnce([sellerProduct()]).mockResolvedValueOnce([
-        { sellerProductId: 'sp-1', quantity: 10 },
-      ]);
+      manager.find
+        .mockResolvedValueOnce([sellerProduct()])
+        .mockResolvedValueOnce([{ sellerProductId: 'sp-1', quantity: 10 }]);
       manager.count.mockResolvedValue(1); // already used once
 
       await expect(
@@ -200,9 +203,9 @@ describe('OrdersService', () => {
         { match: isAddressLookup, value: address },
         { match: isUserLookup, value: { id: 'user-1', firstName: 'A', lastName: 'B' } as User },
       ]);
-      manager.find.mockResolvedValueOnce([sellerProduct()]).mockResolvedValueOnce([
-        { sellerProductId: 'sp-1', quantity: 10 },
-      ]);
+      manager.find
+        .mockResolvedValueOnce([sellerProduct()])
+        .mockResolvedValueOnce([{ sellerProductId: 'sp-1', quantity: 10 }]);
       manager.save.mockImplementation(async (_entity, value) => value);
       paymentsService.initPayment.mockResolvedValue('https://sslcommerz.test/pay');
 
@@ -227,12 +230,11 @@ describe('OrdersService', () => {
         items: [{ sellerProductId: 'sp-1', quantity: 3 }],
       };
       manager.findOne.mockResolvedValueOnce(order);
-      manager.find
-        .mockImplementationOnce(async (_entity, criteria) => {
-          // Sanity-check the service only touches its own items
-          expect((criteria?.where as { id: string }).id).toBeDefined();
-          return [product];
-        });
+      manager.find.mockImplementationOnce(async (_entity, criteria) => {
+        // Sanity-check the service only touches its own items
+        expect((criteria?.where as { id: string }).id).toBeDefined();
+        return [product];
+      });
       manager.save.mockImplementation(async (_entity, value) => value);
 
       const result = (await service.cancelOrder('user-1', 'o-1')) as {
@@ -252,17 +254,13 @@ describe('OrdersService', () => {
         items: [],
       });
 
-      await expect(service.cancelOrder('user-1', 'o-1')).rejects.toThrow(
-        /cannot be cancelled/i,
-      );
+      await expect(service.cancelOrder('user-1', 'o-1')).rejects.toThrow(/cannot be cancelled/i);
     });
 
     it('throws when the order does not belong to the caller', async () => {
       manager.findOne.mockResolvedValueOnce(null);
 
-      await expect(service.cancelOrder('user-1', 'nope')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.cancelOrder('user-1', 'nope')).rejects.toThrow(NotFoundException);
     });
 
     it('does not restore stock for items without inventory', async () => {
@@ -284,5 +282,4 @@ describe('OrdersService', () => {
       expect(manager.save).toHaveBeenCalled();
     });
   });
-
 });

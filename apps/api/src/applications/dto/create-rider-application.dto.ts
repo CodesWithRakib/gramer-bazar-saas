@@ -30,7 +30,11 @@ export class CreateRiderApplicationDto {
   @IsIn(['BIKE', 'BICYCLE', 'SCOOTER', 'WALKING'])
   vehicleType: string;
 
-  @ApiProperty({ example: 'DHAKA-METRO-HA-1234', description: 'Vehicle plate number', required: false })
+  @ApiProperty({
+    example: 'DHAKA-METRO-HA-1234',
+    description: 'Vehicle plate number',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   vehiclePlateNumber?: string;
@@ -40,12 +44,20 @@ export class CreateRiderApplicationDto {
   @IsString()
   drivingLicenseNumber?: string;
 
-  @ApiProperty({ example: 'Khansama Sadar', description: 'Preferred delivery zone', required: false })
+  @ApiProperty({
+    example: 'Khansama Sadar',
+    description: 'Preferred delivery zone',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   preferredZone?: string;
 
-  @ApiProperty({ example: '01799887766 (Brother)', description: 'Emergency contact number and relationship', required: false })
+  @ApiProperty({
+    example: '01799887766 (Brother)',
+    description: 'Emergency contact number and relationship',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   emergencyContact?: string;

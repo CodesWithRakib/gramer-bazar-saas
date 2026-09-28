@@ -13,7 +13,9 @@ export function AdminMessagesView({ lang = 'en' }: AdminMessagesViewProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{isBn ? 'মেসেজ ও বার্তালাপ' : 'Messages'}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {isBn ? 'মেসেজ ও বার্তালাপ' : 'Messages'}
+        </h1>
         <p className="text-muted-foreground">
           {isBn
             ? 'প্ল্যাটফর্মের সকল ব্যবহারকারীদের সাথে বার্তা আদান-প্রদান ও সমাধান করুন।'

@@ -31,10 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: cookieExtractor,
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>(
-        'JWT_ACCESS_SECRET',
-        'super-secret-key-for-dev-only',
-      ),
+      secretOrKey: configService.get<string>('JWT_ACCESS_SECRET', 'super-secret-key-for-dev-only'),
     });
   }
 

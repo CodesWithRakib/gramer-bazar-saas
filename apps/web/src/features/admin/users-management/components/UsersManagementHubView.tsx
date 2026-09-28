@@ -1,15 +1,7 @@
 'use client';
 
 import React from 'react';
-import {
-  Users,
-  Store,
-  ClipboardList,
-  Truck,
-  FileCheck,
-  ShieldCheck,
-  UserPlus,
-} from 'lucide-react';
+import { Users, Store, ClipboardList, Truck, FileCheck, ShieldCheck, UserPlus } from 'lucide-react';
 import DashboardHubOverview, { HubCardItem } from '@/components/dashboard/DashboardHubOverview';
 
 export interface UsersManagementHubViewProps {
@@ -17,7 +9,10 @@ export interface UsersManagementHubViewProps {
   namespace?: 'admin' | 'super-admin';
 }
 
-export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: UsersManagementHubViewProps) {
+export function UsersManagementHubView({
+  lang = 'en',
+  namespace = 'admin',
+}: UsersManagementHubViewProps) {
   const isSuperAdmin = namespace === 'super-admin';
   const basePath = isSuperAdmin ? 'super-admin' : 'admin';
 
@@ -28,8 +23,10 @@ export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: Use
             id: 'admins',
             title: 'Administrator Roster',
             titleBn: 'সিস্টেম অ্যাডমিন পরিচালনা',
-            description: 'Manage system administrators, oversee assigned roles, monitor administrative access, and view permissions.',
-            descriptionBn: 'সিস্টেম অ্যাডমিনদের তালিকা, ভূমিকার দায়িত্ব এবং অ্যাক্সেস পারমিশন পরিচালনা করুন।',
+            description:
+              'Manage system administrators, oversee assigned roles, monitor administrative access, and view permissions.',
+            descriptionBn:
+              'সিস্টেম অ্যাডমিনদের তালিকা, ভূমিকার দায়িত্ব এবং অ্যাক্সেস পারমিশন পরিচালনা করুন।',
             icon: ShieldCheck,
             href: '/super-admin/users-management/admins',
             badge: 'Super Admin',
@@ -40,8 +37,10 @@ export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: Use
             id: 'create-user',
             title: 'Create Staff Member',
             titleBn: 'নতুন স্টাফ / অ্যাডমিন তৈরি',
-            description: 'Quickly onboard a new system administrator, staff operator, or regional support manager with direct role assignment.',
-            descriptionBn: 'সরাসরি নতুন অ্যাডমিন বা অপারেশনাল স্টাফ সদস্য তৈরি করুন এবং ভূমিকা নির্ধারণ করুন।',
+            description:
+              'Quickly onboard a new system administrator, staff operator, or regional support manager with direct role assignment.',
+            descriptionBn:
+              'সরাসরি নতুন অ্যাডমিন বা অপারেশনাল স্টাফ সদস্য তৈরি করুন এবং ভূমিকা নির্ধারণ করুন।',
             icon: UserPlus,
             href: '/super-admin/users-management/create-user',
             badge: 'Staff Provisioning',
@@ -69,7 +68,8 @@ export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: Use
       description: isSuperAdmin
         ? 'Oversee verified merchant stores, inspect shop performance, manage accounts, and verify business operations.'
         : 'Manage verified merchant stores, view seller contact info, shop ratings, and vendor activity.',
-      descriptionBn: 'যাচাইকৃত সেলার দোকান পরিচালনা, যোগাযোগের তথ্য, রেটিং এবং পারফরম্যান্স পর্যবেক্ষণ করুন।',
+      descriptionBn:
+        'যাচাইকৃত সেলার দোকান পরিচালনা, যোগাযোগের তথ্য, রেটিং এবং পারফরম্যান্স পর্যবেক্ষণ করুন।',
       icon: Store,
       href: `/${basePath}/users-management/sellers`,
     },
@@ -77,8 +77,10 @@ export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: Use
       id: 'seller-applications',
       title: 'Seller KYC Applications',
       titleBn: 'সেলার পার্টনারশিপ আবেদন',
-      description: 'Review pending shop registration applications, verify trade licenses/NID, and approve new merchants.',
-      descriptionBn: 'নতুন দোকান খোলার আবেদন যাচাই, ট্রেড লাইসেন্স ও এনআইডি পরীক্ষা এবং সেলার অনুমোদন দিন।',
+      description:
+        'Review pending shop registration applications, verify trade licenses/NID, and approve new merchants.',
+      descriptionBn:
+        'নতুন দোকান খোলার আবেদন যাচাই, ট্রেড লাইসেন্স ও এনআইডি পরীক্ষা এবং সেলার অনুমোদন দিন।',
       icon: ClipboardList,
       href: `/${basePath}/users-management/seller-applications`,
       badge: 'KYC Verification',
@@ -88,8 +90,10 @@ export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: Use
       id: 'riders',
       title: 'Delivery Fleet & Riders',
       titleBn: 'ডেলিভারি রাইডার ও বহর',
-      description: 'Monitor active delivery personnel, vehicle details, assigned upazilas, and delivery statuses.',
-      descriptionBn: 'ডেলিভারি রাইডার তালিকা, যানবাহনের ধরন, উপজেলা জোন এবং রাইডারের স্থিতি পরিচালনা করুন।',
+      description:
+        'Monitor active delivery personnel, vehicle details, assigned upazilas, and delivery statuses.',
+      descriptionBn:
+        'ডেলিভারি রাইডার তালিকা, যানবাহনের ধরন, উপজেলা জোন এবং রাইডারের স্থিতি পরিচালনা করুন।',
       icon: Truck,
       href: `/${basePath}/users-management/riders`,
     },
@@ -97,8 +101,10 @@ export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: Use
       id: 'rider-applications',
       title: 'Rider Driver Applications',
       titleBn: 'রাইডার আবেদন ও যাচাই',
-      description: 'Review incoming delivery rider applications, driving licenses, and onboard regional drivers.',
-      descriptionBn: 'নতুন রাইডারদের ড্রাইভিং লাইসেন্স এবং পরিচয়পত্র যাচাই করে অনুমোদন প্রদান করুন।',
+      description:
+        'Review incoming delivery rider applications, driving licenses, and onboard regional drivers.',
+      descriptionBn:
+        'নতুন রাইডারদের ড্রাইভিং লাইসেন্স এবং পরিচয়পত্র যাচাই করে অনুমোদন প্রদান করুন।',
       icon: FileCheck,
       href: `/${basePath}/users-management/rider-applications`,
       badge: 'Fleet Onboarding',
@@ -110,9 +116,17 @@ export function UsersManagementHubView({ lang = 'en', namespace = 'admin' }: Use
     <DashboardHubOverview
       lang={lang}
       sectionTag={isSuperAdmin ? 'Full Access Control' : 'Stakeholder Management'}
-      sectionTagBn={isSuperAdmin ? 'সম্পূর্ণ ব্যবহারকারী ও স্টাফ নিয়ন্ত্রণ' : 'অংশীদার ও ব্যবহারকারী ব্যবস্থাপনা'}
+      sectionTagBn={
+        isSuperAdmin
+          ? 'সম্পূর্ণ ব্যবহারকারী ও স্টাফ নিয়ন্ত্রণ'
+          : 'অংশীদার ও ব্যবহারকারী ব্যবস্থাপনা'
+      }
       title={isSuperAdmin ? 'User & Partner Management Hub' : 'Users & Partners Hub'}
-      titleBn={isSuperAdmin ? 'ব্যবহারকারী, অ্যাডমিন ও অংশীদার ব্যবস্থাপনা' : 'ব্যবহারকারী ও পার্টনার ব্যবস্থাপনা'}
+      titleBn={
+        isSuperAdmin
+          ? 'ব্যবহারকারী, অ্যাডমিন ও অংশীদার ব্যবস্থাপনা'
+          : 'ব্যবহারকারী ও পার্টনার ব্যবস্থাপনা'
+      }
       description={
         isSuperAdmin
           ? 'The master control center for all platform roles: Administrators, staff, merchants, delivery riders, and customers.'

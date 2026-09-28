@@ -62,7 +62,10 @@ export function resolveCategoryMapping(
   source: string,
   sourceCategory: string,
 ): CategoryTargetMapping | null {
-  const normalizedKey = sourceCategory.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+  const normalizedKey = sourceCategory
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-');
 
   if (source === 'dummyjson') {
     return DUMMYJSON_CATEGORY_MAP[normalizedKey] || null;

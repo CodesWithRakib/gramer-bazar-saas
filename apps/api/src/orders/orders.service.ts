@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, In } from 'typeorm';
 import { CheckoutDto } from './dto/checkout.dto.js';
@@ -12,7 +7,11 @@ import { OrderItem } from './entities/order-item.entity.js';
 import { OrderStatusHistory } from './entities/order-status-history.entity.js';
 import { PaymentsService } from '../payments/payments.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
-import { Notification, NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
+import {
+  Notification,
+  NotificationType,
+  NotificationPriority,
+} from '../notifications/entities/notification.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 
@@ -47,9 +46,7 @@ export class OrdersService {
         where: { id: checkoutDto.addressId, userId },
       });
       if (!address) {
-        throw new NotFoundException(
-          'Delivery address not found or does not belong to you.',
-        );
+        throw new NotFoundException('Delivery address not found or does not belong to you.');
       }
 
       // 2. Fetch SellerProducts
@@ -79,13 +76,9 @@ export class OrdersService {
 
       // 3. Process each item, validate stock, and calculate subtotal
       for (const cartItem of checkoutDto.items) {
-        const dbProduct = dbProducts.find(
-          (p) => p.id === cartItem.sellerProductId,
-        );
+        const dbProduct = dbProducts.find((p) => p.id === cartItem.sellerProductId);
         if (!dbProduct) {
-          throw new BadRequestException(
-            `Product ${cartItem.sellerProductId} not found.`,
-          );
+          throw new BadRequestException(`Product ${cartItem.sellerProductId} not found.`);
         }
 
         const availableQty = dbProduct.inventory?.quantity || 0;
@@ -138,11 +131,16 @@ export class OrdersService {
         if (appliedCoupon.endDate && new Date(appliedCoupon.endDate) < now) {
           throw new BadRequestException('This coupon has expired');
         }
-        if (appliedCoupon.usageLimit !== null && appliedCoupon.usedCount >= appliedCoupon.usageLimit) {
+        if (
+          appliedCoupon.usageLimit !== null &&
+          appliedCoupon.usedCount >= appliedCoupon.usageLimit
+        ) {
           throw new BadRequestException('This coupon has reached its usage limit');
         }
         if (subtotal < (appliedCoupon.minOrderAmount || 0)) {
-          throw new BadRequestException(`Minimum order amount of ${appliedCoupon.minOrderAmount} BDT is required to use this coupon`);
+          throw new BadRequestException(
+            `Minimum order amount of ${appliedCoupon.minOrderAmount} BDT is required to use this coupon`,
+          );
         }
 
         const userUsageCount = await manager.count(CouponUsage, {
@@ -157,7 +155,10 @@ export class OrdersService {
           discount = Number(appliedCoupon.discountValue);
         } else if (appliedCoupon.discountType === DiscountType.PERCENTAGE) {
           discount = subtotal * (Number(appliedCoupon.discountValue) / 100);
-          if (appliedCoupon.maxDiscountAmount && discount > Number(appliedCoupon.maxDiscountAmount)) {
+          if (
+            appliedCoupon.maxDiscountAmount &&
+            discount > Number(appliedCoupon.maxDiscountAmount)
+          ) {
             discount = Number(appliedCoupon.maxDiscountAmount);
           }
         }
@@ -167,7 +168,7 @@ export class OrdersService {
         }
 
         appliedCoupon.usedCount += 1;
-        
+
         couponUsage = new CouponUsage();
         couponUsage.couponId = appliedCoupon.id;
         couponUsage.userId = userId;
@@ -193,7 +194,7 @@ export class OrdersService {
       const statusHistory = new OrderStatusHistory();
       statusHistory.status = OrderStatus.PENDING;
       statusHistory.remark = 'Order placed successfully';
-      
+
       order.statusHistory = [statusHistory];
 
       // 7. Save all within transaction
@@ -283,12 +284,18 @@ export class OrdersService {
                 titleKey: 'notifications.new_order_seller.title',
                 messageKey: 'notifications.new_order_seller.message',
                 priority: NotificationPriority.HIGH,
-                data: { orderId: savedOrder.id, orderNumber: shortOrderId, total: savedOrder.total },
+                data: {
+                  orderId: savedOrder.id,
+                  orderNumber: shortOrderId,
+                  total: savedOrder.total,
+                },
               });
             }
           })
           .catch((err) => {
-            this.logger.warn(`Failed to notify sellers for order ${savedOrder?.id}: ${err?.message}`);
+            this.logger.warn(
+              `Failed to notify sellers for order ${savedOrder?.id}: ${err?.message}`,
+            );
           });
       }
     }
@@ -318,12 +325,12 @@ export class OrdersService {
     const order = await this.dataSource.getRepository(Order).findOne({
       where: { id: orderId, userId },
       relations: [
-        'items', 
-        'items.sellerProduct', 
+        'items',
+        'items.sellerProduct',
         'items.sellerProduct.productVariant',
         'items.sellerProduct.productVariant.product',
-        'statusHistory', 
-        'address'
+        'statusHistory',
+        'address',
       ],
       order: {
         statusHistory: {
@@ -359,7 +366,8 @@ export class OrdersService {
       return orderRepository.find({ relations: ['user', 'address'] });
     }
 
-    const query = orderRepository.createQueryBuilder('order')
+    const query = orderRepository
+      .createQueryBuilder('order')
       .leftJoinAndSelect('order.user', 'user')
       .leftJoinAndSelect('order.address', 'address')
       .orderBy('order.createdAt', 'DESC');
@@ -413,13 +421,7 @@ export class OrdersService {
       // 1. Fetch Order with items, seller products, shops and lock
       const order = await manager.findOne(Order, {
         where: { id: orderId },
-        relations: [
-          'items',
-          'items.sellerProduct',
-          'items.sellerProduct.shop',
-          'address',
-          'user',
-        ],
+        relations: ['items', 'items.sellerProduct', 'items.sellerProduct.shop', 'address', 'user'],
         lock: { mode: 'pessimistic_write' },
       });
 
@@ -551,7 +553,8 @@ export class OrdersService {
     // 9. Dispatch in-app notifications
     const shortId = (order?.id || '').slice(0, 8).toUpperCase() || 'ORD';
     const formattedStatus = targetStatus.replace(/_/g, ' ').toLowerCase();
-    const isUrgent = targetStatus === OrderStatus.CANCELLED || targetStatus === OrderStatus.DELIVERED;
+    const isUrgent =
+      targetStatus === OrderStatus.CANCELLED || targetStatus === OrderStatus.DELIVERED;
 
     if (order?.userId) {
       void this.notificationsService?.notifyUser?.(order.userId, {

@@ -6,7 +6,10 @@ import { CreatePayoutDto } from './dto/create-payout.dto.js';
 import { ReviewPayoutDto } from './dto/review-payout.dto.js';
 import { WalletsService } from '../wallets/wallets.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
-import { NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
+import {
+  NotificationType,
+  NotificationPriority,
+} from '../notifications/entities/notification.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 
 @Injectable()
@@ -39,7 +42,12 @@ export class PayoutsService {
       titleKey: 'notifications.payout_requested_admin.title',
       messageKey: 'notifications.payout_requested_admin.message',
       priority: NotificationPriority.NORMAL,
-      data: { payoutId: saved.id, amount: createPayoutDto.amount, method: createPayoutDto.method, sellerId },
+      data: {
+        payoutId: saved.id,
+        amount: createPayoutDto.amount,
+        method: createPayoutDto.method,
+        sellerId,
+      },
     });
 
     return saved;
@@ -63,7 +71,7 @@ export class PayoutsService {
 
   async reviewPayout(id: string, reviewDto: ReviewPayoutDto) {
     const request = await this.payoutsRepository.findOne({ where: { id } });
-    
+
     if (!request) {
       throw new NotFoundException('Payout request not found');
     }
@@ -74,10 +82,10 @@ export class PayoutsService {
 
     if (reviewDto.status === PayoutStatus.APPROVED) {
       await this.walletsService.approvePayout(
-        request.sellerId, 
-        request.amount, 
-        `Payout via ${request.method}`, 
-        request.id
+        request.sellerId,
+        request.amount,
+        `Payout via ${request.method}`,
+        request.id,
       );
     } else if (reviewDto.status === PayoutStatus.REJECTED) {
       await this.walletsService.rejectPayout(request.sellerId, request.amount);
@@ -85,7 +93,7 @@ export class PayoutsService {
 
     request.status = reviewDto.status;
     request.adminNote = reviewDto.adminNote || null;
-    
+
     const saved = await this.payoutsRepository.save(request);
 
     // Notify seller

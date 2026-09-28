@@ -40,7 +40,8 @@ export class ShopsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Register a new vendor store / shop profile',
-    description: 'Requires SELLER, ADMIN, or SUPER_ADMIN role. Sellers can register their own shop; Admins can register shops on behalf of any sellerId.',
+    description:
+      'Requires SELLER, ADMIN, or SUPER_ADMIN role. Sellers can register their own shop; Admins can register shops on behalf of any sellerId.',
   })
   @ApiStandardResponse({
     type: ShopResponseDto,
@@ -49,10 +50,7 @@ export class ShopsController {
   })
   @ApiCommonErrors([400, 401, 403, 409, 500])
   create(@Body() createShopDto: CreateShopDto, @Request() req: any) {
-    if (
-      !req.user.roles?.includes(Role.ADMIN) &&
-      !req.user.roles?.includes(Role.SUPER_ADMIN)
-    ) {
+    if (!req.user.roles?.includes(Role.ADMIN) && !req.user.roles?.includes(Role.SUPER_ADMIN)) {
       createShopDto.sellerId = req.user.id;
     }
     return this.shopsService.create(createShopDto);
@@ -149,7 +147,8 @@ export class ShopsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Update shop profile details',
-    description: 'Requires shop owner or ADMIN role. Modifies contact numbers, logos, banners, or address.',
+    description:
+      'Requires shop owner or ADMIN role. Modifies contact numbers, logos, banners, or address.',
   })
   @ApiParam({ name: 'id', type: String, description: 'Shop UUID' })
   @ApiStandardResponse({
@@ -158,20 +157,13 @@ export class ShopsController {
     description: 'Shop profile updated successfully',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  async update(
-    @Param('id') id: string,
-    @Body() updateShopDto: UpdateShopDto,
-    @Request() req: any,
-  ) {
+  async update(@Param('id') id: string, @Body() updateShopDto: UpdateShopDto, @Request() req: any) {
     const isAdmin =
-      req.user.roles?.includes(Role.ADMIN) ||
-      req.user.roles?.includes(Role.SUPER_ADMIN);
+      req.user.roles?.includes(Role.ADMIN) || req.user.roles?.includes(Role.SUPER_ADMIN);
     if (!isAdmin) {
       const existing = await this.shopsService.findOne(id);
       if (existing.sellerId !== req.user.id) {
-        throw new NotFoundException(
-          'You do not have permission to modify this shop',
-        );
+        throw new NotFoundException('You do not have permission to modify this shop');
       }
     }
     return this.shopsService.update(id, updateShopDto);

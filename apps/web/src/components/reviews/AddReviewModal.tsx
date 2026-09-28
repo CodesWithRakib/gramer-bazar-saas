@@ -30,7 +30,9 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
     if (!files) return;
 
     if (images.length + files.length > 3) {
-      toast.error(isBn ? 'সর্বোচ্চ ৩টি ছবি আপলোড করতে পারবেন' : 'You can upload a maximum of 3 images');
+      toast.error(
+        isBn ? 'সর্বোচ্চ ৩টি ছবি আপলোড করতে পারবেন' : 'You can upload a maximum of 3 images'
+      );
       return;
     }
 
@@ -40,7 +42,8 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
         toast.error(isBn ? 'দয়া করে শুধুমাত্র ছবি আপলোড করুন' : 'Please upload images only');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
         toast.error(isBn ? 'ছবির সাইজ ৫MB এর বেশি হতে পারবে না' : 'Image size cannot exceed 5MB');
         return;
       }
@@ -54,7 +57,7 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
   };
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,13 +66,20 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
 
     try {
       await addReview({ productId, rating, comment, images }).unwrap();
-      toast.success(isBn ? 'আপনার রিভিউ সফলভাবে সাবমিট হয়েছে। এডমিন অনুমোদনের পর এটি প্রদর্শিত হবে।' : 'Review submitted successfully. It will be visible after admin approval.');
+      toast.success(
+        isBn
+          ? 'আপনার রিভিউ সফলভাবে সাবমিট হয়েছে। এডমিন অনুমোদনের পর এটি প্রদর্শিত হবে।'
+          : 'Review submitted successfully. It will be visible after admin approval.'
+      );
       setRating(5);
       setComment('');
       setImages([]);
       onClose();
     } catch (err) {
-      toast.error(getApiErrorMessage(err) || (isBn ? 'রিভিউ সাবমিট করতে সমস্যা হয়েছে' : 'Failed to submit review'));
+      toast.error(
+        getApiErrorMessage(err) ||
+          (isBn ? 'রিভিউ সাবমিট করতে সমস্যা হয়েছে' : 'Failed to submit review')
+      );
     }
   };
 
@@ -104,9 +114,15 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">{isBn ? 'আপনার মন্তব্য (ঐচ্ছিক)' : 'Your Comment (Optional)'}</label>
+            <label className="text-sm font-medium">
+              {isBn ? 'আপনার মন্তব্য (ঐচ্ছিক)' : 'Your Comment (Optional)'}
+            </label>
             <Textarea
-              placeholder={isBn ? 'আপনার অভিজ্ঞতা আমাদের সাথে শেয়ার করুন...' : 'Share your experience with us...'}
+              placeholder={
+                isBn
+                  ? 'আপনার অভিজ্ঞতা আমাদের সাথে শেয়ার করুন...'
+                  : 'Share your experience with us...'
+              }
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               className="resize-none"
@@ -114,11 +130,16 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">{isBn ? 'ছবি যোগ করুন (সর্বোচ্চ ৩টি)' : 'Add Photos (Max 3)'}</label>
+            <label className="text-sm font-medium">
+              {isBn ? 'ছবি যোগ করুন (সর্বোচ্চ ৩টি)' : 'Add Photos (Max 3)'}
+            </label>
             {images.length > 0 && (
               <div className="flex gap-2 flex-wrap mb-2">
                 {images.map((img, idx) => (
-                  <div key={idx} className="relative w-20 h-20 rounded-md overflow-hidden border bg-muted group">
+                  <div
+                    key={idx}
+                    className="relative w-20 h-20 rounded-md overflow-hidden border bg-muted group"
+                  >
                     <CustomImage src={img} alt={`Preview ${idx}`} fill className="object-cover" />
                     <button
                       type="button"
@@ -142,13 +163,23 @@ export function AddReviewModal({ isOpen, onClose, productId, isBn }: AddReviewMo
                   title="Upload photos"
                 />
                 <Upload className="h-6 w-6 mb-2 group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-medium">{isBn ? 'ছবি আপলোড করতে ক্লিক করুন' : 'Click to upload photos'}</span>
-                <span className="text-xs opacity-70 mt-1">{isBn ? 'সর্বোচ্চ ৫MB' : 'Max 5MB each'}</span>
+                <span className="text-sm font-medium">
+                  {isBn ? 'ছবি আপলোড করতে ক্লিক করুন' : 'Click to upload photos'}
+                </span>
+                <span className="text-xs opacity-70 mt-1">
+                  {isBn ? 'সর্বোচ্চ ৫MB' : 'Max 5MB each'}
+                </span>
               </div>
             )}
           </div>
           <Button type="submit" className="w-full" disabled={isLoading || rating === 0}>
-            {isLoading ? (isBn ? 'সাবমিট হচ্ছে...' : 'Submitting...') : (isBn ? 'সাবমিট করুন' : 'Submit Review')}
+            {isLoading
+              ? isBn
+                ? 'সাবমিট হচ্ছে...'
+                : 'Submitting...'
+              : isBn
+                ? 'সাবমিট করুন'
+                : 'Submit Review'}
           </Button>
         </form>
       </DialogContent>

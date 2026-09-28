@@ -6,7 +6,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useUpdateUserRolesMutation, Role, User } from '@/features/users/usersApi';
@@ -30,12 +37,12 @@ export function UserRoleDialog({
   isSuperAdminMode?: boolean;
 }) {
   const [updateRoles, { isLoading }] = useUpdateUserRolesMutation();
-  
+
   const form = useForm<z.infer<typeof roleSchema>>({
     resolver: zodResolver(roleSchema),
     values: {
       roles: user?.roles?.map((r) => r.name) || [Role.CUSTOMER],
-    }
+    },
   });
 
   const onSubmit = async (values: z.infer<typeof roleSchema>) => {
@@ -52,7 +59,9 @@ export function UserRoleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Roles - {user?.firstName} {user?.lastName}</DialogTitle>
+          <DialogTitle>
+            Edit Roles - {user?.firstName} {user?.lastName}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -82,18 +91,14 @@ export function UserRoleDialog({
                                   return checked
                                     ? field.onChange([...field.value, role])
                                     : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== role
-                                        )
-                                      )
+                                        field.value?.filter((value) => value !== role)
+                                      );
                                 }}
                               />
                             </FormControl>
-                            <FormLabel className="font-normal">
-                              {role}
-                            </FormLabel>
+                            <FormLabel className="font-normal">{role}</FormLabel>
                           </FormItem>
-                        )
+                        );
                       }}
                     />
                   ))}

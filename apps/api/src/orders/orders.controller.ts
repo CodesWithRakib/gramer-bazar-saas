@@ -44,7 +44,8 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Process checkout, deduct stock, and initiate order',
-    description: 'Requires customer authentication. Validates cart items, applies delivery fees, records initial state, and returns order plus gateway paymentUrl (if digital payment).',
+    description:
+      'Requires customer authentication. Validates cart items, applies delivery fees, records initial state, and returns order plus gateway paymentUrl (if digital payment).',
   })
   @ApiStandardResponse({
     type: CheckoutResponseDto,
@@ -66,7 +67,8 @@ export class OrdersController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
     summary: 'List all platform orders with search (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Returns paginated marketplace orders with customer and address details.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Returns paginated marketplace orders with customer and address details.',
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
@@ -138,7 +140,8 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Retrieve single order details',
-    description: 'Returns complete order items, delivery address, payments, and history if order belongs to customer.',
+    description:
+      'Returns complete order items, delivery address, payments, and history if order belongs to customer.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Order UUID' })
   @ApiStandardResponse({
@@ -156,7 +159,8 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Cancel an order before dispatch',
-    description: 'Allows customer to cancel a pending order. Restores inventory and records cancellation reason.',
+    description:
+      'Allows customer to cancel a pending order. Restores inventory and records cancellation reason.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Order UUID' })
   @ApiStandardResponse({
@@ -175,7 +179,8 @@ export class OrdersController {
   @Roles(Role.CUSTOMER, Role.SELLER, Role.RIDER, Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Transition order state via authoritative state machine',
-    description: 'Validates state machine transitions (e.g. CONFIRMED -> PROCESSING -> SHIPPED -> DELIVERED) based on actor role.',
+    description:
+      'Validates state machine transitions (e.g. CONFIRMED -> PROCESSING -> SHIPPED -> DELIVERED) based on actor role.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Order UUID' })
   @ApiStandardResponse({
@@ -189,9 +194,7 @@ export class OrdersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: TransitionOrderDto,
   ) {
-    const userRoles = (req.user?.roles || []).map((r: any) =>
-      typeof r === 'string' ? r : r.name,
-    );
+    const userRoles = (req.user?.roles || []).map((r: any) => (typeof r === 'string' ? r : r.name));
 
     const result = await this.ordersService.transitionOrder(id, dto, {
       id: req.user.id,

@@ -88,7 +88,13 @@ export class ProductImporterService {
   }
 
   async runImport(options: ImportOptions): Promise<ImportResult> {
-    const { source, mode = ImportMode.IMPORT, limit = 20, category, updateExisting = false } = options;
+    const {
+      source,
+      mode = ImportMode.IMPORT,
+      limit = 20,
+      category,
+      updateExisting = false,
+    } = options;
     const adapter = this.getAdapter(source);
 
     // Create initial import log
@@ -248,9 +254,10 @@ export class ProductImporterService {
               sourceUrl: item.sourceUrl,
               sourcePrice: item.sourcePrice || undefined,
               sourceCurrency: item.sourceCurrency || undefined,
-              status: targetCategory && item.suggestedBdtPrice
-                ? ProductStatus.PUBLISHED
-                : ProductStatus.PENDING_REVIEW,
+              status:
+                targetCategory && item.suggestedBdtPrice
+                  ? ProductStatus.PUBLISHED
+                  : ProductStatus.PENDING_REVIEW,
               isActive: true,
               isFeatured: false,
             });
@@ -261,7 +268,11 @@ export class ProductImporterService {
           if (item.imageUrls && item.imageUrls.length > 0) {
             let imageDownloaded = false;
             for (const imgUrl of item.imageUrls.slice(0, 5)) {
-              const success = await this.downloadAndStoreImage(savedProduct.id, imgUrl, item.source);
+              const success = await this.downloadAndStoreImage(
+                savedProduct.id,
+                imgUrl,
+                item.source,
+              );
               if (success) {
                 imageDownloaded = true;
               }
@@ -272,7 +283,9 @@ export class ProductImporterService {
           }
         } catch (itemErr: unknown) {
           failedCount++;
-          this.logger.error(`Error processing product ${item.nameEn}: ${(itemErr as Error).message}`);
+          this.logger.error(
+            `Error processing product ${item.nameEn}: ${(itemErr as Error).message}`,
+          );
         }
       }
 
@@ -318,7 +331,11 @@ export class ProductImporterService {
   /**
    * Safe image downloader with SSRF protection, timeout, and magic bytes check
    */
-  private async downloadAndStoreImage(productId: string, imageUrl: string, source: string): Promise<boolean> {
+  private async downloadAndStoreImage(
+    productId: string,
+    imageUrl: string,
+    source: string,
+  ): Promise<boolean> {
     if (!this.isSafeUrl(imageUrl)) {
       this.logger.warn(`Rejected unsafe image URL: ${imageUrl}`);
       return false;
@@ -348,7 +365,9 @@ export class ProductImporterService {
 
       return true;
     } catch (err: unknown) {
-      this.logger.warn(`Failed to download image ${imageUrl} for product ${productId}: ${(err as Error).message}`);
+      this.logger.warn(
+        `Failed to download image ${imageUrl} for product ${productId}: ${(err as Error).message}`,
+      );
       return false;
     }
   }
@@ -398,7 +417,9 @@ export class ProductImporterService {
       .replace(/(^-|-$)+/g, '')
       .slice(0, 80);
 
-    const safeSuffix = `${source.slice(0, 3)}-${sourceId.slice(-6)}`.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    const safeSuffix = `${source.slice(0, 3)}-${sourceId.slice(-6)}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '');
     return `${base}-${safeSuffix}`;
   }
 

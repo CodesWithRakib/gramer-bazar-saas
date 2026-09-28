@@ -3,8 +3,21 @@
 import { useState } from 'react';
 import { useGetAddressesQuery, useDeleteAddressMutation, Address } from '../addressApi';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Trash2, Edit2 } from 'lucide-react';
 import { AddressForm } from './AddressForm';
@@ -83,12 +96,19 @@ export function AddressList() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {addresses.map((address) => (
-            <Card key={address.id} className={address.isDefault ? 'border-primary/50 shadow-sm' : ''}>
+            <Card
+              key={address.id}
+              className={address.isDefault ? 'border-primary/50 shadow-sm' : ''}
+            >
               <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
                 <div>
                   <CardTitle className="text-base flex items-center gap-2">
                     {address.title}
-                    {address.isDefault && <Badge variant="secondary" className="text-xs">Default</Badge>}
+                    {address.isDefault && (
+                      <Badge variant="secondary" className="text-xs">
+                        Default
+                      </Badge>
+                    )}
                   </CardTitle>
                   <CardDescription className="mt-1">
                     {address.contactName} • {address.contactPhone}
@@ -108,9 +128,17 @@ export function AddressList() {
                 </p>
               </CardContent>
               <CardFooter className="flex gap-2 pt-0">
-                <Dialog open={editingAddress?.id === address.id} onOpenChange={(open) => !open && setEditingAddress(null)}>
+                <Dialog
+                  open={editingAddress?.id === address.id}
+                  onOpenChange={(open) => !open && setEditingAddress(null)}
+                >
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full" onClick={() => setEditingAddress(address)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setEditingAddress(address)}
+                    >
                       <Edit2 className="mr-2 h-3 w-3" /> Edit
                     </Button>
                   </DialogTrigger>
@@ -119,11 +147,19 @@ export function AddressList() {
                       <DialogTitle>Edit Address</DialogTitle>
                     </DialogHeader>
                     {editingAddress && (
-                      <AddressForm initialData={editingAddress} onSuccess={() => setEditingAddress(null)} />
+                      <AddressForm
+                        initialData={editingAddress}
+                        onSuccess={() => setEditingAddress(null)}
+                      />
                     )}
                   </DialogContent>
                 </Dialog>
-                <Button variant="destructive" size="sm" className="w-full" onClick={() => setAddressToDelete(address.id)}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setAddressToDelete(address.id)}
+                >
                   <Trash2 className="mr-2 h-3 w-3" /> Delete
                 </Button>
               </CardFooter>

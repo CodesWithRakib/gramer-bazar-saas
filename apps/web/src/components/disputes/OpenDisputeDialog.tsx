@@ -23,7 +23,7 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<DisputeReason | ''>('');
   const [description, setDescription] = useState('');
-  
+
   const [createDispute, { isLoading }] = useCreateDisputeMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,9 +34,9 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
       await createDispute({
         orderId,
         reason: reason as DisputeReason,
-        description
+        description,
       }).unwrap();
-      
+
       setOpen(false);
       // Reset form
       setReason('');
@@ -44,14 +44,21 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
       toast.success(isBn ? 'অভিযোগ সফলভাবে দায়ের করা হয়েছে।' : 'Dispute opened successfully.');
     } catch (error) {
       console.error('Failed to create dispute:', error);
-      toast.error(isBn ? 'অভিযোগ দায়ের করতে সমস্যা হয়েছে।' : 'Failed to open dispute. You may already have an active dispute for this order.');
+      toast.error(
+        isBn
+          ? 'অভিযোগ দায়ের করতে সমস্যা হয়েছে।'
+          : 'Failed to open dispute. You may already have an active dispute for this order.'
+      );
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
+        <Button
+          variant="outline"
+          className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+        >
           {isBn ? 'অভিযোগ করুন (Dispute)' : 'Open Dispute'}
         </Button>
       </DialogTrigger>
@@ -59,7 +66,7 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
         <DialogHeader>
           <DialogTitle>{isBn ? 'অভিযোগ দায়ের করুন' : 'Open a Dispute'}</DialogTitle>
           <DialogDescription>
-            {isBn 
+            {isBn
               ? 'আপনার অর্ডারের সমস্যার বিস্তারিত তথ্য দিন। আমাদের সাপোর্ট টিম এটি পর্যালোচনা করবে।'
               : 'Provide details about the issue with your order. Our support team will review it.'}
           </DialogDescription>
@@ -78,14 +85,16 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
               <option value="" disabled>
                 {isBn ? 'কারণ নির্বাচন করুন' : 'Select a reason'}
               </option>
-              <option value="ITEM_NOT_AS_DESCRIBED">{isBn ? 'পণ্য বর্ণনার সাথে মিলেনি' : 'Item not as described'}</option>
+              <option value="ITEM_NOT_AS_DESCRIBED">
+                {isBn ? 'পণ্য বর্ণনার সাথে মিলেনি' : 'Item not as described'}
+              </option>
               <option value="ITEM_DEFECTIVE">{isBn ? 'পণ্য ত্রুটিপূর্ণ' : 'Item defective'}</option>
               <option value="NOT_DELIVERED">{isBn ? 'ডেলিভারি পাইনি' : 'Not delivered'}</option>
               <option value="WRONG_ITEM">{isBn ? 'ভুল পণ্য পেয়েছি' : 'Wrong item received'}</option>
               <option value="OTHER">{isBn ? 'অন্যান্য' : 'Other'}</option>
             </select>
           </div>
-          
+
           <div className="space-y-2">
             <label className="text-sm font-medium">
               {isBn ? 'বিস্তারিত বর্ণনা' : 'Detailed Description'}
@@ -99,13 +108,24 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
               className="w-full flex rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
             />
           </div>
-          
+
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isLoading}
+            >
               {isBn ? 'বাতিল' : 'Cancel'}
             </Button>
             <Button type="submit" disabled={isLoading || !reason || !description.trim()}>
-              {isLoading ? (isBn ? 'দায়ের হচ্ছে...' : 'Submitting...') : (isBn ? 'দায়ের করুন' : 'Submit Dispute')}
+              {isLoading
+                ? isBn
+                  ? 'দায়ের হচ্ছে...'
+                  : 'Submitting...'
+                : isBn
+                  ? 'দায়ের করুন'
+                  : 'Submit Dispute'}
             </Button>
           </DialogFooter>
         </form>

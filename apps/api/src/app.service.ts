@@ -11,11 +11,9 @@ export class AppService {
 
   getLandingPageHtml(): string {
     const frontendUrl =
-      this.configService.get<string>('FRONTEND_URL') ||
-      'https://gramer-bazar-saas.vercel.app';
+      this.configService.get<string>('FRONTEND_URL') || 'https://gramer-bazar-saas.vercel.app';
     const backendUrl =
-      this.configService.get<string>('BACKEND_URL') ||
-      'https://gramer-bazar-api.onrender.com';
+      this.configService.get<string>('BACKEND_URL') || 'https://gramer-bazar-api.onrender.com';
     const nodeEnv = this.configService.get<string>('NODE_ENV') || 'production';
     const uptimeSec = Math.floor(process.uptime());
     const uptimeFormatted = `${Math.floor(uptimeSec / 3600)}h ${Math.floor((uptimeSec % 3600) / 60)}m ${uptimeSec % 60}s`;

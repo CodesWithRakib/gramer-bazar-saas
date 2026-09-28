@@ -1,26 +1,13 @@
-"use client";
+'use client';
 
-import React from "react";
-import { useGetRiderDashboardQuery } from "@/features/deliveries/deliveriesApi";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import {
-  MapPin,
-  Phone,
-  Banknote,
-  Navigation,
-  CheckCircle2,
-  TrendingUp,
-} from "lucide-react";
+import React from 'react';
+import { useGetRiderDashboardQuery } from '@/features/deliveries/deliveriesApi';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { MapPin, Phone, Banknote, Navigation, CheckCircle2, TrendingUp } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -29,14 +16,14 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 
 export interface RiderDashboardViewProps {
   lang?: string;
 }
 
-export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
-  const isBn = lang === "bn";
+export function RiderDashboardView({ lang = 'en' }: RiderDashboardViewProps) {
+  const isBn = lang === 'bn';
 
   const { data, isLoading, isError } = useGetRiderDashboardQuery(undefined, {
     pollingInterval: 30000,
@@ -54,9 +41,7 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
   if (isError || !data) {
     return (
       <div className="p-8 text-center text-sm text-destructive bg-destructive/5 rounded-2xl border border-destructive/20 my-4">
-        {isBn
-          ? "ড্যাশবোর্ড লোড করতে সমস্যা হয়েছে।"
-          : "Failed to load rider dashboard."}
+        {isBn ? 'ড্যাশবোর্ড লোড করতে সমস্যা হয়েছে।' : 'Failed to load rider dashboard.'}
       </div>
     );
   }
@@ -73,25 +58,17 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {isBn ? "রাইডার ড্যাশবোর্ড" : "Rider Dashboard"}
+            {isBn ? 'রাইডার ড্যাশবোর্ড' : 'Rider Dashboard'}
           </h1>
           <p className="text-muted-foreground text-xs md:text-sm">
-            {isBn
-              ? "আজকের কাজ ও ডেলিভারি অগ্রগতি"
-              : "Today's deliveries & earnings progress"}
+            {isBn ? 'আজকের কাজ ও ডেলিভারি অগ্রগতি' : "Today's deliveries & earnings progress"}
           </p>
         </div>
         <Badge
-          variant={activeCount > 0 ? "default" : "secondary"}
+          variant={activeCount > 0 ? 'default' : 'secondary'}
           className="h-8 px-3 font-semibold text-xs"
         >
-          {activeCount > 0
-            ? isBn
-              ? "ডিউটিতে আছেন"
-              : "On Duty"
-            : isBn
-              ? "অপেক্ষমাণ"
-              : "Standby"}
+          {activeCount > 0 ? (isBn ? 'ডিউটিতে আছেন' : 'On Duty') : isBn ? 'অপেক্ষমাণ' : 'Standby'}
         </Badge>
       </div>
 
@@ -104,7 +81,7 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                {isBn ? "অ্যাসাইনকৃত" : "Assigned"}
+                {isBn ? 'অ্যাসাইনকৃত' : 'Assigned'}
               </p>
               <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
                 {pendingCount}
@@ -120,7 +97,7 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                {isBn ? "চলমান" : "Active"}
+                {isBn ? 'চলমান' : 'Active'}
               </p>
               <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
                 {activeCount}
@@ -136,7 +113,7 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                {isBn ? "সম্পন্ন" : "Delivered"}
+                {isBn ? 'সম্পন্ন' : 'Delivered'}
               </p>
               <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
                 {completedCount}
@@ -152,7 +129,7 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                {isBn ? "মোট আয়" : "Earnings"}
+                {isBn ? 'মোট আয়' : 'Earnings'}
               </p>
               <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
                 ৳{totalEarnings.toLocaleString()}
@@ -167,14 +144,10 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
         <Card className="rounded-xl border border-border bg-card shadow-none overflow-hidden">
           <CardHeader className="pb-3 border-b border-border/50">
             <CardTitle className="text-sm font-semibold text-foreground">
-              {isBn
-                ? "ডেলিভারি প্রবণতা (গত ৭ দিন)"
-                : "Delivery Trends (Last 7 Days)"}
+              {isBn ? 'ডেলিভারি প্রবণতা (গত ৭ দিন)' : 'Delivery Trends (Last 7 Days)'}
             </CardTitle>
             <CardDescription className="text-xs">
-              {isBn
-                ? "প্রতিদিনের সম্পন্ন ডেলিভারি ও আয়"
-                : "Daily completed deliveries & earnings"}
+              {isBn ? 'প্রতিদিনের সম্পন্ন ডেলিভারি ও আয়' : 'Daily completed deliveries & earnings'}
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-0 pt-6 pr-6">
@@ -206,9 +179,9 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
                   />
                   <Tooltip
                     contentStyle={{
-                      borderRadius: "8px",
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      borderRadius: '8px',
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
                     }}
                   />
                   <Area
@@ -218,7 +191,7 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
                     strokeWidth={2}
                     fillOpacity={0.15}
                     fill="hsl(var(--primary))"
-                    name={isBn ? "সম্পন্ন" : "Completed"}
+                    name={isBn ? 'সম্পন্ন' : 'Completed'}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -230,7 +203,7 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
       {/* Recent Deliveries List */}
       <div className="space-y-3">
         <h2 className="font-semibold text-base md:text-lg text-foreground">
-          {isBn ? "সাম্প্রতিক অ্যাসাইনমেন্ট ও কাজ" : "Assigned Deliveries"} (
+          {isBn ? 'সাম্প্রতিক অ্যাসাইনমেন্ট ও কাজ' : 'Assigned Deliveries'} (
           {recentDeliveries.length})
         </h2>
 
@@ -238,8 +211,8 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
           <div className="p-8 text-center bg-muted/20 border border-dashed border-border rounded-xl">
             <p className="text-xs text-muted-foreground">
               {isBn
-                ? "এই মুহূর্তে কোনো নতুন ডেলিভারি অ্যাসাইনমেন্ট নেই।"
-                : "No active delivery assignments at the moment."}
+                ? 'এই মুহূর্তে কোনো নতুন ডেলিভারি অ্যাসাইনমেন্ট নেই।'
+                : 'No active delivery assignments at the moment.'}
             </p>
           </div>
         )}
@@ -252,17 +225,11 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
             >
               <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
                 <div>
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] font-semibold uppercase"
-                  >
-                    {delivery.status.replace(/_/g, " ")}
+                  <Badge variant="outline" className="text-[10px] font-semibold uppercase">
+                    {delivery.status.replace(/_/g, ' ')}
                   </Badge>
                   <span className="text-xs text-muted-foreground font-mono ml-2">
-                    #
-                    {delivery.order?.id
-                      ? delivery.order.id.slice(0, 8)
-                      : delivery.id.slice(0, 8)}
+                    #{delivery.order?.id ? delivery.order.id.slice(0, 8) : delivery.id.slice(0, 8)}
                   </span>
                 </div>
                 <span className="text-xs font-semibold text-primary">
@@ -275,30 +242,18 @@ export function RiderDashboardView({ lang = "en" }: RiderDashboardViewProps) {
                   <span>
                     {delivery.order?.address?.streetAddress ||
                       delivery.order?.address?.street ||
-                      (isBn ? "ঠিকানা উপলব্ধ নেই" : "Address not specified")}
+                      (isBn ? 'ঠিকানা উপলব্ধ নেই' : 'Address not specified')}
                   </span>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    asChild
-                    size="sm"
-                    className="flex-1 font-semibold rounded-lg"
-                  >
+                  <Button asChild size="sm" className="flex-1 font-semibold rounded-lg">
                     <Link href={`/${lang}/rider/deliveries/${delivery.id}`}>
-                      {isBn ? "বিস্তারিত ও ট্র্যাক" : "View & Track"}
+                      {isBn ? 'বিস্তারিত ও ট্র্যাক' : 'View & Track'}
                     </Link>
                   </Button>
                   {delivery.order?.user?.phone && (
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="sm"
-                      className="rounded-lg px-3"
-                    >
-                      <a
-                        href={`tel:${delivery.order.user.phone}`}
-                        aria-label="Call customer"
-                      >
+                    <Button asChild variant="outline" size="sm" className="rounded-lg px-3">
+                      <a href={`tel:${delivery.order.user.phone}`} aria-label="Call customer">
                         <Phone className="h-4 w-4" />
                       </a>
                     </Button>

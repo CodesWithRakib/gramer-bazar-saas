@@ -1,7 +1,10 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useGetFeaturedProductsQuery, useGetPublicCategoriesQuery } from '@/features/catalog/catalogApi';
+import {
+  useGetFeaturedProductsQuery,
+  useGetPublicCategoriesQuery,
+} from '@/features/catalog/catalogApi';
 import { useGetPublicBannersQuery } from '@/features/banners/bannersApi';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { ProductCardSkeleton, CategoryCardSkeleton } from '@/components/ui/Skeletons';
@@ -28,11 +31,11 @@ export function HomeClient({
   // Auto slide banners
   useEffect(() => {
     if (!banners || banners.length <= 1) return;
-    
+
     const interval = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [banners]);
 
@@ -55,13 +58,13 @@ export function HomeClient({
             <span className="text-muted-foreground">Loading Campaigns...</span>
           </div>
         ) : !banners || banners.length === 0 ? (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-r from-primary/20 to-emerald-500/20 text-center p-6">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-primary/10 text-center p-6">
             <h2 className="text-2xl md:text-4xl font-bold text-primary mb-2">
               {lang === 'bn' ? 'গ্রামের বাজারে স্বাগতম' : 'Welcome to Gramer Bazar'}
             </h2>
             <p className="text-muted-foreground">
-              {lang === 'bn' 
-                ? 'আপনার প্রয়োজনীয় সব কিছু এক জায়গায়' 
+              {lang === 'bn'
+                ? 'আপনার প্রয়োজনীয় সব কিছু এক জায়গায়'
                 : 'Everything you need in one place'}
             </p>
           </div>
@@ -77,7 +80,10 @@ export function HomeClient({
                 className="absolute inset-0 w-full h-full"
               >
                 {banners[currentBanner].linkUrl ? (
-                  <Link href={banners[currentBanner].linkUrl!} className="absolute inset-0 z-10 block">
+                  <Link
+                    href={banners[currentBanner].linkUrl!}
+                    className="absolute inset-0 z-10 block"
+                  >
                     <span className="sr-only">{banners[currentBanner].title}</span>
                   </Link>
                 ) : null}
@@ -90,32 +96,34 @@ export function HomeClient({
                 />
               </motion.div>
             </AnimatePresence>
-            
+
             {banners.length > 1 && (
               <>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   className="absolute left-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-background/50 hover:bg-background/90 border-0"
                   onClick={prevBanner}
                 >
                   <ChevronLeft className="h-6 w-6" />
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   className="absolute right-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-background/50 hover:bg-background/90 border-0"
                   onClick={nextBanner}
                 >
                   <ChevronRight className="h-6 w-6" />
                 </Button>
-                
+
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
                   {banners.map((_, idx) => (
                     <button
                       key={idx}
                       className={`h-2.5 rounded-full transition-all ${
-                        currentBanner === idx ? 'w-8 bg-primary' : 'w-2.5 bg-primary/40 hover:bg-primary/60'
+                        currentBanner === idx
+                          ? 'w-8 bg-primary'
+                          : 'w-2.5 bg-primary/40 hover:bg-primary/60'
                       }`}
                       onClick={() => setCurrentBanner(idx)}
                       aria-label={`Go to slide ${idx + 1}`}
@@ -130,13 +138,18 @@ export function HomeClient({
 
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold tracking-tight">{dict.home?.featuredProducts || 'Featured Products'}</h2>
+          <h2 className="text-2xl font-bold tracking-tight">
+            {dict.home?.featuredProducts || 'Featured Products'}
+          </h2>
         </div>
-        
+
         <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:grid md:grid-cols-4 lg:grid-cols-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {isLoadingFeatured
             ? Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="min-w-[75vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0">
+                <div
+                  key={i}
+                  className="min-w-[75vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0"
+                >
                   <ProductCardSkeleton />
                 </div>
               ))
@@ -156,13 +169,18 @@ export function HomeClient({
 
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold tracking-tight">{dict.home?.categories || 'Categories'}</h2>
+          <h2 className="text-2xl font-bold tracking-tight">
+            {dict.home?.categories || 'Categories'}
+          </h2>
         </div>
 
         <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:grid md:grid-cols-4 lg:grid-cols-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {isLoadingCategories
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start shrink-0">
+                <div
+                  key={i}
+                  className="min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start shrink-0"
+                >
                   <CategoryCardSkeleton />
                 </div>
               ))
@@ -174,7 +192,10 @@ export function HomeClient({
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className="group relative bg-white border border-border rounded-xl overflow-hidden p-6 text-center hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 min-w-[40vw] sm:min-w-[30vw] md:min-w-0 snap-start shrink-0"
                 >
-                  <Link href={`/${lang}/catalog?category=${category.slug}`} className="absolute inset-0 z-10" />
+                  <Link
+                    href={`/${lang}/catalog?category=${category.slug}`}
+                    className="absolute inset-0 z-10"
+                  />
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                     <span className="text-xl font-bold">{category.nameEn.charAt(0)}</span>
                   </div>

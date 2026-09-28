@@ -49,7 +49,10 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
       );
       setCategoryToDelete(null);
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || (lang === 'bn' ? 'ক্যাটাগরি মুছতে ব্যর্থ হয়েছে' : 'Failed to delete category'));
+      toast.error(
+        getApiErrorMessage(error) ||
+          (lang === 'bn' ? 'ক্যাটাগরি মুছতে ব্যর্থ হয়েছে' : 'Failed to delete category')
+      );
     }
   };
 
@@ -57,9 +60,7 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
     {
       accessorKey: 'icon',
       header: 'Icon',
-      cell: ({ row }) => (
-        <span className="text-xl">{row.original.icon || '📁'}</span>
-      ),
+      cell: ({ row }) => <span className="text-xl">{row.original.icon || '📁'}</span>,
     },
     {
       accessorKey: 'nameEn',
@@ -74,9 +75,7 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
     {
       accessorKey: 'nameBn',
       header: 'Name (BN)',
-      cell: ({ row }) => (
-        <div className="font-medium text-foreground">{row.original.nameBn}</div>
-      ),
+      cell: ({ row }) => <div className="font-medium text-foreground">{row.original.nameBn}</div>,
     },
     {
       id: 'hierarchy',
@@ -109,11 +108,7 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
       header: 'Actions',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setEditingCategory(row.original)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setEditingCategory(row.original)}>
             Edit
           </Button>
           <Button
@@ -163,7 +158,11 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
           setSearch(val);
           setPage(1);
         }}
-        searchPlaceholder={lang === 'bn' ? 'ক্যাটাগরি বা স্লাগ দিয়ে খুঁজুন...' : 'Search categories by name or slug...'}
+        searchPlaceholder={
+          lang === 'bn'
+            ? 'ক্যাটাগরি বা স্লাগ দিয়ে খুঁজুন...'
+            : 'Search categories by name or slug...'
+        }
         actionSlot={<AddCategoryDialog />}
         totalItems={data?.meta?.total}
         itemsPerPage={limit}
@@ -200,9 +199,7 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
             : `Delete category "${categoryToDelete?.nameEn}"?`
         }
         description={
-          lang === 'bn'
-            ? 'এই অ্যাকশনটি বাতিল করা যাবে না।'
-            : 'This action cannot be undone.'
+          lang === 'bn' ? 'এই অ্যাকশনটি বাতিল করা যাবে না।' : 'This action cannot be undone.'
         }
         confirmLabel={lang === 'bn' ? 'মুছে ফেলুন' : 'Delete'}
         cancelLabel={lang === 'bn' ? 'বাতিল' : 'Cancel'}

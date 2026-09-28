@@ -109,7 +109,8 @@ export class ProductsService {
       sort = 'newest',
     } = options;
 
-    const query = this.productsRepository.createQueryBuilder('product')
+    const query = this.productsRepository
+      .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.subCategory', 'subCategory')
       .leftJoinAndSelect('product.brand', 'brand')
@@ -124,10 +125,9 @@ export class ProductsService {
     }
 
     if (categoryId) {
-      query.andWhere(
-        '(product.categoryId = :categoryId OR product.subCategoryId = :categoryId)',
-        { categoryId },
-      );
+      query.andWhere('(product.categoryId = :categoryId OR product.subCategoryId = :categoryId)', {
+        categoryId,
+      });
     }
 
     if (subCategoryId) {
@@ -239,8 +239,10 @@ export class ProductsService {
   async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
     const product = await this.findOne(id);
 
-    const effectiveBrandId = updateProductDto.brandId !== undefined ? updateProductDto.brandId : product.brandId;
-    const effectiveCategoryId = updateProductDto.categoryId !== undefined ? updateProductDto.categoryId : product.categoryId;
+    const effectiveBrandId =
+      updateProductDto.brandId !== undefined ? updateProductDto.brandId : product.brandId;
+    const effectiveCategoryId =
+      updateProductDto.categoryId !== undefined ? updateProductDto.categoryId : product.categoryId;
     if (effectiveBrandId && effectiveCategoryId) {
       await this.validateBrandCategory(effectiveBrandId, effectiveCategoryId);
     }
@@ -345,7 +347,9 @@ export class ProductsService {
       }
       await this.inventoryRepository.save(inventory);
     } catch (err: unknown) {
-      this.logger.warn(`Could not sync seller product for product ${product.id}: ${(err as Error).message}`);
+      this.logger.warn(
+        `Could not sync seller product for product ${product.id}: ${(err as Error).message}`,
+      );
     }
   }
 }

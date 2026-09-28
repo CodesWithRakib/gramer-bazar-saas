@@ -123,11 +123,7 @@ export class SupabaseStorageService {
    * Normalize storage path by trimming leading/trailing slashes and directory traversal
    */
   normalizePath(rawPath: string): string {
-    return rawPath
-      .replace(/\\/g, '/')
-      .replace(/^\/+/, '')
-      .replace(/\/+$/, '')
-      .replace(/\.\./g, '');
+    return rawPath.replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/+$/, '').replace(/\.\./g, '');
   }
 
   /**
@@ -228,7 +224,9 @@ export class SupabaseStorageService {
       const newCleaned = this.normalizePath(newStoragePath);
       if (oldCleaned && oldCleaned !== newCleaned) {
         await this.deleteImage(oldCleaned).catch((err: unknown) => {
-          this.logger.warn(`Could not delete replaced image ${oldCleaned}: ${(err as Error).message}`);
+          this.logger.warn(
+            `Could not delete replaced image ${oldCleaned}: ${(err as Error).message}`,
+          );
         });
       }
     }
@@ -242,9 +240,7 @@ export class SupabaseStorageService {
   getPublicUrl(storagePath: string): string {
     const cleaned = this.normalizePath(storagePath);
     if (this.supabaseClient) {
-      const { data } = this.supabaseClient.storage
-        .from(this.bucketName)
-        .getPublicUrl(cleaned);
+      const { data } = this.supabaseClient.storage.from(this.bucketName).getPublicUrl(cleaned);
       return data.publicUrl;
     }
     return `/uploads/${cleaned}`;

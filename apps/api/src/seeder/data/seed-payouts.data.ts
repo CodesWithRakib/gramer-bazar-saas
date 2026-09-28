@@ -14,7 +14,8 @@ export const SEED_PAYOUT_REQUESTS: SeedPayoutItem[] = [
     sellerIndex: 0, // Rahim Traders
     amount: 5000,
     method: PayoutMethod.BANK_TRANSFER,
-    accountDetails: 'Islami Bank Bangladesh Ltd, Debiganj Branch, A/C: 20501140203040, Name: Rahim Uddin',
+    accountDetails:
+      'Islami Bank Bangladesh Ltd, Debiganj Branch, A/C: 20501140203040, Name: Rahim Uddin',
     status: PayoutStatus.APPROVED,
     adminNote: 'Settled via BEFTN Trx #TXN-EFT-992102. Bank funds transferred.',
   },
@@ -32,7 +33,8 @@ export const SEED_PAYOUT_REQUESTS: SeedPayoutItem[] = [
     method: PayoutMethod.NAGAD,
     accountDetails: 'Nagad Personal: 01899112233',
     status: PayoutStatus.REJECTED,
-    adminNote: 'Rejected: Registered merchant phone does not match Nagad beneficiary name. Please update in KYC settings.',
+    adminNote:
+      'Rejected: Registered merchant phone does not match Nagad beneficiary name. Please update in KYC settings.',
   },
   {
     sellerIndex: 3, // Maa Babar Doa Veggies

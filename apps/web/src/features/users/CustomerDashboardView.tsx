@@ -43,7 +43,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
   const { data: disputes = [], isLoading: isDisputesLoading } = useGetCustomerDisputesQuery();
 
   const activeOrders = orders.filter(
-    (o) => !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(o.status.toUpperCase()),
+    (o) => !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(o.status.toUpperCase())
   );
 
   const hubCards = [
@@ -70,10 +70,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'আপনার পছন্দের পণ্যসমূহ সংরক্ষণ ও দ্রুত কিনুন',
       icon: Heart,
       href: `/${lang}/customer/wishlist`,
-      badge:
-        wishlist.length > 0
-          ? `${wishlist.length} ${isBn ? 'পণ্য' : 'Items'}`
-          : undefined,
+      badge: wishlist.length > 0 ? `${wishlist.length} ${isBn ? 'পণ্য' : 'Items'}` : undefined,
       badgeVariant: 'secondary' as const,
       color: 'from-rose-500/20 to-rose-500/5 text-rose-600',
     },
@@ -85,10 +82,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
       descriptionBn: 'বাসা, অফিস ও গ্রামের ডেলিভারি ঠিকানা যুক্ত ও পরিবর্তন করুন',
       icon: MapPin,
       href: `/${lang}/customer/addresses`,
-      badge:
-        addresses.length > 0
-          ? `${addresses.length} ${isBn ? 'ঠিকানা' : 'Saved'}`
-          : undefined,
+      badge: addresses.length > 0 ? `${addresses.length} ${isBn ? 'ঠিকানা' : 'Saved'}` : undefined,
       badgeVariant: 'secondary' as const,
       color: 'from-emerald-500/20 to-emerald-500/5 text-emerald-600',
     },
@@ -212,9 +206,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
             <p className="text-xs text-muted-foreground font-medium">
               {isBn ? 'মোট অর্ডার' : 'Total Orders'}
             </p>
-            <p className="text-2xl font-bold">
-              {isOrdersLoading ? '...' : orders.length}
-            </p>
+            <p className="text-2xl font-bold">{isOrdersLoading ? '...' : orders.length}</p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground font-medium">
@@ -264,9 +256,7 @@ export function CustomerDashboardView({ lang = 'en' }: CustomerDashboardViewProp
                 <Card className="h-full rounded-2xl border-muted/60 transition-all duration-300 hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 relative overflow-hidden bg-card/60 backdrop-blur-sm">
                   <CardHeader className="p-5 pb-3">
                     <div className="flex items-start justify-between gap-3">
-                      <div
-                        className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
-                      >
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex items-center gap-2">

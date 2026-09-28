@@ -84,11 +84,16 @@ describe('OrderStateMachine', () => {
       ).not.toThrow();
 
       expect(() =>
-        validateRoleTransition(OrderStatus.PROCESSING, OrderStatus.READY_FOR_PICKUP, [Role.SELLER], {
-          isCustomerOwner: false,
-          isSellerOwner: true,
-          isAssignedRider: false,
-        }),
+        validateRoleTransition(
+          OrderStatus.PROCESSING,
+          OrderStatus.READY_FOR_PICKUP,
+          [Role.SELLER],
+          {
+            isCustomerOwner: false,
+            isSellerOwner: true,
+            isAssignedRider: false,
+          },
+        ),
       ).not.toThrow();
     });
 

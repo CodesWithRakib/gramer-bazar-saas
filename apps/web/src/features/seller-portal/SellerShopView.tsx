@@ -65,7 +65,6 @@ export interface SellerShopViewProps {
 }
 
 export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
-  
   const isBn = lang === 'bn';
 
   const { data: shop, isLoading } = useGetSellerShopQuery();
@@ -117,7 +116,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
     if (!file) return;
 
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error(isBn ? 'শুধুমাত্র JPG, PNG বা WEBP ফাইল গ্রহণযোগ্য' : 'Only JPG, PNG or WEBP allowed');
+      toast.error(
+        isBn ? 'শুধুমাত্র JPG, PNG বা WEBP ফাইল গ্রহণযোগ্য' : 'Only JPG, PNG or WEBP allowed'
+      );
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -142,7 +143,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
     if (!file) return;
 
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error(isBn ? 'শুধুমাত্র JPG, PNG বা WEBP ফাইল গ্রহণযোগ্য' : 'Only JPG, PNG or WEBP allowed');
+      toast.error(
+        isBn ? 'শুধুমাত্র JPG, PNG বা WEBP ফাইল গ্রহণযোগ্য' : 'Only JPG, PNG or WEBP allowed'
+      );
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -165,7 +168,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
   const onSubmit = async (data: ShopFormValues) => {
     try {
       await updateShop(data).unwrap();
-      toast.success(isBn ? 'শপ প্রোফাইল সফলভাবে আপডেট করা হয়েছে' : 'Shop profile updated successfully');
+      toast.success(
+        isBn ? 'শপ প্রোফাইল সফলভাবে আপডেট করা হয়েছে' : 'Shop profile updated successfully'
+      );
     } catch {
       toast.error(isBn ? 'শপ প্রোফাইল আপডেট করতে সমস্যা হয়েছে' : 'Failed to update shop profile');
     }
@@ -175,7 +180,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
     return (
       <div className="p-12 text-center flex flex-col items-center justify-center gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">{isBn ? 'শপ তথ্য লোড হচ্ছে...' : 'Loading shop profile...'}</p>
+        <p className="text-sm text-muted-foreground">
+          {isBn ? 'শপ তথ্য লোড হচ্ছে...' : 'Loading shop profile...'}
+        </p>
       </div>
     );
   }
@@ -274,8 +281,8 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                             ? 'লোগো পরিবর্তন'
                             : 'Change Logo'
                           : isBn
-                          ? 'লোগো আপলোড'
-                          : 'Upload Logo'}
+                            ? 'লোগো আপলোড'
+                            : 'Upload Logo'}
                       </span>
                     </Button>
                     <input
@@ -296,7 +303,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                     {isBn ? 'কভার ব্যানার' : 'Cover Banner'}
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    {isBn ? 'প্রশস্ত ল্যান্ডস্কেপ ব্যানার (১৬:৯ অনুপাত)' : 'Wide landscape banner (16:9 ratio, max 5MB)'}
+                    {isBn
+                      ? 'প্রশস্ত ল্যান্ডস্কেপ ব্যানার (১৬:৯ অনুপাত)'
+                      : 'Wide landscape banner (16:9 ratio, max 5MB)'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-4">
@@ -306,7 +315,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                     ) : (
                       <div className="flex flex-col items-center text-muted-foreground/40 gap-1">
                         <ImageIcon className="w-8 h-8" />
-                        <span className="text-xs">{isBn ? 'কোন ব্যানার নেই' : 'No banner set'}</span>
+                        <span className="text-xs">
+                          {isBn ? 'কোন ব্যানার নেই' : 'No banner set'}
+                        </span>
                       </div>
                     )}
                     {isUploadingBanner && (
@@ -356,15 +367,23 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="nameEn">{isBn ? 'দোকানের নাম (English)' : 'Shop Name (English)'} *</Label>
+                    <Label htmlFor="nameEn">
+                      {isBn ? 'দোকানের নাম (English)' : 'Shop Name (English)'} *
+                    </Label>
                     <Input id="nameEn" {...register('nameEn')} />
-                    {errors.nameEn && <p className="text-xs text-destructive">{errors.nameEn.message}</p>}
+                    {errors.nameEn && (
+                      <p className="text-xs text-destructive">{errors.nameEn.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="nameBn">{isBn ? 'দোকানের নাম (বাংলা)' : 'Shop Name (Bangla)'} *</Label>
+                    <Label htmlFor="nameBn">
+                      {isBn ? 'দোকানের নাম (বাংলা)' : 'Shop Name (Bangla)'} *
+                    </Label>
                     <Input id="nameBn" {...register('nameBn')} />
-                    {errors.nameBn && <p className="text-xs text-destructive">{errors.nameBn.message}</p>}
+                    {errors.nameBn && (
+                      <p className="text-xs text-destructive">{errors.nameBn.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -374,10 +393,16 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                   </Label>
                   <Input
                     id="shortDescription"
-                    placeholder={isBn ? 'উদা: খাঁটি তাজা শাকসবজি ও গ্রামের তাজা ফলমূল' : 'e.g. Pure fresh organic farm vegetables & fruits'}
+                    placeholder={
+                      isBn
+                        ? 'উদা: খাঁটি তাজা শাকসবজি ও গ্রামের তাজা ফলমূল'
+                        : 'e.g. Pure fresh organic farm vegetables & fruits'
+                    }
                     {...register('shortDescription')}
                   />
-                  {errors.shortDescription && <p className="text-xs text-destructive">{errors.shortDescription.message}</p>}
+                  {errors.shortDescription && (
+                    <p className="text-xs text-destructive">{errors.shortDescription.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -387,10 +412,16 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                   <Textarea
                     id="description"
                     rows={4}
-                    placeholder={isBn ? 'আপনার দোকান ও পণ্য সম্পর্কে বিস্তারিত লিখুন...' : 'Tell customers about your shop history, quality promise, and services...'}
+                    placeholder={
+                      isBn
+                        ? 'আপনার দোকান ও পণ্য সম্পর্কে বিস্তারিত লিখুন...'
+                        : 'Tell customers about your shop history, quality promise, and services...'
+                    }
                     {...register('description')}
                   />
-                  {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
+                  {errors.description && (
+                    <p className="text-xs text-destructive">{errors.description.message}</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -417,7 +448,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       {isBn ? 'প্রধান ফোন নম্বর' : 'Primary Phone'}
                     </Label>
                     <Input id="phone" placeholder="017XXXXXXXX" {...register('phone')} />
-                    {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+                    {errors.phone && (
+                      <p className="text-xs text-destructive">{errors.phone.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -425,11 +458,18 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       <Phone className="w-3.5 h-3.5 text-muted-foreground" />
                       {isBn ? 'বিকল্প ফোন নম্বর' : 'Secondary Phone'}
                     </Label>
-                    <Input id="secondaryPhone" placeholder="018XXXXXXXX" {...register('secondaryPhone')} />
+                    <Input
+                      id="secondaryPhone"
+                      placeholder="018XXXXXXXX"
+                      {...register('secondaryPhone')}
+                    />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="whatsapp" className="flex items-center gap-1.5 text-emerald-600">
+                    <Label
+                      htmlFor="whatsapp"
+                      className="flex items-center gap-1.5 text-emerald-600"
+                    >
                       <MessageCircle className="w-3.5 h-3.5" />
                       {isBn ? 'হোয়াটসঅ্যাপ নম্বর' : 'WhatsApp Number'}
                     </Label>
@@ -441,8 +481,15 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       <Mail className="w-3.5 h-3.5 text-primary" />
                       {isBn ? 'পাবলিক ইমেইল' : 'Public Email'}
                     </Label>
-                    <Input id="email" type="email" placeholder="contact@shop.com" {...register('email')} />
-                    {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="contact@shop.com"
+                      {...register('email')}
+                    />
+                    {errors.email && (
+                      <p className="text-xs text-destructive">{errors.email.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -457,19 +504,33 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                         {isBn ? 'ওয়েবসাইট লিংক' : 'Website'}
                       </Label>
                       <Input id="website" placeholder="https://..." {...register('website')} />
-                      {errors.website && <p className="text-xs text-destructive">{errors.website.message}</p>}
+                      {errors.website && (
+                        <p className="text-xs text-destructive">{errors.website.message}</p>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
                       <Label htmlFor="facebook">Facebook</Label>
-                      <Input id="facebook" placeholder="https://facebook.com/..." {...register('facebook')} />
-                      {errors.facebook && <p className="text-xs text-destructive">{errors.facebook.message}</p>}
+                      <Input
+                        id="facebook"
+                        placeholder="https://facebook.com/..."
+                        {...register('facebook')}
+                      />
+                      {errors.facebook && (
+                        <p className="text-xs text-destructive">{errors.facebook.message}</p>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
                       <Label htmlFor="instagram">Instagram</Label>
-                      <Input id="instagram" placeholder="https://instagram.com/..." {...register('instagram')} />
-                      {errors.instagram && <p className="text-xs text-destructive">{errors.instagram.message}</p>}
+                      <Input
+                        id="instagram"
+                        placeholder="https://instagram.com/..."
+                        {...register('instagram')}
+                      />
+                      {errors.instagram && (
+                        <p className="text-xs text-destructive">{errors.instagram.message}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -485,35 +546,61 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                   {isBn ? 'ঠিকানা ও এলাকা' : 'Store Address & Location'}
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  {isBn ? 'আপনার স্থানীয় অবস্থান নির্দেশ করুন' : 'Local geographical coordinates and address'}
+                  {isBn
+                    ? 'আপনার স্থানীয় অবস্থান নির্দেশ করুন'
+                    : 'Local geographical coordinates and address'}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="district">{isBn ? 'জেলা' : 'District'}</Label>
-                    <Input id="district" placeholder={isBn ? 'উদা: নরসিংদী' : 'e.g. Narsingdi'} {...register('district')} />
+                    <Input
+                      id="district"
+                      placeholder={isBn ? 'উদা: নরসিংদী' : 'e.g. Narsingdi'}
+                      {...register('district')}
+                    />
                   </div>
 
                   <div className="space-y-1.5">
                     <Label htmlFor="upazila">{isBn ? 'উপজেলা' : 'Upazila'}</Label>
-                    <Input id="upazila" placeholder={isBn ? 'উদা: রায়পুরা' : 'e.g. Raipura'} {...register('upazila')} />
+                    <Input
+                      id="upazila"
+                      placeholder={isBn ? 'উদা: রায়পুরা' : 'e.g. Raipura'}
+                      {...register('upazila')}
+                    />
                   </div>
 
                   <div className="space-y-1.5">
                     <Label htmlFor="union">{isBn ? 'ইউনিয়ন' : 'Union'}</Label>
-                    <Input id="union" placeholder={isBn ? 'উদা: আমিরগঞ্জ' : 'e.g. Amirganj'} {...register('union')} />
+                    <Input
+                      id="union"
+                      placeholder={isBn ? 'উদা: আমিরগঞ্জ' : 'e.g. Amirganj'}
+                      {...register('union')}
+                    />
                   </div>
 
                   <div className="space-y-1.5">
                     <Label htmlFor="village">{isBn ? 'গ্রাম' : 'Village'}</Label>
-                    <Input id="village" placeholder={isBn ? 'উদা: করিমগঞ্জ' : 'e.g. Karimganj'} {...register('village')} />
+                    <Input
+                      id="village"
+                      placeholder={isBn ? 'উদা: করিমগঞ্জ' : 'e.g. Karimganj'}
+                      {...register('village')}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="address">{isBn ? 'বিস্তারিত রাস্তার ঠিকানা' : 'Detailed Street Address'}</Label>
-                  <Input id="address" placeholder={isBn ? 'দোকান নং, বাজার বা রাস্তার নাম' : 'Shop No, Market or Road Name'} {...register('address')} />
+                  <Label htmlFor="address">
+                    {isBn ? 'বিস্তারিত রাস্তার ঠিকানা' : 'Detailed Street Address'}
+                  </Label>
+                  <Input
+                    id="address"
+                    placeholder={
+                      isBn ? 'দোকান নং, বাজার বা রাস্তার নাম' : 'Shop No, Market or Road Name'
+                    }
+                    {...register('address')}
+                  />
                 </div>
 
                 <div className="pt-4 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -524,7 +611,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                     </Label>
                     <Input
                       id="openingHours"
-                      placeholder={isBn ? 'সকাল ৯:০০ - রাত ৯:০০ (প্রতিদিন)' : '9:00 AM - 9:00 PM (Daily)'}
+                      placeholder={
+                        isBn ? 'সকাল ৯:০০ - রাত ৯:০০ (প্রতিদিন)' : '9:00 AM - 9:00 PM (Daily)'
+                      }
                       {...register('openingHours')}
                     />
                   </div>
@@ -536,7 +625,11 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                     </Label>
                     <Input
                       id="deliveryInfo"
-                      placeholder={isBn ? 'ইউনিয়নের মধ্যে ১ ঘণ্টার মধ্যে পৌঁছে দেওয়া হয়' : 'Delivered within 1 hour locally'}
+                      placeholder={
+                        isBn
+                          ? 'ইউনিয়নের মধ্যে ১ ঘণ্টার মধ্যে পৌঁছে দেওয়া হয়'
+                          : 'Delivered within 1 hour locally'
+                      }
                       {...register('deliveryInfo')}
                     />
                   </div>
@@ -548,11 +641,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
 
         {/* Action Save Bar */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t sticky bottom-4 bg-background/90 backdrop-blur-md p-4 rounded-xl border shadow-lg z-20">
-          <Button
-            type="submit"
-            disabled={isUpdating || !isDirty}
-            className="gap-2 px-6"
-          >
+          <Button type="submit" disabled={isUpdating || !isDirty} className="gap-2 px-6">
             {isUpdating ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
@@ -563,8 +652,8 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                 ? 'সংরক্ষণ হচ্ছে...'
                 : 'Saving...'
               : isBn
-              ? 'পরিবর্তন সংরক্ষণ করুন'
-              : 'Save Profile Changes'}
+                ? 'পরিবর্তন সংরক্ষণ করুন'
+                : 'Save Profile Changes'}
           </Button>
         </div>
       </form>

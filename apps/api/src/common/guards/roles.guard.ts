@@ -16,18 +16,20 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    
+
     if (!user || !user.roles) {
       throw new ForbiddenException('Insufficient permissions');
     }
 
     const hasRole = requiredRoles.some((role) =>
-      user.roles.some((userRole: { name: Role } | Role) =>
-        (typeof userRole === 'string' ? userRole : userRole.name) === role
-      )
+      user.roles.some(
+        (userRole: { name: Role } | Role) =>
+          (typeof userRole === 'string' ? userRole : userRole.name) === role,
+      ),
     );
-    const isSuperAdmin = user.roles.some((userRole: { name: Role } | Role) =>
-      (typeof userRole === 'string' ? userRole : userRole.name) === Role.SUPER_ADMIN
+    const isSuperAdmin = user.roles.some(
+      (userRole: { name: Role } | Role) =>
+        (typeof userRole === 'string' ? userRole : userRole.name) === Role.SUPER_ADMIN,
     );
 
     if (!hasRole && !isSuperAdmin) {

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { logout } from "@/store/slices/authSlice";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '@/store/store';
+import { logout } from '@/store/slices/authSlice';
 import {
   DashboardRoute,
   adminRoutes,
@@ -13,21 +13,15 @@ import {
   sellerRoutes,
   riderRoutes,
   customerRoutes,
-} from "@/config/dashboard-routes";
-import { api } from "@/store/api";
-import { Menu, LogOut, Store, User, Settings, ChevronDown } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { NotificationBell } from "@/components/ui/NotificationBell";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
-import { BrandLogo } from "@/components/common/BrandLogo";
-import { getUserRoles } from "@/lib/roles";
+} from '@/config/dashboard-routes';
+import { api } from '@/store/api';
+import { Menu, LogOut, Store, User, Settings, ChevronDown } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { NotificationBell } from '@/components/ui/NotificationBell';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { BrandLogo } from '@/components/common/BrandLogo';
+import { getUserRoles } from '@/lib/roles';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +29,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -43,11 +37,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  routeType: "admin" | "seller" | "rider" | "customer" | "super-admin";
+  routeType: 'admin' | 'seller' | 'rider' | 'customer' | 'super-admin';
   lang: string;
 }
 
@@ -66,15 +60,13 @@ function NavItem({ href, icon: Icon, title, isActive, onClick }: NavItemProps) {
       onClick={onClick}
       className={`group flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors font-medium ${
         isActive
-          ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary pl-2.5"
-          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+          ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary pl-2.5'
+          : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
       }`}
     >
       <Icon
         className={`w-4 h-4 shrink-0 transition-colors ${
-          isActive
-            ? "text-primary"
-            : "text-muted-foreground group-hover:text-foreground"
+          isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
         }`}
       />
       <span className="truncate">{title}</span>
@@ -102,8 +94,8 @@ function SidebarContent({
     items: DashboardRoute[];
   }[] = [];
   routes.forEach((route) => {
-    const secTitle = route.section || "Main";
-    const secTitleBn = route.sectionBn || "মূল";
+    const secTitle = route.section || 'Main';
+    const secTitleBn = route.sectionBn || 'মূল';
     let existing = sections.find((s) => s.title === secTitle);
     if (!existing) {
       existing = { title: secTitle, titleBn: secTitleBn, items: [] };
@@ -138,16 +130,14 @@ function SidebarContent({
                 const isExactActive = pathname === fullHref;
                 const isPrefixActive =
                   route.matchPrefixes?.some(
-                    (p) =>
-                      pathname === `/${lang}${p}` ||
-                      pathname.startsWith(`/${lang}${p}/`),
+                    (p) => pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`)
                   ) ?? false;
                 const isSubActive =
-                  route.href !== "/admin" &&
-                  route.href !== "/super-admin" &&
-                  route.href !== "/seller" &&
-                  route.href !== "/rider" &&
-                  route.href !== "/customer" &&
+                  route.href !== '/admin' &&
+                  route.href !== '/super-admin' &&
+                  route.href !== '/seller' &&
+                  route.href !== '/rider' &&
+                  route.href !== '/customer' &&
                   pathname.startsWith(`${fullHref}/`);
 
                 const isActive = isExactActive || isPrefixActive || isSubActive;
@@ -173,21 +163,16 @@ function SidebarContent({
   );
 }
 
-export function DashboardLayout({
-  children,
-  routeType,
-  lang,
-}: DashboardLayoutProps) {
-  const routesMap: Record<DashboardLayoutProps["routeType"], DashboardRoute[]> =
-    {
-      admin: adminRoutes,
-      "super-admin": superAdminRoutes,
-      seller: sellerRoutes,
-      rider: riderRoutes,
-      customer: customerRoutes,
-    };
+export function DashboardLayout({ children, routeType, lang }: DashboardLayoutProps) {
+  const routesMap: Record<DashboardLayoutProps['routeType'], DashboardRoute[]> = {
+    admin: adminRoutes,
+    'super-admin': superAdminRoutes,
+    seller: sellerRoutes,
+    rider: riderRoutes,
+    customer: customerRoutes,
+  };
   const routes = routesMap[routeType] || adminRoutes;
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -201,14 +186,14 @@ export function DashboardLayout({
     setIsLoggingOut(true);
     try {
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}/auth/logout`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/auth/logout`,
         {
-          method: "POST",
-          credentials: "include",
+          method: 'POST',
+          credentials: 'include',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+            Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
           },
-        },
+        }
       );
     } catch {
       // Ignore network error on logout
@@ -222,15 +207,14 @@ export function DashboardLayout({
   };
 
   // Determine the active title
-  let activeTitle = isBn ? "ড্যাশবোর্ড" : "Dashboard";
+  let activeTitle = isBn ? 'ড্যাশবোর্ড' : 'Dashboard';
   for (const route of routes) {
     const fullHref = `/${lang}${route.href}`;
     if (
       pathname === fullHref ||
       pathname.startsWith(`${fullHref}/`) ||
       route.matchPrefixes?.some(
-        (p) =>
-          pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`),
+        (p) => pathname === `/${lang}${p}` || pathname.startsWith(`/${lang}${p}/`)
       )
     ) {
       activeTitle = isBn ? route.titleBn : route.title;
@@ -239,18 +223,13 @@ export function DashboardLayout({
   }
 
   const userRoles = getUserRoles(user);
-  const primaryRole = userRoles[0] || "User";
+  const primaryRole = userRoles[0] || 'User';
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 flex-shrink-0 sticky top-0 h-screen">
-        <SidebarContent
-          routes={routes}
-          lang={lang}
-          isBn={isBn}
-          pathname={pathname}
-        />
+        <SidebarContent routes={routes} lang={lang} isBn={isBn} pathname={pathname} />
       </aside>
 
       {/* Main Content Area */}
@@ -268,9 +247,7 @@ export function DashboardLayout({
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
                 <SheetHeader className="sr-only">
-                  <SheetTitle>
-                    {isBn ? "ন্যাভিগেশন মেনু" : "Navigation Menu"}
-                  </SheetTitle>
+                  <SheetTitle>{isBn ? 'ন্যাভিগেশন মেনু' : 'Navigation Menu'}</SheetTitle>
                 </SheetHeader>
                 <SidebarContent
                   routes={routes}
@@ -300,16 +277,14 @@ export function DashboardLayout({
                   className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/60 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs ring-1 ring-primary/20 shrink-0">
-                    {user?.firstName?.[0]?.toUpperCase() || (
-                      <User className="h-4 w-4" />
-                    )}
+                    {user?.firstName?.[0]?.toUpperCase() || <User className="h-4 w-4" />}
                   </div>
                   <div className="hidden sm:block text-left text-xs">
                     <p className="font-semibold text-foreground leading-tight truncate max-w-[120px]">
                       {user?.firstName} {user?.lastName}
                     </p>
                     <p className="text-[10px] text-muted-foreground capitalize leading-tight">
-                      {primaryRole.toLowerCase().replace("_", " ")}
+                      {primaryRole.toLowerCase().replace('_', ' ')}
                     </p>
                   </div>
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground hidden sm:block opacity-60" />
@@ -329,41 +304,35 @@ export function DashboardLayout({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="my-1" />
 
-                <DropdownMenuItem
-                  asChild
-                  className="rounded-lg cursor-pointer py-2 text-xs"
-                >
+                <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
                   <Link
                     href={
-                      routeType === "seller"
+                      routeType === 'seller'
                         ? `/${lang}/seller/profile`
-                        : routeType === "rider"
+                        : routeType === 'rider'
                           ? `/${lang}/rider/profile`
                           : `/${lang}/customer/profile`
                     }
                     className="flex items-center gap-2 w-full"
                   >
                     <User className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>{isBn ? "প্রোফাইল" : "Profile"}</span>
+                    <span>{isBn ? 'প্রোফাইল' : 'Profile'}</span>
                   </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                  asChild
-                  className="rounded-lg cursor-pointer py-2 text-xs"
-                >
+                <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
                   <Link
                     href={
-                      routeType === "admin"
+                      routeType === 'admin'
                         ? `/${lang}/admin/settings`
-                        : routeType === "super-admin"
+                        : routeType === 'super-admin'
                           ? `/${lang}/super-admin/settings`
                           : `/${lang}/customer/settings`
                     }
                     className="flex items-center gap-2 w-full"
                   >
                     <Settings className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>{isBn ? "সেটিংস" : "Settings"}</span>
+                    <span>{isBn ? 'সেটিংস' : 'Settings'}</span>
                   </Link>
                 </DropdownMenuItem>
 
@@ -377,7 +346,7 @@ export function DashboardLayout({
                   className="rounded-lg cursor-pointer py-2 text-xs text-destructive focus:text-destructive focus:bg-destructive/10 flex items-center gap-2"
                 >
                   <LogOut className="h-3.5 w-3.5 text-destructive" />
-                  <span>{isBn ? "লগআউট" : "Logout"}</span>
+                  <span>{isBn ? 'লগআউট' : 'Logout'}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -394,13 +363,11 @@ export function DashboardLayout({
       <Dialog open={isLogoutModalOpen} onOpenChange={setIsLogoutModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {isBn ? "লগআউট নিশ্চিত করুন" : "Confirm Logout"}
-            </DialogTitle>
+            <DialogTitle>{isBn ? 'লগআউট নিশ্চিত করুন' : 'Confirm Logout'}</DialogTitle>
             <DialogDescription>
               {isBn
-                ? "আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?"
-                : "Are you sure you want to log out of your dashboard?"}
+                ? 'আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?'
+                : 'Are you sure you want to log out of your dashboard?'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 sm:justify-end mt-4">
@@ -409,20 +376,16 @@ export function DashboardLayout({
               onClick={() => setIsLogoutModalOpen(false)}
               disabled={isLoggingOut}
             >
-              {isBn ? "বাতিল" : "Cancel"}
+              {isBn ? 'বাতিল' : 'Cancel'}
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
+            <Button variant="destructive" onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut
                 ? isBn
-                  ? "লগআউট হচ্ছে..."
-                  : "Logging out..."
+                  ? 'লগআউট হচ্ছে...'
+                  : 'Logging out...'
                 : isBn
-                  ? "লগআউট"
-                  : "Logout"}
+                  ? 'লগআউট'
+                  : 'Logout'}
             </Button>
           </DialogFooter>
         </DialogContent>

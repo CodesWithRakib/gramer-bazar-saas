@@ -16,7 +16,10 @@ import type { Message } from './message.entity.js';
 import { ConversationType, ConversationStatus, SupportPriority } from '../enums/chat.enum.js';
 
 @Entity('conversations')
-@Index('idx_conversations_canonical_key', ['canonicalKey'], { unique: true, where: '"canonical_key" IS NOT NULL' })
+@Index('idx_conversations_canonical_key', ['canonicalKey'], {
+  unique: true,
+  where: '"canonical_key" IS NOT NULL',
+})
 @Index('idx_conversations_updated_at', ['updatedAt'])
 @Index('idx_conversations_type_status', ['type', 'status'])
 export class Conversation {

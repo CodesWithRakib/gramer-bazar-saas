@@ -46,11 +46,13 @@ export function ErrorState({
         <AlertTriangle className="w-8 h-8" />
       </div>
       <h3 className="text-lg font-semibold tracking-tight text-foreground">{defaultTitle}</h3>
-      <p className="text-sm text-muted-foreground mt-1.5 max-w-md leading-relaxed">{defaultMessage}</p>
+      <p className="text-sm text-muted-foreground mt-1.5 max-w-md leading-relaxed">
+        {defaultMessage}
+      </p>
       {(onRetry || secondaryAction) && (
         <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-          {secondaryAction && (
-            secondaryAction.href ? (
+          {secondaryAction &&
+            (secondaryAction.href ? (
               <Button asChild variant="outline" className="rounded-xl">
                 <Link href={secondaryAction.href}>{secondaryAction.label}</Link>
               </Button>
@@ -58,8 +60,7 @@ export function ErrorState({
               <Button onClick={secondaryAction.onClick} variant="outline" className="rounded-xl">
                 {secondaryAction.label}
               </Button>
-            )
-          )}
+            ))}
           {onRetry && (
             <Button
               onClick={onRetry}

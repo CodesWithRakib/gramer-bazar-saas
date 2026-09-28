@@ -11,6 +11,7 @@ export interface CartItem {
   image: string;
   sellerNameEn?: string;
   sellerNameBn?: string;
+  slug?: string;
 }
 
 export interface AppliedCoupon {
@@ -43,7 +44,7 @@ export const loadCartFromStorage = (): {
     if (!Array.isArray(parsed.items)) return null;
     const items = parsed.items.filter(
       (i): i is CartItem =>
-        !!i && typeof i.sellerProductId === 'string' && typeof i.quantity === 'number',
+        !!i && typeof i.sellerProductId === 'string' && typeof i.quantity === 'number'
     );
     return { items, appliedCoupon: parsed.appliedCoupon ?? null };
   } catch {
@@ -57,7 +58,7 @@ export const saveCartToStorage = (cart: Pick<CartState, 'items' | 'appliedCoupon
   try {
     localStorage.setItem(
       CART_STORAGE_KEY,
-      JSON.stringify({ items: cart.items, appliedCoupon: cart.appliedCoupon }),
+      JSON.stringify({ items: cart.items, appliedCoupon: cart.appliedCoupon })
     );
   } catch {
     // Storage unavailable/full — cart simply won't persist.
@@ -77,13 +78,18 @@ const cartSlice = createSlice({
     // Restore a persisted cart after mount (avoids SSR hydration mismatches).
     hydrateCart: (
       state,
-      action: PayloadAction<{ items: CartItem[]; appliedCoupon: AppliedCoupon | null }>,
+      action: PayloadAction<{
+        items: CartItem[];
+        appliedCoupon: AppliedCoupon | null;
+      }>
     ) => {
       state.items = action.payload.items;
       state.appliedCoupon = action.payload.appliedCoupon;
     },
     addToCart: (state, action: PayloadAction<CartItem>) => {
-      const existingItem = state.items.find(i => i.sellerProductId === action.payload.sellerProductId);
+      const existingItem = state.items.find(
+        (i) => i.sellerProductId === action.payload.sellerProductId
+      );
       if (existingItem) {
         existingItem.quantity += action.payload.quantity;
       } else {
@@ -93,14 +99,17 @@ const cartSlice = createSlice({
       // If we add something, it might affect minimum order amount for a coupon, but we'll re-validate at checkout.
     },
     removeFromCart: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter(i => i.sellerProductId !== action.payload);
+      state.items = state.items.filter((i) => i.sellerProductId !== action.payload);
       // If cart becomes empty, remove coupon
       if (state.items.length === 0) {
         state.appliedCoupon = null;
       }
     },
-    updateQuantity: (state, action: PayloadAction<{ sellerProductId: string, quantity: number }>) => {
-      const item = state.items.find(i => i.sellerProductId === action.payload.sellerProductId);
+    updateQuantity: (
+      state,
+      action: PayloadAction<{ sellerProductId: string; quantity: number }>
+    ) => {
+      const item = state.items.find((i) => i.sellerProductId === action.payload.sellerProductId);
       if (item) {
         item.quantity = action.payload.quantity;
       }
@@ -120,9 +129,19 @@ const cartSlice = createSlice({
     },
     removeCoupon: (state) => {
       state.appliedCoupon = null;
-    }
+    },
   },
 });
 
-export const { hydrateCart, addToCart, removeFromCart, updateQuantity, clearCart, toggleCart, setCartOpen, applyCoupon, removeCoupon } = cartSlice.actions;
+export const {
+  hydrateCart,
+  addToCart,
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+  toggleCart,
+  setCartOpen,
+  applyCoupon,
+  removeCoupon,
+} = cartSlice.actions;
 export default cartSlice.reducer;

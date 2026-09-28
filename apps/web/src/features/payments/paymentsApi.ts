@@ -1,6 +1,6 @@
-import { api } from "../../store/api";
-import { PaginationMeta } from "../catalog/catalogApi";
-import { Order } from "../orders/ordersApi";
+import { api } from '../../store/api';
+import { PaginationMeta } from '../catalog/catalogApi';
+import { Order } from '../orders/ordersApi';
 
 export interface PaymentRecord {
   id: string;
@@ -10,7 +10,15 @@ export interface PaymentRecord {
   transactionId: string;
   amount: number | string;
   currency: string;
-  status: 'PENDING' | 'INITIATED' | 'PROCESSING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'EXPIRED' | 'REFUNDED';
+  status:
+    | 'PENDING'
+    | 'INITIATED'
+    | 'PROCESSING'
+    | 'PAID'
+    | 'FAILED'
+    | 'CANCELLED'
+    | 'EXPIRED'
+    | 'REFUNDED';
   gatewayStatus?: string | null;
   validationId?: string | null;
   bankTransactionId?: string | null;

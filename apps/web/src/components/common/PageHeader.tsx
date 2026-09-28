@@ -32,7 +32,10 @@ export function PageHeader({
   return (
     <div className={cn('space-y-3 pb-6 border-b border-border/40', className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav aria-label="Breadcrumb" className="flex items-center text-xs text-muted-foreground gap-1.5 flex-wrap">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center text-xs text-muted-foreground gap-1.5 flex-wrap"
+        >
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
             return (
@@ -45,7 +48,12 @@ export function PageHeader({
                     {crumb.label}
                   </Link>
                 ) : (
-                  <span className={cn('truncate max-w-[200px]', isLast && 'text-foreground font-medium')}>
+                  <span
+                    className={cn(
+                      'truncate max-w-[200px]',
+                      isLast && 'text-foreground font-medium'
+                    )}
+                  >
                     {crumb.label}
                   </span>
                 )}
@@ -65,9 +73,7 @@ export function PageHeader({
             {badge && <div className="shrink-0">{badge}</div>}
           </div>
           {description && (
-            <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              {description}
-            </p>
+            <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">{description}</p>
           )}
         </div>
 

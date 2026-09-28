@@ -29,8 +29,13 @@ export class RolesService implements OnModuleInit {
       }
     } catch (err: unknown) {
       const message = (err as Error)?.message || '';
-      if (message.includes('relation "roles" does not exist') || (message.includes('roles') && message.includes('does not exist'))) {
-        this.logger.warn('Skipping initial role seed: "roles" table does not exist in database yet. Please run migrations first.');
+      if (
+        message.includes('relation "roles" does not exist') ||
+        (message.includes('roles') && message.includes('does not exist'))
+      ) {
+        this.logger.warn(
+          'Skipping initial role seed: "roles" table does not exist in database yet. Please run migrations first.',
+        );
         return;
       }
       throw err;

@@ -26,7 +26,6 @@ export interface SellerProductsViewProps {
 }
 
 export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
-  
   const isBn = lang === 'bn';
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -35,9 +34,12 @@ export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const { data: products, isLoading, isError, refetch } = useGetSellerProductsQuery(
-    searchTerm.trim() || undefined,
-  );
+  const {
+    data: products,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetSellerProductsQuery(searchTerm.trim() || undefined);
 
   const filteredProducts = useMemo(() => {
     let list = products || [];
@@ -95,13 +97,13 @@ export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
 
         return (
           <div>
-            <span className={`font-medium ${isLow ? 'text-destructive font-semibold' : 'text-foreground'}`}>
+            <span
+              className={`font-medium ${isLow ? 'text-destructive font-semibold' : 'text-foreground'}`}
+            >
               {qty}
             </span>
             {isLow && (
-              <span className="ml-2 text-xs text-destructive">
-                ({isBn ? 'কম স্টক' : 'Low'})
-              </span>
+              <span className="ml-2 text-xs text-destructive">({isBn ? 'কম স্টক' : 'Low'})</span>
             )}
           </div>
         );

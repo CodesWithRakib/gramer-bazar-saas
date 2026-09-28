@@ -1,10 +1,6 @@
-import { SellerOrdersView } from "@/features/seller/orders";
+import { SellerOrdersView } from '@/features/seller/orders';
 
-export default async function SellerOrdersPage({
-  params,
-}: {
-  params: Promise<{ lang: "ar" | "en" }>;
-}) {
+export default async function SellerOrdersPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   return <SellerOrdersView lang={lang} />;
 }

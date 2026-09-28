@@ -8,6 +8,6 @@ import { FlashSaleItem } from './entities/flash-sale-item.entity.js';
 @Module({
   imports: [TypeOrmModule.forFeature([FlashSale, FlashSaleItem])],
   providers: [FlashSalesService],
-  controllers: [FlashSalesController]
+  controllers: [FlashSalesController],
 })
 export class FlashSalesModule {}

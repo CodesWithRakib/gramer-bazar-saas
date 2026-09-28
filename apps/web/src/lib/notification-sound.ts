@@ -26,7 +26,9 @@ export function setNotificationSoundEnabled(enabled: boolean): void {
  * High priority: pleasant dual-tone chime (587Hz D5 -> 880Hz A5)
  * Critical priority: attention-getting triple-tone chime
  */
-export function playNotificationSound(priority: NotificationPriority = NotificationPriority.NORMAL): void {
+export function playNotificationSound(
+  priority: NotificationPriority = NotificationPriority.NORMAL
+): void {
   if (typeof window === 'undefined') return;
 
   // Sound only allowed for HIGH and CRITICAL events
@@ -46,7 +48,9 @@ export function playNotificationSound(priority: NotificationPriority = Notificat
   lastSoundTime = now;
 
   try {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextClass) return;
 
     if (!audioCtx || audioCtx.state === 'closed') {
@@ -61,9 +65,10 @@ export function playNotificationSound(priority: NotificationPriority = Notificat
     const startTime = ctx.currentTime + 0.05;
 
     // Frequencies: High = pleasant upward chime; Critical = slightly more prominent triad
-    const notes = priority === NotificationPriority.CRITICAL 
-      ? [523.25, 659.25, 783.99] // C5, E5, G5
-      : [587.33, 880.00];          // D5, A5
+    const notes =
+      priority === NotificationPriority.CRITICAL
+        ? [523.25, 659.25, 783.99] // C5, E5, G5
+        : [587.33, 880.0]; // D5, A5
 
     notes.forEach((freq, index) => {
       const osc = ctx.createOscillator();

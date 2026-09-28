@@ -40,7 +40,7 @@ export interface Dispute {
   adminDecision?: string | null;
   createdAt: string;
   updatedAt: string;
-  
+
   order?: Order;
   customer?: User;
   seller?: User;
@@ -50,7 +50,10 @@ export interface Dispute {
 export const disputesApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // Customer Endpoints
-    createDispute: builder.mutation<Dispute, { orderId: string; reason: DisputeReason; description: string; evidenceImages?: string[] }>({
+    createDispute: builder.mutation<
+      Dispute,
+      { orderId: string; reason: DisputeReason; description: string; evidenceImages?: string[] }
+    >({
       query: (body) => ({
         url: '/disputes/customer',
         method: 'POST',
@@ -66,7 +69,10 @@ export const disputesApi = api.injectEndpoints({
       query: (id) => `/disputes/customer/${id}`,
       providesTags: (result, error, id) => [{ type: 'Dispute', id }],
     }),
-    addCustomerDisputeMessage: builder.mutation<DisputeMessage, { id: string; message: string; attachment?: string }>({
+    addCustomerDisputeMessage: builder.mutation<
+      DisputeMessage,
+      { id: string; message: string; attachment?: string }
+    >({
       query: ({ id, ...body }) => ({
         url: `/disputes/customer/${id}/messages`,
         method: 'POST',
@@ -84,7 +90,10 @@ export const disputesApi = api.injectEndpoints({
       query: (id) => `/disputes/seller/${id}`,
       providesTags: (result, error, id) => [{ type: 'Dispute', id }],
     }),
-    addSellerDisputeMessage: builder.mutation<DisputeMessage, { id: string; message: string; attachment?: string }>({
+    addSellerDisputeMessage: builder.mutation<
+      DisputeMessage,
+      { id: string; message: string; attachment?: string }
+    >({
       query: ({ id, ...body }) => ({
         url: `/disputes/seller/${id}/messages`,
         method: 'POST',
@@ -102,7 +111,10 @@ export const disputesApi = api.injectEndpoints({
       query: (id) => `/disputes/admin/${id}`,
       providesTags: (result, error, id) => [{ type: 'Dispute', id }],
     }),
-    addAdminDisputeMessage: builder.mutation<DisputeMessage, { id: string; message: string; attachment?: string }>({
+    addAdminDisputeMessage: builder.mutation<
+      DisputeMessage,
+      { id: string; message: string; attachment?: string }
+    >({
       query: ({ id, ...body }) => ({
         url: `/disputes/admin/${id}/messages`,
         method: 'POST',
@@ -110,7 +122,10 @@ export const disputesApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Dispute', id }],
     }),
-    resolveDispute: builder.mutation<Dispute, { id: string; status: DisputeStatus; adminDecision?: string }>({
+    resolveDispute: builder.mutation<
+      Dispute,
+      { id: string; status: DisputeStatus; adminDecision?: string }
+    >({
       query: ({ id, ...body }) => ({
         url: `/disputes/admin/${id}/resolve`,
         method: 'PATCH',

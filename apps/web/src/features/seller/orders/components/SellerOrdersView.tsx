@@ -142,9 +142,7 @@ export function SellerOrdersView({ lang = 'en' }: SellerOrdersViewProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {isBn ? 'অর্ডারসমূহ' : 'Orders'}
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">{isBn ? 'অর্ডারসমূহ' : 'Orders'}</h1>
           <p className="text-muted-foreground text-sm">
             {isBn
               ? 'আপনার স্টোরের সমস্ত গ্রাহক অর্ডার পরিচালনা এবং ট্র্যাক করুন।'
@@ -197,8 +195,12 @@ export function SellerOrdersView({ lang = 'en' }: SellerOrdersViewProps) {
                 <SelectItem value="PENDING">{isBn ? 'পেন্ডিং' : 'Pending'}</SelectItem>
                 <SelectItem value="CONFIRMED">{isBn ? 'নিশ্চিত' : 'Confirmed'}</SelectItem>
                 <SelectItem value="PROCESSING">{isBn ? 'প্রক্রিয়াধীন' : 'Processing'}</SelectItem>
-                <SelectItem value="READY_FOR_PICKUP">{isBn ? 'পিকআপের জন্য প্রস্তুত' : 'Ready for Pickup'}</SelectItem>
-                <SelectItem value="OUT_FOR_DELIVERY">{isBn ? 'ডেলিভারিতে রয়েছে' : 'Out for Delivery'}</SelectItem>
+                <SelectItem value="READY_FOR_PICKUP">
+                  {isBn ? 'পিকআপের জন্য প্রস্তুত' : 'Ready for Pickup'}
+                </SelectItem>
+                <SelectItem value="OUT_FOR_DELIVERY">
+                  {isBn ? 'ডেলিভারিতে রয়েছে' : 'Out for Delivery'}
+                </SelectItem>
                 <SelectItem value="DELIVERED">{isBn ? 'ডেলিভারি সম্পন্ন' : 'Delivered'}</SelectItem>
                 <SelectItem value="CANCELLED">{isBn ? 'বাতিল' : 'Cancelled'}</SelectItem>
               </SelectContent>

@@ -15,7 +15,8 @@ export class DevOtpController {
   @Get(':phone')
   @ApiOperation({
     summary: 'Retrieve latest active OTP for automated testing',
-    description: 'DEV ONLY — Peeks the latest active OTP code for a phone number. Hard-blocked in production.',
+    description:
+      'DEV ONLY — Peeks the latest active OTP code for a phone number. Hard-blocked in production.',
   })
   @ApiParam({ name: 'phone', type: String, example: '01712345678', description: 'Phone number' })
   @ApiStandardResponse({

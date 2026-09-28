@@ -35,7 +35,10 @@ async function bootstrap() {
       { name: 'order_status_history', query: 'SELECT COUNT(*) as count FROM order_status_history' },
       { name: 'payments', query: 'SELECT COUNT(*) as count FROM payments' },
       { name: 'deliveries', query: 'SELECT COUNT(*) as count FROM deliveries' },
-      { name: 'delivery_status_history', query: 'SELECT COUNT(*) as count FROM delivery_status_history' },
+      {
+        name: 'delivery_status_history',
+        query: 'SELECT COUNT(*) as count FROM delivery_status_history',
+      },
       { name: 'reviews', query: 'SELECT COUNT(*) as count FROM reviews' },
       { name: 'wishlist_items', query: 'SELECT COUNT(*) as count FROM wishlist_items' },
       { name: 'coupons', query: 'SELECT COUNT(*) as count FROM coupons' },
@@ -53,7 +56,10 @@ async function bootstrap() {
       { name: 'seller_applications', query: 'SELECT COUNT(*) as count FROM seller_applications' },
       { name: 'rider_applications', query: 'SELECT COUNT(*) as count FROM rider_applications' },
       { name: 'product_requests', query: 'SELECT COUNT(*) as count FROM product_requests' },
-      { name: 'product_request_history', query: 'SELECT COUNT(*) as count FROM product_request_history' },
+      {
+        name: 'product_request_history',
+        query: 'SELECT COUNT(*) as count FROM product_request_history',
+      },
       { name: 'disputes', query: 'SELECT COUNT(*) as count FROM disputes' },
       { name: 'dispute_messages', query: 'SELECT COUNT(*) as count FROM dispute_messages' },
       { name: 'coupon_usages', query: 'SELECT COUNT(*) as count FROM coupon_usages' },
@@ -70,7 +76,9 @@ async function bootstrap() {
         counts[t.name] = count;
         console.log(`  ✓ ${t.name.padEnd(25)}: ${count} records`);
       } catch (err) {
-        console.warn(`  ⚠ ${t.name.padEnd(25)}: [Table not queried or error: ${(err as Error).message}]`);
+        console.warn(
+          `  ⚠ ${t.name.padEnd(25)}: [Table not queried or error: ${(err as Error).message}]`,
+        );
       }
     }
 
@@ -151,7 +159,9 @@ async function bootstrap() {
           console.error(`  ❌ [${acc.role}] Login failed for ${acc.email} (No token returned)`);
         }
       } catch (err) {
-        console.error(`  ❌ [${acc.role}] Login failed for ${acc.email}: ${(err as Error).message}`);
+        console.error(
+          `  ❌ [${acc.role}] Login failed for ${acc.email}: ${(err as Error).message}`,
+        );
       }
     }
 

@@ -18,7 +18,10 @@ export class DisputeMessageResponseDto {
   @ApiProperty({ example: 'The items delivered were damaged during transit.' })
   message: string;
 
-  @ApiPropertyOptional({ example: 'https://storage.gramerbazar.com/evidence/123.jpg', nullable: true })
+  @ApiPropertyOptional({
+    example: 'https://storage.gramerbazar.com/evidence/123.jpg',
+    nullable: true,
+  })
   attachment?: string | null;
 
   @ApiProperty({ example: '2026-09-26T10:00:00.000Z' })

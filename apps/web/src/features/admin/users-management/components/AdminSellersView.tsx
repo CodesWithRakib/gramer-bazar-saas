@@ -18,8 +18,13 @@ export function AdminSellersView({ lang = 'en' }: AdminSellersViewProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  
-  const { data, isLoading, isError, refetch } = useGetUsersQuery({ page, limit, search, role: Role.SELLER });
+
+  const { data, isLoading, isError, refetch } = useGetUsersQuery({
+    page,
+    limit,
+    search,
+    role: Role.SELLER,
+  });
   const [updateStatus] = useUpdateUserStatusMutation();
 
   const columns: ColumnDef<User>[] = [
@@ -45,19 +50,25 @@ export function AdminSellersView({ lang = 'en' }: AdminSellersViewProps) {
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
         const user = row.original;
-        
+
         return (
           <div className="flex items-center space-x-2">
-            <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>
-              {status}
-            </Badge>
+            <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>{status}</Badge>
             {status !== 'ACTIVE' && (
-              <Button size="sm" variant="outline" onClick={() => updateStatus({ id: user.id, status: 'ACTIVE' })}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => updateStatus({ id: user.id, status: 'ACTIVE' })}
+              >
                 Approve
               </Button>
             )}
             {status === 'ACTIVE' && (
-              <Button size="sm" variant="destructive" onClick={() => updateStatus({ id: user.id, status: 'SUSPENDED' })}>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => updateStatus({ id: user.id, status: 'SUSPENDED' })}
+              >
                 Suspend
               </Button>
             )}
@@ -77,9 +88,9 @@ export function AdminSellersView({ lang = 'en' }: AdminSellersViewProps) {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Sellers</h1>
       </div>
-      
-      <DataTable 
-        columns={columns} 
+
+      <DataTable
+        columns={columns}
         data={data?.data || []}
         pageCount={data?.meta.totalPages ?? -1}
         totalCount={data?.meta?.total}

@@ -8,10 +8,7 @@ describe('AddressesService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AddressesService,
-        { provide: getRepositoryToken(Address), useValue: {} },
-      ],
+      providers: [AddressesService, { provide: getRepositoryToken(Address), useValue: {} }],
     }).compile();
 
     service = module.get<AddressesService>(AddressesService);

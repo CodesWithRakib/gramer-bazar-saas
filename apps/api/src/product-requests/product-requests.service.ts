@@ -50,9 +50,9 @@ export class ProductRequestsService {
       relations: ['statusHistory', 'linkedProduct'],
       order: {
         statusHistory: {
-          createdAt: 'DESC'
-        }
-      }
+          createdAt: 'DESC',
+        },
+      },
     });
 
     if (!request) {
@@ -62,23 +62,30 @@ export class ProductRequestsService {
     return request;
   }
 
-  async findAllAdmin(status?: ProductRequestStatus, search?: string, page?: number, limit?: number) {
+  async findAllAdmin(
+    status?: ProductRequestStatus,
+    search?: string,
+    page?: number,
+    limit?: number,
+  ) {
     if (!page || !limit) {
-      const query = this.requestRepository.createQueryBuilder('request')
+      const query = this.requestRepository
+        .createQueryBuilder('request')
         .leftJoinAndSelect('request.user', 'user')
         .orderBy('request.createdAt', 'DESC');
-  
+
       if (status) query.andWhere('request.status = :status', { status });
       if (search) {
         query.andWhere(
           '(request.requestedProductName ILIKE :search OR user.firstName ILIKE :search OR user.phone ILIKE :search)',
-          { search: `%${search}%` }
+          { search: `%${search}%` },
         );
       }
       return query.getMany();
     }
 
-    const query = this.requestRepository.createQueryBuilder('request')
+    const query = this.requestRepository
+      .createQueryBuilder('request')
       .leftJoinAndSelect('request.user', 'user')
       .orderBy('request.createdAt', 'DESC');
 
@@ -86,7 +93,7 @@ export class ProductRequestsService {
     if (search) {
       query.andWhere(
         '(request.requestedProductName ILIKE :search OR user.firstName ILIKE :search OR user.phone ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
@@ -112,9 +119,9 @@ export class ProductRequestsService {
       relations: ['user', 'statusHistory', 'statusHistory.changedByUser', 'linkedProduct'],
       order: {
         statusHistory: {
-          createdAt: 'DESC'
-        }
-      }
+          createdAt: 'DESC',
+        },
+      },
     });
 
     if (!request) {
@@ -124,11 +131,7 @@ export class ProductRequestsService {
     return request;
   }
 
-  async updateStatus(
-    id: string,
-    adminId: string,
-    updateDto: UpdateProductRequestStatusDto,
-  ) {
+  async updateStatus(id: string, adminId: string, updateDto: UpdateProductRequestStatusDto) {
     return this.dataSource.transaction(async (manager) => {
       const request = await manager.findOne(ProductRequest, {
         where: { id },
@@ -154,7 +157,7 @@ export class ProductRequestsService {
 
       await manager.save(ProductRequestHistory, history);
       const savedRequest = await manager.save(ProductRequest, request);
-      
+
       this.eventEmitter.emit('productRequest.status.changed', {
         requestId: savedRequest.id,
         customerId: savedRequest.userId,

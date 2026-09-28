@@ -18,15 +18,9 @@ import { AuthService } from './auth.service.js';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>(
-          'JWT_ACCESS_SECRET',
-          'super-secret-key-for-dev-only',
-        ),
+        secret: configService.get<string>('JWT_ACCESS_SECRET', 'super-secret-key-for-dev-only'),
         signOptions: {
-          expiresIn: configService.get<string>(
-            'JWT_ACCESS_EXPIRES_IN',
-            '1h',
-          ) as any,
+          expiresIn: configService.get<string>('JWT_ACCESS_EXPIRES_IN', '1h') as any,
         },
       }),
       inject: [ConfigService],

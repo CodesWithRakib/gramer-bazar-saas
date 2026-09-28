@@ -1,10 +1,6 @@
-import { RiderSettingsView } from "@/features/rider/settings";
+import { RiderSettingsView } from '@/features/rider/settings';
 
-export default async function RiderSettingsPage({
-  params,
-}: {
-  params: Promise<{ lang: "ar" | "en" }>;
-}) {
+export default async function RiderSettingsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   return <RiderSettingsView lang={lang} />;
 }

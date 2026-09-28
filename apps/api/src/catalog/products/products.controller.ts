@@ -28,10 +28,7 @@ import { ProductImageService } from './product-image.service.js';
 import { CreateProductDto } from '../dto/create-product.dto.js';
 import { UpdateProductDto } from '../dto/update-product.dto.js';
 import { ReorderImagesDto } from '../dto/reorder-images.dto.js';
-import {
-  ProductResponseDto,
-  ProductImageResponseDto,
-} from '../dto/product-response.dto.js';
+import { ProductResponseDto, ProductImageResponseDto } from '../dto/product-response.dto.js';
 import { MessageResponseDto } from '../../common/dto/api-response.dto.js';
 import {
   ApiStandardResponse,
@@ -74,7 +71,8 @@ export class ProductsController {
   @Get()
   @ApiOperation({
     summary: 'Search and filter global master catalog products',
-    description: 'Returns paginated products filtered by category, subcategory, brand, status, or keyword.',
+    description:
+      'Returns paginated products filtered by category, subcategory, brand, status, or keyword.',
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
@@ -119,7 +117,8 @@ export class ProductsController {
   @Get(':id')
   @ApiOperation({
     summary: 'Retrieve single product by UUID',
-    description: 'Returns complete product record including images, variants, brand, and category relations.',
+    description:
+      'Returns complete product record including images, variants, brand, and category relations.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Product UUID' })
   @ApiStandardResponse({
@@ -138,7 +137,8 @@ export class ProductsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Update a global product (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Updates product fields in the master catalog.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Updates product fields in the master catalog.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Product UUID' })
   @ApiStandardResponse({
@@ -147,10 +147,7 @@ export class ProductsController {
     description: 'Product updated successfully',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateProductDto: UpdateProductDto,
-  ) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
   }
 
@@ -181,7 +178,8 @@ export class ProductsController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Upload images for product (Admin only)',
-    description: 'Uploads up to 10 image files (JPEG, PNG, WebP up to 5MB each) attached to the product.',
+    description:
+      'Uploads up to 10 image files (JPEG, PNG, WebP up to 5MB each) attached to the product.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Product UUID' })
   @ApiBody({
@@ -258,10 +256,7 @@ export class ProductsController {
     description: 'Reordered images list',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  reorderImages(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: ReorderImagesDto,
-  ) {
+  reorderImages(@Param('id', ParseUUIDPipe) id: string, @Body() dto: ReorderImagesDto) {
     return this.productImageService.reorderImages(id, dto.imageIds);
   }
 

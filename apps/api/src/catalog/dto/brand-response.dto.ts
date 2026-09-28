@@ -14,13 +14,20 @@ export class BrandResponseDto {
   @ApiProperty({ example: 'pran', description: 'Unique brand URL slug' })
   slug: string;
 
-  @ApiPropertyOptional({ example: 'https://storage.gramerbazar.com/brands/pran.png', nullable: true, description: 'Brand logo image URL' })
+  @ApiPropertyOptional({
+    example: 'https://storage.gramerbazar.com/brands/pran.png',
+    nullable: true,
+    description: 'Brand logo image URL',
+  })
   logo: string | null;
 
   @ApiProperty({ example: true, description: 'Whether the brand is active' })
   isActive: boolean;
 
-  @ApiPropertyOptional({ type: () => [CategoryResponseDto], description: 'Categories associated with this brand' })
+  @ApiPropertyOptional({
+    type: () => [CategoryResponseDto],
+    description: 'Categories associated with this brand',
+  })
   categories?: CategoryResponseDto[];
 
   @ApiProperty({ example: '2026-01-01T00:00:00.000Z' })

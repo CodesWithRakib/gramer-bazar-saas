@@ -33,7 +33,4 @@ export const walletsApi = api.injectEndpoints({
   overrideExisting: false,
 });
 
-export const {
-  useGetMyWalletQuery,
-  useGetMyTransactionsQuery,
-} = walletsApi;
+export const { useGetMyWalletQuery, useGetMyTransactionsQuery } = walletsApi;

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useGetPublicBannersQuery } from "@/features/banners/bannersApi";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CustomImage } from "@/components/ui/CustomImage";
-import { ProductRequestModal } from "@/components/catalog/ProductRequestModal";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useGetPublicBannersQuery } from '@/features/banners/bannersApi';
+import { Skeleton } from '@/components/ui/skeleton';
+import { CustomImage } from '@/components/ui/CustomImage';
+import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
+import { Button } from '@/components/ui/button';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -16,7 +16,7 @@ const fadeUp = {
 };
 
 export function HeroBanners({ lang }: { lang: string }) {
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
   const { data: banners, isLoading } = useGetPublicBannersQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -79,8 +79,8 @@ export function HeroBanners({ lang }: { lang: string }) {
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight") nextSlide();
-    if (e.key === "ArrowLeft") prevSlide();
+    if (e.key === 'ArrowRight') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
   };
 
   if (isLoading) {
@@ -103,9 +103,7 @@ export function HeroBanners({ lang }: { lang: string }) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            {isBn
-              ? "আপনার বিশ্বস্ত গ্রামীণ ডিজিটাল মার্কেট"
-              : "Your Trusted Rural Digital Market"}
+            {isBn ? 'আপনার বিশ্বস্ত গ্রামীণ ডিজিটাল মার্কেট' : 'Your Trusted Rural Digital Market'}
           </motion.div>
 
           <motion.h1
@@ -116,13 +114,11 @@ export function HeroBanners({ lang }: { lang: string }) {
             className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold mb-6 text-foreground tracking-tight leading-tight"
           >
             {isBn
-              ? "গ্রামের খাঁটি পণ্য ও নিত্যপ্রয়োজনীয় সবকিছু"
-              : "Pure Village Products & Everyday Needs,"}
+              ? 'গ্রামের খাঁটি পণ্য ও নিত্যপ্রয়োজনীয় সবকিছু'
+              : 'Pure Village Products & Everyday Needs,'}
             <br className="hidden md:block" />
             <span className="text-primary">
-              {isBn
-                ? " এখন সরাসরি আপনার দোরগোড়ায়"
-                : " Right at Your Doorstep"}
+              {isBn ? ' এখন সরাসরি আপনার দোরগোড়ায়' : ' Right at Your Doorstep'}
             </span>
           </motion.h1>
 
@@ -134,8 +130,8 @@ export function HeroBanners({ lang }: { lang: string }) {
             className="text-base md:text-lg text-muted-foreground mb-8 max-w-2xl mx-auto"
           >
             {isBn
-              ? "গ্রামের বাজার থেকে খাঁটি শাকসবজি, মুদি ও ইলেকট্রনিক্স পণ্য কিনুন সরাসরি স্থানীয় বিশ্বস্ত বিক্রেতাদের কাছ থেকে।"
-              : "Buy authentic fresh produce, groceries, and electronics directly from local trusted sellers across Bangladesh."}
+              ? 'গ্রামের বাজার থেকে খাঁটি শাকসবজি, মুদি ও ইলেকট্রনিক্স পণ্য কিনুন সরাসরি স্থানীয় বিশ্বস্ত বিক্রেতাদের কাছ থেকে।'
+              : 'Buy authentic fresh produce, groceries, and electronics directly from local trusted sellers across Bangladesh.'}
           </motion.p>
 
           <motion.div
@@ -150,9 +146,7 @@ export function HeroBanners({ lang }: { lang: string }) {
               className="w-full sm:w-auto h-12 px-8 rounded-full shadow-lg shadow-primary/25 transition-transform hover:-translate-y-0.5 text-base font-semibold"
               asChild
             >
-              <Link href={`/${lang}/categories`}>
-                {isBn ? "শপিং শুরু করুন" : "Start Shopping"}
-              </Link>
+              <Link href={`/${lang}/categories`}>{isBn ? 'শপিং শুরু করুন' : 'Start Shopping'}</Link>
             </Button>
             <ProductRequestModal
               lang={lang}
@@ -162,7 +156,7 @@ export function HeroBanners({ lang }: { lang: string }) {
                   variant="outline"
                   className="w-full sm:w-auto h-12 px-8 rounded-full shadow-xs hover:shadow-md transition-all bg-background/60 backdrop-blur text-base hover:-translate-y-0.5"
                 >
-                  {isBn ? "পণ্য অনুরোধ" : "Product Request"}
+                  {isBn ? 'পণ্য অনুরোধ' : 'Product Request'}
                 </Button>
               }
             />
@@ -185,9 +179,7 @@ export function HeroBanners({ lang }: { lang: string }) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       role="region"
-      aria-label={
-        isBn ? "প্রধান ব্যানার ক্যারোজেল" : "Featured banners carousel"
-      }
+      aria-label={isBn ? 'প্রধান ব্যানার ক্যারোজেল' : 'Featured banners carousel'}
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.div
@@ -211,7 +203,6 @@ export function HeroBanners({ lang }: { lang: string }) {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 1200px"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
             </Link>
           ) : (
             <div className="w-full h-full relative">
@@ -223,7 +214,6 @@ export function HeroBanners({ lang }: { lang: string }) {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 1200px"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
             </div>
           )}
         </motion.div>
@@ -234,14 +224,14 @@ export function HeroBanners({ lang }: { lang: string }) {
         <>
           <button
             onClick={prevSlide}
-            aria-label={isBn ? "পূর্ববর্তী স্লাইড" : "Previous slide"}
+            aria-label={isBn ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
             className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-background/70 hover:bg-background/95 backdrop-blur-md flex items-center justify-center opacity-80 md:opacity-0 md:group-hover:opacity-100 transition-all shadow-md z-10"
           >
             <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
           </button>
           <button
             onClick={nextSlide}
-            aria-label={isBn ? "পরবর্তী স্লাইড" : "Next slide"}
+            aria-label={isBn ? 'পরবর্তী স্লাইড' : 'Next slide'}
             className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-background/70 hover:bg-background/95 backdrop-blur-md flex items-center justify-center opacity-80 md:opacity-0 md:group-hover:opacity-100 transition-all shadow-md z-10"
           >
             <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
@@ -253,11 +243,9 @@ export function HeroBanners({ lang }: { lang: string }) {
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
-                aria-label={`${isBn ? "স্লাইড" : "Slide"} ${idx + 1}`}
+                aria-label={`${isBn ? 'স্লাইড' : 'Slide'} ${idx + 1}`}
                 className={`h-2 rounded-full transition-all duration-300 ${
-                  idx === currentIndex
-                    ? "bg-primary w-6"
-                    : "bg-white/60 hover:bg-white w-2"
+                  idx === currentIndex ? 'bg-primary w-6' : 'bg-white/60 hover:bg-white w-2'
                 }`}
               />
             ))}

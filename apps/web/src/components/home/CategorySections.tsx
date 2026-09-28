@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { ProductCard } from "@/components/catalog/ProductCard";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { useGetCategorySectionsQuery } from "@/features/catalog/catalogApi";
+import React from 'react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { ProductCard } from '@/components/catalog/ProductCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { useGetCategorySectionsQuery } from '@/features/catalog/catalogApi';
 
 interface CategorySectionsProps {
   lang: string;
 }
 
 export function CategorySections({ lang }: CategorySectionsProps) {
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
   const { data: sections = [], isLoading } = useGetCategorySectionsQuery();
 
   if (isLoading) {
@@ -37,9 +37,7 @@ export function CategorySections({ lang }: CategorySectionsProps) {
   }
 
   // Filter out any sections that don't have products (per Phase 3 & 42 rule)
-  const populatedSections = sections.filter(
-    (sec) => sec.products && sec.products.length > 0
-  );
+  const populatedSections = sections.filter((sec) => sec.products && sec.products.length > 0);
 
   if (populatedSections.length === 0) {
     return null;
@@ -64,14 +62,14 @@ export function CategorySections({ lang }: CategorySectionsProps) {
               <div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-2xl md:text-3xl flex-shrink-0">
-                    {category.icon || "📦"}
+                    {category.icon || '📦'}
                   </span>
                   <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">
                     {categoryName}
                   </h2>
                   {category.productCount !== undefined && category.productCount > 0 && (
                     <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5">
-                      {category.productCount} {isBn ? "টি পণ্য" : "items"}
+                      {category.productCount} {isBn ? 'টি পণ্য' : 'items'}
                     </Badge>
                   )}
                 </div>
@@ -99,7 +97,7 @@ export function CategorySections({ lang }: CategorySectionsProps) {
                   href={`/${lang}/categories/${category.slug}`}
                   className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-primary-foreground shadow-xs whitespace-nowrap"
                 >
-                  {isBn ? "সবগুলো" : "All"}
+                  {isBn ? 'সবগুলো' : 'All'}
                 </Link>
                 {category.subCategories.map((sub) => (
                   <Link
@@ -121,11 +119,7 @@ export function CategorySections({ lang }: CategorySectionsProps) {
             {/* Product Grid (Phase 8: 2 cols on mobile, 3 on tablet, 4 on desktop) */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  lang={lang}
-                />
+                <ProductCard key={product.id} product={product} lang={lang} />
               ))}
             </div>
           </section>

@@ -9,11 +9,7 @@ import { AlertCircle, RefreshCw, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 import { useGetOrderByIdQuery } from '@/features/orders/ordersApi';
 
-export default function PaymentCancelledPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function PaymentCancelledPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const searchParams = useSearchParams();
@@ -39,7 +35,7 @@ export default function PaymentCancelledPage({
     } catch (err: any) {
       setErrorMessage(
         err?.data?.message ||
-          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to restart payment session.'),
+          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to restart payment session.')
       );
     }
   };
@@ -67,13 +63,17 @@ export default function PaymentCancelledPage({
             <div className="rounded-2xl bg-muted/40 p-4 space-y-2 border border-border/50 text-sm">
               {orderId && (
                 <div className="flex justify-between items-center text-xs sm:text-sm">
-                  <span className="text-muted-foreground">{isBn ? 'অর্ডার রেফারেন্স' : 'Order Reference'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'অর্ডার রেফারেন্স' : 'Order Reference'}
+                  </span>
                   <span className="font-mono font-medium">{orderId.slice(0, 13)}...</span>
                 </div>
               )}
               {order?.total && (
                 <div className="flex justify-between items-center text-xs sm:text-sm font-semibold">
-                  <span className="text-muted-foreground">{isBn ? 'অর্ডার মোট' : 'Order Total'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'অর্ডার মোট' : 'Order Total'}
+                  </span>
                   <span>৳{Number(order.total).toFixed(2)}</span>
                 </div>
               )}
@@ -96,8 +96,12 @@ export default function PaymentCancelledPage({
               >
                 <RefreshCw className={`w-4 h-4 ${isRetrying ? 'animate-spin' : ''}`} />
                 {isRetrying
-                  ? (isBn ? 'গেটওয়েতে নিয়ে যাওয়া হচ্ছে...' : 'Redirecting...')
-                  : (isBn ? 'আবার পেমেন্ট করুন' : 'Resume Payment')}
+                  ? isBn
+                    ? 'গেটওয়েতে নিয়ে যাওয়া হচ্ছে...'
+                    : 'Redirecting...'
+                  : isBn
+                    ? 'আবার পেমেন্ট করুন'
+                    : 'Resume Payment'}
               </Button>
             )}
 
@@ -115,7 +119,9 @@ export default function PaymentCancelledPage({
               className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              {isBn ? 'অন্য কোনো পেমেন্ট মেথড দিয়ে অর্ডার করুন' : 'Change payment method at checkout'}
+              {isBn
+                ? 'অন্য কোনো পেমেন্ট মেথড দিয়ে অর্ডার করুন'
+                : 'Change payment method at checkout'}
             </Link>
           </div>
         </CardContent>

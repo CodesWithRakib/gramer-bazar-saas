@@ -21,7 +21,9 @@ export class CategoriesService {
         where: { id: createCategoryDto.parentId },
       });
       if (!parent) {
-        throw new NotFoundException(`Parent category with ID ${createCategoryDto.parentId} not found`);
+        throw new NotFoundException(
+          `Parent category with ID ${createCategoryDto.parentId} not found`,
+        );
       }
     }
     const category = this.categoriesRepository.create(createCategoryDto);
@@ -49,7 +51,8 @@ export class CategoriesService {
       });
     }
 
-    const query = this.categoriesRepository.createQueryBuilder('category')
+    const query = this.categoriesRepository
+      .createQueryBuilder('category')
       .leftJoinAndSelect('category.parent', 'parent')
       .leftJoinAndSelect('category.children', 'children')
       .orderBy('category.sortOrder', 'ASC')

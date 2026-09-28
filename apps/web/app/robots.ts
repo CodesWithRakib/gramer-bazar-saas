@@ -1,13 +1,22 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5000';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5000';
 
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/en/profile/', '/bn/profile/', '/en/cart/', '/bn/cart/', '/admin/', '/seller/', '/rider/'],
+      disallow: [
+        '/en/profile/',
+        '/bn/profile/',
+        '/en/cart/',
+        '/bn/cart/',
+        '/admin/',
+        '/seller/',
+        '/rider/',
+      ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

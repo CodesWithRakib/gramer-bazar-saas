@@ -1,10 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsInt, Min, IsBoolean } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
-import {
-  NotificationType,
-  NotificationPriority,
-} from '../entities/notification.entity.js';
+import { NotificationType, NotificationPriority } from '../entities/notification.entity.js';
 
 export class NotificationResponseDto {
   @ApiProperty({ example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d' })

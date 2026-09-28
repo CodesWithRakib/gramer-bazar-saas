@@ -49,7 +49,15 @@ export function ConfirmDialog({
     }
   };
 
-  const defaultConfirmLabel = confirmLabel || (variant === 'destructive' ? (isBn ? 'মুছে ফেলুন' : 'Delete') : (isBn ? 'নিশ্চিত করুন' : 'Confirm'));
+  const defaultConfirmLabel =
+    confirmLabel ||
+    (variant === 'destructive'
+      ? isBn
+        ? 'মুছে ফেলুন'
+        : 'Delete'
+      : isBn
+        ? 'নিশ্চিত করুন'
+        : 'Confirm');
   const defaultCancelLabel = cancelLabel || (isBn ? 'বাতিল' : 'Cancel');
 
   const handleConfirm = async () => {
@@ -61,7 +69,12 @@ export function ConfirmDialog({
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={(o) => { if (!isLoading) setDialogOpen(o); }}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(o) => {
+        if (!isLoading) setDialogOpen(o);
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="gap-3 sm:gap-2">
           <div className="flex items-center gap-3">

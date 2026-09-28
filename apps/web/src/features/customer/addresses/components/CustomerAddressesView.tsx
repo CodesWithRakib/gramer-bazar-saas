@@ -2,7 +2,11 @@
 
 import { getApiErrorMessage } from '@/lib/apiError';
 import React, { useState } from 'react';
-import { useGetAddressesQuery, useDeleteAddressMutation, Address } from '@/features/addresses/addressApi';
+import {
+  useGetAddressesQuery,
+  useDeleteAddressMutation,
+  Address,
+} from '@/features/addresses/addressApi';
 import { AddressForm } from '@/components/profile/AddressForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,8 +74,8 @@ export function CustomerAddressesView({ lang = 'en' }: CustomerAddressesViewProp
                 ? 'ঠিকানা আপডেট করুন'
                 : 'Edit Address'
               : isBn
-              ? 'নতুন ঠিকানা যোগ করুন'
-              : 'Add New Address'
+                ? 'নতুন ঠিকানা যোগ করুন'
+                : 'Add New Address'
           }
           description={
             isBn
@@ -164,11 +168,15 @@ export function CustomerAddressesView({ lang = 'en' }: CustomerAddressesViewProp
                     </div>
                     <p className="text-sm font-medium">{primaryAddress.contactName}</p>
                     <p className="text-sm text-muted-foreground">{primaryAddress.contactPhone}</p>
-                    <p className="text-sm mt-2 text-muted-foreground">{primaryAddress.streetAddress}</p>
+                    <p className="text-sm mt-2 text-muted-foreground">
+                      {primaryAddress.streetAddress}
+                    </p>
                     {primaryAddress.lat != null && primaryAddress.lng != null && (
                       <span className="mt-1.5 inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                         <LocateFixed className="w-3.5 h-3.5" />
-                        {isBn ? 'জিপিএস পিন করা আছে — লাইভ ট্র্যাকিং চালু' : 'GPS pinned — live tracking enabled'}
+                        {isBn
+                          ? 'জিপিএস পিন করা আছে — লাইভ ট্র্যাকিং চালু'
+                          : 'GPS pinned — live tracking enabled'}
                       </span>
                     )}
                   </div>
@@ -189,7 +197,10 @@ export function CustomerAddressesView({ lang = 'en' }: CustomerAddressesViewProp
           )}
 
           {otherAddresses.map((address) => (
-            <Card key={address.id} className="rounded-2xl border-border/70 shadow-xs hover:border-primary/30 transition-all">
+            <Card
+              key={address.id}
+              className="rounded-2xl border-border/70 shadow-xs hover:border-primary/30 transition-all"
+            >
               <CardContent className="p-5 flex justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <div className="mt-1 bg-muted p-2 rounded-xl shrink-0">
@@ -199,7 +210,9 @@ export function CustomerAddressesView({ lang = 'en' }: CustomerAddressesViewProp
                     <h3 className="font-semibold">{address.title}</h3>
                     <p className="text-sm font-medium">{address.contactName}</p>
                     <p className="text-sm text-muted-foreground">{address.contactPhone}</p>
-                    <p className="text-sm mt-1 text-muted-foreground line-clamp-2">{address.streetAddress}</p>
+                    <p className="text-sm mt-1 text-muted-foreground line-clamp-2">
+                      {address.streetAddress}
+                    </p>
                     {address.lat != null && address.lng != null && (
                       <span className="mt-1 inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                         <LocateFixed className="w-3 h-3" />

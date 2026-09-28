@@ -19,12 +19,14 @@ export class SellerProductsService {
     const inventory = new Inventory();
     inventory.quantity = 0;
     sellerProduct.inventory = inventory as any;
-    
+
     return this.sellerProductsRepository.save(sellerProduct);
   }
 
   async findAll(): Promise<SellerProduct[]> {
-    return this.sellerProductsRepository.find({ relations: ['shop', 'productVariant', 'inventory'] });
+    return this.sellerProductsRepository.find({
+      relations: ['shop', 'productVariant', 'inventory'],
+    });
   }
 
   async findOne(id: string): Promise<SellerProduct> {

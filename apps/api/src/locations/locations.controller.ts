@@ -40,7 +40,12 @@ export class LocationsController {
     summary: 'List administrative divisions',
     description: 'Retrieves all divisions, optionally filtered by countryId.',
   })
-  @ApiQuery({ name: 'countryId', required: false, type: String, description: 'Optional country UUID filter' })
+  @ApiQuery({
+    name: 'countryId',
+    required: false,
+    type: String,
+    description: 'Optional country UUID filter',
+  })
   @ApiStandardResponse({
     type: DivisionResponseDto,
     isArray: true,
@@ -57,7 +62,12 @@ export class LocationsController {
     summary: 'List districts by division',
     description: 'Retrieves districts, optionally filtered by divisionId.',
   })
-  @ApiQuery({ name: 'divisionId', required: false, type: String, description: 'Optional division UUID filter' })
+  @ApiQuery({
+    name: 'divisionId',
+    required: false,
+    type: String,
+    description: 'Optional division UUID filter',
+  })
   @ApiStandardResponse({
     type: DistrictResponseDto,
     isArray: true,
@@ -74,7 +84,12 @@ export class LocationsController {
     summary: 'List upazilas by district',
     description: 'Retrieves upazilas (sub-districts), optionally filtered by districtId.',
   })
-  @ApiQuery({ name: 'districtId', required: false, type: String, description: 'Optional district UUID filter' })
+  @ApiQuery({
+    name: 'districtId',
+    required: false,
+    type: String,
+    description: 'Optional district UUID filter',
+  })
   @ApiStandardResponse({
     type: UpazilaResponseDto,
     isArray: true,
@@ -91,7 +106,12 @@ export class LocationsController {
     summary: 'List unions by upazila',
     description: 'Retrieves union parishads, optionally filtered by upazilaId.',
   })
-  @ApiQuery({ name: 'upazilaId', required: false, type: String, description: 'Optional upazila UUID filter' })
+  @ApiQuery({
+    name: 'upazilaId',
+    required: false,
+    type: String,
+    description: 'Optional upazila UUID filter',
+  })
   @ApiStandardResponse({
     type: UnionResponseDto,
     isArray: true,
@@ -106,9 +126,15 @@ export class LocationsController {
   @Get('areas')
   @ApiOperation({
     summary: 'List hyperlocal delivery areas / villages',
-    description: 'Retrieves local delivery areas and corresponding delivery fee schedules, optionally filtered by unionId.',
+    description:
+      'Retrieves local delivery areas and corresponding delivery fee schedules, optionally filtered by unionId.',
   })
-  @ApiQuery({ name: 'unionId', required: false, type: String, description: 'Optional union UUID filter' })
+  @ApiQuery({
+    name: 'unionId',
+    required: false,
+    type: String,
+    description: 'Optional union UUID filter',
+  })
   @ApiStandardResponse({
     type: AreaResponseDto,
     isArray: true,

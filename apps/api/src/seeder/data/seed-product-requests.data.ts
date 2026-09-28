@@ -19,7 +19,8 @@ export const SEED_PRODUCT_REQUESTS: SeedProductRequestItem[] = [
   {
     customerEmail: 'customer1@gramerbazar.com',
     requestedProductName: 'Organic Sundarban Wild Honey (৫০০ গ্রাম সুন্দরবনের খাঁটি মধু)',
-    description: 'Looking for 100% natural, raw, unprocessed forest honey collected by traditional Mouals.',
+    description:
+      'Looking for 100% natural, raw, unprocessed forest honey collected by traditional Mouals.',
     preferredInformation: 'Preferred pack size 500g glass jar with moisture seal.',
     status: ProductRequestStatus.PRODUCT_ADDED,
     adminNotes: 'Sourced from certified cooperative via Rahim Traders. Catalog product listed.',
@@ -87,7 +88,8 @@ export const SEED_PRODUCT_REQUESTS: SeedProductRequestItem[] = [
   {
     customerEmail: 'customer3@gramerbazar.com',
     requestedProductName: 'Handmade Nakshi Kantha Blanket (হস্তনির্মিত ঐতিহ্যবাহী নকশী কাঁথা)',
-    description: 'Traditional Bengali hand-stitched cotton quilt with intricate floral folk motifs.',
+    description:
+      'Traditional Bengali hand-stitched cotton quilt with intricate floral folk motifs.',
     preferredInformation: 'King size or double bed size, preferably red/maroon border.',
     status: ProductRequestStatus.REVIEWING,
     adminNotes: 'Referred to Panchagarh & Jamalpur women artisan network.',
@@ -109,7 +111,8 @@ export const SEED_PRODUCT_REQUESTS: SeedProductRequestItem[] = [
   {
     customerEmail: 'customer4@gramerbazar.com',
     requestedProductName: 'Pure Mustard Flower Honey (সরিষা ফুলের সাদা মধু)',
-    description: 'White creamy crystallized mustard blossom honey from Panchagarh winter mustard crops.',
+    description:
+      'White creamy crystallized mustard blossom honey from Panchagarh winter mustard crops.',
     preferredInformation: '1 kg container, unheated raw harvest.',
     status: ProductRequestStatus.FOUND,
     adminNotes: 'Verified local beekeeper found in Debiganj mustard fields. Finalizing packaging.',
@@ -156,7 +159,8 @@ export const SEED_PRODUCT_REQUESTS: SeedProductRequestItem[] = [
     description: 'Imported chemical booster spray for rapid bottle gourd enlargement.',
     preferredInformation: '500ml spray bottle.',
     status: ProductRequestStatus.REJECTED,
-    adminNotes: 'Rejected: Unapproved agricultural chemical not compliant with Department of Agricultural Extension safety regulations.',
+    adminNotes:
+      'Rejected: Unapproved agricultural chemical not compliant with Department of Agricultural Extension safety regulations.',
     historyEvents: [
       {
         status: ProductRequestStatus.PENDING,

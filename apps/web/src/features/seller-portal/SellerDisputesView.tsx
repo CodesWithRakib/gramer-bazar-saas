@@ -5,7 +5,13 @@ import { useParams } from 'next/navigation';
 import { useGetSellerDisputesQuery, DisputeStatus } from '@/features/disputes/disputesApi';
 import Link from 'next/link';
 import { Search, X, AlertCircle, Eye } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import AdminPagination from '@/components/AdminPagination';
@@ -15,7 +21,6 @@ export interface SellerDisputesViewProps {
 }
 
 export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
-  
   const isBn = lang === 'bn';
 
   const { data: disputes = [], isLoading, isError, refetch } = useGetSellerDisputesQuery();
@@ -32,9 +37,7 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
       const query = search.trim().toLowerCase();
 
       const matchesSearch =
-        !query ||
-        orderId.toLowerCase().includes(query) ||
-        reason.toLowerCase().includes(query);
+        !query || orderId.toLowerCase().includes(query) || reason.toLowerCase().includes(query);
 
       const matchesStatus = statusFilter === 'ALL' || dispute.status === statusFilter;
 
@@ -51,26 +54,38 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
     switch (status) {
       case 'OPEN':
         return (
-          <Badge variant="secondary" className="bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400">
+          <Badge
+            variant="secondary"
+            className="bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
+          >
             {isBn ? 'উন্মুক্ত' : 'Open'}
           </Badge>
         );
       case 'UNDER_REVIEW':
         return (
-          <Badge variant="secondary" className="bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
+          <Badge
+            variant="secondary"
+            className="bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
+          >
             {isBn ? 'পর্যালোচনাধীন' : 'Under Review'}
           </Badge>
         );
       case 'RESOLVED_REFUNDED':
         return (
-          <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+          <Badge
+            variant="secondary"
+            className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
+          >
             {isBn ? 'রিফান্ড সম্পন্ন' : 'Resolved (Refunded)'}
           </Badge>
         );
       case 'RESOLVED_REJECTED':
       default:
         return (
-          <Badge variant="secondary" className="bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400">
+          <Badge
+            variant="secondary"
+            className="bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+          >
             {isBn ? 'বাতিল' : 'Rejected'}
           </Badge>
         );
@@ -107,7 +122,9 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                   setSearch(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder={isBn ? 'অর্ডার আইডি বা কারণ দিয়ে খুঁজুন...' : 'Search by order ID or reason...'}
+                placeholder={
+                  isBn ? 'অর্ডার আইডি বা কারণ দিয়ে খুঁজুন...' : 'Search by order ID or reason...'
+                }
                 className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
               />
               {search && (
@@ -136,8 +153,12 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                 <SelectContent>
                   <SelectItem value="ALL">{isBn ? 'সকল স্ট্যাটাস' : 'All Status'}</SelectItem>
                   <SelectItem value="OPEN">{isBn ? 'উন্মুক্ত' : 'Open'}</SelectItem>
-                  <SelectItem value="UNDER_REVIEW">{isBn ? 'পর্যালোচনাধীন' : 'Under Review'}</SelectItem>
-                  <SelectItem value="RESOLVED_REFUNDED">{isBn ? 'রিফান্ড সম্পন্ন' : 'Resolved'}</SelectItem>
+                  <SelectItem value="UNDER_REVIEW">
+                    {isBn ? 'পর্যালোচনাধীন' : 'Under Review'}
+                  </SelectItem>
+                  <SelectItem value="RESOLVED_REFUNDED">
+                    {isBn ? 'রিফান্ড সম্পন্ন' : 'Resolved'}
+                  </SelectItem>
                   <SelectItem value="RESOLVED_REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
                 </SelectContent>
               </Select>
@@ -162,11 +183,21 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, index) => (
                     <tr key={`skeleton-${index}`} className="animate-pulse">
-                      <td className="py-4 px-4"><div className="h-4 w-28 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-36 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-6 w-20 rounded-full bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4 text-right"><div className="ml-auto h-8 w-20 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-28 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-36 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-6 w-20 rounded-full bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-24 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="ml-auto h-8 w-20 rounded bg-muted"></div>
+                      </td>
                     </tr>
                   ))
                 ) : isError ? (
@@ -175,7 +206,12 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                       <p className="text-sm font-medium">
                         {isBn ? 'বিরোধ লোড করতে ব্যর্থ হয়েছে।' : 'Failed to load disputes.'}
                       </p>
-                      <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => refetch()}
+                        className="mt-3"
+                      >
                         {isBn ? 'আবার চেষ্টা করুন' : 'Retry'}
                       </Button>
                     </td>
@@ -192,8 +228,12 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || statusFilter !== 'ALL'
-                            ? (isBn ? 'আপনার ফিল্টারের সাথে কোনো বিরোধ মেলেনি' : 'No disputes match your search criteria.')
-                            : (isBn ? 'বর্তমানে কোনো সক্রিয় বিরোধ নেই' : 'You have no active disputes.')}
+                            ? isBn
+                              ? 'আপনার ফিল্টারের সাথে কোনো বিরোধ মেলেনি'
+                              : 'No disputes match your search criteria.'
+                            : isBn
+                              ? 'বর্তমানে কোনো সক্রিয় বিরোধ নেই'
+                              : 'You have no active disputes.'}
                         </p>
                         {(search || statusFilter !== 'ALL') && (
                           <button
@@ -212,21 +252,27 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                   </tr>
                 ) : (
                   paginatedDisputes.map((dispute) => (
-                    <tr key={dispute.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <tr
+                      key={dispute.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <td className="py-3.5 px-4 font-mono text-xs font-semibold text-foreground">
                         {dispute.orderId.slice(0, 8)}...
                       </td>
                       <td className="py-3.5 px-4 font-medium text-foreground">
                         {dispute.reason.replace(/_/g, ' ')}
                       </td>
-                      <td className="py-3.5 px-4">
-                        {getStatusBadge(dispute.status)}
-                      </td>
+                      <td className="py-3.5 px-4">{getStatusBadge(dispute.status)}</td>
                       <td className="py-3.5 px-4 text-muted-foreground whitespace-nowrap">
                         {new Date(dispute.createdAt).toLocaleDateString(isBn ? 'bn-BD' : 'en-US')}
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <Button asChild variant="outline" size="sm" className="rounded-full gap-1 text-xs">
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full gap-1 text-xs"
+                        >
                           <Link href={`/${lang}/seller/disputes/${dispute.id}`}>
                             <Eye className="h-3.5 w-3.5" />
                             <span>{isBn ? 'বিস্তারিত' : 'View'}</span>

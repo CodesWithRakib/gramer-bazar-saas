@@ -33,11 +33,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
-export default function BecomeARiderPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function BecomeARiderPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
 
@@ -99,7 +95,7 @@ export default function BecomeARiderPage({
   return (
     <div className="min-h-screen bg-background pb-16">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-500/10 via-background to-background py-16 md:py-24 border-b">
+      <section className="relative overflow-hidden bg-muted/40 py-16 md:py-24 border-b">
         <div className="container max-w-5xl mx-auto px-4 text-center space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 text-xs font-semibold text-blue-600">
             <Bike className="w-4 h-4" />
@@ -107,7 +103,9 @@ export default function BecomeARiderPage({
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground">
-            {isBn ? 'নিজের সুবিধাজনক সময়ে ডেলিভারি দিন, আয় করুন সম্মানজনক অর্থ' : 'Earn With Pride in Your Own Community'}
+            {isBn
+              ? 'নিজের সুবিধাজনক সময়ে ডেলিভারি দিন, আয় করুন সম্মানজনক অর্থ'
+              : 'Earn With Pride in Your Own Community'}
           </h1>
 
           <p className="max-w-2xl mx-auto text-muted-foreground text-base md:text-lg leading-relaxed">
@@ -119,7 +117,9 @@ export default function BecomeARiderPage({
           {!isAuthenticated && (
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" className="rounded-2xl px-8 shadow-md" asChild>
-                <Link href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-rider`)}`}>
+                <Link
+                  href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-rider`)}`}
+                >
                   {isBn ? 'লগইন করে আবেদন করুন' : 'Login to Apply'}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
@@ -141,7 +141,9 @@ export default function BecomeARiderPage({
             <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center">
               <Coins className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-lg">{isBn ? 'প্রতি ডেলিভারিতে নিশ্চিত আয়' : 'Guaranteed Trip Earnings'}</h3>
+            <h3 className="font-bold text-lg">
+              {isBn ? 'প্রতি ডেলিভারিতে নিশ্চিত আয়' : 'Guaranteed Trip Earnings'}
+            </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isBn
                 ? 'দূরত্ব অনুযায়ী স্বচ্ছ ডেলিভারি চার্জ এবং বেশি ডেলিভারির জন্য অতিরিক্ত বোনাস।'
@@ -153,7 +155,9 @@ export default function BecomeARiderPage({
             <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
               <Clock className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-lg">{isBn ? 'কাজের পূর্ণ স্বাধীনতা' : 'Flexible Hours'}</h3>
+            <h3 className="font-bold text-lg">
+              {isBn ? 'কাজের পূর্ণ স্বাধীনতা' : 'Flexible Hours'}
+            </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isBn
                 ? 'যখন ইচ্ছা অনলাইন হোন। কোনো নির্দিষ্ট সময়ের বাধ্যবাধকতা নেই।'
@@ -165,7 +169,9 @@ export default function BecomeARiderPage({
             <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
               <MapPin className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-lg">{isBn ? 'স্থানীয় এরিয়ায় ডেলিভারি' : 'Local Neighborhoods'}</h3>
+            <h3 className="font-bold text-lg">
+              {isBn ? 'স্থানীয় এরিয়ায় ডেলিভারি' : 'Local Neighborhoods'}
+            </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isBn
                 ? 'আপনার চেনা ইউনিয়ন এবং উপজেলায় কাজ করার সুবিধা, কোনো অজানা রুটের চাপ নেই।'
@@ -207,7 +213,8 @@ export default function BecomeARiderPage({
                   {isBn ? 'আপনার আবেদনের বর্তমান অবস্থা' : 'Your Rider Application Status'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {isBn ? 'জমা দেওয়ার তারিখ:' : 'Submitted on:'} {new Date(myApp.createdAt).toLocaleDateString()}
+                  {isBn ? 'জমা দেওয়ার তারিখ:' : 'Submitted on:'}{' '}
+                  {new Date(myApp.createdAt).toLocaleDateString()}
                 </p>
               </div>
 
@@ -239,15 +246,21 @@ export default function BecomeARiderPage({
                 <span className="font-semibold">{myApp.fullName}</span>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground block">{isBn ? 'মোবাইল নম্বর' : 'Phone'}</span>
+                <span className="text-xs text-muted-foreground block">
+                  {isBn ? 'মোবাইল নম্বর' : 'Phone'}
+                </span>
                 <span className="font-semibold">{myApp.phone}</span>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground block">{isBn ? 'যানবাহন' : 'Vehicle'}</span>
+                <span className="text-xs text-muted-foreground block">
+                  {isBn ? 'যানবাহন' : 'Vehicle'}
+                </span>
                 <span className="font-medium">{myApp.vehicleType}</span>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground block">{isBn ? 'পছন্দের জোন' : 'Preferred Zone'}</span>
+                <span className="text-xs text-muted-foreground block">
+                  {isBn ? 'পছন্দের জোন' : 'Preferred Zone'}
+                </span>
                 <span>{myApp.preferredZone || '—'}</span>
               </div>
             </div>
@@ -266,7 +279,12 @@ export default function BecomeARiderPage({
             {myApp.status === 'REJECTED' && (
               <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">
                 <span className="font-bold block mb-1">{isBn ? 'বাতিলের কারণ:' : 'Reason:'}</span>
-                <p>{myApp.adminNotes || (isBn ? 'প্রদত্ত তথ্য অসঙ্গতিপূর্ণ।' : 'Submitted details did not meet the criteria.')}</p>
+                <p>
+                  {myApp.adminNotes ||
+                    (isBn
+                      ? 'প্রদত্ত তথ্য অসঙ্গতিপূর্ণ।'
+                      : 'Submitted details did not meet the criteria.')}
+                </p>
               </div>
             )}
 
@@ -283,7 +301,9 @@ export default function BecomeARiderPage({
           </div>
         ) : !isAuthenticated ? (
           <div className="p-8 rounded-3xl bg-card border shadow-sm text-center space-y-4">
-            <h2 className="text-2xl font-bold">{isBn ? 'আবেদন করতে সাইন ইন করুন' : 'Sign In to Apply'}</h2>
+            <h2 className="text-2xl font-bold">
+              {isBn ? 'আবেদন করতে সাইন ইন করুন' : 'Sign In to Apply'}
+            </h2>
             <p className="text-muted-foreground text-sm max-w-md mx-auto">
               {isBn
                 ? 'রাইডার পার্টনার হতে অনুগ্রহ করে প্রথমে লগইন অথবা নতুন অ্যাকাউন্ট তৈরি করুন।'
@@ -291,14 +311,14 @@ export default function BecomeARiderPage({
             </p>
             <div className="pt-2 flex justify-center gap-3">
               <Button asChild className="rounded-xl px-6">
-                <Link href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-rider`)}`}>
+                <Link
+                  href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-rider`)}`}
+                >
                   {isBn ? 'লগইন' : 'Login'}
                 </Link>
               </Button>
               <Button asChild variant="outline" className="rounded-xl px-6">
-                <Link href={`/${lang}/register`}>
-                  {isBn ? 'রেজিস্টার' : 'Register'}
-                </Link>
+                <Link href={`/${lang}/register`}>{isBn ? 'রেজিস্টার' : 'Register'}</Link>
               </Button>
             </div>
           </div>
@@ -388,10 +408,18 @@ export default function BecomeARiderPage({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="BIKE">{isBn ? 'মোটরসাইকেল (Bike)' : 'Motorcycle (Bike)'}</SelectItem>
-                      <SelectItem value="BICYCLE">{isBn ? 'বাইসাইকেল (Bicycle)' : 'Bicycle'}</SelectItem>
-                      <SelectItem value="SCOOTER">{isBn ? 'স্কুটার (Scooter)' : 'Scooter'}</SelectItem>
-                      <SelectItem value="WALKING">{isBn ? 'হাঁটা (Walking/Local)' : 'Walking / Foot'}</SelectItem>
+                      <SelectItem value="BIKE">
+                        {isBn ? 'মোটরসাইকেল (Bike)' : 'Motorcycle (Bike)'}
+                      </SelectItem>
+                      <SelectItem value="BICYCLE">
+                        {isBn ? 'বাইসাইকেল (Bicycle)' : 'Bicycle'}
+                      </SelectItem>
+                      <SelectItem value="SCOOTER">
+                        {isBn ? 'স্কুটার (Scooter)' : 'Scooter'}
+                      </SelectItem>
+                      <SelectItem value="WALKING">
+                        {isBn ? 'হাঁটা (Walking/Local)' : 'Walking / Foot'}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -405,7 +433,12 @@ export default function BecomeARiderPage({
                   <Input
                     id="vehiclePlateNumber"
                     value={formData.vehiclePlateNumber}
-                    onChange={(e) => setFormData((p) => ({ ...p, vehiclePlateNumber: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((p) => ({
+                        ...p,
+                        vehiclePlateNumber: e.target.value,
+                      }))
+                    }
                     disabled={isSubmitting}
                     placeholder="DINAJPUR-HA-1234"
                     className="rounded-xl"
@@ -418,7 +451,12 @@ export default function BecomeARiderPage({
                   <Input
                     id="drivingLicenseNumber"
                     value={formData.drivingLicenseNumber}
-                    onChange={(e) => setFormData((p) => ({ ...p, drivingLicenseNumber: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((p) => ({
+                        ...p,
+                        drivingLicenseNumber: e.target.value,
+                      }))
+                    }
                     disabled={isSubmitting}
                     placeholder="DL-882736"
                     className="rounded-xl"
@@ -428,11 +466,18 @@ export default function BecomeARiderPage({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="preferredZone">{isBn ? 'পছন্দের ডেলিভারি জোন' : 'Preferred Zone'}</Label>
+                  <Label htmlFor="preferredZone">
+                    {isBn ? 'পছন্দের ডেলিভারি জোন' : 'Preferred Zone'}
+                  </Label>
                   <Input
                     id="preferredZone"
                     value={formData.preferredZone}
-                    onChange={(e) => setFormData((p) => ({ ...p, preferredZone: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((p) => ({
+                        ...p,
+                        preferredZone: e.target.value,
+                      }))
+                    }
                     disabled={isSubmitting}
                     placeholder="Khansama Sadar / Bhabanipur"
                     className="rounded-xl"
@@ -445,7 +490,12 @@ export default function BecomeARiderPage({
                   <Input
                     id="emergencyContact"
                     value={formData.emergencyContact}
-                    onChange={(e) => setFormData((p) => ({ ...p, emergencyContact: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((p) => ({
+                        ...p,
+                        emergencyContact: e.target.value,
+                      }))
+                    }
                     disabled={isSubmitting}
                     placeholder="01799887766 (Brother)"
                     className="rounded-xl"
@@ -464,8 +514,8 @@ export default function BecomeARiderPage({
                     ? 'আবেদন জমা হচ্ছে...'
                     : 'Submitting Application...'
                   : isBn
-                  ? 'আবেদন জমা দিন'
-                  : 'Submit Rider Application'}
+                    ? 'আবেদন জমা দিন'
+                    : 'Submit Rider Application'}
               </Button>
             </form>
           </div>

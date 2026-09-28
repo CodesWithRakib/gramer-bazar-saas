@@ -2,7 +2,7 @@
 
 import React, { use, useState } from 'react';
 import { useGetShopsQuery } from '@/features/shops/shopsApi';
-import { Card, CardContent,  } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Store, CheckCircle, ChevronRight } from 'lucide-react';
@@ -15,7 +15,7 @@ export default function ShopsPage({ params }: { params: Promise<{ lang: string }
   const { data: shops, isLoading } = useGetShopsQuery();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredShops = shops?.filter(shop => {
+  const filteredShops = shops?.filter((shop) => {
     if (!shop.isActive) return false;
     const searchLower = searchTerm.toLowerCase();
     const nameEnMatch = shop.nameEn.toLowerCase().includes(searchLower);
@@ -31,14 +31,14 @@ export default function ShopsPage({ params }: { params: Promise<{ lang: string }
             {isBn ? 'ভেরিফাইড দোকান সমূহ' : 'Verified Shops'}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {isBn 
-              ? 'গ্রামের বাজারের সব বিশ্বস্ত বিক্রেতাদের খুঁজুন' 
+            {isBn
+              ? 'গ্রামের বাজারের সব বিশ্বস্ত বিক্রেতাদের খুঁজুন'
               : 'Discover all trusted sellers on Gramer Bazar'}
           </p>
         </div>
-        
+
         <div className="relative w-full md:w-72">
-          <Input 
+          <Input
             type="search"
             placeholder={isBn ? 'দোকান খুঁজুন...' : 'Search shops...'}
             value={searchTerm}
@@ -72,8 +72,8 @@ export default function ShopsPage({ params }: { params: Promise<{ lang: string }
             {isBn ? 'কোন দোকান পাওয়া যায়নি' : 'No shops found'}
           </h3>
           <p className="text-muted-foreground max-w-md mx-auto text-sm">
-            {isBn 
-              ? 'আপনার খোঁজা নামের সাথে মিলিয়ে কোন দোকান পাওয়া যায়নি। অনুগ্রহ করে অন্য নাম দিয়ে চেষ্টা করুন।' 
+            {isBn
+              ? 'আপনার খোঁজা নামের সাথে মিলিয়ে কোন দোকান পাওয়া যায়নি। অনুগ্রহ করে অন্য নাম দিয়ে চেষ্টা করুন।'
               : 'No shops match your search criteria. Please try a different name.'}
           </p>
           {searchTerm && (

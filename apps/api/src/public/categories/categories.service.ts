@@ -24,13 +24,15 @@ export class CategoriesService {
       WHERE c.is_active = true
       GROUP BY c.id
     `);
-    const countMap = new Map<string, number>(countRows.map((r: { id: string; count: number }) => [r.id, r.count]));
+    const countMap = new Map<string, number>(
+      countRows.map((r: { id: string; count: number }) => [r.id, r.count]),
+    );
 
-    return categories.map(cat => {
+    return categories.map((cat) => {
       const parentCount = countMap.get(cat.id) || 0;
       let childrenTotal = 0;
       if (cat.children) {
-        cat.children.forEach(child => {
+        cat.children.forEach((child) => {
           const cCount = countMap.get(child.id) || 0;
           child.productCount = cCount;
           childrenTotal += cCount;
@@ -62,13 +64,15 @@ export class CategoriesService {
       WHERE c.is_active = true
       GROUP BY c.id
     `);
-    const countMap = new Map<string, number>(countRows.map((r: { id: string; count: number }) => [r.id, r.count]));
+    const countMap = new Map<string, number>(
+      countRows.map((r: { id: string; count: number }) => [r.id, r.count]),
+    );
 
-    return categories.map(cat => {
+    return categories.map((cat) => {
       const parentCount = countMap.get(cat.id) || 0;
       let childrenTotal = 0;
       if (cat.children) {
-        cat.children.forEach(child => {
+        cat.children.forEach((child) => {
           const cCount = countMap.get(child.id) || 0;
           child.productCount = cCount;
           childrenTotal += cCount;
@@ -87,19 +91,24 @@ export class CategoriesService {
 
     if (!category) return null;
 
-    const countRows = await this.categoriesRepository.manager.query(`
+    const countRows = await this.categoriesRepository.manager.query(
+      `
       SELECT c.id, COUNT(DISTINCT p.id)::int as count
       FROM categories c
       LEFT JOIN products p ON (p.category_id = c.id OR p.sub_category_id = c.id)
       WHERE c.id = $1 OR c.parent_id = $1
       GROUP BY c.id
-    `, [category.id]);
-    const countMap = new Map<string, number>(countRows.map((r: { id: string; count: number }) => [r.id, r.count]));
+    `,
+      [category.id],
+    );
+    const countMap = new Map<string, number>(
+      countRows.map((r: { id: string; count: number }) => [r.id, r.count]),
+    );
 
     const parentCount = countMap.get(category.id) || 0;
     let childrenTotal = 0;
     if (category.children) {
-      category.children.forEach(child => {
+      category.children.forEach((child) => {
         const cCount = countMap.get(child.id) || 0;
         child.productCount = cCount;
         childrenTotal += cCount;

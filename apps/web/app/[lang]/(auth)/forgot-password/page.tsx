@@ -27,7 +27,11 @@ export default function ForgotPasswordPage({ params }: { params: Promise<{ lang:
     setErrorMsg('');
 
     if (!phone || phone.length < 11) {
-      setErrorMsg(isBn ? 'দয়া করে একটি সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন' : 'Please enter a valid 11-digit mobile number');
+      setErrorMsg(
+        isBn
+          ? 'দয়া করে একটি সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন'
+          : 'Please enter a valid 11-digit mobile number'
+      );
       return;
     }
 
@@ -35,7 +39,9 @@ export default function ForgotPasswordPage({ params }: { params: Promise<{ lang:
       await sendOtp({ phone }).unwrap();
       router.push(`/${lang}/reset-password?phone=${encodeURIComponent(phone)}`);
     } catch (err) {
-      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'ওটিপি পাঠাতে সমস্যা হয়েছে' : 'Failed to send OTP code'));
+      setErrorMsg(
+        getApiErrorMessage(err) || (isBn ? 'ওটিপি পাঠাতে সমস্যা হয়েছে' : 'Failed to send OTP code')
+      );
     }
   };
 
@@ -43,7 +49,10 @@ export default function ForgotPasswordPage({ params }: { params: Promise<{ lang:
     <div className="min-h-screen flex flex-col bg-muted/20">
       {/* Brand Top Bar */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card">
-        <Link href={`/${lang}`} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <Link
+          href={`/${lang}`}
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+        >
           <BrandLogo lang={lang} variant="full" width={140} height={38} />
         </Link>
         <LanguageSwitcher currentLocale={lang} />
@@ -89,14 +98,24 @@ export default function ForgotPasswordPage({ params }: { params: Promise<{ lang:
                 <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               </div>
               <p className="text-xs text-muted-foreground">
-                {isBn ? 'আমরা একটি ৬ সংখ্যার ভেরিফিকেশন কোড পাঠাব' : 'We will send a 6-digit verification code'}
+                {isBn
+                  ? 'আমরা একটি ৬ সংখ্যার ভেরিফিকেশন কোড পাঠাব'
+                  : 'We will send a 6-digit verification code'}
               </p>
             </div>
 
-            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-11 text-base font-semibold"
+              disabled={isLoading}
+            >
               {isLoading
-                ? (isBn ? 'কোড পাঠানো হচ্ছে...' : 'Sending Code...')
-                : (isBn ? 'ভেরিফিকেশন কোড পাঠান' : 'Send Verification Code')}
+                ? isBn
+                  ? 'কোড পাঠানো হচ্ছে...'
+                  : 'Sending Code...'
+                : isBn
+                  ? 'ভেরিফিকেশন কোড পাঠান'
+                  : 'Send Verification Code'}
             </Button>
           </form>
 

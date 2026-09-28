@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5000';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5000';
   let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
   // Use 127.0.0.1 instead of localhost for Node fetch to avoid IPv6 resolution issues (ECONNREFUSED)
   if (typeof window === 'undefined') {
@@ -12,40 +13,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let categories: Array<{ slug?: string }> = [];
 
   try {
-    const prodRes = await fetch(`${apiUrl}/public/catalog/search?limit=1000`, { 
+    const prodRes = await fetch(`${apiUrl}/public/catalog/search?limit=1000`, {
       next: { revalidate: 3600 },
       signal: AbortSignal.timeout(2500),
     });
     if (prodRes.ok) {
       const data = await prodRes.json();
-      products = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+      products = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
     }
   } catch {
     // API server is offline during build time; fallback to default static sitemap
   }
 
   try {
-    const catRes = await fetch(`${apiUrl}/public/categories`, { 
+    const catRes = await fetch(`${apiUrl}/public/categories`, {
       next: { revalidate: 3600 },
       signal: AbortSignal.timeout(2500),
     });
     if (catRes.ok) {
       const catData = await catRes.json();
-      categories = Array.isArray(catData) ? catData : (Array.isArray(catData?.data) ? catData.data : []);
+      categories = Array.isArray(catData)
+        ? catData
+        : Array.isArray(catData?.data)
+          ? catData.data
+          : [];
     }
   } catch {
     // API server is offline during build time; fallback to default static sitemap
   }
 
   const basePaths = ['', '/login', '/register', '/search', '/categories', '/cart'];
-  
+
   const routes = basePaths.map((route) => ({
     url: `${baseUrl}/en${route}`,
     lastModified: new Date(),
     changeFrequency: 'daily' as const,
     priority: route === '' ? 1 : 0.8,
   }));
-  
+
   const bnRoutes = basePaths.map((route) => ({
     url: `${baseUrl}/bn${route}`,
     lastModified: new Date(),
@@ -71,7 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.9,
-      }
+      },
     ];
   });
 
@@ -89,7 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.7,
-      }
+      },
     ];
   });
 

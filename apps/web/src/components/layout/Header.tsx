@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { SearchBar } from "./SearchBar";
-import { UserActions } from "./UserActions";
-import { BrandLogo } from "@/components/common/BrandLogo";
-import { CategoryMegaMenu } from "./CategoryMegaMenu";
-import { MobileCategoryDrawer } from "./MobileCategoryDrawer";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { SearchBar } from './SearchBar';
+import { UserActions } from './UserActions';
+import { BrandLogo } from '@/components/common/BrandLogo';
+import { CategoryMegaMenu } from './CategoryMegaMenu';
+import { MobileCategoryDrawer } from './MobileCategoryDrawer';
 import {
   Menu,
   Zap,
@@ -23,9 +23,9 @@ import {
   HelpCircle,
   Search,
   X,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface HeaderProps {
   lang: string;
@@ -33,10 +33,10 @@ interface HeaderProps {
 
 export function Header({ lang }: HeaderProps) {
   const pathname = usePathname();
-  const isSearchPage = pathname?.includes("/search") ?? false;
+  const isSearchPage = pathname?.includes('/search') ?? false;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(isSearchPage);
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
@@ -65,7 +65,7 @@ export function Header({ lang }: HeaderProps) {
                 className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
               >
                 <Store className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>{isBn ? "সেলার হন" : "Become a Seller"}</span>
+                <span>{isBn ? 'সেলার হন' : 'Become a Seller'}</span>
               </Link>
 
               <Link
@@ -73,7 +73,7 @@ export function Header({ lang }: HeaderProps) {
                 className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
               >
                 <Bike className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>{isBn ? "ডেলিভারি রাইডার হন" : "Become a Rider"}</span>
+                <span>{isBn ? 'ডেলিভারি রাইডার হন' : 'Become a Rider'}</span>
               </Link>
 
               {/* Track Orders (Shown if authenticated) */}
@@ -83,7 +83,7 @@ export function Header({ lang }: HeaderProps) {
                   className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
                 >
                   <Package className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span>{isBn ? "অর্ডার ট্র্যাকিং" : "Track Orders"}</span>
+                  <span>{isBn ? 'অর্ডার ট্র্যাকিং' : 'Track Orders'}</span>
                 </Link>
               )}
 
@@ -93,7 +93,7 @@ export function Header({ lang }: HeaderProps) {
                 className="inline-flex items-center gap-1 font-medium hover:text-primary transition-colors"
               >
                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>{isBn ? "সহায়তা" : "Help"}</span>
+                <span>{isBn ? 'সহায়তা' : 'Help'}</span>
               </Link>
             </div>
           </div>
@@ -110,7 +110,7 @@ export function Header({ lang }: HeaderProps) {
               className="md:hidden h-9 w-9 -ml-1 text-foreground hover:bg-muted shrink-0"
             >
               <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
-              <span className="sr-only">{isBn ? "মেনু" : "Menu"}</span>
+              <span className="sr-only">{isBn ? 'মেনু' : 'Menu'}</span>
             </Button>
             <Link
               href={`/${lang}`}
@@ -144,11 +144,11 @@ export function Header({ lang }: HeaderProps) {
               aria-label={
                 isBn
                   ? isMobileSearchOpen
-                    ? "অনুসন্ধান বন্ধ করুন"
-                    : "অনুসন্ধান খুলুন"
+                    ? 'অনুসন্ধান বন্ধ করুন'
+                    : 'অনুসন্ধান খুলুন'
                   : isMobileSearchOpen
-                    ? "Close search"
-                    : "Open search"
+                    ? 'Close search'
+                    : 'Open search'
               }
             >
               {isMobileSearchOpen ? (
@@ -182,12 +182,9 @@ export function Header({ lang }: HeaderProps) {
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-bold transition-colors whitespace-nowrap"
               >
                 <Zap className="h-3.5 w-3.5 fill-rose-500 text-rose-500" />
-                <span>{isBn ? "ফ্ল্যাশ সেল" : "Flash Sale"}</span>
-                <Badge
-                  variant="destructive"
-                  className="text-[9px] h-4 px-1 py-0 uppercase"
-                >
-                  {isBn ? "ছাড়" : "Sale"}
+                <span>{isBn ? 'ফ্ল্যাশ সেল' : 'Flash Sale'}</span>
+                <Badge variant="destructive" className="text-[9px] h-4 px-1 py-0 uppercase">
+                  {isBn ? 'ছাড়' : 'Sale'}
                 </Badge>
               </Link>
 
@@ -195,35 +192,35 @@ export function Header({ lang }: HeaderProps) {
                 href={`/${lang}/categories/fresh-vegetables`}
                 className="hover:text-primary transition-colors whitespace-nowrap text-foreground/80 hover:font-semibold"
               >
-                {isBn ? "তাজা শাকসবজি ও ফল" : "Fresh & Vegetables"}
+                {isBn ? 'তাজা শাকসবজি ও ফল' : 'Fresh & Vegetables'}
               </Link>
 
               <Link
                 href={`/${lang}/categories/grocery`}
                 className="hover:text-primary transition-colors whitespace-nowrap text-foreground/80 hover:font-semibold"
               >
-                {isBn ? "মুদি বাজার" : "Grocery"}
+                {isBn ? 'মুদি বাজার' : 'Grocery'}
               </Link>
 
               <Link
                 href={`/${lang}/categories/food`}
                 className="hover:text-primary transition-colors whitespace-nowrap text-foreground/80 hover:font-semibold"
               >
-                {isBn ? "খাবার ও বেকারি" : "Food"}
+                {isBn ? 'খাবার ও বেকারি' : 'Food'}
               </Link>
 
               <Link
                 href={`/${lang}/categories/cosmetics`}
                 className="hover:text-primary transition-colors whitespace-nowrap text-foreground/80 hover:font-semibold"
               >
-                {isBn ? "প্রসাধন সামগ্রী" : "Cosmetics"}
+                {isBn ? 'প্রসাধন সামগ্রী' : 'Cosmetics'}
               </Link>
 
               <Link
                 href={`/${lang}/categories/medicine-health`}
                 className="hover:text-primary transition-colors whitespace-nowrap text-foreground/80 hover:font-semibold"
               >
-                {isBn ? "ওষুধ ও স্বাস্থ্য" : "Medicine & Health"}
+                {isBn ? 'ওষুধ ও স্বাস্থ্য' : 'Medicine & Health'}
               </Link>
             </div>
 
@@ -232,8 +229,8 @@ export function Header({ lang }: HeaderProps) {
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
               <span>
                 {isBn
-                  ? "১০০% খাঁটি পণ্য ও নিরাপদ ক্যাশ অন ডেলিভারি"
-                  : "100% Authentic Products & Safe Cash on Delivery"}
+                  ? '১০০% খাঁটি পণ্য ও নিরাপদ ক্যাশ অন ডেলিভারি'
+                  : '100% Authentic Products & Safe Cash on Delivery'}
               </span>
             </div>
           </div>

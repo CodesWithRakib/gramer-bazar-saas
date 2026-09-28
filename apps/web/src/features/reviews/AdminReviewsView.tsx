@@ -19,13 +19,16 @@ export interface AdminReviewsViewProps {
 export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
-  
+
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  
+
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useGetAdminReviewsQuery({ page, limit: 10 }, {
-    skip: !isAuthenticated,
-  });
+  const { data, isLoading } = useGetAdminReviewsQuery(
+    { page, limit: 10 },
+    {
+      skip: !isAuthenticated,
+    }
+  );
 
   const [moderateReview, { isLoading: isModerating }] = useModerateReviewMutation();
 
@@ -53,7 +56,9 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">{isBn ? 'রিভিউ মডারেশন' : 'Review Moderation'}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {isBn ? 'রিভিউ মডারেশন' : 'Review Moderation'}
+        </h1>
       </div>
 
       <Card>
@@ -68,13 +73,17 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
             <div className="text-center py-8 text-muted-foreground">Loading reviews...</div>
           ) : reviews.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">{isBn ? 'কোনো রিভিউ পাওয়া যায়নি' : 'No reviews found'}</p>
+              <p className="text-muted-foreground">
+                {isBn ? 'কোনো রিভিউ পাওয়া যায়নি' : 'No reviews found'}
+              </p>
             </div>
           ) : (
             <div className="divide-y border rounded-xl overflow-hidden">
               {reviews.map((review) => (
-                <div key={review.id} className={`p-4 flex flex-col lg:flex-row gap-6 items-start lg:items-center transition-colors ${review.isApproved ? 'bg-background' : 'bg-amber-50/50'}`}>
-                  
+                <div
+                  key={review.id}
+                  className={`p-4 flex flex-col lg:flex-row gap-6 items-start lg:items-center transition-colors ${review.isApproved ? 'bg-background' : 'bg-amber-50/50'}`}
+                >
                   {/* Review Context */}
                   <div className="w-full lg:w-1/4">
                     <div className="text-sm font-medium mb-1">
@@ -99,15 +108,17 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
                       ))}
                     </div>
                     <p className="text-sm">
-                      {review.comment || <span className="text-muted-foreground italic">No comment provided</span>}
+                      {review.comment || (
+                        <span className="text-muted-foreground italic">No comment provided</span>
+                      )}
                     </p>
                   </div>
 
                   {/* Actions */}
                   <div className="w-full lg:w-1/4 flex gap-2 justify-end mt-4 lg:mt-0">
                     {review.isApproved ? (
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         size="sm"
                         disabled={isModerating}
                         onClick={() => handleModerate(review.id, false)}
@@ -116,8 +127,8 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
                         <X className="h-4 w-4 mr-1" /> {isBn ? 'রিজেক্ট' : 'Reject'}
                       </Button>
                     ) : (
-                      <Button 
-                        variant="default" 
+                      <Button
+                        variant="default"
                         size="sm"
                         disabled={isModerating}
                         onClick={() => handleModerate(review.id, true)}
@@ -135,20 +146,20 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
           {/* Pagination */}
           {meta && meta.totalPages > 1 && (
             <div className="flex justify-center gap-2 mt-6">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 disabled={page === 1}
-                onClick={() => setPage(p => Math.max(1, p - 1))}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
                 {isBn ? 'পূর্ববর্তী' : 'Previous'}
               </Button>
               <div className="flex items-center px-4 text-sm font-medium">
                 {page} / {meta.totalPages}
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 disabled={page === meta.totalPages}
-                onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+                onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
               >
                 {isBn ? 'পরবর্তী' : 'Next'}
               </Button>

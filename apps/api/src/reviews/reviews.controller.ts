@@ -33,7 +33,8 @@ export class ReviewsController {
   @Get('product/:productId')
   @ApiOperation({
     summary: 'Retrieve approved reviews for a product',
-    description: 'Public endpoint. Returns paginated customer ratings and feedback for the product.',
+    description:
+      'Public endpoint. Returns paginated customer ratings and feedback for the product.',
   })
   @ApiParam({ name: 'productId', type: String, format: 'uuid', description: 'Product UUID' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
@@ -47,7 +48,11 @@ export class ReviewsController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
   ) {
-    return this.reviewsService.getProductReviews(productId, parseInt(page, 10), parseInt(limit, 10));
+    return this.reviewsService.getProductReviews(
+      productId,
+      parseInt(page, 10),
+      parseInt(limit, 10),
+    );
   }
 
   @Post()
@@ -56,7 +61,8 @@ export class ReviewsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Submit a product review (Customer only)',
-    description: 'Requires CUSTOMER role. Submits verified purchase rating score (1-5), optional feedback comment, and product photos.',
+    description:
+      'Requires CUSTOMER role. Submits verified purchase rating score (1-5), optional feedback comment, and product photos.',
   })
   @ApiStandardResponse({
     type: ReviewResponseDto,
@@ -65,7 +71,13 @@ export class ReviewsController {
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
   addReview(@Request() req: any, @Body() dto: CreateReviewDto) {
-    return this.reviewsService.addReview(req.user.id, dto.productId, dto.rating, dto.comment, dto.images);
+    return this.reviewsService.addReview(
+      req.user.id,
+      dto.productId,
+      dto.rating,
+      dto.comment,
+      dto.images,
+    );
   }
 
   @Get('user')
@@ -93,7 +105,8 @@ export class ReviewsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'List all reviews for moderation (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Returns paginated reviews queue with approval flags.',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Returns paginated reviews queue with approval flags.',
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
@@ -125,10 +138,7 @@ export class ReviewsController {
     description: 'Review moderation updated',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  moderateReview(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: ModerateReviewDto,
-  ) {
+  moderateReview(@Param('id', ParseUUIDPipe) id: string, @Body() dto: ModerateReviewDto) {
     return this.reviewsService.moderateReview(id, dto.isApproved);
   }
 }

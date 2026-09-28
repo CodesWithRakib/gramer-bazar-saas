@@ -50,7 +50,9 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
     setErrorMsg('');
 
     if (formData.password.length < 6) {
-      setErrorMsg(isBn ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'Password must be at least 6 characters');
+      setErrorMsg(
+        isBn ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'Password must be at least 6 characters'
+      );
       return;
     }
 
@@ -65,7 +67,9 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
     } catch (err) {
       setErrorMsg(
         getApiErrorMessage(err) ||
-          (isBn ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে। তথ্য যাচাই করুন।' : 'Registration failed. Please check information.')
+          (isBn
+            ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে। তথ্য যাচাই করুন।'
+            : 'Registration failed. Please check information.')
       );
     }
   };
@@ -78,7 +82,10 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Top Bar with Language Switcher */}
       <header className="h-16 px-4 sm:px-8 flex items-center justify-between border-b border-border/40 shrink-0">
-        <Link href={`/${lang}`} className="flex items-center gap-2 group hover:opacity-90 transition-opacity">
+        <Link
+          href={`/${lang}`}
+          className="flex items-center gap-2 group hover:opacity-90 transition-opacity"
+        >
           <BrandLogo lang={lang} variant="full" width={140} height={38} />
         </Link>
         <div className="flex items-center gap-3">
@@ -122,21 +129,27 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
             <div className="flex items-start gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-foreground">{isBn ? 'সহজ অর্ডার' : 'Easy Ordering'}</p>
+                <p className="font-semibold text-foreground">
+                  {isBn ? 'সহজ অর্ডার' : 'Easy Ordering'}
+                </p>
                 <p className="text-[11px] mt-0.5">{isBn ? 'দ্রুত কেনাকাটা' : 'Fast checkout'}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-foreground">{isBn ? 'লাইভ ট্র্যাকিং' : 'Live Tracking'}</p>
+                <p className="font-semibold text-foreground">
+                  {isBn ? 'লাইভ ট্র্যাকিং' : 'Live Tracking'}
+                </p>
                 <p className="text-[11px] mt-0.5">{isBn ? 'অর্ডার আপডেট' : 'Real-time updates'}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-foreground">{isBn ? 'গ্রাহক সহায়তা' : 'Help & Support'}</p>
+                <p className="font-semibold text-foreground">
+                  {isBn ? 'গ্রাহক সহায়তা' : 'Help & Support'}
+                </p>
                 <p className="text-[11px] mt-0.5">{isBn ? 'সার্বক্ষণিক সেবা' : 'Dedicated care'}</p>
               </div>
             </div>
@@ -291,8 +304,8 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                     ? 'অ্যাকাউন্ট তৈরি হচ্ছে...'
                     : 'Creating Account...'
                   : isBn
-                  ? 'রেজিস্টার করুন'
-                  : 'Create Account'}
+                    ? 'রেজিস্টার করুন'
+                    : 'Create Account'}
               </Button>
             </form>
 

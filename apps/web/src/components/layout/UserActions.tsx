@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useSyncExternalStore } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   MapPin,
   ShoppingCart,
@@ -20,15 +20,15 @@ import {
   LogOut,
   ChevronDown,
   Sparkles,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { RootState } from "@/store/store";
-import { logout, setUser } from "@/store/slices/authSlice";
-import { setCartOpen } from "@/store/slices/cartSlice";
-import { useGetProfileQuery } from "@/features/auth/authApi";
-import { useGetUserWishlistQuery } from "@/features/wishlists/wishlistsApi";
-import { getUserRoles } from "@/lib/roles";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { RootState } from '@/store/store';
+import { logout, setUser } from '@/store/slices/authSlice';
+import { setCartOpen } from '@/store/slices/cartSlice';
+import { useGetProfileQuery } from '@/features/auth/authApi';
+import { useGetUserWishlistQuery } from '@/features/wishlists/wishlistsApi';
+import { getUserRoles } from '@/lib/roles';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +36,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -44,11 +44,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
-import { NotificationBell } from "@/components/ui/NotificationBell";
-import { api } from "@/store/api";
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { NotificationBell } from '@/components/ui/NotificationBell';
+import { api } from '@/store/api';
 
 interface UserActionsProps {
   lang: string;
@@ -60,16 +60,14 @@ export function UserActions({ lang }: UserActionsProps) {
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false,
+    () => false
   );
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
-  const { isAuthenticated, user } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const cartItemsCount = useSelector((state: RootState) =>
-    state.cart.items.reduce((total, item) => total + item.quantity, 0),
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
   );
 
   const { data: profile } = useGetProfileQuery(undefined, {
@@ -89,23 +87,18 @@ export function UserActions({ lang }: UserActionsProps) {
 
   const currentUser = user || profile;
   const userRoles = getUserRoles(currentUser);
-  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
-  const isAdmin = userRoles.includes("ADMIN") || isSuperAdmin;
-  const isSeller = userRoles.includes("SELLER");
-  const isRider = userRoles.includes("RIDER");
+  const isSuperAdmin = userRoles.includes('SUPER_ADMIN');
+  const isAdmin = userRoles.includes('ADMIN') || isSuperAdmin;
+  const isSeller = userRoles.includes('SELLER');
+  const isRider = userRoles.includes('RIDER');
 
   const displayName =
-    currentUser?.firstName ||
-    currentUser?.lastName ||
-    (isBn ? "প্রোফাইল" : "Profile");
+    currentUser?.firstName || currentUser?.lastName || (isBn ? 'প্রোফাইল' : 'Profile');
 
   return (
     <div className="flex items-center gap-1 sm:gap-2">
       {/* Language Switcher Dropdown */}
-      <LanguageSwitcher
-        currentLocale={lang}
-        className="h-9 px-1.5 sm:px-2.5 sm:h-10"
-      />
+      <LanguageSwitcher currentLocale={lang} className="h-9 px-1.5 sm:px-2.5 sm:h-10" />
 
       {/* Notifications */}
       {isAuthenticated && <NotificationBell lang={lang} />}
@@ -125,7 +118,7 @@ export function UserActions({ lang }: UserActionsProps) {
                 {wishlistCount}
               </span>
             )}
-            <span className="sr-only">{isBn ? "উইশলিস্ট" : "Wishlist"}</span>
+            <span className="sr-only">{isBn ? 'উইশলিস্ট' : 'Wishlist'}</span>
           </Link>
         </Button>
       )}
@@ -144,7 +137,7 @@ export function UserActions({ lang }: UserActionsProps) {
               {cartItemsCount}
             </span>
           )}
-          <span className="sr-only">{isBn ? "কার্ট" : "Cart"}</span>
+          <span className="sr-only">{isBn ? 'কার্ট' : 'Cart'}</span>
         </Button>
       )}
 
@@ -180,24 +173,15 @@ export function UserActions({ lang }: UserActionsProps) {
                   {currentUser?.firstName} {currentUser?.lastName}
                 </p>
                 {isSuperAdmin ? (
-                  <Badge
-                    variant="warning"
-                    className="text-[10px] px-1.5 py-0 h-4"
-                  >
+                  <Badge variant="warning" className="text-[10px] px-1.5 py-0 h-4">
                     Super Admin
                   </Badge>
                 ) : isAdmin ? (
-                  <Badge
-                    variant="default"
-                    className="text-[10px] px-1.5 py-0 h-4"
-                  >
+                  <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4">
                     Admin
                   </Badge>
                 ) : isSeller ? (
-                  <Badge
-                    variant="success"
-                    className="text-[10px] px-1.5 py-0 h-4"
-                  >
+                  <Badge variant="success" className="text-[10px] px-1.5 py-0 h-4">
                     Seller
                   </Badge>
                 ) : isRider ? (
@@ -224,14 +208,9 @@ export function UserActions({ lang }: UserActionsProps) {
                 asChild
                 className="cursor-pointer py-2 rounded-lg font-semibold text-warning"
               >
-                <Link
-                  href={`/${lang}/super-admin`}
-                  className="flex items-center gap-2.5"
-                >
+                <Link href={`/${lang}/super-admin`} className="flex items-center gap-2.5">
                   <ShieldAlert className="h-4 w-4 text-warning" />
-                  <span>
-                    {isBn ? "সুপার অ্যাডমিন কনসোল" : "Super Admin Console"}
-                  </span>
+                  <span>{isBn ? 'সুপার অ্যাডমিন কনসোল' : 'Super Admin Console'}</span>
                 </Link>
               </DropdownMenuItem>
             )}
@@ -241,14 +220,9 @@ export function UserActions({ lang }: UserActionsProps) {
                 asChild
                 className="cursor-pointer py-2 rounded-lg font-semibold text-primary"
               >
-                <Link
-                  href={`/${lang}/admin`}
-                  className="flex items-center gap-2.5"
-                >
+                <Link href={`/${lang}/admin`} className="flex items-center gap-2.5">
                   <LayoutDashboard className="h-4 w-4" />
-                  <span>
-                    {isBn ? "অ্যাডমিন ড্যাশবোর্ড" : "Admin Dashboard"}
-                  </span>
+                  <span>{isBn ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Dashboard'}</span>
                 </Link>
               </DropdownMenuItem>
             )}
@@ -258,12 +232,9 @@ export function UserActions({ lang }: UserActionsProps) {
                 asChild
                 className="cursor-pointer py-2 rounded-lg font-semibold text-emerald-600 dark:text-emerald-400"
               >
-                <Link
-                  href={`/${lang}/seller`}
-                  className="flex items-center gap-2.5"
-                >
+                <Link href={`/${lang}/seller`} className="flex items-center gap-2.5">
                   <Store className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                  <span>{isBn ? "সেলার পোর্টাল" : "Seller Portal"}</span>
+                  <span>{isBn ? 'সেলার পোর্টাল' : 'Seller Portal'}</span>
                 </Link>
               </DropdownMenuItem>
             )}
@@ -273,90 +244,52 @@ export function UserActions({ lang }: UserActionsProps) {
                 asChild
                 className="cursor-pointer py-2 rounded-lg font-semibold text-blue-600 dark:text-blue-400"
               >
-                <Link
-                  href={`/${lang}/rider`}
-                  className="flex items-center gap-2.5"
-                >
+                <Link href={`/${lang}/rider`} className="flex items-center gap-2.5">
                   <Bike className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span>{isBn ? "রাইডার ড্যাশবোর্ড" : "Rider Dashboard"}</span>
+                  <span>{isBn ? 'রাইডার ড্যাশবোর্ড' : 'Rider Dashboard'}</span>
                 </Link>
               </DropdownMenuItem>
             )}
 
-            {(isAdmin || isSeller || isRider) && (
-              <DropdownMenuSeparator className="my-1.5" />
-            )}
+            {(isAdmin || isSeller || isRider) && <DropdownMenuSeparator className="my-1.5" />}
 
             {/* Customer Account Section */}
             <DropdownMenuLabel className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground px-2 py-1">
-              {isBn ? "আমার অ্যাকাউন্ট" : "My Account"}
+              {isBn ? 'আমার অ্যাকাউন্ট' : 'My Account'}
             </DropdownMenuLabel>
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer py-2 rounded-lg"
-            >
-              <Link
-                href={`/${lang}/customer/orders`}
-                className="flex items-center gap-2.5"
-              >
+            <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg">
+              <Link href={`/${lang}/customer/orders`} className="flex items-center gap-2.5">
                 <Package className="h-4 w-4 text-muted-foreground" />
-                <span>{isBn ? "আমার অর্ডারসমূহ" : "My Orders"}</span>
+                <span>{isBn ? 'আমার অর্ডারসমূহ' : 'My Orders'}</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer py-2 rounded-lg"
-            >
-              <Link
-                href={`/${lang}/customer/profile`}
-                className="flex items-center gap-2.5"
-              >
+            <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg">
+              <Link href={`/${lang}/customer/profile`} className="flex items-center gap-2.5">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span>{isBn ? "আমার প্রোফাইল" : "My Profile"}</span>
+                <span>{isBn ? 'আমার প্রোফাইল' : 'My Profile'}</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer py-2 rounded-lg"
-            >
-              <Link
-                href={`/${lang}/customer/wishlist`}
-                className="flex items-center gap-2.5"
-              >
+            <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg">
+              <Link href={`/${lang}/customer/wishlist`} className="flex items-center gap-2.5">
                 <Heart className="h-4 w-4 text-muted-foreground" />
-                <span>{isBn ? "উইশলিস্ট" : "Wishlist"}</span>
+                <span>{isBn ? 'উইশলিস্ট' : 'Wishlist'}</span>
                 {wishlistCount > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="ml-auto text-[10px] h-4 px-1.5"
-                  >
+                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1.5">
                     {wishlistCount}
                   </Badge>
                 )}
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer py-2 rounded-lg"
-            >
-              <Link
-                href={`/${lang}/customer/addresses`}
-                className="flex items-center gap-2.5"
-              >
+            <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg">
+              <Link href={`/${lang}/customer/addresses`} className="flex items-center gap-2.5">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>{isBn ? "ঠিকানা সমুহ" : "Saved Addresses"}</span>
+                <span>{isBn ? 'ঠিকানা সমুহ' : 'Saved Addresses'}</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer py-2 rounded-lg"
-            >
-              <Link
-                href={`/${lang}/customer/disputes`}
-                className="flex items-center gap-2.5"
-              >
+            <DropdownMenuItem asChild className="cursor-pointer py-2 rounded-lg">
+              <Link href={`/${lang}/customer/disputes`} className="flex items-center gap-2.5">
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                <span>{isBn ? "অভিযোগ ও সহায়তা" : "Disputes & Support"}</span>
+                <span>{isBn ? 'অভিযোগ ও সহায়তা' : 'Disputes & Support'}</span>
               </Link>
             </DropdownMenuItem>
 
@@ -366,21 +299,16 @@ export function UserActions({ lang }: UserActionsProps) {
                 <DropdownMenuSeparator className="my-1.5" />
                 <DropdownMenuLabel className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground px-2 py-1 flex items-center gap-1">
                   <Sparkles className="h-3 w-3 text-amber-500" />
-                  <span>{isBn ? "উপার্জন করুন" : "Earn with Us"}</span>
+                  <span>{isBn ? 'উপার্জন করুন' : 'Earn with Us'}</span>
                 </DropdownMenuLabel>
                 {!isSeller && (
                   <DropdownMenuItem
                     asChild
                     className="cursor-pointer py-2 rounded-lg text-emerald-600 dark:text-emerald-400"
                   >
-                    <Link
-                      href={`/${lang}/become-a-seller`}
-                      className="flex items-center gap-2.5"
-                    >
+                    <Link href={`/${lang}/become-a-seller`} className="flex items-center gap-2.5">
                       <Store className="h-4 w-4" />
-                      <span>
-                        {isBn ? "সেলার হতে আবেদন" : "Become a Seller"}
-                      </span>
+                      <span>{isBn ? 'সেলার হতে আবেদন' : 'Become a Seller'}</span>
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -389,14 +317,9 @@ export function UserActions({ lang }: UserActionsProps) {
                     asChild
                     className="cursor-pointer py-2 rounded-lg text-blue-600 dark:text-blue-400"
                   >
-                    <Link
-                      href={`/${lang}/become-a-rider`}
-                      className="flex items-center gap-2.5"
-                    >
+                    <Link href={`/${lang}/become-a-rider`} className="flex items-center gap-2.5">
                       <Bike className="h-4 w-4" />
-                      <span>
-                        {isBn ? "রাইডার হতে আবেদন" : "Become a Rider"}
-                      </span>
+                      <span>{isBn ? 'রাইডার হতে আবেদন' : 'Become a Rider'}</span>
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -412,7 +335,7 @@ export function UserActions({ lang }: UserActionsProps) {
               className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10 rounded-lg py-2 flex items-center gap-2.5 font-medium"
             >
               <LogOut className="h-4 w-4" />
-              <span>{isBn ? "লগআউট" : "Logout"}</span>
+              <span>{isBn ? 'লগআউট' : 'Logout'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -421,7 +344,7 @@ export function UserActions({ lang }: UserActionsProps) {
           asChild
           className="h-9 sm:h-10 rounded-full px-3.5 sm:px-5 text-xs sm:text-sm font-semibold shadow-xs shrink-0"
         >
-          <Link href={`/${lang}/login`}>{isBn ? "লগইন" : "Login"}</Link>
+          <Link href={`/${lang}/login`}>{isBn ? 'লগইন' : 'Login'}</Link>
         </Button>
       )}
 
@@ -429,29 +352,22 @@ export function UserActions({ lang }: UserActionsProps) {
       <Dialog open={isLogoutModalOpen} onOpenChange={setIsLogoutModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {isBn ? "লগআউট নিশ্চিত করুন" : "Confirm Logout"}
-            </DialogTitle>
+            <DialogTitle>{isBn ? 'লগআউট নিশ্চিত করুন' : 'Confirm Logout'}</DialogTitle>
             <DialogDescription>
               {isBn
-                ? "আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?"
-                : "Are you sure you want to log out of your account?"}
+                ? 'আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?'
+                : 'Are you sure you want to log out of your account?'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 sm:justify-end mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setIsLogoutModalOpen(false)}
-            >
-              {isBn ? "বাতিল" : "Cancel"}
+            <Button variant="outline" onClick={() => setIsLogoutModalOpen(false)}>
+              {isBn ? 'বাতিল' : 'Cancel'}
             </Button>
             <Button
               variant="destructive"
               onClick={async () => {
                 try {
-                  await fetch("/api/v1/auth/logout", { method: "POST" }).catch(
-                    () => {},
-                  );
+                  await fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => {});
                 } catch {}
                 dispatch(logout());
                 dispatch(api.util.resetApiState());
@@ -459,7 +375,7 @@ export function UserActions({ lang }: UserActionsProps) {
                 router.push(`/${lang}/login`);
               }}
             >
-              {isBn ? "লগআউট" : "Logout"}
+              {isBn ? 'লগআউট' : 'Logout'}
             </Button>
           </DialogFooter>
         </DialogContent>

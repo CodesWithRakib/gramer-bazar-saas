@@ -93,9 +93,7 @@ export class AnalyticsService {
       },
       recentOrders: recentOrders.map((o) => ({
         id: o.id,
-        customerName: o.user
-          ? `${o.user.firstName} ${o.user.lastName}`
-          : 'Unknown',
+        customerName: o.user ? `${o.user.firstName} ${o.user.lastName}` : 'Unknown',
         totalAmount: o.total,
         status: o.status,
         createdAt: o.createdAt,
@@ -125,18 +123,9 @@ export class AnalyticsService {
       .select('event.productId', 'productId')
       .addSelect('product.nameEn', 'productName')
       .addSelect('product.nameBn', 'productNameBn')
-      .addSelect(
-        "COUNT(CASE WHEN event.eventType = 'VIEW' THEN 1 END)",
-        'views',
-      )
-      .addSelect(
-        "COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)",
-        'carts',
-      )
-      .addSelect(
-        "COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)",
-        'purchases',
-      )
+      .addSelect("COUNT(CASE WHEN event.eventType = 'VIEW' THEN 1 END)", 'views')
+      .addSelect("COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)", 'carts')
+      .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
       .leftJoin(Product, 'product', 'product.id = event.productId')
       .where('event.productId IS NOT NULL')
       .groupBy('event.productId')
@@ -175,14 +164,8 @@ export class AnalyticsService {
     const purchaseTrendsRaw = await this.demandEventRepository
       .createQueryBuilder('event')
       .select("TO_CHAR(event.created_at, 'YYYY-MM-DD')", 'date')
-      .addSelect(
-        "COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)",
-        'purchases',
-      )
-      .addSelect(
-        "COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)",
-        'carts',
-      )
+      .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
+      .addSelect("COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)", 'carts')
       .where("event.eventType IN ('PURCHASE', 'ADD_TO_CART')")
       .andWhere("event.created_at >= NOW() - INTERVAL '7 days'")
       .groupBy("TO_CHAR(event.created_at, 'YYYY-MM-DD')")
@@ -248,14 +231,8 @@ export class AnalyticsService {
     const requestedProductsRaw = await this.demandEventRepository
       .createQueryBuilder('event')
       .select('event.productRequestId', 'productRequestId')
-      .addSelect(
-        "COUNT(CASE WHEN event.eventType = 'REQUEST' THEN 1 END)",
-        'requests',
-      )
-      .addSelect(
-        "COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)",
-        'purchases',
-      )
+      .addSelect("COUNT(CASE WHEN event.eventType = 'REQUEST' THEN 1 END)", 'requests')
+      .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
       .where('event.productRequestId IS NOT NULL')
       .groupBy('event.productRequestId')
       .orderBy('requests', 'DESC')
@@ -266,8 +243,7 @@ export class AnalyticsService {
       productRequestId: r.productRequestId,
       requests: Number(r.requests),
       purchases: Number(r.purchases),
-      conversionRate:
-        r.requests > 0 ? (Number(r.purchases) / Number(r.requests)) * 100 : 0,
+      conversionRate: r.requests > 0 ? (Number(r.purchases) / Number(r.requests)) * 100 : 0,
     }));
 
     return {

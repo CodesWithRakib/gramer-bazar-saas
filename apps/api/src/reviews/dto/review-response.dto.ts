@@ -11,7 +11,10 @@ export class ReviewUserSummaryDto {
   @ApiPropertyOptional({ example: 'Uddin', nullable: true })
   lastName?: string | null;
 
-  @ApiPropertyOptional({ example: 'https://storage.gramerbazar.com/avatars/user.jpg', nullable: true })
+  @ApiPropertyOptional({
+    example: 'https://storage.gramerbazar.com/avatars/user.jpg',
+    nullable: true,
+  })
   avatar?: string | null;
 }
 
@@ -31,13 +34,20 @@ export class ReviewResponseDto {
   @ApiProperty({ example: 5, description: 'Rating score from 1 to 5', minimum: 1, maximum: 5 })
   rating: number;
 
-  @ApiPropertyOptional({ example: 'Very fresh and good quality potatoes. Delivered quickly.', nullable: true })
+  @ApiPropertyOptional({
+    example: 'Very fresh and good quality potatoes. Delivered quickly.',
+    nullable: true,
+  })
   comment: string | null;
 
   @ApiProperty({ example: true, description: 'Whether the review is approved by moderation' })
   isApproved: boolean;
 
-  @ApiPropertyOptional({ type: [String], nullable: true, description: 'Array of customer proof image URLs' })
+  @ApiPropertyOptional({
+    type: [String],
+    nullable: true,
+    description: 'Array of customer proof image URLs',
+  })
   images: string[] | null;
 
   @ApiProperty({ example: '2026-01-01T00:00:00.000Z' })
@@ -48,7 +58,10 @@ export class ReviewResponseDto {
 }
 
 export class ModerateReviewDto {
-  @ApiProperty({ example: true, description: 'Approval decision: true to approve, false to reject' })
+  @ApiProperty({
+    example: true,
+    description: 'Approval decision: true to approve, false to reject',
+  })
   @IsNotEmpty()
   @IsBoolean()
   isApproved: boolean;

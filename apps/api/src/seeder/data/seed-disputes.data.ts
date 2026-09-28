@@ -29,17 +29,20 @@ export const SEED_DISPUTES: SeedDisputeItem[] = [
     messages: [
       {
         senderRole: 'CUSTOMER',
-        message: 'The mustard oil bottle cap was cracked and half of the oil leaked inside the courier box upon arrival.',
+        message:
+          'The mustard oil bottle cap was cracked and half of the oil leaked inside the courier box upon arrival.',
         minutesOffset: 0,
       },
       {
         senderRole: 'SELLER',
-        message: 'We apologize sincerely for the damage. Our packaging team will add heavy double bubble wrap for all oil bottles.',
+        message:
+          'We apologize sincerely for the damage. Our packaging team will add heavy double bubble wrap for all oil bottles.',
         minutesOffset: 120,
       },
       {
         senderRole: 'ADMIN',
-        message: 'Photo evidence verified. Refund of 380 BDT has been credited to customer wallet. Order closed.',
+        message:
+          'Photo evidence verified. Refund of 380 BDT has been credited to customer wallet. Order closed.',
         minutesOffset: 360,
       },
     ],
@@ -56,12 +59,14 @@ export const SEED_DISPUTES: SeedDisputeItem[] = [
     messages: [
       {
         senderRole: 'CUSTOMER',
-        message: 'I ordered 10kg Miniket Rice, but the sack delivered is clearly labeled BR-28 Atash Rice.',
+        message:
+          'I ordered 10kg Miniket Rice, but the sack delivered is clearly labeled BR-28 Atash Rice.',
         minutesOffset: 0,
       },
       {
         senderRole: 'SELLER',
-        message: 'Checking warehouse dispatch log with our Debiganj packer right now. We will arrange exchange delivery.',
+        message:
+          'Checking warehouse dispatch log with our Debiganj packer right now. We will arrange exchange delivery.',
         minutesOffset: 90,
       },
       {
@@ -74,14 +79,16 @@ export const SEED_DISPUTES: SeedDisputeItem[] = [
   {
     orderIndex: 2,
     reason: DisputeReason.MISSING_ITEM,
-    description: 'Packet of Radhuni Turmeric Powder (হলুদ গুঁড়া) was missing from delivery basket.',
+    description:
+      'Packet of Radhuni Turmeric Powder (হলুদ গুঁড়া) was missing from delivery basket.',
     evidenceImages: [],
     status: DisputeStatus.OPEN,
     adminDecision: null,
     messages: [
       {
         senderRole: 'CUSTOMER',
-        message: 'All other items arrived intact, but the 200g turmeric powder packet was not inside the bag.',
+        message:
+          'All other items arrived intact, but the 200g turmeric powder packet was not inside the bag.',
         minutesOffset: 0,
       },
     ],
@@ -94,21 +101,25 @@ export const SEED_DISPUTES: SeedDisputeItem[] = [
       'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80',
     ],
     status: DisputeStatus.RESOLVED_REJECTED,
-    adminDecision: 'Product batch tested. Conforms to authentic 100% natural sun-dried chili standards without synthetic color dyes. Dispute dismissed.',
+    adminDecision:
+      'Product batch tested. Conforms to authentic 100% natural sun-dried chili standards without synthetic color dyes. Dispute dismissed.',
     messages: [
       {
         senderRole: 'CUSTOMER',
-        message: 'The red chili powder looks darker in color compared to the bright red photo in the app.',
+        message:
+          'The red chili powder looks darker in color compared to the bright red photo in the app.',
         minutesOffset: 0,
       },
       {
         senderRole: 'SELLER',
-        message: 'Our chili is 100% naturally ground without any added artificial red food coloring or brick dust.',
+        message:
+          'Our chili is 100% naturally ground without any added artificial red food coloring or brick dust.',
         minutesOffset: 60,
       },
       {
         senderRole: 'ADMIN',
-        message: 'Inspection confirms natural seasonal batch purity. No artificial coloring added. Claim dismissed.',
+        message:
+          'Inspection confirms natural seasonal batch purity. No artificial coloring added. Claim dismissed.',
         minutesOffset: 300,
       },
     ],

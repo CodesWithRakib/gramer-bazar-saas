@@ -18,8 +18,10 @@ export function FinanceHubView({ lang = 'en', namespace = 'admin' }: FinanceHubV
       id: 'payments',
       title: 'Customer Payments & Transactions',
       titleBn: 'গ্রাহক পেমেন্ট ও ট্রানজ্যাকশন',
-      description: 'Review digital gateway payments, Cash on Delivery (COD) reconciliations, and customer payment logs.',
-      descriptionBn: 'অনলাইন গেটওয়ে পেমেন্ট, ক্যাশ অন ডেলিভারি (সিওডি) এবং গ্রাহক লেনদেনের স্থিতি যাচাই করুন।',
+      description:
+        'Review digital gateway payments, Cash on Delivery (COD) reconciliations, and customer payment logs.',
+      descriptionBn:
+        'অনলাইন গেটওয়ে পেমেন্ট, ক্যাশ অন ডেলিভারি (সিওডি) এবং গ্রাহক লেনদেনের স্থিতি যাচাই করুন।',
       icon: CreditCard,
       href: `/${basePath}/finance/payments`,
       badge: 'SSLCOMMERZ / COD',
@@ -29,8 +31,10 @@ export function FinanceHubView({ lang = 'en', namespace = 'admin' }: FinanceHubV
       id: 'payouts',
       title: 'Merchant Payouts & Wallets',
       titleBn: 'সেলার পেআউট ও উত্তোলন',
-      description: 'Audit seller wallet balances, process disbursement withdrawal requests, and approve bank/bKash payouts.',
-      descriptionBn: 'সেলারদের ওয়ালেট ব্যালেন্স নিরীক্ষা, তহবিল উত্তোলন অনুরোধ অনুমোদন ও ব্যাংক/বিকাশ পেআউট পরিচালনা করুন।',
+      description:
+        'Audit seller wallet balances, process disbursement withdrawal requests, and approve bank/bKash payouts.',
+      descriptionBn:
+        'সেলারদের ওয়ালেট ব্যালেন্স নিরীক্ষা, তহবিল উত্তোলন অনুরোধ অনুমোদন ও ব্যাংক/বিকাশ পেআউট পরিচালনা করুন।',
       icon: Wallet,
       href: `/${basePath}/finance/payouts`,
       badge: 'Disbursements',

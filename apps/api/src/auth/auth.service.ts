@@ -136,10 +136,7 @@ export class AuthService {
           'JWT_ACCESS_SECRET',
           'super-secret-key-for-dev-only',
         ),
-        expiresIn: this.configService.get<string>(
-          'JWT_ACCESS_EXPIRES_IN',
-          '1h',
-        ) as any,
+        expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '1h') as any,
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET', 'super-secret-refresh-key'),
@@ -212,7 +209,7 @@ export class AuthService {
         email: updatedUser.email,
         avatar: updatedUser.avatar,
         roles: updatedUser.roles?.map((r: any) => (typeof r === 'string' ? r : r.name)) || [],
-      }
+      },
     };
   }
 
@@ -248,4 +245,3 @@ export class AuthService {
     return { message: 'Account scheduled for deletion' };
   }
 }
-

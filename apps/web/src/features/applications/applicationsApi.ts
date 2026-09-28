@@ -119,7 +119,10 @@ export const applicationsApi = api.injectEndpoints({
       query: (id) => `/applications/admin/sellers/${id}`,
       providesTags: ['SellerApplication'],
     }),
-    approveSellerApplication: builder.mutation<SellerApplication, { id: string; adminNotes?: string }>({
+    approveSellerApplication: builder.mutation<
+      SellerApplication,
+      { id: string; adminNotes?: string }
+    >({
       query: ({ id, adminNotes }) => ({
         url: `/applications/admin/sellers/${id}/approve`,
         method: 'PATCH',
@@ -127,7 +130,10 @@ export const applicationsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['SellerApplication', 'User', 'Shop'],
     }),
-    rejectSellerApplication: builder.mutation<SellerApplication, { id: string; adminNotes?: string }>({
+    rejectSellerApplication: builder.mutation<
+      SellerApplication,
+      { id: string; adminNotes?: string }
+    >({
       query: ({ id, adminNotes }) => ({
         url: `/applications/admin/sellers/${id}/reject`,
         method: 'PATCH',
@@ -163,7 +169,10 @@ export const applicationsApi = api.injectEndpoints({
       query: (id) => `/applications/admin/riders/${id}`,
       providesTags: ['RiderApplication'],
     }),
-    approveRiderApplication: builder.mutation<RiderApplication, { id: string; adminNotes?: string }>({
+    approveRiderApplication: builder.mutation<
+      RiderApplication,
+      { id: string; adminNotes?: string }
+    >({
       query: ({ id, adminNotes }) => ({
         url: `/applications/admin/riders/${id}/approve`,
         method: 'PATCH',
@@ -171,14 +180,16 @@ export const applicationsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['RiderApplication', 'User'],
     }),
-    rejectRiderApplication: builder.mutation<RiderApplication, { id: string; adminNotes?: string }>({
-      query: ({ id, adminNotes }) => ({
-        url: `/applications/admin/riders/${id}/reject`,
-        method: 'PATCH',
-        body: { adminNotes },
-      }),
-      invalidatesTags: ['RiderApplication'],
-    }),
+    rejectRiderApplication: builder.mutation<RiderApplication, { id: string; adminNotes?: string }>(
+      {
+        query: ({ id, adminNotes }) => ({
+          url: `/applications/admin/riders/${id}/reject`,
+          method: 'PATCH',
+          body: { adminNotes },
+        }),
+        invalidatesTags: ['RiderApplication'],
+      }
+    ),
   }),
 });
 

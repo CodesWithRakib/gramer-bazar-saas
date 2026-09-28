@@ -15,9 +15,17 @@ export class AppController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'System root landing page or JSON metadata', description: 'Returns interactive HTML landing dashboard for browsers or JSON metadata when Accept: application/json.' })
+  @ApiOperation({
+    summary: 'System root landing page or JSON metadata',
+    description:
+      'Returns interactive HTML landing dashboard for browsers or JSON metadata when Accept: application/json.',
+  })
   @ApiProduces('text/html', 'application/json')
-  @ApiResponse({ status: 200, type: AppRootResponseDto, description: 'API service summary or landing page' })
+  @ApiResponse({
+    status: 200,
+    type: AppRootResponseDto,
+    description: 'API service summary or landing page',
+  })
   getRoot(
     @Req() req?: Request,
     @Res({ passthrough: true }) res?: Response,
@@ -37,8 +45,7 @@ export class AppController {
         healthCheck: '/health',
         apiV1: '/api/v1',
         frontendUrl:
-          this.configService.get<string>('FRONTEND_URL') ||
-          'https://gramer-bazar-saas.vercel.app',
+          this.configService.get<string>('FRONTEND_URL') || 'https://gramer-bazar-saas.vercel.app',
       };
     }
 
@@ -49,7 +56,10 @@ export class AppController {
   }
 
   @Get('hello')
-  @ApiOperation({ summary: 'Hello ping check', description: 'Simple text string greeting for quick uptime verification.' })
+  @ApiOperation({
+    summary: 'Hello ping check',
+    description: 'Simple text string greeting for quick uptime verification.',
+  })
   @ApiResponse({ status: 200, type: String, description: 'Hello greeting' })
   getHello(): string {
     return this.appService.getHello();
@@ -63,7 +73,11 @@ export class AppController {
   }
 
   @Get('health')
-  @ApiOperation({ summary: 'Liveness and health check probe', description: 'Standard health check endpoint reporting uptime, service identifier, and environment.' })
+  @ApiOperation({
+    summary: 'Liveness and health check probe',
+    description:
+      'Standard health check endpoint reporting uptime, service identifier, and environment.',
+  })
   @ApiResponse({ status: 200, type: HealthResponseDto, description: 'System health probe status' })
   getHealth() {
     return {

@@ -6,8 +6,21 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -29,14 +42,14 @@ const addProductSchema = z.object({
 export function AddProductDialog({ isBn }: { isBn: boolean }) {
   const [open, setOpen] = useState(false);
   const [addProduct, { isLoading }] = useAddSellerProductMutation();
-  
+
   const form = useForm<z.infer<typeof addProductSchema>>({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
       productVariantId: '',
       price: 0,
       quantity: 0,
-    }
+    },
   });
 
   const onSubmit = async (values: z.infer<typeof addProductSchema>) => {
@@ -61,38 +74,64 @@ export function AddProductDialog({ isBn }: { isBn: boolean }) {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField control={form.control} name="productVariantId" render={({ field }) => (
-              <FormItem>
-                <FormLabel>{isBn ? 'প্রোডাক্ট ভেরিয়েন্ট আইডি (সাময়িক)' : 'Product Variant ID (Temp)'}</FormLabel>
-                <FormControl><Input placeholder="UUID..." {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="productVariantId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {isBn ? 'প্রোডাক্ট ভেরিয়েন্ট আইডি (সাময়িক)' : 'Product Variant ID (Temp)'}
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="UUID..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="price" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{isBn ? 'দাম (৳)' : 'Price (৳)'}</FormLabel>
-                  <FormControl><Input type="number" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="quantity" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{isBn ? 'পরিমাণ' : 'Quantity'}</FormLabel>
-                  <FormControl><Input type="number" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isBn ? 'দাম (৳)' : 'Price (৳)'}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isBn ? 'পরিমাণ' : 'Quantity'}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <FormField control={form.control} name="sellerSku" render={({ field }) => (
-              <FormItem>
-                <FormLabel>{isBn ? 'এসকেইউ (ঐচ্ছিক)' : 'SKU (Optional)'}</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="sellerSku"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{isBn ? 'এসকেইউ (ঐচ্ছিক)' : 'SKU (Optional)'}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Saving...' : (isBn ? 'সংরক্ষণ করুন' : 'Save')}
+              {isLoading ? 'Saving...' : isBn ? 'সংরক্ষণ করুন' : 'Save'}
             </Button>
           </form>
         </Form>
@@ -108,9 +147,19 @@ const editProductSchema = z.object({
   quantity: z.coerce.number().min(0),
 });
 
-export function EditProductDialog({ isBn, product, open, onOpenChange }: { isBn: boolean, product: SellerProductItem, open: boolean, onOpenChange: (o: boolean) => void }) {
+export function EditProductDialog({
+  isBn,
+  product,
+  open,
+  onOpenChange,
+}: {
+  isBn: boolean;
+  product: SellerProductItem;
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+}) {
   const [updateProduct, { isLoading }] = useUpdateSellerProductMutation();
-  
+
   const form = useForm<z.infer<typeof editProductSchema>>({
     resolver: zodResolver(editProductSchema),
     values: {
@@ -118,7 +167,7 @@ export function EditProductDialog({ isBn, product, open, onOpenChange }: { isBn:
       discountPrice: product?.discountPrice || undefined,
       sellerSku: product?.sellerSku || '',
       quantity: product?.inventory?.quantity || 0,
-    }
+    },
   });
 
   const onSubmit = async (values: z.infer<typeof editProductSchema>) => {
@@ -127,7 +176,9 @@ export function EditProductDialog({ isBn, product, open, onOpenChange }: { isBn:
       toast.success(isBn ? 'আপডেট হয়েছে' : 'Updated successfully');
       onOpenChange(false);
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || (isBn ? 'ত্রুটি হয়েছে' : 'Failed to update product'));
+      toast.error(
+        getApiErrorMessage(error) || (isBn ? 'ত্রুটি হয়েছে' : 'Failed to update product')
+      );
     }
   };
 
@@ -135,35 +186,58 @@ export function EditProductDialog({ isBn, product, open, onOpenChange }: { isBn:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isBn ? 'এডিট করুন' : 'Edit'} - {isBn ? product?.productVariant?.product?.nameBn : product?.productVariant?.product?.nameEn}</DialogTitle>
+          <DialogTitle>
+            {isBn ? 'এডিট করুন' : 'Edit'} -{' '}
+            {isBn
+              ? product?.productVariant?.product?.nameBn
+              : product?.productVariant?.product?.nameEn}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="price" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{isBn ? 'দাম (৳)' : 'Price (৳)'}</FormLabel>
-                  <FormControl><Input type="number" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="quantity" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{isBn ? 'পরিমাণ (নতুন করে সেট করুন)' : 'Set Quantity'}</FormLabel>
-                  <FormControl><Input type="number" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isBn ? 'দাম (৳)' : 'Price (৳)'}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isBn ? 'পরিমাণ (নতুন করে সেট করুন)' : 'Set Quantity'}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <FormField control={form.control} name="sellerSku" render={({ field }) => (
-              <FormItem>
-                <FormLabel>{isBn ? 'এসকেইউ (ঐচ্ছিক)' : 'SKU (Optional)'}</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="sellerSku"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{isBn ? 'এসকেইউ (ঐচ্ছিক)' : 'SKU (Optional)'}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Saving...' : (isBn ? 'সংরক্ষণ করুন' : 'Save Changes')}
+              {isLoading ? 'Saving...' : isBn ? 'সংরক্ষণ করুন' : 'Save Changes'}
             </Button>
           </form>
         </Form>

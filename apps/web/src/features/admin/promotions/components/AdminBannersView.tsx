@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { use, useState, useMemo } from "react";
+import React, { use, useState, useMemo } from 'react';
 import {
   useGetAdminBannersQuery,
   useCreateBannerMutation,
   useUpdateBannerMutation,
   useDeleteBannerMutation,
   Banner,
-} from "@/features/banners/bannersApi";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from '@/features/banners/bannersApi';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -17,22 +17,28 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
+} from '@/components/ui/table';
+import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Plus, Image as ImageIcon, Trash2, Edit, Search, X } from "lucide-react";
-import Image from "next/image";
-import { AdminPagination } from "@/components/ui/AdminPagination";
-import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { toast } from "sonner";
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Plus, Image as ImageIcon, Trash2, Edit, Search, X } from 'lucide-react';
+import Image from 'next/image';
+import { AdminPagination } from '@/components/ui/AdminPagination';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { toast } from 'sonner';
 
 export interface AdminBannersViewProps {
   lang?: string;
@@ -40,7 +46,7 @@ export interface AdminBannersViewProps {
 }
 
 export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
   const { data: banners = [], isLoading } = useGetAdminBannersQuery();
   const [createBanner] = useCreateBannerMutation();
@@ -48,8 +54,8 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
   const [deleteBanner, { isLoading: isDeleting }] = useDeleteBannerMutation();
   const [bannerToDelete, setBannerToDelete] = useState<string | null>(null);
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -57,9 +63,9 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
 
   const [formData, setFormData] = useState({
-    title: "",
-    imageUrl: "",
-    linkUrl: "",
+    title: '',
+    imageUrl: '',
+    linkUrl: '',
     displayOrder: 0,
     isActive: true,
   });
@@ -72,7 +78,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
         (banner.linkUrl && banner.linkUrl.toLowerCase().includes(search.toLowerCase()));
 
       const matchesStatus =
-        statusFilter === "ALL" || (statusFilter === "ACTIVE" ? banner.isActive : !banner.isActive);
+        statusFilter === 'ALL' || (statusFilter === 'ACTIVE' ? banner.isActive : !banner.isActive);
 
       return matchesSearch && matchesStatus;
     });
@@ -89,16 +95,16 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
       setFormData({
         title: banner.title,
         imageUrl: banner.imageUrl,
-        linkUrl: banner.linkUrl || "",
+        linkUrl: banner.linkUrl || '',
         displayOrder: banner.displayOrder,
         isActive: banner.isActive,
       });
     } else {
       setEditingBanner(null);
       setFormData({
-        title: "",
-        imageUrl: "",
-        linkUrl: "",
+        title: '',
+        imageUrl: '',
+        linkUrl: '',
         displayOrder: 0,
         isActive: true,
       });
@@ -121,7 +127,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
       }
       setIsModalOpen(false);
     } catch (err) {
-      console.error("Failed to save banner:", err);
+      console.error('Failed to save banner:', err);
     }
   };
 
@@ -132,7 +138,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
         data: { isActive: !banner.isActive },
       }).unwrap();
     } catch (err) {
-      console.error("Failed to toggle status:", err);
+      console.error('Failed to toggle status:', err);
     }
   };
 
@@ -140,9 +146,9 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
     if (!bannerToDelete) return;
     try {
       await deleteBanner(bannerToDelete).unwrap();
-      toast.success(isBn ? "ব্যানার মুছে ফেলা হয়েছে" : "Banner deleted successfully");
+      toast.success(isBn ? 'ব্যানার মুছে ফেলা হয়েছে' : 'Banner deleted successfully');
     } catch {
-      toast.error(isBn ? "ব্যানার মুছতে সমস্যা হয়েছে" : "Failed to delete banner");
+      toast.error(isBn ? 'ব্যানার মুছতে সমস্যা হয়েছে' : 'Failed to delete banner');
     } finally {
       setBannerToDelete(null);
     }
@@ -153,12 +159,12 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {isBn ? "প্রচারমূলক ব্যানারসমূহ" : "Campaign Banners"}
+            {isBn ? 'প্রচারমূলক ব্যানারসমূহ' : 'Campaign Banners'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             {isBn
-              ? "হোমপেজ ও বিভিন্ন পেজের ব্যানার স্লাইডার এবং প্রচার নিয়ন্ত্রণ করুন।"
-              : "Manage marketing promotional banners, hero sliders, and custom links."}
+              ? 'হোমপেজ ও বিভিন্ন পেজের ব্যানার স্লাইডার এবং প্রচার নিয়ন্ত্রণ করুন।'
+              : 'Manage marketing promotional banners, hero sliders, and custom links.'}
           </p>
         </div>
       </div>
@@ -178,14 +184,18 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                   setSearch(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder={isBn ? "ব্যানারের শিরোনাম বা লিংক খুঁজুন..." : "Search banners by title or link..."}
+                placeholder={
+                  isBn
+                    ? 'ব্যানারের শিরোনাম বা লিংক খুঁজুন...'
+                    : 'Search banners by title or link...'
+                }
                 className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => {
-                    setSearch("");
+                    setSearch('');
                     setCurrentPage(1);
                   }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-gray-100 dark:hover:bg-muted"
@@ -208,9 +218,9 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ALL">{isBn ? "সকল স্ট্যাটাস" : "All Status"}</SelectItem>
-                  <SelectItem value="ACTIVE">{isBn ? "সক্রিয়" : "Active"}</SelectItem>
-                  <SelectItem value="INACTIVE">{isBn ? "নিষ্ক্রিয়" : "Inactive"}</SelectItem>
+                  <SelectItem value="ALL">{isBn ? 'সকল স্ট্যাটাস' : 'All Status'}</SelectItem>
+                  <SelectItem value="ACTIVE">{isBn ? 'সক্রিয়' : 'Active'}</SelectItem>
+                  <SelectItem value="INACTIVE">{isBn ? 'নিষ্ক্রিয়' : 'Inactive'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -219,62 +229,67 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
           {/* Action Slot */}
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => handleOpenModal()} className="rounded-full px-6 h-11 whitespace-nowrap">
+              <Button
+                onClick={() => handleOpenModal()}
+                className="rounded-full px-6 h-11 whitespace-nowrap"
+              >
                 <Plus className="mr-2 h-4 w-4" />
-                {isBn ? "নতুন ব্যানার যোগ করুন" : "Add Banner"}
+                {isBn ? 'নতুন ব্যানার যোগ করুন' : 'Add Banner'}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[525px]">
               <DialogHeader>
                 <DialogTitle>
-                  {editingBanner ? (isBn ? "ব্যানার সম্পাদনা" : "Edit Banner") : (isBn ? "নতুন ব্যানার" : "Create New Banner")}
+                  {editingBanner
+                    ? isBn
+                      ? 'ব্যানার সম্পাদনা'
+                      : 'Edit Banner'
+                    : isBn
+                      ? 'নতুন ব্যানার'
+                      : 'Create New Banner'}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="title">{isBn ? "ব্যানার শিরোনাম" : "Banner Title"}</Label>
+                  <Label htmlFor="title">{isBn ? 'ব্যানার শিরোনাম' : 'Banner Title'}</Label>
                   <Input
                     id="title"
                     required
                     value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="e.g. Summer Campaign"
                     className="rounded-lg"
                   />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="imageUrl">{isBn ? "ইমেজ URL" : "Image URL"}</Label>
+                  <Label htmlFor="imageUrl">{isBn ? 'ইমেজ URL' : 'Image URL'}</Label>
                   <Input
                     id="imageUrl"
                     required
                     type="url"
                     value={formData.imageUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, imageUrl: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                     placeholder="https://example.com/banner.jpg"
                     className="rounded-lg"
                   />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="linkUrl">{isBn ? "টার্গেট লিংক (ঐচ্ছিক)" : "Target Link (Optional)"}</Label>
+                  <Label htmlFor="linkUrl">
+                    {isBn ? 'টার্গেট লিংক (ঐচ্ছিক)' : 'Target Link (Optional)'}
+                  </Label>
                   <Input
                     id="linkUrl"
                     value={formData.linkUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, linkUrl: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
                     placeholder="/products?category=summer"
                     className="rounded-lg"
                   />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="displayOrder">{isBn ? "প্রদর্শনের ক্রম" : "Display Order"}</Label>
+                  <Label htmlFor="displayOrder">{isBn ? 'প্রদর্শনের ক্রম' : 'Display Order'}</Label>
                   <Input
                     id="displayOrder"
                     type="number"
@@ -297,7 +312,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                       setFormData({ ...formData, isActive: checked })
                     }
                   />
-                  <Label htmlFor="isActive">{isBn ? "সক্রিয়" : "Active"}</Label>
+                  <Label htmlFor="isActive">{isBn ? 'সক্রিয়' : 'Active'}</Label>
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
@@ -307,10 +322,16 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                     onClick={() => setIsModalOpen(false)}
                     className="rounded-full"
                   >
-                    {isBn ? "বাতিল" : "Cancel"}
+                    {isBn ? 'বাতিল' : 'Cancel'}
                   </Button>
                   <Button type="submit" className="rounded-full">
-                    {editingBanner ? (isBn ? "আপডেট করুন" : "Update Banner") : (isBn ? "তৈরি করুন" : "Create Banner")}
+                    {editingBanner
+                      ? isBn
+                        ? 'আপডেট করুন'
+                        : 'Update Banner'
+                      : isBn
+                        ? 'তৈরি করুন'
+                        : 'Create Banner'}
                   </Button>
                 </div>
               </form>
@@ -324,24 +345,40 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
             <Table>
               <TableHeader className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                 <TableRow>
-                  <TableHead className="py-3.5 px-4 w-28">{isBn ? "প্রিভিউ" : "Preview"}</TableHead>
-                  <TableHead className="py-3.5 px-4">{isBn ? "শিরোনাম" : "Title"}</TableHead>
-                  <TableHead className="py-3.5 px-4">{isBn ? "টার্গেট লিংক" : "Link"}</TableHead>
-                  <TableHead className="py-3.5 px-4 w-24">{isBn ? "ক্রম" : "Order"}</TableHead>
-                  <TableHead className="py-3.5 px-4 w-24 text-center">{isBn ? "স্ট্যাটাস" : "Status"}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">{isBn ? "পদক্ষেপ" : "Actions"}</TableHead>
+                  <TableHead className="py-3.5 px-4 w-28">{isBn ? 'প্রিভিউ' : 'Preview'}</TableHead>
+                  <TableHead className="py-3.5 px-4">{isBn ? 'শিরোনাম' : 'Title'}</TableHead>
+                  <TableHead className="py-3.5 px-4">{isBn ? 'টার্গেট লিংক' : 'Link'}</TableHead>
+                  <TableHead className="py-3.5 px-4 w-24">{isBn ? 'ক্রম' : 'Order'}</TableHead>
+                  <TableHead className="py-3.5 px-4 w-24 text-center">
+                    {isBn ? 'স্ট্যাটাস' : 'Status'}
+                  </TableHead>
+                  <TableHead className="py-3.5 px-4 text-right">
+                    {isBn ? 'পদক্ষেপ' : 'Actions'}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-gray-200 dark:divide-border text-sm">
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`} className="animate-pulse">
-                      <TableCell className="py-3.5 px-4"><div className="h-10 w-16 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-3.5 px-4"><div className="h-4 w-32 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-3.5 px-4"><div className="h-4 w-28 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-3.5 px-4"><div className="h-4 w-12 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-3.5 px-4 text-center"><div className="h-6 w-12 rounded-full bg-muted mx-auto"></div></TableCell>
-                      <TableCell className="py-3.5 px-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-muted"></div></TableCell>
+                      <TableCell className="py-3.5 px-4">
+                        <div className="h-10 w-16 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-4">
+                        <div className="h-4 w-32 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-4">
+                        <div className="h-4 w-28 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-4">
+                        <div className="h-4 w-12 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-4 text-center">
+                        <div className="h-6 w-12 rounded-full bg-muted mx-auto"></div>
+                      </TableCell>
+                      <TableCell className="py-3.5 px-4 text-right">
+                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : paginatedBanners.length === 0 ? (
@@ -352,19 +389,26 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                           <ImageIcon className="h-6 w-6 text-muted-foreground/60" />
                         </div>
                         <h3 className="mb-1 text-base font-semibold text-foreground">
-                          {isBn ? "কোনো ব্যানার পাওয়া যায়নি" : "No banners found"}
+                          {isBn ? 'কোনো ব্যানার পাওয়া যায়নি' : 'No banners found'}
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
-                          {search || statusFilter !== "ALL"
-                            ? (isBn ? "আপনার ফিল্টারের সাথে কোনো ব্যানার মেলেনি" : "No banners match your search or filter.")
-                            : (isBn ? "বর্তমানে কোনো ক্যাম্পেইন ব্যানার যোগ করা হয়নি" : "No campaign banners created yet.")}
+                          {search || statusFilter !== 'ALL'
+                            ? isBn
+                              ? 'আপনার ফিল্টারের সাথে কোনো ব্যানার মেলেনি'
+                              : 'No banners match your search or filter.'
+                            : isBn
+                              ? 'বর্তমানে কোনো ক্যাম্পেইন ব্যানার যোগ করা হয়নি'
+                              : 'No campaign banners created yet.'}
                         </p>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedBanners.map((banner) => (
-                    <TableRow key={banner.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <TableRow
+                      key={banner.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <TableCell className="py-3.5 px-4">
                         <div className="relative h-12 w-20 rounded-lg overflow-hidden border bg-muted">
                           {banner.imageUrl ? (
@@ -379,11 +423,15 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 font-semibold text-foreground">{banner.title}</TableCell>
-                      <TableCell className="py-3.5 px-4 text-muted-foreground text-xs max-w-[200px] truncate font-mono">
-                        {banner.linkUrl || "—"}
+                      <TableCell className="py-3.5 px-4 font-semibold text-foreground">
+                        {banner.title}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-muted-foreground font-mono">{banner.displayOrder}</TableCell>
+                      <TableCell className="py-3.5 px-4 text-muted-foreground text-xs max-w-[200px] truncate font-mono">
+                        {banner.linkUrl || '—'}
+                      </TableCell>
+                      <TableCell className="py-3.5 px-4 text-muted-foreground font-mono">
+                        {banner.displayOrder}
+                      </TableCell>
                       <TableCell className="py-3.5 px-4 text-center">
                         <Switch
                           checked={banner.isActive}
@@ -405,7 +453,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                             size="icon"
                             onClick={() => setBannerToDelete(banner.id)}
                             className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
-                            aria-label={isBn ? "মুছে ফেলুন" : "Delete"}
+                            aria-label={isBn ? 'মুছে ফেলুন' : 'Delete'}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -429,10 +477,10 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
             setPageSize(newLimit);
             setCurrentPage(1);
           }}
-          lang={isBn ? "bn" : "en"}
+          lang={isBn ? 'bn' : 'en'}
           itemLabel={{
-            singular: isBn ? "ব্যানার" : "banner",
-            plural: isBn ? "ব্যানার" : "banners",
+            singular: isBn ? 'ব্যানার' : 'banner',
+            plural: isBn ? 'ব্যানার' : 'banners',
           }}
         />
       </div>
@@ -442,14 +490,14 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
         onOpenChange={(open) => {
           if (!open) setBannerToDelete(null);
         }}
-        title={isBn ? "ব্যানার মুছে ফেলতে চান?" : "Delete Banner?"}
+        title={isBn ? 'ব্যানার মুছে ফেলতে চান?' : 'Delete Banner?'}
         description={
           isBn
-            ? "আপনি কি নিশ্চিত যে আপনি এই ব্যানারটি মুছে ফেলতে চান? এটি আর হোমপেজ বা ক্যাম্পেইনে প্রদর্শিত হবে না।"
-            : "Are you sure you want to delete this promotional banner? It will immediately disappear from live storefronts."
+            ? 'আপনি কি নিশ্চিত যে আপনি এই ব্যানারটি মুছে ফেলতে চান? এটি আর হোমপেজ বা ক্যাম্পেইনে প্রদর্শিত হবে না।'
+            : 'Are you sure you want to delete this promotional banner? It will immediately disappear from live storefronts.'
         }
-        confirmLabel={isBn ? "মুছে ফেলুন" : "Delete Banner"}
-        cancelLabel={isBn ? "বাতিল" : "Cancel"}
+        confirmLabel={isBn ? 'মুছে ফেলুন' : 'Delete Banner'}
+        cancelLabel={isBn ? 'বাতিল' : 'Cancel'}
         variant="destructive"
         isLoading={isDeleting}
         onConfirm={handleConfirmDelete}

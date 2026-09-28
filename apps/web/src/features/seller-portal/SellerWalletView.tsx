@@ -4,9 +4,22 @@ import React, { useState, useMemo } from 'react';
 import { useGetMyWalletQuery, useGetMyTransactionsQuery } from '@/features/wallets/walletsApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Wallet, ArrowUpRight, Clock, CheckCircle2, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -45,14 +58,20 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
   }, [filteredTransactions, currentPage, pageSize]);
 
   if (isWalletLoading) {
-    return <div className="p-8 text-center text-muted-foreground">{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</div>;
+    return (
+      <div className="p-8 text-center text-muted-foreground">
+        {isBn ? 'লোড হচ্ছে...' : 'Loading...'}
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{isBn ? 'আমার ওয়ালেট' : 'My Wallet'}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {isBn ? 'আমার ওয়ালেট' : 'My Wallet'}
+          </h1>
           <p className="text-muted-foreground text-sm mt-1">
             {isBn ? 'আপনার আয় এবং লেনদেন পরিচালনা করুন' : 'Manage your earnings and transactions'}
           </p>
@@ -86,7 +105,9 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-500">৳ {wallet?.pendingClearance || 0}</div>
+            <div className="text-2xl font-bold text-amber-500">
+              ৳ {wallet?.pendingClearance || 0}
+            </div>
           </CardContent>
         </Card>
 
@@ -129,7 +150,11 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                   setSearch(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder={isBn ? 'বিবরণ বা পরিমাণ দিয়ে লেনদেন খুঁজুন...' : 'Search transactions by description...'}
+                placeholder={
+                  isBn
+                    ? 'বিবরণ বা পরিমাণ দিয়ে লেনদেন খুঁজুন...'
+                    : 'Search transactions by description...'
+                }
                 className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
               />
               {search && (
@@ -157,8 +182,12 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">{isBn ? 'সকল ধরন' : 'All Types'}</SelectItem>
-                  <SelectItem value="CREDIT">{isBn ? 'ক্রেডিট (আয়)' : 'Credit (Income)'}</SelectItem>
-                  <SelectItem value="DEBIT">{isBn ? 'ডেবিট (ব্যয়)' : 'Debit (Expense)'}</SelectItem>
+                  <SelectItem value="CREDIT">
+                    {isBn ? 'ক্রেডিট (আয়)' : 'Credit (Income)'}
+                  </SelectItem>
+                  <SelectItem value="DEBIT">
+                    {isBn ? 'ডেবিট (ব্যয়)' : 'Debit (Expense)'}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -174,17 +203,27 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                   <TableHead className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'বিবরণ' : 'Description'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'ধরন' : 'Type'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">{isBn ? 'পরিমাণ' : 'Amount'}</TableHead>
+                  <TableHead className="py-3.5 px-4 text-right">
+                    {isBn ? 'পরিমাণ' : 'Amount'}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-gray-200 dark:divide-border">
                 {isTxLoading ? (
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`} className="animate-pulse">
-                      <TableCell className="py-4 px-4"><div className="h-4 w-32 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-48 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-6 w-16 rounded-full bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4 text-right"><div className="ml-auto h-4 w-20 rounded bg-muted"></div></TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-32 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-48 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-6 w-16 rounded-full bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4 text-right">
+                        <div className="ml-auto h-4 w-20 rounded bg-muted"></div>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : paginatedTransactions.length === 0 ? (
@@ -199,8 +238,12 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || typeFilter !== 'ALL'
-                            ? (isBn ? 'আপনার ফিল্টারের সাথে কোনো লেনদেন মেলেনি' : 'No transactions match your search criteria.')
-                            : (isBn ? 'বর্তমানে কোনো লেনদেনের রেকর্ড নেই' : 'No transaction records available.')}
+                            ? isBn
+                              ? 'আপনার ফিল্টারের সাথে কোনো লেনদেন মেলেনি'
+                              : 'No transactions match your search criteria.'
+                            : isBn
+                              ? 'বর্তমানে কোনো লেনদেনের রেকর্ড নেই'
+                              : 'No transaction records available.'}
                         </p>
                         {(search || typeFilter !== 'ALL') && (
                           <button
@@ -219,11 +262,16 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                   </TableRow>
                 ) : (
                   paginatedTransactions.map((tx: any) => (
-                    <TableRow key={tx.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <TableRow
+                      key={tx.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <TableCell className="whitespace-nowrap py-3.5 px-4 font-mono text-xs">
                         {format(new Date(tx.createdAt), 'MMM dd, yyyy HH:mm')}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 font-medium text-foreground">{tx.description}</TableCell>
+                      <TableCell className="py-3.5 px-4 font-medium text-foreground">
+                        {tx.description}
+                      </TableCell>
                       <TableCell className="py-3.5 px-4">
                         <Badge
                           variant="secondary"

@@ -11,11 +11,7 @@ import { CheckCircle2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useGetOrderByIdQuery } from '@/features/orders/ordersApi';
 import { useGetPaymentByTransactionIdQuery } from '@/features/payments/paymentsApi';
 
-export default function CheckoutSuccessPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function CheckoutSuccessPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const searchParams = useSearchParams();
@@ -47,7 +43,7 @@ export default function CheckoutSuccessPage({
   return (
     <div className="container max-w-xl py-16 px-4">
       <Card className="border-0 shadow-xl ring-1 ring-emerald-500/20 rounded-3xl overflow-hidden bg-card text-center">
-        <div className="h-3 bg-gradient-to-r from-emerald-500 to-green-500" />
+        <div className="h-2.5 bg-emerald-600 dark:bg-emerald-500" />
         <CardHeader className="pt-8 pb-4">
           <div className="mx-auto w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 ring-8 ring-emerald-500/5">
             <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
@@ -68,12 +64,16 @@ export default function CheckoutSuccessPage({
               {orderId && (
                 <div className="flex justify-between items-center text-xs sm:text-sm">
                   <span className="text-muted-foreground">{isBn ? 'অর্ডার আইডি' : 'Order ID'}</span>
-                  <span className="font-mono font-semibold text-primary">{orderId.slice(0, 13).toUpperCase()}...</span>
+                  <span className="font-mono font-semibold text-primary">
+                    {orderId.slice(0, 13).toUpperCase()}...
+                  </span>
                 </div>
               )}
               {tranId && (
                 <div className="flex justify-between items-center text-xs sm:text-sm">
-                  <span className="text-muted-foreground">{isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}
+                  </span>
                   <span className="font-mono text-muted-foreground">{tranId}</span>
                 </div>
               )}
@@ -82,7 +82,9 @@ export default function CheckoutSuccessPage({
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button asChild size="lg" className="flex-1 rounded-xl h-12 gap-2 shadow-md">
-              <Link href={orderId ? `/${lang}/customer/orders/${orderId}` : `/${lang}/customer/orders`}>
+              <Link
+                href={orderId ? `/${lang}/customer/orders/${orderId}` : `/${lang}/customer/orders`}
+              >
                 <ShoppingBag className="w-4 h-4" />
                 {isBn ? 'অর্ডার ট্র্যাক করুন' : 'Track Order Status'}
               </Link>

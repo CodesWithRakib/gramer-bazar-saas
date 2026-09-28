@@ -9,13 +9,7 @@ import {
   Request,
   Patch,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ChatService } from './chat.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { CreateConversationDto } from './dto/create-conversation.dto.js';
@@ -42,8 +36,7 @@ export class ChatController {
   @Get('unread-count')
   @ApiOperation({
     summary: 'Get unread message and conversation counts',
-    description:
-      'Returns aggregate counts of unread messages and conversations for badges.',
+    description: 'Returns aggregate counts of unread messages and conversations for badges.',
   })
   @ApiStandardResponse({
     type: ChatUnreadCountsResponseDto,
@@ -79,10 +72,7 @@ export class ChatController {
     status: 201,
     description: 'Conversation retrieved or created',
   })
-  async createConversation(
-    @Request() req: any,
-    @Body() dto: CreateConversationDto,
-  ) {
+  async createConversation(@Request() req: any, @Body() dto: CreateConversationDto) {
     return this.chatService.getOrCreateConversation(
       [req.user.id, dto.participantId],
       dto.referenceId,
@@ -130,19 +120,13 @@ export class ChatController {
     @Query('before') before?: string,
   ) {
     const parsedLimit = limit ? parseInt(limit, 10) : 50;
-    return this.chatService.getConversationMessages(
-      id,
-      req.user,
-      parsedLimit,
-      before,
-    );
+    return this.chatService.getConversationMessages(id, req.user, parsedLimit, before);
   }
 
   @Post('conversations/:id/messages')
   @ApiOperation({
     summary: 'Send message in conversation',
-    description:
-      'Dispatches a new text or media message to a conversation thread.',
+    description: 'Dispatches a new text or media message to a conversation thread.',
   })
   @ApiParam({ name: 'id', description: 'Conversation UUID' })
   @ApiStandardResponse({
@@ -150,17 +134,8 @@ export class ChatController {
     status: 201,
     description: 'Message sent successfully',
   })
-  async sendMessage(
-    @Request() req: any,
-    @Param('id') id: string,
-    @Body() dto: SendChatMessageDto,
-  ) {
-    return this.chatService.sendMessage(
-      req.user.id,
-      id,
-      dto.content,
-      dto.messageType,
-    );
+  async sendMessage(@Request() req: any, @Param('id') id: string, @Body() dto: SendChatMessageDto) {
+    return this.chatService.sendMessage(req.user.id, id, dto.content, dto.messageType);
   }
 
   @Patch('conversations/:id/read')

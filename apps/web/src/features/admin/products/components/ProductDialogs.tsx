@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { getApiErrorMessage } from "@/lib/apiError";
-import React, { useState, useMemo } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { getApiErrorMessage } from '@/lib/apiError';
+import React, { useState, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -20,20 +20,20 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
-import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
   useCreateAdminProductMutation,
   useUpdateAdminProductMutation,
@@ -43,41 +43,41 @@ import {
   useSetPrimaryProductImageMutation,
   useDeleteProductImageMutation,
   Product,
-} from "@/features/catalog/catalogApi";
-import { CustomImage } from "@/components/ui/CustomImage";
-import { ImagePlus, Trash2, Star, RefreshCw } from "lucide-react";
+} from '@/features/catalog/catalogApi';
+import { CustomImage } from '@/components/ui/CustomImage';
+import { ImagePlus, Trash2, Star, RefreshCw } from 'lucide-react';
 
 const COMMON_UNITS = [
-  { value: "kg", label: "kg (Kilogram)" },
-  { value: "gram", label: "gram (g)" },
-  { value: "piece", label: "piece (টি / পিস)" },
-  { value: "liter", label: "liter (L)" },
-  { value: "ml", label: "ml (Milliliter)" },
-  { value: "pack", label: "pack (প্যাকেট)" },
-  { value: "box", label: "box (বাক্স)" },
-  { value: "dozen", label: "dozen (ডজন)" },
-  { value: "pair", label: "pair (জোড়া)" },
-  { value: "bottle", label: "bottle (বোতল)" },
-  { value: "bundle", label: "bundle (আঁটি / বান্ডিল)" },
+  { value: 'kg', label: 'kg (Kilogram)' },
+  { value: 'gram', label: 'gram (g)' },
+  { value: 'piece', label: 'piece (টি / পিস)' },
+  { value: 'liter', label: 'liter (L)' },
+  { value: 'ml', label: 'ml (Milliliter)' },
+  { value: 'pack', label: 'pack (প্যাকেট)' },
+  { value: 'box', label: 'box (বাক্স)' },
+  { value: 'dozen', label: 'dozen (ডজন)' },
+  { value: 'pair', label: 'pair (জোড়া)' },
+  { value: 'bottle', label: 'bottle (বোতল)' },
+  { value: 'bundle', label: 'bundle (আঁটি / বান্ডিল)' },
 ];
 
 const productFormSchema = z.object({
-  nameEn: z.string().min(2, "English name is required"),
-  nameBn: z.string().min(2, "Bangla name is required"),
+  nameEn: z.string().min(2, 'English name is required'),
+  nameBn: z.string().min(2, 'Bangla name is required'),
   shortDescriptionEn: z.string().optional().nullable(),
   shortDescriptionBn: z.string().optional().nullable(),
   descriptionEn: z.string().optional().nullable(),
   descriptionBn: z.string().optional().nullable(),
-  categoryId: z.string().min(1, "Category is required"),
+  categoryId: z.string().min(1, 'Category is required'),
   subCategoryId: z.string().optional().nullable(),
   brandId: z.string().optional().nullable(),
   sku: z.string().optional().nullable(),
   barcode: z.string().optional().nullable(),
-  price: z.coerce.number().min(0, "Price must be 0 or higher"),
+  price: z.coerce.number().min(0, 'Price must be 0 or higher'),
   compareAtPrice: z.coerce.number().min(0).optional().nullable(),
-  stock: z.coerce.number().int().min(0, "Stock must be 0 or higher"),
-  unit: z.string().min(1, "Unit is required"),
-  status: z.string().default("PUBLISHED"),
+  stock: z.coerce.number().int().min(0, 'Stock must be 0 or higher'),
+  unit: z.string().min(1, 'Unit is required'),
+  status: z.string().default('PUBLISHED'),
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),
 });
@@ -93,28 +93,28 @@ export function AddProductDialog() {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
-      nameEn: "",
-      nameBn: "",
-      shortDescriptionEn: "",
-      shortDescriptionBn: "",
-      descriptionEn: "",
-      descriptionBn: "",
-      categoryId: "",
+      nameEn: '',
+      nameBn: '',
+      shortDescriptionEn: '',
+      shortDescriptionBn: '',
+      descriptionEn: '',
+      descriptionBn: '',
+      categoryId: '',
       subCategoryId: null,
       brandId: null,
-      sku: "",
-      barcode: "",
+      sku: '',
+      barcode: '',
       price: 0,
       compareAtPrice: null,
       stock: 10,
-      unit: "piece",
-      status: "PUBLISHED",
+      unit: 'piece',
+      status: 'PUBLISHED',
       isFeatured: false,
       isActive: true,
     },
   });
 
-  const selectedCategoryId = form.watch("categoryId");
+  const selectedCategoryId = form.watch('categoryId');
 
   // Subcategories belonging to selected category
   const availableSubcategories = useMemo(() => {
@@ -130,7 +130,7 @@ export function AddProductDialog() {
       (b) =>
         !b.categories ||
         b.categories.length === 0 ||
-        b.categories.some((c) => c.id === selectedCategoryId),
+        b.categories.some((c) => c.id === selectedCategoryId)
     );
   }, [brandsData, selectedCategoryId]);
 
@@ -139,31 +139,24 @@ export function AddProductDialog() {
       await createProduct({
         ...values,
         subCategoryId:
-          values.subCategoryId === "NONE" || !values.subCategoryId
+          values.subCategoryId === 'NONE' || !values.subCategoryId
             ? undefined
             : values.subCategoryId,
-        brandId:
-          values.brandId === "NONE" || !values.brandId
-            ? undefined
-            : values.brandId,
-        compareAtPrice: values.compareAtPrice
-          ? Number(values.compareAtPrice)
-          : undefined,
+        brandId: values.brandId === 'NONE' || !values.brandId ? undefined : values.brandId,
+        compareAtPrice: values.compareAtPrice ? Number(values.compareAtPrice) : undefined,
       }).unwrap();
-      toast.success("Product created successfully in master catalog");
+      toast.success('Product created successfully in master catalog');
       setOpen(false);
       form.reset();
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || "Failed to create product");
+      toast.error(getApiErrorMessage(error) || 'Failed to create product');
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="text-xs sm:text-sm h-9 sm:h-10">
-          Add New Product
-        </Button>
+        <Button className="text-xs sm:text-sm h-9 sm:h-10">Add New Product</Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -198,10 +191,7 @@ export function AddProductDialog() {
                     <FormItem>
                       <FormLabel>Product Name (Bangla) *</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="যেমন: মিনিকেট চাল ৫ কেজি"
-                          {...field}
-                        />
+                        <Input placeholder="যেমন: মিনিকেট চাল ৫ কেজি" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -219,7 +209,7 @@ export function AddProductDialog() {
                       <FormControl>
                         <Input
                           placeholder="Brief summary"
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -236,7 +226,7 @@ export function AddProductDialog() {
                       <FormControl>
                         <Input
                           placeholder="সংক্ষিপ্ত বিবরণ"
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -257,7 +247,7 @@ export function AddProductDialog() {
                         <Textarea
                           rows={3}
                           placeholder="Detailed product specifications..."
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -275,7 +265,7 @@ export function AddProductDialog() {
                         <Textarea
                           rows={3}
                           placeholder="বিস্তারিত বিবরণ..."
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -302,7 +292,7 @@ export function AddProductDialog() {
                         value={field.value}
                         onValueChange={(val) => {
                           field.onChange(val);
-                          form.setValue("subCategoryId", null);
+                          form.setValue('subCategoryId', null);
                         }}
                       >
                         <FormControl>
@@ -330,10 +320,8 @@ export function AddProductDialog() {
                     <FormItem>
                       <FormLabel>Subcategory</FormLabel>
                       <Select
-                        value={field.value || "NONE"}
-                        onValueChange={(val) =>
-                          field.onChange(val === "NONE" ? null : val)
-                        }
+                        value={field.value || 'NONE'}
+                        onValueChange={(val) => field.onChange(val === 'NONE' ? null : val)}
                         disabled={availableSubcategories.length === 0}
                       >
                         <FormControl>
@@ -341,8 +329,8 @@ export function AddProductDialog() {
                             <SelectValue
                               placeholder={
                                 availableSubcategories.length === 0
-                                  ? "No subcategories"
-                                  : "Select Subcategory"
+                                  ? 'No subcategories'
+                                  : 'Select Subcategory'
                               }
                             />
                           </SelectTrigger>
@@ -368,10 +356,8 @@ export function AddProductDialog() {
                     <FormItem>
                       <FormLabel>Brand</FormLabel>
                       <Select
-                        value={field.value || "NONE"}
-                        onValueChange={(val) =>
-                          field.onChange(val === "NONE" ? null : val)
-                        }
+                        value={field.value || 'NONE'}
+                        onValueChange={(val) => field.onChange(val === 'NONE' ? null : val)}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -379,9 +365,7 @@ export function AddProductDialog() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="NONE">
-                            — None / Generic —
-                          </SelectItem>
+                          <SelectItem value="NONE">— None / Generic —</SelectItem>
                           {availableBrands.map((b) => (
                             <SelectItem key={b.id} value={b.id}>
                               {b.nameEn}
@@ -428,7 +412,7 @@ export function AddProductDialog() {
                           step="0.01"
                           min={0}
                           placeholder="Optional strikethrough price"
-                          value={field.value ?? ""}
+                          value={field.value ?? ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -443,10 +427,7 @@ export function AddProductDialog() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Unit *</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
+                      <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select unit" />
@@ -496,7 +477,7 @@ export function AddProductDialog() {
                       <FormControl>
                         <Input
                           placeholder="e.g. GB-RICE-01"
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -514,7 +495,7 @@ export function AddProductDialog() {
                       <FormControl>
                         <Input
                           placeholder="e.g. 894110000000"
-                          value={field.value || ""}
+                          value={field.value || ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -537,26 +518,19 @@ export function AddProductDialog() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
+                      <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="PUBLISHED">
-                            Published (লাইভ)
-                          </SelectItem>
+                          <SelectItem value="PUBLISHED">Published (লাইভ)</SelectItem>
                           <SelectItem value="PENDING_REVIEW">
                             Pending Review (পর্যালোচনাধীন)
                           </SelectItem>
                           <SelectItem value="DRAFT">Draft (খসড়া)</SelectItem>
-                          <SelectItem value="UNPUBLISHED">
-                            Unpublished (অপ্রকাশিত)
-                          </SelectItem>
+                          <SelectItem value="UNPUBLISHED">Unpublished (অপ্রকাশিত)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -574,10 +548,7 @@ export function AddProductDialog() {
                         <FormDescription>Highlight on homepage</FormDescription>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -590,15 +561,10 @@ export function AddProductDialog() {
                     <FormItem className="flex items-center justify-between rounded-lg border p-3 shadow-xs">
                       <div>
                         <FormLabel>Active in Catalog</FormLabel>
-                        <FormDescription>
-                          Available for ordering
-                        </FormDescription>
+                        <FormDescription>Available for ordering</FormDescription>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -607,7 +573,7 @@ export function AddProductDialog() {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating Product..." : "Create Master Product"}
+              {isLoading ? 'Creating Product...' : 'Create Master Product'}
             </Button>
           </form>
         </Form>
@@ -632,30 +598,28 @@ export function EditProductDialog({
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     values: {
-      nameEn: product?.nameEn || "",
-      nameBn: product?.nameBn || "",
-      shortDescriptionEn: product?.shortDescriptionEn || "",
-      shortDescriptionBn: product?.shortDescriptionBn || "",
-      descriptionEn: product?.descriptionEn || "",
-      descriptionBn: product?.descriptionBn || "",
-      categoryId: product?.categoryId || "",
+      nameEn: product?.nameEn || '',
+      nameBn: product?.nameBn || '',
+      shortDescriptionEn: product?.shortDescriptionEn || '',
+      shortDescriptionBn: product?.shortDescriptionBn || '',
+      descriptionEn: product?.descriptionEn || '',
+      descriptionBn: product?.descriptionBn || '',
+      categoryId: product?.categoryId || '',
       subCategoryId: product?.subCategoryId || null,
       brandId: product?.brandId || null,
-      sku: product?.sku || "",
-      barcode: product?.barcode || "",
+      sku: product?.sku || '',
+      barcode: product?.barcode || '',
       price: Number(product?.price || 0),
-      compareAtPrice: product?.compareAtPrice
-        ? Number(product.compareAtPrice)
-        : null,
+      compareAtPrice: product?.compareAtPrice ? Number(product.compareAtPrice) : null,
       stock: product?.stock || 0,
-      unit: product?.unit || "piece",
-      status: product?.status || "PUBLISHED",
+      unit: product?.unit || 'piece',
+      status: product?.status || 'PUBLISHED',
       isFeatured: !!product?.isFeatured,
       isActive: !!product?.isActive,
     },
   });
 
-  const selectedCategoryId = form.watch("categoryId");
+  const selectedCategoryId = form.watch('categoryId');
 
   const availableSubcategories = useMemo(() => {
     if (!selectedCategoryId || !tree) return [];
@@ -670,7 +634,7 @@ export function EditProductDialog({
       (b) =>
         !b.categories ||
         b.categories.length === 0 ||
-        b.categories.some((c) => c.id === selectedCategoryId),
+        b.categories.some((c) => c.id === selectedCategoryId)
     );
   }, [brandsData, selectedCategoryId]);
 
@@ -681,22 +645,17 @@ export function EditProductDialog({
         data: {
           ...values,
           subCategoryId:
-            values.subCategoryId === "NONE" || !values.subCategoryId
+            values.subCategoryId === 'NONE' || !values.subCategoryId
               ? undefined
               : values.subCategoryId,
-          brandId:
-            values.brandId === "NONE" || !values.brandId
-              ? undefined
-              : values.brandId,
-          compareAtPrice: values.compareAtPrice
-            ? Number(values.compareAtPrice)
-            : undefined,
+          brandId: values.brandId === 'NONE' || !values.brandId ? undefined : values.brandId,
+          compareAtPrice: values.compareAtPrice ? Number(values.compareAtPrice) : undefined,
         },
       }).unwrap();
-      toast.success("Product updated successfully");
+      toast.success('Product updated successfully');
       onOpenChange(false);
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || "Failed to update product");
+      toast.error(getApiErrorMessage(error) || 'Failed to update product');
     }
   };
 
@@ -750,10 +709,7 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>Short Description (English)</FormLabel>
                       <FormControl>
-                        <Input
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                        />
+                        <Input value={field.value || ''} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -766,10 +722,7 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>Short Description (Bangla)</FormLabel>
                       <FormControl>
-                        <Input
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                        />
+                        <Input value={field.value || ''} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -785,11 +738,7 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>Full Description (English)</FormLabel>
                       <FormControl>
-                        <Textarea
-                          rows={3}
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                        />
+                        <Textarea rows={3} value={field.value || ''} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -802,11 +751,7 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>Full Description (Bangla)</FormLabel>
                       <FormControl>
-                        <Textarea
-                          rows={3}
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                        />
+                        <Textarea rows={3} value={field.value || ''} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -830,7 +775,7 @@ export function EditProductDialog({
                         value={field.value}
                         onValueChange={(val) => {
                           field.onChange(val);
-                          form.setValue("subCategoryId", null);
+                          form.setValue('subCategoryId', null);
                         }}
                       >
                         <FormControl>
@@ -858,10 +803,8 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>Subcategory</FormLabel>
                       <Select
-                        value={field.value || "NONE"}
-                        onValueChange={(val) =>
-                          field.onChange(val === "NONE" ? null : val)
-                        }
+                        value={field.value || 'NONE'}
+                        onValueChange={(val) => field.onChange(val === 'NONE' ? null : val)}
                         disabled={availableSubcategories.length === 0}
                       >
                         <FormControl>
@@ -869,8 +812,8 @@ export function EditProductDialog({
                             <SelectValue
                               placeholder={
                                 availableSubcategories.length === 0
-                                  ? "No subcategories"
-                                  : "Select Subcategory"
+                                  ? 'No subcategories'
+                                  : 'Select Subcategory'
                               }
                             />
                           </SelectTrigger>
@@ -896,10 +839,8 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>Brand</FormLabel>
                       <Select
-                        value={field.value || "NONE"}
-                        onValueChange={(val) =>
-                          field.onChange(val === "NONE" ? null : val)
-                        }
+                        value={field.value || 'NONE'}
+                        onValueChange={(val) => field.onChange(val === 'NONE' ? null : val)}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -907,9 +848,7 @@ export function EditProductDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="NONE">
-                            — None / Generic —
-                          </SelectItem>
+                          <SelectItem value="NONE">— None / Generic —</SelectItem>
                           {availableBrands.map((b) => (
                             <SelectItem key={b.id} value={b.id}>
                               {b.nameEn}
@@ -954,7 +893,7 @@ export function EditProductDialog({
                           type="number"
                           step="0.01"
                           min={0}
-                          value={field.value ?? ""}
+                          value={field.value ?? ''}
                           onChange={field.onChange}
                         />
                       </FormControl>
@@ -969,10 +908,7 @@ export function EditProductDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Unit *</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
+                      <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue />
@@ -1019,10 +955,7 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>SKU</FormLabel>
                       <FormControl>
-                        <Input
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                        />
+                        <Input value={field.value || ''} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1036,10 +969,7 @@ export function EditProductDialog({
                     <FormItem>
                       <FormLabel>Barcode</FormLabel>
                       <FormControl>
-                        <Input
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                        />
+                        <Input value={field.value || ''} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1059,26 +989,19 @@ export function EditProductDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
+                      <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="PUBLISHED">
-                            Published (লাইভ)
-                          </SelectItem>
+                          <SelectItem value="PUBLISHED">Published (লাইভ)</SelectItem>
                           <SelectItem value="PENDING_REVIEW">
                             Pending Review (পর্যালোচনাধীন)
                           </SelectItem>
                           <SelectItem value="DRAFT">Draft (খসড়া)</SelectItem>
-                          <SelectItem value="UNPUBLISHED">
-                            Unpublished (অপ্রকাশিত)
-                          </SelectItem>
+                          <SelectItem value="UNPUBLISHED">Unpublished (অপ্রকাশিত)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -1095,10 +1018,7 @@ export function EditProductDialog({
                         <FormLabel>Featured Product</FormLabel>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -1113,10 +1033,7 @@ export function EditProductDialog({
                         <FormLabel>Active</FormLabel>
                       </div>
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -1125,7 +1042,7 @@ export function EditProductDialog({
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Saving..." : "Save Product Changes"}
+              {isLoading ? 'Saving...' : 'Save Product Changes'}
             </Button>
           </form>
         </Form>
@@ -1143,12 +1060,9 @@ export function ProductImagesDialog({
   open: boolean;
   onOpenChange: (o: boolean) => void;
 }) {
-  const [uploadImages, { isLoading: isUploading }] =
-    useUploadProductImagesMutation();
-  const [setPrimary, { isLoading: isSettingPrimary }] =
-    useSetPrimaryProductImageMutation();
-  const [deleteImage, { isLoading: isDeleting }] =
-    useDeleteProductImageMutation();
+  const [uploadImages, { isLoading: isUploading }] = useUploadProductImagesMutation();
+  const [setPrimary, { isLoading: isSettingPrimary }] = useSetPrimaryProductImageMutation();
+  const [deleteImage, { isLoading: isDeleting }] = useDeleteProductImageMutation();
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1157,24 +1071,24 @@ export function ProductImagesDialog({
 
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i]);
+      formData.append('files', files[i]);
     }
 
     try {
       await uploadImages({ productId: product.id, formData }).unwrap();
-      toast.success("Images uploaded successfully");
-      e.target.value = "";
+      toast.success('Images uploaded successfully');
+      e.target.value = '';
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || "Failed to upload images");
+      toast.error(getApiErrorMessage(error) || 'Failed to upload images');
     }
   };
 
   const handleSetPrimary = async (imageId: string) => {
     try {
       await setPrimary({ productId: product.id, imageId }).unwrap();
-      toast.success("Primary image updated");
+      toast.success('Primary image updated');
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || "Failed to set primary image");
+      toast.error(getApiErrorMessage(error) || 'Failed to set primary image');
     }
   };
 
@@ -1185,10 +1099,10 @@ export function ProductImagesDialog({
         productId: product.id,
         imageId: imageToDelete,
       }).unwrap();
-      toast.success("Image deleted");
+      toast.success('Image deleted');
       setImageToDelete(null);
     } catch (error) {
-      toast.error(getApiErrorMessage(error) || "Failed to delete image");
+      toast.error(getApiErrorMessage(error) || 'Failed to delete image');
     }
   };
 
@@ -1213,8 +1127,7 @@ export function ProductImagesDialog({
                 Click to upload images
               </label>
               <p className="text-xs text-muted-foreground mt-1">
-                Supports JPEG, PNG, WebP (Max 5MB each, validated with magic
-                bytes)
+                Supports JPEG, PNG, WebP (Max 5MB each, validated with magic bytes)
               </p>
             </div>
             <input
@@ -1236,9 +1149,7 @@ export function ProductImagesDialog({
 
           {/* Current Images Grid */}
           <div>
-            <h4 className="text-sm font-semibold mb-3">
-              Stored Product Images ({images.length})
-            </h4>
+            <h4 className="text-sm font-semibold mb-3">Stored Product Images ({images.length})</h4>
 
             {images.length === 0 ? (
               <div className="text-center py-8 text-sm text-muted-foreground border rounded-lg bg-muted/10">
@@ -1250,7 +1161,7 @@ export function ProductImagesDialog({
                   <div
                     key={img.id}
                     className={`relative group rounded-xl border overflow-hidden p-2 flex flex-col gap-2 bg-card ${
-                      img.isPrimary ? "ring-2 ring-primary border-primary" : ""
+                      img.isPrimary ? 'ring-2 ring-primary border-primary' : ''
                     }`}
                   >
                     <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-muted">

@@ -36,8 +36,7 @@ export class PublicCatalogController {
   @Get('recently-added')
   @ApiOperation({
     summary: 'Retrieve recently added storefront products',
-    description:
-      'Returns latest catalog products sorted by creation timestamp descending.',
+    description: 'Returns latest catalog products sorted by creation timestamp descending.',
   })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 8 })
   @ApiStandardResponse({
@@ -48,9 +47,7 @@ export class PublicCatalogController {
   })
   @ApiCommonErrors([500])
   getRecentlyAdded(@Query('limit') limit?: string) {
-    return this.catalogService.getRecentlyAdded(
-      limit ? parseInt(limit, 10) : 8,
-    );
+    return this.catalogService.getRecentlyAdded(limit ? parseInt(limit, 10) : 8);
   }
 
   @Get('search')
@@ -86,8 +83,7 @@ export class PublicCatalogController {
   @Get('popular')
   @ApiOperation({
     summary: 'Retrieve trending / popular products for storefront',
-    description:
-      'Returns top products ordered by customer demand and sales volume.',
+    description: 'Returns top products ordered by customer demand and sales volume.',
   })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 8 })
   @ApiStandardResponse({
@@ -144,8 +140,7 @@ export class PublicCatalogController {
   @Get('brands')
   @ApiOperation({
     summary: 'List active storefront brands',
-    description:
-      'Returns all active brand partners for brand sliders and filters.',
+    description: 'Returns all active brand partners for brand sliders and filters.',
   })
   @ApiStandardResponse({
     type: BrandResponseDto,
@@ -183,8 +178,7 @@ export class PublicCatalogController {
   @Get(':slug/related')
   @ApiOperation({
     summary: 'Retrieve related product recommendations',
-    description:
-      'Returns related products sharing same category or brand taxonomy.',
+    description: 'Returns related products sharing same category or brand taxonomy.',
   })
   @ApiParam({ name: 'slug', type: String, example: 'organic-red-potato' })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 5 })
@@ -195,13 +189,7 @@ export class PublicCatalogController {
     description: 'Related product recommendations',
   })
   @ApiCommonErrors([404, 500])
-  getRelatedProducts(
-    @Param('slug') slug: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.catalogService.getRelatedProducts(
-      slug,
-      limit ? parseInt(limit, 10) : 5,
-    );
+  getRelatedProducts(@Param('slug') slug: string, @Query('limit') limit?: string) {
+    return this.catalogService.getRelatedProducts(slug, limit ? parseInt(limit, 10) : 5);
   }
 }

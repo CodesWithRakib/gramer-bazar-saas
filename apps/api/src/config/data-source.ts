@@ -11,7 +11,8 @@ config({ path: join(process.cwd(), '.env') });
 config({ path: join(__dirname, '../../.env') });
 config({ path: join(__dirname, '../../../.env') });
 
-const dbUrl = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/gramer_bazar';
+const dbUrl =
+  process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/gramer_bazar';
 const isSsl = dbUrl.includes('sslmode=require') || process.env.NODE_ENV === 'production';
 
 export const dataSourceOptions: DataSourceOptions = {

@@ -15,14 +15,12 @@ export default function NotFound() {
         {isBn ? 'পাতা খুঁজে পাওয়া যায়নি' : 'Page Not Found'}
       </h2>
       <p className="text-muted-foreground mb-8 max-w-md">
-        {isBn 
-          ? 'আপনি যে পাতাটি খুঁজছেন তা আমরা খুঁজে পাইনি।' 
-          : 'We couldn\'t find the page you were looking for.'}
+        {isBn
+          ? 'আপনি যে পাতাটি খুঁজছেন তা আমরা খুঁজে পাইনি।'
+          : "We couldn't find the page you were looking for."}
       </p>
       <Button asChild size="lg">
-        <Link href={isBn ? "/bn" : "/en"}>
-          {isBn ? 'হোমে ফিরে যান' : 'Return Home'}
-        </Link>
+        <Link href={isBn ? '/bn' : '/en'}>{isBn ? 'হোমে ফিরে যান' : 'Return Home'}</Link>
       </Button>
     </div>
   );

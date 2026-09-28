@@ -23,7 +23,9 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{isBn ? 'অর্ডার বিস্তারিত' : 'Order Details'} - {order.id.slice(-8).toUpperCase()}</h1>
+      <h1 className="text-2xl font-bold">
+        {isBn ? 'অর্ডার বিস্তারিত' : 'Order Details'} - {order.id.slice(-8).toUpperCase()}
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
@@ -33,18 +35,26 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
           <CardContent>
             <div className="flex flex-col gap-4">
               <div>
-                <p><strong>{isBn ? 'নাম' : 'Name'}:</strong> {order.user?.firstName} {order.user?.lastName}</p>
-                <p><strong>{isBn ? 'ফোন' : 'Phone'}:</strong> {order.user?.phone}</p>
-                <p><strong>{isBn ? 'ঠিকানা' : 'Address'}:</strong> {order.address?.street}, {order.address?.city}</p>
+                <p>
+                  <strong>{isBn ? 'নাম' : 'Name'}:</strong> {order.user?.firstName}{' '}
+                  {order.user?.lastName}
+                </p>
+                <p>
+                  <strong>{isBn ? 'ফোন' : 'Phone'}:</strong> {order.user?.phone}
+                </p>
+                <p>
+                  <strong>{isBn ? 'ঠিকানা' : 'Address'}:</strong> {order.address?.street},{' '}
+                  {order.address?.city}
+                </p>
               </div>
               {order.user?.id && (
                 <div className="pt-4 border-t">
-                  <StartChatButton 
-                    participantId={order.user.id} 
-                    lang={lang} 
+                  <StartChatButton
+                    participantId={order.user.id}
+                    lang={lang}
                     referenceId={order.id}
                     referenceType="ORDER"
-                    buttonText={isBn ? 'গ্রাহককে মেসেজ দিন' : 'Message Customer'} 
+                    buttonText={isBn ? 'গ্রাহককে মেসেজ দিন' : 'Message Customer'}
                     redirectPath={`/${lang}/seller/messages`}
                   />
                 </div>
@@ -58,8 +68,12 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
             <CardTitle>{isBn ? 'অর্ডার সামারি' : 'Order Summary'}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p><strong>{isBn ? 'স্ট্যাটাস' : 'Status'}:</strong> <Badge>{order.status}</Badge></p>
-            <p><strong>{isBn ? 'আপনার সাবটোটাল' : 'Your Subtotal'}:</strong> ৳ {order.sellerSubtotal}</p>
+            <p>
+              <strong>{isBn ? 'স্ট্যাটাস' : 'Status'}:</strong> <Badge>{order.status}</Badge>
+            </p>
+            <p>
+              <strong>{isBn ? 'আপনার সাবটোটাল' : 'Your Subtotal'}:</strong> ৳ {order.sellerSubtotal}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -73,7 +87,10 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
             {order.items.map((item) => (
               <div key={item.id} className="py-4 flex justify-between">
                 <div>
-                  <p className="font-medium">{item.sellerProduct?.productVariant?.nameEn || item.sellerProduct?.productVariant?.product?.nameEn}</p>
+                  <p className="font-medium">
+                    {item.sellerProduct?.productVariant?.nameEn ||
+                      item.sellerProduct?.productVariant?.product?.nameEn}
+                  </p>
                   <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
                 <div className="font-bold">৳ {item.subtotal}</div>

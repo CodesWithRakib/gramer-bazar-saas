@@ -48,7 +48,9 @@ export class CreateCategoryDto {
   @IsOptional()
   sortOrder?: number;
 
-  @ApiPropertyOptional({ description: 'True if products in this category require a license to sell' })
+  @ApiPropertyOptional({
+    description: 'True if products in this category require a license to sell',
+  })
   @IsOptional()
   @IsBoolean()
   isRegulated?: boolean;

@@ -20,7 +20,10 @@ export interface Coupon {
 
 export const couponsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getAdminCoupons: builder.query<{ data: Coupon[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
+    getAdminCoupons: builder.query<
+      { data: Coupon[]; meta: PaginationMeta },
+      { page?: number; limit?: number; search?: string }
+    >({
       query: (params) => ({
         url: '/admin/coupons',
         params,
@@ -50,7 +53,10 @@ export const couponsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Coupon'],
     }),
-    getSellerCoupons: builder.query<{ data: Coupon[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
+    getSellerCoupons: builder.query<
+      { data: Coupon[]; meta: PaginationMeta },
+      { page?: number; limit?: number; search?: string }
+    >({
       query: (params) => ({
         url: '/seller/coupons',
         params,
@@ -88,7 +94,10 @@ export const couponsApi = api.injectEndpoints({
       query: () => '/public/coupons',
       providesTags: ['Coupon'],
     }),
-    validateCoupon: builder.mutation<{ discountAmount: number; subtotalAfterDiscount: number; code: string; couponId: string }, { code: string; subtotal: number }>({
+    validateCoupon: builder.mutation<
+      { discountAmount: number; subtotalAfterDiscount: number; code: string; couponId: string },
+      { code: string; subtotal: number }
+    >({
       query: (body) => ({
         url: '/coupons/validate',
         method: 'POST',

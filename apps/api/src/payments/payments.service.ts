@@ -19,7 +19,10 @@ import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
-import { NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
+import {
+  NotificationType,
+  NotificationPriority,
+} from '../notifications/entities/notification.entity.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
@@ -103,7 +106,13 @@ export class PaymentsService {
     lang = 'en',
     entityManager?: EntityManager,
   ): Promise<string> {
-    const res = await this.createPaymentAttempt(order, customerInfo, lang, redirectUrl, entityManager);
+    const res = await this.createPaymentAttempt(
+      order,
+      customerInfo,
+      lang,
+      redirectUrl,
+      entityManager,
+    );
     return res.paymentUrl;
   }
 
@@ -152,7 +161,8 @@ export class PaymentsService {
     // 2. SSLCOMMERZ Configuration (dynamic with .env fallback)
     const dynamicConfig = await this.settingsService?.getSslcommerzConfig();
     const storeId = dynamicConfig?.storeId || this.configService.get<string>('SSLCOMMERZ_STORE_ID');
-    const storePassword = dynamicConfig?.storePassword || this.configService.get<string>('SSLCOMMERZ_STORE_PASSWORD');
+    const storePassword =
+      dynamicConfig?.storePassword || this.configService.get<string>('SSLCOMMERZ_STORE_PASSWORD');
     const isLive =
       dynamicConfig?.isLive ??
       (this.configService.get<string>('SSLCOMMERZ_IS_LIVE') === 'true' ||
@@ -216,7 +226,9 @@ export class PaymentsService {
     };
 
     try {
-      this.logger.log(`Initiating SSLCOMMERZ V4 session for TranID: ${transactionId} via ${paymentUrl}`);
+      this.logger.log(
+        `Initiating SSLCOMMERZ V4 session for TranID: ${transactionId} via ${paymentUrl}`,
+      );
       const params = new URLSearchParams(postData);
       const response = await axios.post(paymentUrl, params.toString(), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -261,11 +273,9 @@ export class PaymentsService {
    */
   async validateServerSide(valId: string): Promise<any> {
     const dynamicConfig = await this.settingsService?.getSslcommerzConfig();
-    const storeId =
-      dynamicConfig?.storeId || this.configService.get<string>('SSLCOMMERZ_STORE_ID');
+    const storeId = dynamicConfig?.storeId || this.configService.get<string>('SSLCOMMERZ_STORE_ID');
     const storePassword =
-      dynamicConfig?.storePassword ||
-      this.configService.get<string>('SSLCOMMERZ_STORE_PASSWORD');
+      dynamicConfig?.storePassword || this.configService.get<string>('SSLCOMMERZ_STORE_PASSWORD');
     const isLive =
       dynamicConfig?.isLive ??
       (this.configService.get<string>('SSLCOMMERZ_IS_LIVE') === 'true' ||
@@ -644,8 +654,7 @@ export class PaymentsService {
       throw new NotFoundException('Order not found');
     }
 
-    const isAdmin =
-      userRoles.includes(Role.ADMIN) || userRoles.includes(Role.SUPER_ADMIN);
+    const isAdmin = userRoles.includes(Role.ADMIN) || userRoles.includes(Role.SUPER_ADMIN);
     if (order.userId !== userId && !isAdmin) {
       throw new ForbiddenException('You do not have permission to retry payment for this order.');
     }
@@ -689,8 +698,7 @@ export class PaymentsService {
       throw new NotFoundException('Payment record not found.');
     }
 
-    const isAdmin =
-      userRoles.includes(Role.ADMIN) || userRoles.includes(Role.SUPER_ADMIN);
+    const isAdmin = userRoles.includes(Role.ADMIN) || userRoles.includes(Role.SUPER_ADMIN);
     if (payment.userId !== userId && !isAdmin) {
       throw new ForbiddenException('You do not have permission to view this payment.');
     }
@@ -711,8 +719,7 @@ export class PaymentsService {
       throw new NotFoundException('Order not found.');
     }
 
-    const isAdmin =
-      userRoles.includes(Role.ADMIN) || userRoles.includes(Role.SUPER_ADMIN);
+    const isAdmin = userRoles.includes(Role.ADMIN) || userRoles.includes(Role.SUPER_ADMIN);
     if (order.userId !== userId && !isAdmin) {
       throw new ForbiddenException('You do not have permission to view this order payment.');
     }

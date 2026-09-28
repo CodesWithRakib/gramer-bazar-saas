@@ -8,9 +8,7 @@ export const getUserRoles = (user: UserProfile | null | undefined): string[] => 
   if (!user) return [];
   const roles = Array.isArray(user.roles) ? user.roles : [];
   return roles
-    .map((r: string | { name?: string }) =>
-      typeof r === 'string' ? r : (r?.name ?? ''),
-    )
+    .map((r: string | { name?: string }) => (typeof r === 'string' ? r : (r?.name ?? '')))
     .filter(Boolean);
 };
 

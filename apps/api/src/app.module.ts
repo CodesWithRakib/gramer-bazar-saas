@@ -66,14 +66,11 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
       useFactory: (configService: ConfigService) => {
         const dbUrl = configService.get<string>('database.url');
         const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
-        const isSsl =
-          dbUrl?.includes('sslmode=require') || nodeEnv === 'production';
+        const isSsl = dbUrl?.includes('sslmode=require') || nodeEnv === 'production';
         const syncEnabled =
           configService.get<string>('DB_SYNCHRONIZE') === 'true' ||
-          (nodeEnv !== 'production' &&
-            configService.get<string>('DB_SYNCHRONIZE') !== 'false');
-        const migrationsRun =
-          configService.get<string>('MIGRATIONS_RUN') === 'true';
+          (nodeEnv !== 'production' && configService.get<string>('DB_SYNCHRONIZE') !== 'false');
+        const migrationsRun = configService.get<string>('MIGRATIONS_RUN') === 'true';
 
         return {
           type: 'postgres',
@@ -97,12 +94,8 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
 
         // Automatically synthesize standard Redis TLS URL if Upstash REST URL and token are provided
         if (!redisUrl) {
-          const upstashUrl = configService.get<string>(
-            'UPSTASH_REDIS_REST_URL',
-          );
-          const upstashToken = configService.get<string>(
-            'UPSTASH_REDIS_REST_TOKEN',
-          );
+          const upstashUrl = configService.get<string>('UPSTASH_REDIS_REST_URL');
+          const upstashToken = configService.get<string>('UPSTASH_REDIS_REST_TOKEN');
           if (upstashUrl && upstashToken) {
             try {
               const host = new URL(upstashUrl).hostname;
@@ -136,9 +129,7 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
       {
         ttl: Number(process.env.THROTTLE_TTL_MS ?? 60000),
         limit:
-          process.env.NODE_ENV === 'test' ||
-          process.env.SKIP_THROTTLE === 'true' ||
-          process.env.CI
+          process.env.NODE_ENV === 'test' || process.env.SKIP_THROTTLE === 'true' || process.env.CI
             ? 10000
             : Number(process.env.THROTTLE_LIMIT ?? 500),
       },

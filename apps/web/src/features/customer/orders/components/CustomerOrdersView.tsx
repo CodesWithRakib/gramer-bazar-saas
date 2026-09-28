@@ -56,9 +56,7 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
           return status === 'confirmed' || status === 'processing';
         case 'to-receive':
           return (
-            status === 'shipped' ||
-            status === 'out_for_delivery' ||
-            status === 'ready_for_pickup'
+            status === 'shipped' || status === 'out_for_delivery' || status === 'ready_for_pickup'
           );
         case 'completed':
           return status === 'delivered' || status === 'picked_up';
@@ -177,7 +175,10 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
           </div>
         </div>
 
-        <TabsContent value={activeTab} className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+        <TabsContent
+          value={activeTab}
+          className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+        >
           {filteredOrders.length > 0 ? (
             <div className="space-y-4">
               {filteredOrders.map((order) => (

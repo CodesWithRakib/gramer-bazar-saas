@@ -1,9 +1,9 @@
-import { SellerDisputeDetailsView } from "@/features/seller/disputes";
+import { SellerDisputeDetailsView } from '@/features/seller/disputes';
 
 export default async function SellerDisputeDetailsPage({
   params,
 }: {
-  params: Promise<{ lang: "ar" | "en"; id: string }>;
+  params: Promise<{ lang: string; id: string }>;
 }) {
   const { lang, id } = await params;
   return <SellerDisputeDetailsView lang={lang} id={id} />;

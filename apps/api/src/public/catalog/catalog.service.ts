@@ -56,17 +56,15 @@ export class CatalogService {
     }
 
     if (categoryId) {
-      query.andWhere(
-        '(p.categoryId = :categoryId OR p.subCategoryId = :categoryId)',
-        { categoryId },
-      );
+      query.andWhere('(p.categoryId = :categoryId OR p.subCategoryId = :categoryId)', {
+        categoryId,
+      });
     }
 
     if (searchDto.categorySlug) {
-      query.andWhere(
-        '(cat.slug = :categorySlug OR subCat.slug = :categorySlug)',
-        { categorySlug: searchDto.categorySlug },
-      );
+      query.andWhere('(cat.slug = :categorySlug OR subCat.slug = :categorySlug)', {
+        categorySlug: searchDto.categorySlug,
+      });
     }
 
     if (subCategoryId) {
@@ -135,9 +133,7 @@ export class CatalogService {
     };
   }
 
-  private async populateProductsMetadata(
-    items: SellerProduct[],
-  ): Promise<SellerProduct[]> {
+  private async populateProductsMetadata(items: SellerProduct[]): Promise<SellerProduct[]> {
     if (!items || items.length === 0) return items;
 
     // Ensure pv.images has images from p.images if variant images is null or empty
@@ -156,9 +152,7 @@ export class CatalogService {
     });
 
     // Fetch ratings and attach to products
-    const productIds = items
-      .map((i) => i.productVariant?.product?.id)
-      .filter(Boolean);
+    const productIds = items.map((i) => i.productVariant?.product?.id).filter(Boolean);
     if (productIds.length > 0) {
       const ratings = await this.sellerProductRepo.manager.query(
         `
@@ -170,26 +164,17 @@ export class CatalogService {
         [productIds],
       );
 
-      const ratingsMap = new Map<
-        string,
-        { total_reviews: number; average_rating: number }
-      >(
-        ratings.map(
-          (r: {
-            product_id: string;
-            total_reviews: number;
-            average_rating: number;
-          }) => [r.product_id, r],
-        ),
+      const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
+        ratings.map((r: { product_id: string; total_reviews: number; average_rating: number }) => [
+          r.product_id,
+          r,
+        ]),
       );
 
       items.forEach((item) => {
         if (item.productVariant?.product) {
           const ratingData = ratingsMap.get(item.productVariant.product.id);
-          const p = item.productVariant.product as unknown as Record<
-            string,
-            unknown
-          >;
+          const p = item.productVariant.product as unknown as Record<string, unknown>;
           p.totalReviews = ratingData?.total_reviews || 0;
           p.averageRating = ratingData?.average_rating || 0;
         }
@@ -383,10 +368,7 @@ export class CatalogService {
       .where('sp.isActive = :isActive', { isActive: true })
       .andWhere('pv.isActive = :isActive', { isActive: true })
       .andWhere('p.isActive = :isActive', { isActive: true })
-      .andWhere(
-        '(p.nameEn ILIKE :term OR p.nameBn ILIKE :term OR p.slug ILIKE :term)',
-        { term },
-      )
+      .andWhere('(p.nameEn ILIKE :term OR p.nameBn ILIKE :term OR p.slug ILIKE :term)', { term })
       .take(5)
       .getMany();
 
@@ -394,8 +376,8 @@ export class CatalogService {
       let thumbnail = item.productVariant?.images?.[0];
       if (!thumbnail && item.productVariant?.product?.images?.length) {
         thumbnail =
-          item.productVariant.product.images.find((img) => img.isPrimary)
-            ?.url || item.productVariant.product.images[0]?.url;
+          item.productVariant.product.images.find((img) => img.isPrimary)?.url ||
+          item.productVariant.product.images[0]?.url;
       }
       return {
         id: item.id,
@@ -477,8 +459,7 @@ export class CatalogService {
         items.forEach((item) => {
           if (
             item.productVariant &&
-            (!item.productVariant.images ||
-              item.productVariant.images.length === 0)
+            (!item.productVariant.images || item.productVariant.images.length === 0)
           ) {
             const pImages = item.productVariant.product?.images;
             if (pImages && pImages.length > 0) {
@@ -489,9 +470,7 @@ export class CatalogService {
           }
         });
 
-        const productIds = items
-          .map((i) => i.productVariant?.product?.id)
-          .filter(Boolean);
+        const productIds = items.map((i) => i.productVariant?.product?.id).filter(Boolean);
         if (productIds.length > 0) {
           const ratings = await this.sellerProductRepo.manager.query(
             `
@@ -503,26 +482,19 @@ export class CatalogService {
             [productIds],
           );
 
-          const ratingsMap = new Map<
-            string,
-            { total_reviews: number; average_rating: number }
-          >(
+          const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
             ratings.map(
-              (r: {
-                product_id: string;
-                total_reviews: number;
-                average_rating: number;
-              }) => [r.product_id, r],
+              (r: { product_id: string; total_reviews: number; average_rating: number }) => [
+                r.product_id,
+                r,
+              ],
             ),
           );
 
           items.forEach((item) => {
             if (item.productVariant?.product) {
               const ratingData = ratingsMap.get(item.productVariant.product.id);
-              const p = item.productVariant.product as unknown as Record<
-                string,
-                unknown
-              >;
+              const p = item.productVariant.product as unknown as Record<string, unknown>;
               p.totalReviews = ratingData?.total_reviews || 0;
               p.averageRating = ratingData?.average_rating || 0;
             }
@@ -565,8 +537,16 @@ export class CatalogService {
       .leftJoinAndSelect('p.brand', 'b')
       .leftJoinAndSelect('sp.shop', 'shop')
       .leftJoinAndSelect('sp.inventory', 'inv')
-      .where('sp.isActive = :isActive', { isActive: true })
-      .andWhere('p.slug = :slug', { slug });
+      .where('sp.isActive = :isActive', { isActive: true });
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+    if (isUuid) {
+      query.andWhere('(p.slug = :slug OR p.id = :slug OR sp.id = :slug)', {
+        slug,
+      });
+    } else {
+      query.andWhere('p.slug = :slug', { slug });
+    }
 
     const items = await query.getMany();
 
@@ -589,9 +569,7 @@ export class CatalogService {
       }
     });
 
-    const productIds = items
-      .map((i) => i.productVariant?.product?.id)
-      .filter(Boolean);
+    const productIds = items.map((i) => i.productVariant?.product?.id).filter(Boolean);
     if (productIds.length > 0) {
       const ratings = await this.sellerProductRepo.manager.query(
         `
@@ -603,26 +581,17 @@ export class CatalogService {
         [productIds],
       );
 
-      const ratingsMap = new Map<
-        string,
-        { total_reviews: number; average_rating: number }
-      >(
-        ratings.map(
-          (r: {
-            product_id: string;
-            total_reviews: number;
-            average_rating: number;
-          }) => [r.product_id, r],
-        ),
+      const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
+        ratings.map((r: { product_id: string; total_reviews: number; average_rating: number }) => [
+          r.product_id,
+          r,
+        ]),
       );
 
       items.forEach((item) => {
         if (item.productVariant?.product) {
           const ratingData = ratingsMap.get(item.productVariant.product.id);
-          const p = item.productVariant.product as unknown as Record<
-            string,
-            unknown
-          >;
+          const p = item.productVariant.product as unknown as Record<string, unknown>;
           p.totalReviews = ratingData?.total_reviews || 0;
           p.averageRating = ratingData?.average_rating || 0;
         }
@@ -682,9 +651,7 @@ export class CatalogService {
       }
     });
 
-    const productIds = items
-      .map((i) => i.productVariant?.product?.id)
-      .filter(Boolean);
+    const productIds = items.map((i) => i.productVariant?.product?.id).filter(Boolean);
     if (productIds.length > 0) {
       const ratings = await this.sellerProductRepo.manager.query(
         `
@@ -696,26 +663,17 @@ export class CatalogService {
         [productIds],
       );
 
-      const ratingsMap = new Map<
-        string,
-        { total_reviews: number; average_rating: number }
-      >(
-        ratings.map(
-          (r: {
-            product_id: string;
-            total_reviews: number;
-            average_rating: number;
-          }) => [r.product_id, r],
-        ),
+      const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
+        ratings.map((r: { product_id: string; total_reviews: number; average_rating: number }) => [
+          r.product_id,
+          r,
+        ]),
       );
 
       items.forEach((item) => {
         if (item.productVariant?.product) {
           const ratingData = ratingsMap.get(item.productVariant.product.id);
-          const p = item.productVariant.product as unknown as Record<
-            string,
-            unknown
-          >;
+          const p = item.productVariant.product as unknown as Record<string, unknown>;
           p.totalReviews = ratingData?.total_reviews || 0;
           p.averageRating = ratingData?.average_rating || 0;
         }
@@ -725,4 +683,3 @@ export class CatalogService {
     return items;
   }
 }
-

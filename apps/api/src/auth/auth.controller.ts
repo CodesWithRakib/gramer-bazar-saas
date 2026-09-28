@@ -85,7 +85,8 @@ export class AuthController {
   @Throttle({ default: { limit: SEND_OTP_LIMIT, ttl: 60000 } })
   @ApiOperation({
     summary: 'Request OTP for phone verification or login',
-    description: 'Generates and dispatches a 6-digit OTP code to a Bangladeshi mobile number (public endpoint).',
+    description:
+      'Generates and dispatches a 6-digit OTP code to a Bangladeshi mobile number (public endpoint).',
   })
   @ApiStandardResponse({
     type: SendOtpResponseDto,
@@ -102,7 +103,8 @@ export class AuthController {
   @Throttle({ default: { limit: VERIFY_OTP_LIMIT, ttl: 60000 } })
   @ApiOperation({
     summary: 'Verify OTP code and authenticate',
-    description: 'Validates 6-digit OTP code. If the user does not exist, registers a new CUSTOMER account automatically. Returns access & refresh tokens and sets secure HTTP-only cookies.',
+    description:
+      'Validates 6-digit OTP code. If the user does not exist, registers a new CUSTOMER account automatically. Returns access & refresh tokens and sets secure HTTP-only cookies.',
   })
   @ApiStandardResponse({
     type: AuthResponseDto,
@@ -121,7 +123,8 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({
     summary: 'Reset account password with OTP',
-    description: 'Verifies the OTP sent to user phone and updates account password with new credential.',
+    description:
+      'Verifies the OTP sent to user phone and updates account password with new credential.',
   })
   @ApiStandardMessageResponse({
     status: HttpStatus.OK,
@@ -137,7 +140,8 @@ export class AuthController {
   @Throttle({ default: { limit: REGISTER_LIMIT, ttl: 60000 } })
   @ApiOperation({
     summary: 'Register new user account with credentials',
-    description: 'Registers a new platform user with email, phone, and password (e.g., CUSTOMER, SELLER, RIDER).',
+    description:
+      'Registers a new platform user with email, phone, and password (e.g., CUSTOMER, SELLER, RIDER).',
   })
   @ApiStandardResponse({
     type: AuthResponseDto,
@@ -155,7 +159,8 @@ export class AuthController {
   @Throttle({ default: { limit: LOGIN_LIMIT, ttl: 60000 } })
   @ApiOperation({
     summary: 'Password-based user authentication',
-    description: 'Authenticates administrative staff, sellers, or riders with email/phone and password.',
+    description:
+      'Authenticates administrative staff, sellers, or riders with email/phone and password.',
   })
   @ApiStandardResponse({
     type: AuthResponseDto,
@@ -174,7 +179,8 @@ export class AuthController {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({
     summary: 'Refresh access token using HTTP-only cookie, body, or header',
-    description: 'Reads refresh token from secure cookie, body, or x-refresh-token header, validates signature and database hash, and issues a fresh access token.',
+    description:
+      'Reads refresh token from secure cookie, body, or x-refresh-token header, validates signature and database hash, and issues a fresh access token.',
   })
   @ApiStandardResponse({
     type: AuthResponseDto,
@@ -189,9 +195,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken =
-      req.cookies?.['refresh_token'] ||
-      body?.refreshToken ||
-      req.headers?.['x-refresh-token'];
+      req.cookies?.['refresh_token'] || body?.refreshToken || req.headers?.['x-refresh-token'];
     if (!refreshToken) {
       throw new BadRequestException('Refresh token is missing from cookies, body, or headers');
     }
@@ -289,7 +293,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Upload user profile avatar image',
-    description: 'Uploads a JPEG/PNG/WebP image (up to 5MB) as the profile avatar in cloud storage.',
+    description:
+      'Uploads a JPEG/PNG/WebP image (up to 5MB) as the profile avatar in cloud storage.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -311,9 +316,11 @@ export class AuthController {
     description: 'Avatar uploaded and profile updated with new image URL',
   })
   @ApiCommonErrors([400, 401, 500])
-  @UseInterceptors(FileInterceptor('file', {
-    limits: { fileSize: 5 * 1024 * 1024 },
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 5 * 1024 * 1024 },
+    }),
+  )
   async uploadAvatar(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('File is required');

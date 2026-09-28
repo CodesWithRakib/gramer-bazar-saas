@@ -1,9 +1,20 @@
-import { IsString, IsBoolean, IsOptional, IsDateString, IsArray, ValidateNested, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsOptional,
+  IsDateString,
+  IsArray,
+  ValidateNested,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateFlashSaleItemDto {
-  @ApiProperty({ example: 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', description: 'Seller product UUID' })
+  @ApiProperty({
+    example: 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
+    description: 'Seller product UUID',
+  })
   @IsString()
   sellerProductId: string;
 

@@ -1,4 +1,4 @@
-import { api } from "../../store/api";
+import { api } from '../../store/api';
 
 export interface DashboardMetrics {
   metrics: {
@@ -80,14 +80,13 @@ export interface DemandReport {
 export const analyticsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getDashboardMetrics: builder.query<DashboardMetrics, void>({
-      query: () => "/admin/analytics/dashboard",
-      providesTags: ["Order", "User", "Catalog"], // Invalidate if any of these change
+      query: () => '/admin/analytics/dashboard',
+      providesTags: ['Order', 'User', 'Catalog'], // Invalidate if any of these change
     }),
     getDemandAnalytics: builder.query<DemandReport, void>({
-      query: () => "/admin/analytics/demand",
+      query: () => '/admin/analytics/demand',
     }),
   }),
 });
 
-export const { useGetDashboardMetricsQuery, useGetDemandAnalyticsQuery } =
-  analyticsApi;
+export const { useGetDashboardMetricsQuery, useGetDemandAnalyticsQuery } = analyticsApi;

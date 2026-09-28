@@ -4,7 +4,7 @@ import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 /**
  * Authoritative lifecycle state machine for Orders.
- * 
+ *
  * Rules:
  * - PENDING: Initial state when order is placed.
  * - CONFIRMED: Order confirmed (payment verified or COD accepted).
@@ -90,9 +90,7 @@ export function validateRoleTransition(
         `Order cannot be cancelled because it is already in ${fromStatus} state. Customers can only cancel orders while in PENDING or CONFIRMED state.`,
       );
     }
-    throw new ForbiddenException(
-      `Customers cannot transition orders to ${toStatus}.`,
-    );
+    throw new ForbiddenException(`Customers cannot transition orders to ${toStatus}.`);
   }
 
   // 5. Seller: Can confirm, process, mark ready for pickup, or cancel
@@ -138,7 +136,5 @@ export function validateRoleTransition(
     );
   }
 
-  throw new ForbiddenException(
-    'You are not authorized to perform this order status transition.',
-  );
+  throw new ForbiddenException('You are not authorized to perform this order status transition.');
 }

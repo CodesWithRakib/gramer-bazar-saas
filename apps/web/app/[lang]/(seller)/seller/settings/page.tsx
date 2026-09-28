@@ -1,9 +1,9 @@
-import { SellerSettingsView } from "@/features/seller/settings";
+import { SellerSettingsView } from '@/features/seller/settings';
 
 export default async function SellerSettingsPage({
   params,
 }: {
-  params: Promise<{ lang: "ar" | "en" }>;
+  params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
   return <SellerSettingsView lang={lang} />;

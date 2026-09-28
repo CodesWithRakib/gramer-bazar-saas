@@ -59,9 +59,7 @@ describe('ReviewsService', () => {
     it('rejects a duplicate review by the same user', async () => {
       reviewRepo.findOne.mockResolvedValue({ id: 'existing' });
 
-      await expect(service.addReview('u1', 'p1', 5)).rejects.toThrow(
-        /already reviewed/,
-      );
+      await expect(service.addReview('u1', 'p1', 5)).rejects.toThrow(/already reviewed/);
       expect(dataSource.query).not.toHaveBeenCalled();
     });
 
@@ -69,9 +67,7 @@ describe('ReviewsService', () => {
       reviewRepo.findOne.mockResolvedValue(null);
       dataSource.query.mockResolvedValue([]); // no purchase
 
-      await expect(service.addReview('u1', 'p1', 5)).rejects.toThrow(
-        /legitimately purchased/,
-      );
+      await expect(service.addReview('u1', 'p1', 5)).rejects.toThrow(/legitimately purchased/);
       expect(reviewRepo.save).not.toHaveBeenCalled();
     });
   });
@@ -91,9 +87,7 @@ describe('ReviewsService', () => {
     it('throws when the review does not exist', async () => {
       reviewRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.moderateReview('ghost', true)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.moderateReview('ghost', true)).rejects.toThrow(NotFoundException);
     });
   });
 

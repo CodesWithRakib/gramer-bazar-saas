@@ -18,7 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       client.emit('exception', {
         status: 'error',
         message: exception instanceof Error ? exception.message : 'Internal server error',
-        details: exception instanceof Error ? exception.stack : undefined
+        details: exception instanceof Error ? exception.stack : undefined,
       });
       return;
     }
@@ -28,14 +28,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : 'Internal server error';
+      exception instanceof HttpException ? exception.getResponse() : 'Internal server error';
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
@@ -50,12 +46,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       message: typeof message === 'string' ? message : (message as any).message || message,
-      errorCode: typeof message === 'object' && (message as any).error ? (message as any).error : undefined,
+      errorCode:
+        typeof message === 'object' && (message as any).error ? (message as any).error : undefined,
       // Provide detailed error in development for debugging
-      debug: status === HttpStatus.INTERNAL_SERVER_ERROR ? {
-        message: exception instanceof Error ? exception.message : 'Unknown error',
-        stack: exception instanceof Error ? exception.stack : undefined,
-      } : undefined,
+      debug:
+        status === HttpStatus.INTERNAL_SERVER_ERROR
+          ? {
+              message: exception instanceof Error ? exception.message : 'Unknown error',
+              stack: exception instanceof Error ? exception.stack : undefined,
+            }
+          : undefined,
     };
 
     response.status(status).json(errorResponse);

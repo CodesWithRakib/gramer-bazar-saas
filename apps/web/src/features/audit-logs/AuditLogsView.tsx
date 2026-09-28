@@ -10,7 +10,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useGetAuditLogsQuery } from '@/features/audit-logs/auditLogsApi';
 import { ScrollText, Search, X } from 'lucide-react';
 import AdminPagination from '@/components/AdminPagination';
@@ -45,9 +51,7 @@ export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          {isBn ? 'অডিট লগস' : 'Audit Logs'}
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">{isBn ? 'অডিট লগস' : 'Audit Logs'}</h1>
         <p className="text-sm text-muted-foreground mt-1">
           {isBn
             ? 'সিস্টেমের সকল পরিবর্তন ও প্রশাসনিক পদক্ষেপ ট্র্যাক করুন।'
@@ -70,7 +74,11 @@ export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder={isBn ? 'ইউজার, অ্যাকশন বা বিস্তারিত খুঁজুন...' : 'Search logs by user, action, or details...'}
+                placeholder={
+                  isBn
+                    ? 'ইউজার, অ্যাকশন বা বিস্তারিত খুঁজুন...'
+                    : 'Search logs by user, action, or details...'
+                }
                 className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
               />
               {search && (
@@ -116,7 +124,9 @@ export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
             <Table>
               <TableHeader className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                 <TableRow>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'তারিখ ও সময়' : 'Date & Time'}</TableHead>
+                  <TableHead className="py-3.5 px-4">
+                    {isBn ? 'তারিখ ও সময়' : 'Date & Time'}
+                  </TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'অ্যাকশন' : 'Action'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'ইউজার' : 'Performed By'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'টার্গেট' : 'Target'}</TableHead>
@@ -127,20 +137,37 @@ export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`} className="animate-pulse">
-                      <TableCell className="py-4 px-4"><div className="h-4 w-32 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-6 w-20 rounded-full bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-28 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-48 rounded bg-muted"></div></TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-32 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-6 w-20 rounded-full bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-28 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-24 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-48 rounded bg-muted"></div>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : isError ? (
                   <TableRow>
                     <TableCell colSpan={5} className="py-12 text-center text-destructive">
                       <p className="text-sm font-medium">
-                        {isBn ? 'লগ লোড করা যায়নি। পরে আবার চেষ্টা করুন।' : 'Failed to load audit logs. Please try again.'}
+                        {isBn
+                          ? 'লগ লোড করা যায়নি। পরে আবার চেষ্টা করুন।'
+                          : 'Failed to load audit logs. Please try again.'}
                       </p>
-                      <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => refetch()}
+                        className="mt-3"
+                      >
                         {isBn ? 'আবার চেষ্টা করুন' : 'Retry'}
                       </Button>
                     </TableCell>
@@ -157,8 +184,12 @@ export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || actionFilter !== 'ALL'
-                            ? (isBn ? 'আপনার অনুসন্ধানের ফিল্টারের সাথে কোনো লগ মেলেনি' : 'No logs match your search or filter.')
-                            : (isBn ? 'বর্তমানে কোনো সিস্টেম অডিট লগ নেই' : 'No system audit logs recorded.')}
+                            ? isBn
+                              ? 'আপনার অনুসন্ধানের ফিল্টারের সাথে কোনো লগ মেলেনি'
+                              : 'No logs match your search or filter.'
+                            : isBn
+                              ? 'বর্তমানে কোনো সিস্টেম অডিট লগ নেই'
+                              : 'No system audit logs recorded.'}
                         </p>
                         {(search || actionFilter !== 'ALL') && (
                           <button
@@ -178,7 +209,10 @@ export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
                   </TableRow>
                 ) : (
                   logs.map((log) => (
-                    <TableRow key={log.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <TableRow
+                      key={log.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <TableCell className="whitespace-nowrap py-3.5 px-4 font-mono text-xs text-muted-foreground">
                         {new Date(log.createdAt).toLocaleString(isBn ? 'bn-BD' : 'en-US')}
                       </TableCell>

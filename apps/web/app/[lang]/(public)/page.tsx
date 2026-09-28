@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ProductGrid } from "@/components/catalog/ProductGrid";
-import { CategoryCard } from "@/components/catalog/CategoryCard";
-import { ShopCard } from "@/components/catalog/ShopCard";
-import { ProductRequestModal } from "@/components/catalog/ProductRequestModal";
-import { useGetHomepageDataQuery } from "@/features/catalog/catalogApi";
-import { Skeleton } from "@/components/ui/skeleton";
-import { use } from "react";
+import React from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ProductGrid } from '@/components/catalog/ProductGrid';
+import { CategoryCard } from '@/components/catalog/CategoryCard';
+import { ShopCard } from '@/components/catalog/ShopCard';
+import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
+import { useGetHomepageDataQuery } from '@/features/catalog/catalogApi';
+import { Skeleton } from '@/components/ui/skeleton';
+import { use } from 'react';
 import {
   ArrowRight,
   ShieldCheck,
@@ -20,24 +20,20 @@ import {
   Store,
   Flame,
   PackagePlus,
-} from "lucide-react";
-import { motion } from "framer-motion";
-import { MarketplaceHero } from "@/components/home/MarketplaceHero";
-import { FlashSalesSection } from "@/components/home/FlashSalesSection";
-import { PromotionalModal } from "@/components/promotions/PromotionalModal";
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MarketplaceHero } from '@/components/home/MarketplaceHero';
+import { FlashSalesSection } from '@/components/home/FlashSalesSection';
+import { PromotionalModal } from '@/components/promotions/PromotionalModal';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0 },
 };
 
-export default function HomePage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function HomePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
   // Single performant cached endpoint returning curated homepage data
   const { data: homeData, isLoading } = useGetHomepageDataQuery();
@@ -68,10 +64,10 @@ export default function HomePage({
             </div>
             <div className="space-y-0.5">
               <h3 className="text-xs md:text-sm font-bold text-foreground">
-                {isBn ? "আপনার এলাকায়" : "Local Delivery"}
+                {isBn ? 'আপনার এলাকায়' : 'Local Delivery'}
               </h3>
               <p className="text-[11px] md:text-xs text-muted-foreground">
-                {isBn ? "খানসামা ও সংলগ্ন অঞ্চল" : "Khansama & nearby"}
+                {isBn ? 'খানসামা ও সংলগ্ন অঞ্চল' : 'Khansama & nearby'}
               </p>
             </div>
           </div>
@@ -81,10 +77,10 @@ export default function HomePage({
             </div>
             <div className="space-y-0.5">
               <h3 className="text-xs md:text-sm font-bold text-foreground">
-                {isBn ? "ভেরিফাইড দোকান" : "Verified Sellers"}
+                {isBn ? 'ভেরিফাইড দোকান' : 'Verified Sellers'}
               </h3>
               <p className="text-[11px] md:text-xs text-muted-foreground">
-                {isBn ? "১০০% আসল ও নিরাপদ" : "100% Genuine"}
+                {isBn ? '১০০% আসল ও নিরাপদ' : '100% Genuine'}
               </p>
             </div>
           </div>
@@ -94,10 +90,10 @@ export default function HomePage({
             </div>
             <div className="space-y-0.5">
               <h3 className="text-xs md:text-sm font-bold text-foreground">
-                {isBn ? "তাজা ও খাঁটি পণ্য" : "Fresh & Pure"}
+                {isBn ? 'তাজা ও খাঁটি পণ্য' : 'Fresh & Pure'}
               </h3>
               <p className="text-[11px] md:text-xs text-muted-foreground">
-                {isBn ? "সরাসরি খামার থেকে" : "Farm fresh daily"}
+                {isBn ? 'সরাসরি খামার থেকে' : 'Farm fresh daily'}
               </p>
             </div>
           </div>
@@ -107,10 +103,10 @@ export default function HomePage({
             </div>
             <div className="space-y-0.5">
               <h3 className="text-xs md:text-sm font-bold text-foreground">
-                {isBn ? "ক্যাশ অন ডেলিভারি" : "Cash on Delivery"}
+                {isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery'}
               </h3>
               <p className="text-[11px] md:text-xs text-muted-foreground">
-                {isBn ? "পণ্য হাতে পেয়ে মূল্য দিন" : "Pay when received"}
+                {isBn ? 'পণ্য হাতে পেয়ে মূল্য দিন' : 'Pay when received'}
               </p>
             </div>
           </div>
@@ -122,19 +118,19 @@ export default function HomePage({
         <div className="flex items-center justify-between mb-4 md:mb-6">
           <div>
             <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
-              {isBn ? "ক্যাটাগরি ব্রাউজ করুন" : "Shop by Category"}
+              {isBn ? 'ক্যাটাগরি ব্রাউজ করুন' : 'Shop by Category'}
             </h2>
             <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
               {isBn
-                ? "আপনার প্রয়োজনীয় খাদ্য, মুদি ও নিত্যপণ্য নির্বাচন করুন"
-                : "Explore products by category"}
+                ? 'আপনার প্রয়োজনীয় খাদ্য, মুদি ও নিত্যপণ্য নির্বাচন করুন'
+                : 'Explore products by category'}
             </p>
           </div>
           <Link
             href={`/${lang}/categories`}
             className="text-primary hover:underline flex items-center gap-1 text-xs md:text-sm font-medium"
           >
-            <span>{isBn ? "সকল ক্যাটাগরি" : "All Categories"}</span>
+            <span>{isBn ? 'সকল ক্যাটাগরি' : 'All Categories'}</span>
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -168,7 +164,7 @@ export default function HomePage({
         <motion.section
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ once: true, margin: '-60px' }}
           variants={fadeUp}
           transition={{ duration: 0.35 }}
           className="container mx-auto px-4"
@@ -180,12 +176,12 @@ export default function HomePage({
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-foreground">
-                  {isBn ? "নির্বাচিত পণ্যসমূহ" : "Featured Products"}
+                  {isBn ? 'নির্বাচিত পণ্যসমূহ' : 'Featured Products'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {isBn
-                    ? "স্থানীয় বাজারের সেরা মানের কিউরেটেড পণ্য"
-                    : "Handpicked quality products from local sellers"}
+                    ? 'স্থানীয় বাজারের সেরা মানের কিউরেটেড পণ্য'
+                    : 'Handpicked quality products from local sellers'}
                 </p>
               </div>
             </div>
@@ -193,15 +189,11 @@ export default function HomePage({
               href={`/${lang}/products?featured=true`}
               className="text-primary hover:underline flex items-center gap-1 text-xs md:text-sm font-medium"
             >
-              <span>{isBn ? "সব দেখুন" : "View All"}</span>
+              <span>{isBn ? 'সব দেখুন' : 'View All'}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <ProductGrid
-            products={featuredProducts}
-            isLoading={false}
-            lang={lang}
-          />
+          <ProductGrid products={featuredProducts} isLoading={false} lang={lang} />
         </motion.section>
       ) : null}
 
@@ -210,7 +202,7 @@ export default function HomePage({
         <motion.section
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ once: true, margin: '-60px' }}
           variants={fadeUp}
           transition={{ duration: 0.35 }}
           className="container mx-auto px-4 border-t border-border/40 pt-10"
@@ -222,12 +214,12 @@ export default function HomePage({
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-foreground">
-                  {isBn ? "জনপ্রিয় পণ্য" : "Popular Products"}
+                  {isBn ? 'জনপ্রিয় পণ্য' : 'Popular Products'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {isBn
-                    ? "গ্রাহকদের পছন্দের সর্বাধিক বিক্রিত পণ্য"
-                    : "Most loved items by village shoppers"}
+                    ? 'গ্রাহকদের পছন্দের সর্বাধিক বিক্রিত পণ্য'
+                    : 'Most loved items by village shoppers'}
                 </p>
               </div>
             </div>
@@ -235,15 +227,11 @@ export default function HomePage({
               href={`/${lang}/products?sort=popular`}
               className="text-primary hover:underline flex items-center gap-1 text-xs md:text-sm font-medium"
             >
-              <span>{isBn ? "সব দেখুন" : "View All"}</span>
+              <span>{isBn ? 'সব দেখুন' : 'View All'}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <ProductGrid
-            products={popularProducts}
-            isLoading={false}
-            lang={lang}
-          />
+          <ProductGrid products={popularProducts} isLoading={false} lang={lang} />
         </motion.section>
       ) : null}
 
@@ -252,7 +240,7 @@ export default function HomePage({
         <motion.section
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ once: true, margin: '-60px' }}
           variants={fadeUp}
           transition={{ duration: 0.35 }}
           className="container mx-auto px-4 border-t border-border/40 pt-10"
@@ -264,12 +252,12 @@ export default function HomePage({
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-foreground">
-                  {isBn ? "স্থানীয় বিশ্বস্ত দোকান" : "Featured Local Shops"}
+                  {isBn ? 'স্থানীয় বিশ্বস্ত দোকান' : 'Featured Local Shops'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {isBn
-                    ? "সরাসরি আপনার আশেপাশের বিশ্বস্ত ব্যবসায়ীদের দোকান থেকে কিনুন"
-                    : "Support local merchants and neighborhood stores"}
+                    ? 'সরাসরি আপনার আশেপাশের বিশ্বস্ত ব্যবসায়ীদের দোকান থেকে কিনুন'
+                    : 'Support local merchants and neighborhood stores'}
                 </p>
               </div>
             </div>
@@ -277,7 +265,7 @@ export default function HomePage({
               href={`/${lang}/shops`}
               className="text-primary hover:underline flex items-center gap-1 text-xs md:text-sm font-medium"
             >
-              <span>{isBn ? "সব দোকান" : "All Shops"}</span>
+              <span>{isBn ? 'সব দোকান' : 'All Shops'}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -308,7 +296,7 @@ export default function HomePage({
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">{category.icon || "📦"}</span>
+                      <span className="text-2xl">{category.icon || '📦'}</span>
                       <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">
                         {categoryName}
                       </h2>
@@ -323,20 +311,12 @@ export default function HomePage({
                     href={`/${lang}/categories/${category.slug}`}
                     className="inline-flex items-center gap-1 text-xs md:text-sm font-semibold text-primary hover:underline"
                   >
-                    <span>
-                      {isBn
-                        ? `সব ${categoryName} দেখুন`
-                        : `View all ${categoryName}`}
-                    </span>
+                    <span>{isBn ? `সব ${categoryName} দেখুন` : `View all ${categoryName}`}</span>
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
 
-                <ProductGrid
-                  products={products}
-                  isLoading={false}
-                  lang={lang}
-                />
+                <ProductGrid products={products} isLoading={false} lang={lang} />
               </section>
             );
           })}
@@ -348,7 +328,7 @@ export default function HomePage({
         <motion.section
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ once: true, margin: '-60px' }}
           variants={fadeUp}
           transition={{ duration: 0.35 }}
           className="container mx-auto px-4 border-t border-border/40 pt-10"
@@ -360,12 +340,12 @@ export default function HomePage({
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-foreground">
-                  {isBn ? "নতুন যুক্ত পণ্য" : "Recently Added"}
+                  {isBn ? 'নতুন যুক্ত পণ্য' : 'Recently Added'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {isBn
-                    ? "বাজারে সম্প্রতি অন্তর্ভুক্ত খাঁটি পণ্যসমূহ"
-                    : "Fresh arrivals just listed on Gramer Bazar"}
+                    ? 'বাজারে সম্প্রতি অন্তর্ভুক্ত খাঁটি পণ্যসমূহ'
+                    : 'Fresh arrivals just listed on Gramer Bazar'}
                 </p>
               </div>
             </div>
@@ -373,7 +353,7 @@ export default function HomePage({
               href={`/${lang}/products?sort=newest`}
               className="text-primary hover:underline flex items-center gap-1 text-xs md:text-sm font-medium"
             >
-              <span>{isBn ? "সব দেখুন" : "View All"}</span>
+              <span>{isBn ? 'সব দেখুন' : 'View All'}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -385,7 +365,7 @@ export default function HomePage({
       <motion.section
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-60px" }}
+        viewport={{ once: true, margin: '-60px' }}
         variants={fadeUp}
         transition={{ duration: 0.35 }}
         className="container mx-auto px-4"
@@ -394,13 +374,13 @@ export default function HomePage({
           <div className="relative z-10 max-w-2xl mx-auto space-y-4">
             <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
               {isBn
-                ? "আপনার প্রয়োজনীয় পণ্যটি খুঁজে পাচ্ছেন না?"
-                : "Cannot find what you are looking for?"}
+                ? 'আপনার প্রয়োজনীয় পণ্যটি খুঁজে পাচ্ছেন না?'
+                : 'Cannot find what you are looking for?'}
             </h2>
             <p className="text-sm md:text-base text-primary-foreground/90 leading-relaxed">
               {isBn
-                ? "আমাদের জানান আপনার কী প্রয়োজন। আমাদের টিম স্থানীয় বাজার ও খামার থেকে সংগ্রহ করে আপনার দোরগোড়ায় পৌঁছে দেবে।"
-                : "Tell us what you need. Our local sourcing team will find it from farmers or trusted merchants and deliver it to your door."}
+                ? 'আমাদের জানান আপনার কী প্রয়োজন। আমাদের টিম স্থানীয় বাজার ও খামার থেকে সংগ্রহ করে আপনার দোরগোড়ায় পৌঁছে দেবে।'
+                : 'Tell us what you need. Our local sourcing team will find it from farmers or trusted merchants and deliver it to your door.'}
             </p>
             <div className="pt-2">
               <ProductRequestModal
@@ -411,7 +391,7 @@ export default function HomePage({
                     variant="secondary"
                     className="font-bold px-8 py-3 rounded-full shadow-md bg-background text-foreground hover:bg-background/90"
                   >
-                    {isBn ? "পণ্যের রিকোয়েস্ট পাঠান" : "Request a Product"}
+                    {isBn ? 'পণ্যের রিকোয়েস্ট পাঠান' : 'Request a Product'}
                   </Button>
                 }
               />

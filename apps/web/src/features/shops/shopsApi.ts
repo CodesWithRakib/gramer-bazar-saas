@@ -96,9 +96,7 @@ export const shopsApi = api.injectEndpoints({
     getShopProducts: builder.query<ShopProductsResponse, ShopProductsParams>({
       query: ({ id, ...params }) => {
         const cleanParams = Object.fromEntries(
-          Object.entries(params).filter(
-            ([, v]) => v !== undefined && v !== null && v !== ''
-          )
+          Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
         );
         return {
           url: `/shops/${id}/products`,
@@ -111,9 +109,4 @@ export const shopsApi = api.injectEndpoints({
   overrideExisting: false,
 });
 
-export const {
-  useGetShopsQuery,
-  useGetShopByIdQuery,
-  useGetShopProductsQuery,
-} = shopsApi;
-
+export const { useGetShopsQuery, useGetShopByIdQuery, useGetShopProductsQuery } = shopsApi;

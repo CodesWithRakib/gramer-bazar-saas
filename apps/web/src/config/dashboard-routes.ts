@@ -17,6 +17,7 @@ import {
   MapPin,
   Star,
   ClipboardList,
+  Bell,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -163,7 +164,12 @@ export const superAdminRoutes: DashboardRoute[] = [
     icon: Tag,
     section: 'Governance',
     sectionBn: 'প্রশাসন',
-    matchPrefixes: ['/super-admin/promotions', '/super-admin/coupons', '/super-admin/flash-sales', '/super-admin/banners'],
+    matchPrefixes: [
+      '/super-admin/promotions',
+      '/super-admin/coupons',
+      '/super-admin/flash-sales',
+      '/super-admin/banners',
+    ],
   },
   {
     title: 'Users & Staff',
@@ -172,7 +178,13 @@ export const superAdminRoutes: DashboardRoute[] = [
     icon: Users,
     section: 'Governance',
     sectionBn: 'প্রশাসন',
-    matchPrefixes: ['/super-admin/users-management', '/super-admin/users', '/super-admin/sellers', '/super-admin/riders', '/super-admin/admins'],
+    matchPrefixes: [
+      '/super-admin/users-management',
+      '/super-admin/users',
+      '/super-admin/sellers',
+      '/super-admin/riders',
+      '/super-admin/admins',
+    ],
   },
   {
     title: 'Finance & Payouts',
@@ -435,6 +447,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/messages'],
+  },
+  {
+    title: 'Notifications',
+    titleBn: 'নোটিফিকেশন',
+    href: '/customer/notifications',
+    icon: Bell,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/notifications'],
   },
 
   // Section: Account

@@ -87,10 +87,14 @@ export function FlashSalesSection({ lang }: { lang: string }) {
                 : 0;
 
             const total = item.quantitySold + item.quantityAvailable;
-            const soldPercent = total > 0 ? Math.min(100, Math.round((item.quantitySold / total) * 100)) : 0;
+            const soldPercent =
+              total > 0 ? Math.min(100, Math.round((item.quantitySold / total) * 100)) : 0;
 
             return (
-              <div key={item.id} className="min-w-[190px] sm:min-w-[210px] md:min-w-0 snap-start flex flex-col">
+              <div
+                key={item.id}
+                className="min-w-[190px] sm:min-w-[210px] md:min-w-0 snap-start flex flex-col"
+              >
                 <ProductCard
                   product={item.sellerProduct}
                   lang={lang}
@@ -105,8 +109,12 @@ export function FlashSalesSection({ lang }: { lang: string }) {
                     />
                   </div>
                   <div className="flex justify-between items-center mt-1 text-[10px] text-muted-foreground font-medium">
-                    <span>{isBn ? 'বিক্রি' : 'Sold'}: {item.quantitySold}</span>
-                    <span>{isBn ? 'স্টক বাকি' : 'Left'}: {item.quantityAvailable}</span>
+                    <span>
+                      {isBn ? 'বিক্রি' : 'Sold'}: {item.quantitySold}
+                    </span>
+                    <span>
+                      {isBn ? 'স্টক বাকি' : 'Left'}: {item.quantityAvailable}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -117,4 +125,3 @@ export function FlashSalesSection({ lang }: { lang: string }) {
     </section>
   );
 }
-

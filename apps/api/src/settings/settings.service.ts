@@ -68,11 +68,9 @@ export class SettingsService {
         (stored.get(KEYS.allowSellerRegistration) ?? String(DEFAULTS.allowSellerRegistration)) ===
         'true',
       isMaintenanceMode:
-        (stored.get(KEYS.isMaintenanceMode) ?? String(DEFAULTS.isMaintenanceMode)) ===
-        'true',
+        (stored.get(KEYS.isMaintenanceMode) ?? String(DEFAULTS.isMaintenanceMode)) === 'true',
       sslczStoreId: stored.get(KEYS.sslczStoreId) ?? envStoreId,
-      sslczIsLive:
-        (stored.get(KEYS.sslczIsLive) ?? String(envIsLive)) === 'true',
+      sslczIsLive: (stored.get(KEYS.sslczIsLive) ?? String(envIsLive)) === 'true',
       sslczPublicUrl: stored.get(KEYS.sslczPublicUrl) ?? envPublicUrl,
       hasSslczPassword: Boolean(stored.get(KEYS.sslczStorePassword) || envPassword),
     };

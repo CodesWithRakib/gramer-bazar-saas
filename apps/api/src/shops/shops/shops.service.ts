@@ -56,7 +56,8 @@ export class ShopsService {
     }
 
     // Aggregate stats: productCount, averageRating, totalReviews
-    const stats = await this.dataSource.query(`
+    const stats = await this.dataSource.query(
+      `
       SELECT 
         COUNT(DISTINCT sp.id)::int as product_count,
         COALESCE(AVG(r.rating), 0)::float as average_rating,
@@ -65,7 +66,9 @@ export class ShopsService {
       LEFT JOIN product_variants pv ON pv.id = sp.product_variant_id
       LEFT JOIN reviews r ON r.product_id = pv.product_id AND r.is_approved = true
       WHERE sp.shop_id = $1 AND sp.is_active = true
-    `, [shop.id]);
+    `,
+      [shop.id],
+    );
 
     const stat = stats[0] || {};
 
@@ -84,7 +87,8 @@ export class ShopsService {
     const limit = Math.max(1, Math.min(100, Number(filter.limit) || 20));
 
     // Base query builder using SellerProduct entity repository
-    const query = this.sellerProductsRepository.createQueryBuilder('sp')
+    const query = this.sellerProductsRepository
+      .createQueryBuilder('sp')
       .leftJoinAndSelect('sp.productVariant', 'pv')
       .leftJoinAndSelect('pv.product', 'p')
       .leftJoinAndSelect('p.category', 'cat')
@@ -99,16 +103,19 @@ export class ShopsService {
       .andWhere('p.isActive = true');
 
     if (filter.search) {
-      query.andWhere(
-        '(p.nameEn ILIKE :search OR p.nameBn ILIKE :search OR pv.sku ILIKE :search)',
-        { search: `%${filter.search}%` },
-      );
+      query.andWhere('(p.nameEn ILIKE :search OR p.nameBn ILIKE :search OR pv.sku ILIKE :search)', {
+        search: `%${filter.search}%`,
+      });
     }
 
     if (filter.categoryId) {
-      query.andWhere('(p.categoryId = :catId OR p.subCategoryId = :catId)', { catId: filter.categoryId });
+      query.andWhere('(p.categoryId = :catId OR p.subCategoryId = :catId)', {
+        catId: filter.categoryId,
+      });
     } else if (filter.categorySlug) {
-      query.andWhere('(cat.slug = :catSlug OR subCat.slug = :catSlug)', { catSlug: filter.categorySlug });
+      query.andWhere('(cat.slug = :catSlug OR subCat.slug = :catSlug)', {
+        catSlug: filter.categorySlug,
+      });
     }
 
     if (filter.subCategoryId) {
@@ -164,7 +171,10 @@ export class ShopsService {
 
     // Ensure pv.images fallback to p.images
     items.forEach((item: any) => {
-      if (item.productVariant && (!item.productVariant.images || item.productVariant.images.length === 0)) {
+      if (
+        item.productVariant &&
+        (!item.productVariant.images || item.productVariant.images.length === 0)
+      ) {
         const pImages = item.productVariant.product?.images;
         if (pImages && pImages.length > 0) {
           item.productVariant.images = pImages
@@ -183,7 +193,8 @@ export class ShopsService {
       icon: string | null;
       count: number;
       productCount: number;
-    }> = await this.dataSource.query(`
+    }> = await this.dataSource.query(
+      `
       SELECT c.id, c.name_en as "nameEn", c.name_bn as "nameBn", c.slug, c.icon,
         COUNT(DISTINCT sp.id)::int as count,
         COUNT(DISTINCT sp.id)::int as "productCount"
@@ -195,7 +206,9 @@ export class ShopsService {
       GROUP BY c.id, c.name_en, c.name_bn, c.slug, c.icon
       HAVING COUNT(DISTINCT sp.id) > 0
       ORDER BY count DESC
-    `, [shop.id]);
+    `,
+      [shop.id],
+    );
 
     // Query brands with products in this shop
     const brands: Array<{
@@ -205,7 +218,8 @@ export class ShopsService {
       slug: string;
       logo: string | null;
       count: number;
-    }> = await this.dataSource.query(`
+    }> = await this.dataSource.query(
+      `
       SELECT b.id, b.name_en as "nameEn", b.name_bn as "nameBn", b.slug, b.logo,
         COUNT(DISTINCT sp.id)::int as count
       FROM seller_products sp
@@ -216,7 +230,9 @@ export class ShopsService {
       GROUP BY b.id, b.name_en, b.name_bn, b.slug, b.logo
       HAVING COUNT(DISTINCT sp.id) > 0
       ORDER BY count DESC, b.name_en ASC
-    `, [shop.id]);
+    `,
+      [shop.id],
+    );
 
     return {
       shop,

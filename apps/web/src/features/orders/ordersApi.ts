@@ -1,5 +1,5 @@
-import { api } from "../../store/api";
-import { PaginationMeta } from "../catalog/catalogApi";
+import { api } from '../../store/api';
+import { PaginationMeta } from '../catalog/catalogApi';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -19,7 +19,11 @@ export const VALID_ORDER_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
   [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
   [OrderStatus.PROCESSING]: [OrderStatus.READY_FOR_PICKUP, OrderStatus.CANCELLED],
-  [OrderStatus.READY_FOR_PICKUP]: [OrderStatus.ASSIGNED_TO_RIDER, OrderStatus.PICKED_UP, OrderStatus.CANCELLED],
+  [OrderStatus.READY_FOR_PICKUP]: [
+    OrderStatus.ASSIGNED_TO_RIDER,
+    OrderStatus.PICKED_UP,
+    OrderStatus.CANCELLED,
+  ],
   [OrderStatus.ASSIGNED_TO_RIDER]: [OrderStatus.PICKED_UP, OrderStatus.CANCELLED],
   [OrderStatus.PICKED_UP]: [OrderStatus.OUT_FOR_DELIVERY, OrderStatus.FAILED],
   [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED, OrderStatus.FAILED],
@@ -99,19 +103,19 @@ export interface Order {
 export const ordersApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<Order[], void>({
-      query: () => "/orders",
-      providesTags: ["Order"],
+      query: () => '/orders',
+      providesTags: ['Order'],
     }),
     getOrderById: builder.query<Order, string>({
       query: (id) => `/orders/${id}`,
-      providesTags: (result, error, id) => [{ type: "Order", id }],
+      providesTags: (result, error, id) => [{ type: 'Order', id }],
     }),
     cancelOrder: builder.mutation<Order, string>({
       query: (id) => ({
         url: `/orders/${id}/cancel`,
-        method: "POST",
+        method: 'POST',
       }),
-      invalidatesTags: (result, error, id) => [{ type: "Order", id }, "Order"],
+      invalidatesTags: (result, error, id) => [{ type: 'Order', id }, 'Order'],
     }),
     checkoutOrder: builder.mutation<
       { order: Order; paymentUrl: string | null },
@@ -125,34 +129,39 @@ export const ordersApi = api.injectEndpoints({
     >({
       query: (body) => ({
         url: `/orders/checkout`,
-        method: "POST",
+        method: 'POST',
         body,
       }),
-      invalidatesTags: ["Order"],
+      invalidatesTags: ['Order'],
     }),
-    getAdminOrders: builder.query<{ data: Order[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
+    getAdminOrders: builder.query<
+      { data: Order[]; meta: PaginationMeta },
+      { page?: number; limit?: number; search?: string }
+    >({
       query: (params) => ({
         url: '/orders/admin/all',
         params,
       }),
-      providesTags: ["Order"],
+      providesTags: ['Order'],
     }),
     updateAdminOrderStatus: builder.mutation<Order, { id: string; status: string }>({
       query: ({ id, status }) => ({
         url: `/orders/admin/${id}/status`,
-        method: "PATCH",
+        method: 'PATCH',
         body: { status },
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }, "Order"],
+      invalidatesTags: (result, error, { id }) => [{ type: 'Order', id }, 'Order'],
     }),
-    transitionOrder: builder.mutation<Order, { id: string; targetStatus: string; reason?: string }>({
-      query: ({ id, targetStatus, reason }) => ({
-        url: `/orders/${id}/transition`,
-        method: "POST",
-        body: { targetStatus, reason },
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }, "Order"],
-    }),
+    transitionOrder: builder.mutation<Order, { id: string; targetStatus: string; reason?: string }>(
+      {
+        query: ({ id, targetStatus, reason }) => ({
+          url: `/orders/${id}/transition`,
+          method: 'POST',
+          body: { targetStatus, reason },
+        }),
+        invalidatesTags: (result, error, { id }) => [{ type: 'Order', id }, 'Order'],
+      }
+    ),
   }),
 });
 

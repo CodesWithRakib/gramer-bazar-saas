@@ -82,9 +82,7 @@ describe('CouponsService.validateCoupon', () => {
   it('rejects an unknown code', async () => {
     couponRepository.findOne.mockResolvedValue(null);
 
-    await expect(service.validateCoupon('nope', 'u1', 100)).rejects.toThrow(
-      /Invalid coupon code/,
-    );
+    await expect(service.validateCoupon('nope', 'u1', 100)).rejects.toThrow(/Invalid coupon code/);
   });
 
   it.each([
@@ -96,9 +94,7 @@ describe('CouponsService.validateCoupon', () => {
   ])('rejects a coupon that is %s', async (_label, overrides, matcher) => {
     couponRepository.findOne.mockResolvedValue(makeCoupon(overrides));
 
-    await expect(service.validateCoupon('SAVE10', 'u1', 100)).rejects.toThrow(
-      matcher as RegExp,
-    );
+    await expect(service.validateCoupon('SAVE10', 'u1', 100)).rejects.toThrow(matcher as RegExp);
   });
 
   it('rejects when the customer already used all their redemptions', async () => {

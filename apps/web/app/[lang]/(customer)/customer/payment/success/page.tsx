@@ -7,15 +7,18 @@ import { useDispatch } from 'react-redux';
 import { clearCart } from '@/store/slices/cartSlice';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Loader2, AlertCircle, ShoppingBag, ArrowRight, ShieldCheck } from 'lucide-react';
+import {
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+  ShoppingBag,
+  ArrowRight,
+  ShieldCheck,
+} from 'lucide-react';
 import { useGetPaymentByTransactionIdQuery } from '@/features/payments/paymentsApi';
 import { useGetOrderByIdQuery } from '@/features/orders/ordersApi';
 
-export default function PaymentSuccessPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function PaymentSuccessPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const searchParams = useSearchParams();
@@ -33,18 +36,13 @@ export default function PaymentSuccessPage({
     skip: !tranId,
   });
 
-  const {
-    data: orderData,
-    isLoading: isOrderLoading,
-  } = useGetOrderByIdQuery(orderId, {
+  const { data: orderData, isLoading: isOrderLoading } = useGetOrderByIdQuery(orderId, {
     skip: !orderId,
   });
 
   const isLoading = isPaymentLoading || (isOrderLoading && !paymentData);
 
-  const isVerifiedPaid =
-    paymentData?.status === 'PAID' ||
-    orderData?.paymentStatus === 'PAID';
+  const isVerifiedPaid = paymentData?.status === 'PAID' || orderData?.paymentStatus === 'PAID';
 
   useEffect(() => {
     if (isVerifiedPaid) {
@@ -75,8 +73,8 @@ export default function PaymentSuccessPage({
   return (
     <div className="container max-w-2xl py-12 px-4 space-y-8">
       {isVerifiedPaid ? (
-        <Card className="border-0 shadow-xl ring-1 ring-emerald-500/20 rounded-3xl overflow-hidden bg-gradient-to-b from-card to-emerald-500/[0.02]">
-          <div className="h-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500" />
+        <Card className="border-0 shadow-xl ring-1 ring-emerald-500/20 rounded-3xl overflow-hidden bg-card">
+          <div className="h-2.5 bg-emerald-600 dark:bg-emerald-500" />
           <CardHeader className="text-center pt-8 pb-4">
             <div className="mx-auto w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 ring-8 ring-emerald-500/5">
               <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
@@ -94,18 +92,26 @@ export default function PaymentSuccessPage({
           <CardContent className="space-y-6 px-6 sm:px-8 pb-8">
             <div className="rounded-2xl bg-muted/40 p-5 space-y-3.5 border border-border/50 text-sm">
               <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                <span className="text-muted-foreground">{isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}</span>
-                <span className="font-mono font-semibold text-primary">{tranId || paymentData?.transactionId || 'N/A'}</span>
+                <span className="text-muted-foreground">
+                  {isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}
+                </span>
+                <span className="font-mono font-semibold text-primary">
+                  {tranId || paymentData?.transactionId || 'N/A'}
+                </span>
               </div>
               {orderId && (
                 <div className="flex justify-between items-center pb-2 border-b border-border/40">
                   <span className="text-muted-foreground">{isBn ? 'অর্ডার আইডি' : 'Order ID'}</span>
-                  <span className="font-mono font-medium">{orderId.slice(0, 13).toUpperCase()}...</span>
+                  <span className="font-mono font-medium">
+                    {orderId.slice(0, 13).toUpperCase()}...
+                  </span>
                 </div>
               )}
               {paymentData?.amount && (
                 <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                  <span className="text-muted-foreground">{isBn ? 'পরিশোধিত অর্থ' : 'Amount Paid'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'পরিশোধিত অর্থ' : 'Amount Paid'}
+                  </span>
                   <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                     ৳{Number(paymentData.amount).toFixed(2)} {paymentData.currency || 'BDT'}
                   </span>
@@ -113,13 +119,17 @@ export default function PaymentSuccessPage({
               )}
               {paymentData?.cardType && (
                 <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                  <span className="text-muted-foreground">{isBn ? 'পেমেন্ট মেথড' : 'Payment Method'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'পেমেন্ট মেথড' : 'Payment Method'}
+                  </span>
                   <span className="font-medium uppercase">{paymentData.cardType}</span>
                 </div>
               )}
               {paymentData?.bankTransactionId && (
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">{isBn ? 'ব্যাংক রেফারেন্স' : 'Bank Reference'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'ব্যাংক রেফারেন্স' : 'Bank Reference'}
+                  </span>
                   <span className="font-mono text-xs">{paymentData.bankTransactionId}</span>
                 </div>
               )}

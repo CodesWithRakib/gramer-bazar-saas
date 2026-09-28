@@ -16,13 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import AdminPagination from '@/components/ui/AdminPagination';
 import {
   Store,
@@ -114,7 +108,9 @@ export default function ShopProfilePage({
   const shop = productsResponse?.shop || shopInitial;
 
   // Helper to update URL params cleanly
-  const updateFilters = (newParams: Record<string, string | number | boolean | null | undefined>) => {
+  const updateFilters = (
+    newParams: Record<string, string | number | boolean | null | undefined>
+  ) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === undefined || value === null || value === '' || value === false) {
@@ -222,7 +218,13 @@ export default function ShopProfilePage({
   }
 
   const shopPhone = shop.phone || shop.seller?.phone;
-  const locationParts = [shop.village, shop.union, shop.upazila, shop.district, shop.address].filter(Boolean);
+  const locationParts = [
+    shop.village,
+    shop.union,
+    shop.upazila,
+    shop.district,
+    shop.address,
+  ].filter(Boolean);
   const locationString = locationParts.join(', ');
   const activeFiltersCount = [
     activeCategory,
@@ -236,7 +238,7 @@ export default function ShopProfilePage({
   return (
     <div className="pb-16 bg-muted/10 min-h-screen">
       {/* 1. Hero Cover Banner */}
-      <div className="relative h-48 md:h-72 lg:h-80 w-full bg-linear-to-r from-emerald-800 to-green-700 overflow-hidden">
+      <div className="relative h-48 md:h-72 lg:h-80 w-full bg-emerald-900 overflow-hidden">
         {shop.banner ? (
           <Image
             src={shop.banner}
@@ -246,11 +248,11 @@ export default function ShopProfilePage({
             priority
           />
         ) : (
-          <div className="absolute inset-0 bg-linear-to-r from-emerald-700 to-teal-800 opacity-90 flex items-center justify-center">
+          <div className="absolute inset-0 bg-emerald-800 flex items-center justify-center">
             <Store className="w-24 h-24 text-white/20" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl -mt-16 md:-mt-20 relative z-10">
@@ -280,7 +282,10 @@ export default function ShopProfilePage({
                   {isBn ? shop.nameBn : shop.nameEn}
                 </h1>
                 {shop.isVerified && (
-                  <Badge variant="secondary" className="bg-blue-600 text-white gap-1 py-0.5 px-2 text-xs">
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-600 text-white gap-1 py-0.5 px-2 text-xs"
+                  >
                     <CheckCircle className="h-3.5 w-3.5" />
                     {isBn ? 'ভেরিফাইড দোকান' : 'Verified Shop'}
                   </Badge>
@@ -313,7 +318,8 @@ export default function ShopProfilePage({
 
                 {/* Product Count */}
                 <span className="bg-muted px-2 py-0.5 rounded-md text-xs font-medium">
-                  {shop.productCount || productsResponse?.meta?.total || 0} {isBn ? 'টি পণ্য' : 'products'}
+                  {shop.productCount || productsResponse?.meta?.total || 0}{' '}
+                  {isBn ? 'টি পণ্য' : 'products'}
                 </span>
 
                 {/* Location */}
@@ -338,13 +344,17 @@ export default function ShopProfilePage({
                   {shop.openingHours && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
-                      <span>{isBn ? 'সময়সূচী:' : 'Hours:'} {shop.openingHours}</span>
+                      <span>
+                        {isBn ? 'সময়সূচী:' : 'Hours:'} {shop.openingHours}
+                      </span>
                     </div>
                   )}
                   {shop.deliveryInfo && (
                     <div className="flex items-center gap-1.5">
                       <Truck className="w-3.5 h-3.5 text-primary shrink-0" />
-                      <span>{isBn ? 'ডেলিভারি:' : 'Delivery:'} {shop.deliveryInfo}</span>
+                      <span>
+                        {isBn ? 'ডেলিভারি:' : 'Delivery:'} {shop.deliveryInfo}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -365,7 +375,12 @@ export default function ShopProfilePage({
 
               {/* WhatsApp */}
               {shop.whatsapp && (
-                <Button asChild variant="outline" size="sm" className="flex-1 md:flex-none text-emerald-600 border-emerald-500/30 hover:bg-emerald-50">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 md:flex-none text-emerald-600 border-emerald-500/30 hover:bg-emerald-50"
+                >
                   <a
                     href={`https://wa.me/${shop.whatsapp.replace(/[^0-9]/g, '')}`}
                     target="_blank"
@@ -481,7 +496,9 @@ export default function ShopProfilePage({
                   variant={activeCategory === cat.id ? 'default' : 'outline'}
                   size="sm"
                   onClick={() =>
-                    updateFilters({ category: activeCategory === cat.id ? null : cat.id })
+                    updateFilters({
+                      category: activeCategory === cat.id ? null : cat.id,
+                    })
                   }
                   className="rounded-full text-xs font-semibold px-3 h-8 shrink-0"
                 >
@@ -540,7 +557,9 @@ export default function ShopProfilePage({
                       key={cat.id}
                       type="button"
                       onClick={() =>
-                        updateFilters({ category: activeCategory === cat.id ? null : cat.id })
+                        updateFilters({
+                          category: activeCategory === cat.id ? null : cat.id,
+                        })
                       }
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
                         activeCategory === cat.id
@@ -590,7 +609,11 @@ export default function ShopProfilePage({
                       <button
                         key={b.id}
                         type="button"
-                        onClick={() => updateFilters({ brand: activeBrand === b.id ? null : b.id })}
+                        onClick={() =>
+                          updateFilters({
+                            brand: activeBrand === b.id ? null : b.id,
+                          })
+                        }
                         className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
                           activeBrand === b.id
                             ? 'bg-primary text-primary-foreground font-semibold'
@@ -598,9 +621,7 @@ export default function ShopProfilePage({
                         }`}
                       >
                         <span className="truncate">{isBn ? b.nameBn : b.nameEn}</span>
-                        <span className="opacity-80 text-[11px] ml-1 shrink-0">
-                          {b.count ?? 0}
-                        </span>
+                        <span className="opacity-80 text-[11px] ml-1 shrink-0">{b.count ?? 0}</span>
                       </button>
                     ))}
                   </div>
@@ -677,7 +698,9 @@ export default function ShopProfilePage({
                 <form onSubmit={handleSearchSubmit} className="relative w-full sm:flex-1">
                   <Input
                     type="search"
-                    placeholder={isBn ? 'এই দোকানে পণ্য খুঁজুন...' : 'Search products in this shop...'}
+                    placeholder={
+                      isBn ? 'এই দোকানে পণ্য খুঁজুন...' : 'Search products in this shop...'
+                    }
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     className="pl-9 pr-8 h-10 text-sm rounded-xl"
@@ -699,10 +722,7 @@ export default function ShopProfilePage({
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   {/* Sort Selector */}
-                  <Select
-                    value={sortParam}
-                    onValueChange={(val) => updateFilters({ sort: val })}
-                  >
+                  <Select value={sortParam} onValueChange={(val) => updateFilters({ sort: val })}>
                     <SelectTrigger className="h-10 text-xs w-full sm:w-[160px] rounded-xl">
                       <SelectValue placeholder={isBn ? 'সাজান' : 'Sort by'} />
                     </SelectTrigger>
@@ -723,7 +743,10 @@ export default function ShopProfilePage({
                   {/* Filter Button (Opens Sheet on Mobile & Tablet) */}
                   <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
                     <SheetTrigger asChild>
-                      <Button variant="outline" className="h-10 text-xs rounded-xl relative lg:hidden shrink-0">
+                      <Button
+                        variant="outline"
+                        className="h-10 text-xs rounded-xl relative lg:hidden shrink-0"
+                      >
                         <SlidersHorizontal className="w-4 h-4 mr-1.5" />
                         {isBn ? 'ফিল্টার' : 'Filters'}
                         {activeFiltersCount > 0 && (
@@ -733,7 +756,10 @@ export default function ShopProfilePage({
                         )}
                       </Button>
                     </SheetTrigger>
-                    <SheetContent side="right" className="w-[320px] sm:w-[380px] p-6 overflow-y-auto">
+                    <SheetContent
+                      side="right"
+                      className="w-[320px] sm:w-[380px] p-6 overflow-y-auto"
+                    >
                       <SheetHeader className="mb-6">
                         <SheetTitle className="text-lg font-bold flex items-center justify-between">
                           <span>{isBn ? 'ফিল্টারসমূহ' : 'Filter Products'}</span>
@@ -817,7 +843,9 @@ export default function ShopProfilePage({
                                   key={b.id}
                                   type="button"
                                   onClick={() =>
-                                    updateFilters({ brand: activeBrand === b.id ? null : b.id })
+                                    updateFilters({
+                                      brand: activeBrand === b.id ? null : b.id,
+                                    })
                                   }
                                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
                                     activeBrand === b.id
@@ -976,7 +1004,8 @@ export default function ShopProfilePage({
                   {isBn ? 'দোকানের পণ্যসমূহ' : 'Shop Products'}
                 </h2>
                 <span className="text-xs md:text-sm text-muted-foreground font-medium">
-                  {productsResponse?.meta?.total ?? 0} {isBn ? 'টি পণ্য পাওয়া গেছে' : 'items found'}
+                  {productsResponse?.meta?.total ?? 0}{' '}
+                  {isBn ? 'টি পণ্য পাওয়া গেছে' : 'items found'}
                 </span>
               </div>
 
@@ -998,8 +1027,8 @@ export default function ShopProfilePage({
                         ? 'আপনার ফিল্টারের সাথে মিলে এমন কোন পণ্য পাওয়া যায়নি। অনুগ্রহ করে ফিল্টার পরিবর্তন করুন।'
                         : 'No products matched your active filters. Try adjusting or clearing filters.'
                       : isBn
-                      ? 'এই দোকানটি এখনও কোন পণ্য যোগ করেনি।'
-                      : 'This shop has not listed any products yet.'}
+                        ? 'এই দোকানটি এখনও কোন পণ্য যোগ করেনি।'
+                        : 'This shop has not listed any products yet.'}
                   </p>
                   {activeFiltersCount > 0 && (
                     <Button variant="outline" onClick={clearAllFilters}>
@@ -1009,11 +1038,7 @@ export default function ShopProfilePage({
                 </div>
               ) : (
                 <div className="space-y-8">
-                  <ProductGrid
-                    products={productsResponse.data}
-                    isLoading={false}
-                    lang={lang}
-                  />
+                  <ProductGrid products={productsResponse.data} isLoading={false} lang={lang} />
 
                   {/* Pagination */}
                   {productsResponse.meta && productsResponse.meta.totalPages > 1 && (

@@ -82,11 +82,7 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
       header: 'Status',
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
-        return (
-          <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>
-            {status}
-          </Badge>
-        );
+        return <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>{status}</Badge>;
       },
     },
     {
@@ -98,11 +94,7 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
 
         return (
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditingRolesUser(user)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setEditingRolesUser(user)}>
               Roles
             </Button>
             <Button

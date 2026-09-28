@@ -38,7 +38,7 @@ export class DisputesService {
     // Check time limit (e.g., 7 days)
     const deliveryHistory = order.statusHistory?.find((h) => h.status === OrderStatus.DELIVERED);
     const deliveredAt = deliveryHistory ? deliveryHistory.createdAt : order.updatedAt;
-    
+
     if (new Date().getTime() - new Date(deliveredAt).getTime() > 7 * 24 * 60 * 60 * 1000) {
       throw new BadRequestException('Dispute window (7 days) has expired');
     }
@@ -104,7 +104,9 @@ export class DisputesService {
     }
 
     // Sort messages by creation date
-    dispute.messages = dispute.messages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    dispute.messages = dispute.messages.sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    );
 
     return dispute;
   }
@@ -115,8 +117,10 @@ export class DisputesService {
       throw new NotFoundException('Dispute not found');
     }
 
-    if (role === 'customer' && dispute.customerId !== senderId) throw new BadRequestException('Unauthorized');
-    if (role === 'seller' && dispute.sellerId !== senderId) throw new BadRequestException('Unauthorized');
+    if (role === 'customer' && dispute.customerId !== senderId)
+      throw new BadRequestException('Unauthorized');
+    if (role === 'seller' && dispute.sellerId !== senderId)
+      throw new BadRequestException('Unauthorized');
 
     const message = this.disputeMessageRepository.create({
       disputeId,

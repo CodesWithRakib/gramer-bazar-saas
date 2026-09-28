@@ -11,13 +11,7 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service.js';
 import { CreateCategoryDto } from '../dto/create-category.dto.js';
 import { UpdateCategoryDto } from '../dto/update-category.dto.js';
@@ -112,20 +106,13 @@ export class CategoriesController {
     @Query('parentId') parentId?: string,
     @Query('rootsOnly') rootsOnly?: boolean,
   ) {
-    return this.categoriesService.findAll(
-      page,
-      limit,
-      search,
-      parentId,
-      rootsOnly,
-    );
+    return this.categoriesService.findAll(page, limit, search, parentId, rootsOnly);
   }
 
   @Get(':id')
   @ApiOperation({
     summary: 'Retrieve single category by UUID',
-    description:
-      'Returns full category details, child subcategories, and associated brands.',
+    description: 'Returns full category details, child subcategories, and associated brands.',
   })
   @ApiParam({
     name: 'id',
@@ -164,10 +151,7 @@ export class CategoriesController {
     description: 'Category updated successfully',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
-  ) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 

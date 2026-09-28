@@ -16,7 +16,16 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  IsBoolean,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ImportLogResponseDto } from './dto/import-response.dto.js';
 import {
@@ -47,7 +56,10 @@ export class RunImportDto {
   @IsString()
   category?: string;
 
-  @ApiPropertyOptional({ description: 'Whether to update existing products if duplicates are detected', default: false })
+  @ApiPropertyOptional({
+    description: 'Whether to update existing products if duplicates are detected',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   updateExisting?: boolean;
@@ -64,7 +76,8 @@ export class ProductImporterController {
   @Post('run')
   @ApiOperation({
     summary: 'Trigger bulk product import or dry-run (Admin only)',
-    description: 'Requires ADMIN or SUPER_ADMIN role. Imports seed products from remote sources (dummyjson, openfoodfacts).',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Imports seed products from remote sources (dummyjson, openfoodfacts).',
   })
   @ApiStandardResponse({
     type: ImportLogResponseDto,
@@ -103,7 +116,8 @@ export class ProductImporterController {
   @Get('logs/:id')
   @ApiOperation({
     summary: 'Retrieve specific import log details (Admin only)',
-    description: 'Returns full diagnostic payload, count breakdown, and error messages for an import run.',
+    description:
+      'Returns full diagnostic payload, count breakdown, and error messages for an import run.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Import log UUID' })
   @ApiStandardResponse({

@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import React, { useState, use } from "react";
-import Link from "next/link";
+import React, { useState, use } from 'react';
+import Link from 'next/link';
 import {
   useGetUsersQuery,
   useUpdateUserStatusMutation,
   Role,
   User,
-} from "@/features/users/usersApi";
-import { DataTable } from "@/components/ui/data-table";
-import { ColumnDef } from "@tanstack/react-table";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { UserPlus, ArrowLeft } from "lucide-react";
-import { UserRoleDialog } from "@/features/admin/users-management";
+} from '@/features/users/usersApi';
+import { DataTable } from '@/components/ui/data-table';
+import { ColumnDef } from '@tanstack/react-table';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { UserPlus, ArrowLeft } from 'lucide-react';
+import { UserRoleDialog } from '@/features/admin/users-management';
 
 export interface SuperAdminAdminsViewProps {
   lang?: string;
 }
 
 export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps) {
-  const isBn = lang === "bn";
+  const isBn = lang === 'bn';
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [editingRolesUser, setEditingRolesUser] = useState<User | null>(null);
 
   const { data, isLoading, isError, refetch } = useGetUsersQuery({
@@ -39,22 +39,21 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
 
   const columns: ColumnDef<User>[] = [
     {
-      accessorKey: "firstName",
-      header: isBn ? "নাম" : "Name",
-      cell: ({ row }) =>
-        `${row.original.firstName} ${row.original.lastName}`.trim(),
+      accessorKey: 'firstName',
+      header: isBn ? 'নাম' : 'Name',
+      cell: ({ row }) => `${row.original.firstName} ${row.original.lastName}`.trim(),
     },
     {
-      accessorKey: "email",
-      header: isBn ? "ইমেইল" : "Email",
+      accessorKey: 'email',
+      header: isBn ? 'ইমেইল' : 'Email',
     },
     {
-      accessorKey: "phone",
-      header: isBn ? "ফোন নম্বর" : "Phone",
+      accessorKey: 'phone',
+      header: isBn ? 'ফোন নম্বর' : 'Phone',
     },
     {
-      accessorKey: "roles",
-      header: isBn ? "রোল" : "Roles",
+      accessorKey: 'roles',
+      header: isBn ? 'রোল' : 'Roles',
       cell: ({ row }) => {
         const roles = row.original.roles as { name: string }[];
         return (
@@ -62,7 +61,7 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
             {roles?.map((r) => (
               <Badge
                 key={r.name}
-                variant={r.name === "SUPER_ADMIN" ? "default" : "secondary"}
+                variant={r.name === 'SUPER_ADMIN' ? 'default' : 'secondary'}
                 className="font-medium"
               >
                 {r.name}
@@ -74,42 +73,38 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
               className="h-7 text-xs"
               onClick={() => setEditingRolesUser(row.original)}
             >
-              {isBn ? "পরিবর্তন" : "Edit"}
+              {isBn ? 'পরিবর্তন' : 'Edit'}
             </Button>
           </div>
         );
       },
     },
     {
-      accessorKey: "status",
-      header: isBn ? "স্ট্যাটাস" : "Status",
+      accessorKey: 'status',
+      header: isBn ? 'স্ট্যাটাস' : 'Status',
       cell: ({ row }) => {
         const status = row.original.status as string;
         const user = row.original;
         return (
           <div className="flex items-center gap-2">
-            <Badge variant={status === "ACTIVE" ? "default" : "destructive"}>
-              {status}
-            </Badge>
-            {status !== "ACTIVE" ? (
+            <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>{status}</Badge>
+            {status !== 'ACTIVE' ? (
               <Button
                 size="sm"
                 variant="outline"
                 className="h-7 text-xs"
-                onClick={() => updateStatus({ id: user.id, status: "ACTIVE" })}
+                onClick={() => updateStatus({ id: user.id, status: 'ACTIVE' })}
               >
-                {isBn ? "সক্রিয় করুন" : "Activate"}
+                {isBn ? 'সক্রিয় করুন' : 'Activate'}
               </Button>
             ) : (
               <Button
                 size="sm"
                 variant="destructive"
                 className="h-7 text-xs"
-                onClick={() =>
-                  updateStatus({ id: user.id, status: "SUSPENDED" })
-                }
+                onClick={() => updateStatus({ id: user.id, status: 'SUSPENDED' })}
               >
-                {isBn ? "স্থগিত করুন" : "Suspend"}
+                {isBn ? 'স্থগিত করুন' : 'Suspend'}
               </Button>
             )}
           </div>
@@ -117,8 +112,8 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
       },
     },
     {
-      accessorKey: "createdAt",
-      header: isBn ? "নিবন্ধনের তারিখ" : "Registered",
+      accessorKey: 'createdAt',
+      header: isBn ? 'নিবন্ধনের তারিখ' : 'Registered',
       cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     },
   ];
@@ -135,13 +130,13 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              {isBn ? "অ্যাডমিন পরিচালনা" : "Admin Personnel Roster"}
+              {isBn ? 'অ্যাডমিন পরিচালনা' : 'Admin Personnel Roster'}
             </h1>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
             {isBn
-              ? "প্ল্যাটফর্মের সকল অনুমোদিত অ্যাডমিন ও স্টাফদের তালিকা এবং পারমিশন।"
-              : "Authorized platform operators and administrative personnel."}
+              ? 'প্ল্যাটফর্মের সকল অনুমোদিত অ্যাডমিন ও স্টাফদের তালিকা এবং পারমিশন।'
+              : 'Authorized platform operators and administrative personnel.'}
           </p>
         </div>
       </div>
@@ -152,13 +147,13 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
         pageCount={data?.meta?.totalPages ?? -1}
         totalCount={data?.meta?.total}
         itemLabel={{
-          singular: isBn ? "অ্যাডমিন" : "admin",
-          plural: isBn ? "অ্যাডমিন" : "admins",
+          singular: isBn ? 'অ্যাডমিন' : 'admin',
+          plural: isBn ? 'অ্যাডমিন' : 'admins',
         }}
         isBn={isBn}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
-          if (typeof updater === "function") {
+          if (typeof updater === 'function') {
             const newState = updater({ pageIndex: page - 1, pageSize: limit });
             setPage(newState.pageIndex + 1);
             setLimit(newState.pageSize);
@@ -172,12 +167,12 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
           setSearch(val);
           setPage(1);
         }}
-        searchPlaceholder={isBn ? "অ্যাডমিন খুঁজুন..." : "Search admins..."}
+        searchPlaceholder={isBn ? 'অ্যাডমিন খুঁজুন...' : 'Search admins...'}
         actionSlot={
           <Button asChild className="!h-11 rounded-full px-6 shadow-xs">
             <Link href={`/${lang}/super-admin/create-user`}>
               <UserPlus className="w-4 h-4 mr-2" />
-              {isBn ? "নতুন অ্যাডমিন তৈরি" : "Add Admin User"}
+              {isBn ? 'নতুন অ্যাডমিন তৈরি' : 'Add Admin User'}
             </Link>
           </Button>
         }

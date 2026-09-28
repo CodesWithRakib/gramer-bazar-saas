@@ -110,7 +110,9 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
             </CardTitle>
             <div
               className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-                metrics.lowStockCount ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'
+                metrics.lowStockCount
+                  ? 'bg-destructive/10 text-destructive'
+                  : 'bg-muted text-muted-foreground'
               }`}
             >
               <PackageX className="h-4 w-4" />
@@ -145,7 +147,11 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                   data={metrics.revenueData || []}
                   margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
                   <XAxis
                     dataKey="name"
                     stroke="hsl(var(--muted-foreground))"
@@ -228,8 +234,8 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                         order.status === 'PENDING'
                           ? 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400'
                           : order.status === 'DELIVERED'
-                          ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                          : 'bg-muted text-muted-foreground'
+                            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {order.status}

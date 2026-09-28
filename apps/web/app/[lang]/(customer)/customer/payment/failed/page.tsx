@@ -9,11 +9,7 @@ import { XCircle, RefreshCw, ShoppingCart, HelpCircle, AlertTriangle } from 'luc
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 import { useGetOrderByIdQuery } from '@/features/orders/ordersApi';
 
-export default function PaymentFailedPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default function PaymentFailedPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
   const isBn = lang === 'bn';
   const searchParams = useSearchParams();
@@ -40,7 +36,7 @@ export default function PaymentFailedPage({
     } catch (err: any) {
       setErrorMessage(
         err?.data?.message ||
-          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to retry payment session.'),
+          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to retry payment session.')
       );
     }
   };
@@ -68,19 +64,27 @@ export default function PaymentFailedPage({
             <div className="rounded-2xl bg-muted/40 p-4 space-y-2.5 border border-border/50 text-sm">
               {tranId && (
                 <div className="flex justify-between items-center text-xs sm:text-sm">
-                  <span className="text-muted-foreground">{isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}
+                  </span>
                   <span className="font-mono text-foreground font-medium">{tranId}</span>
                 </div>
               )}
               {orderId && (
                 <div className="flex justify-between items-center text-xs sm:text-sm">
-                  <span className="text-muted-foreground">{isBn ? 'অর্ডার রেফারেন্স' : 'Order Reference'}</span>
-                  <span className="font-mono text-foreground font-medium">{orderId.slice(0, 13)}...</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'অর্ডার রেফারেন্স' : 'Order Reference'}
+                  </span>
+                  <span className="font-mono text-foreground font-medium">
+                    {orderId.slice(0, 13)}...
+                  </span>
                 </div>
               )}
               {order?.total && (
                 <div className="flex justify-between items-center text-xs sm:text-sm font-semibold">
-                  <span className="text-muted-foreground">{isBn ? 'অর্ডার মোট' : 'Order Total'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'অর্ডার মোট' : 'Order Total'}
+                  </span>
                   <span>৳{Number(order.total).toFixed(2)}</span>
                 </div>
               )}
@@ -109,8 +113,12 @@ export default function PaymentFailedPage({
               >
                 <RefreshCw className={`w-4 h-4 ${isRetrying ? 'animate-spin' : ''}`} />
                 {isRetrying
-                  ? (isBn ? 'রিডাইরেক্ট হচ্ছে...' : 'Redirecting...')
-                  : (isBn ? 'পুনরায় পেমেন্ট করুন' : 'Retry Payment')}
+                  ? isBn
+                    ? 'রিডাইরেক্ট হচ্ছে...'
+                    : 'Redirecting...'
+                  : isBn
+                    ? 'পুনরায় পেমেন্ট করুন'
+                    : 'Retry Payment'}
               </Button>
             )}
 
@@ -128,7 +136,9 @@ export default function PaymentFailedPage({
               className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors"
             >
               <HelpCircle className="w-3.5 h-3.5" />
-              {isBn ? 'সহায়তার জন্য আমাদের সাপোর্ট সেন্টারে যোগাযোগ করুন' : 'Need help? Contact Gramer Bazar support'}
+              {isBn
+                ? 'সহায়তার জন্য আমাদের সাপোর্ট সেন্টারে যোগাযোগ করুন'
+                : 'Need help? Contact Gramer Bazar support'}
             </Link>
           </div>
         </CardContent>

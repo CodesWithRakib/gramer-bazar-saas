@@ -1,5 +1,5 @@
-import { api } from "../../store/api";
-import { PaginationMeta } from "../catalog/catalogApi";
+import { api } from '../../store/api';
+import { PaginationMeta } from '../catalog/catalogApi';
 
 export interface AuditLogEntry {
   id: string;
@@ -27,10 +27,10 @@ export const auditLogsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAuditLogs: builder.query<AuditLogResponse, AuditLogQueryParams | void>({
       query: (params) => ({
-        url: "/admin/audit-logs",
+        url: '/admin/audit-logs',
         params: params ?? {},
       }),
-      providesTags: ["AuditLog"],
+      providesTags: ['AuditLog'],
     }),
   }),
 });

@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   useGetConversationsQuery,
   useGetMessagesQuery,
   useMarkMessagesAsReadMutation,
   useSendMessageRestMutation,
   type ConversationParticipant,
-} from "@/features/chat/chatApi";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { useChatSocket } from "@/hooks/useChatSocket";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+} from '@/features/chat/chatApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useChatSocket } from '@/hooks/useChatSocket';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import {
   Send,
   Search,
@@ -28,8 +28,8 @@ import {
   CheckCheck,
   Check,
   AlertCircle,
-} from "lucide-react";
-import { format } from "date-fns";
+} from 'lucide-react';
+import { format } from 'date-fns';
 
 export function ChatInterface() {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -40,16 +40,12 @@ export function ChatInterface() {
     refetch: refetchConversations,
   } = useGetConversationsQuery(undefined, { skip: !user });
 
-  const [activeConversationId, setActiveConversationId] = useState<
-    string | null
-  >(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [messageInput, setMessageInput] = useState("");
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
 
-  const { isConnected, sendMessage, markRead } = useChatSocket(
-    activeConversationId ?? undefined,
-  );
+  const { isConnected, sendMessage, markRead } = useChatSocket(activeConversationId ?? undefined);
   const [sendMessageRest] = useSendMessageRestMutation();
   const [markAsRead] = useMarkMessagesAsReadMutation();
 
@@ -67,7 +63,7 @@ export function ChatInterface() {
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages?.length]);
 
@@ -95,9 +91,9 @@ export function ChatInterface() {
           content,
         }).unwrap();
       }
-      setMessageInput("");
+      setMessageInput('');
     } catch (err) {
-      console.error("Failed to send message:", err);
+      console.error('Failed to send message:', err);
     } finally {
       setIsSending(false);
     }
@@ -107,37 +103,32 @@ export function ChatInterface() {
     (participants: ConversationParticipant[]) => {
       return participants?.find((p) => p.id !== user?.id) || participants?.[0];
     },
-    [user?.id],
+    [user?.id]
   );
 
-  const getParticipantRoleName = (
-    participant?: ConversationParticipant | null,
-  ) => {
-    if (!participant) return "";
+  const getParticipantRoleName = (participant?: ConversationParticipant | null) => {
+    if (!participant) return '';
     if (participant.roles && participant.roles.length > 0) {
       return participant.roles[0].name;
     }
-    return participant.role || "";
+    return participant.role || '';
   };
 
-  const getReferenceBadge = (
-    refType?: string | null,
-    refId?: string | null,
-  ) => {
+  const getReferenceBadge = (refType?: string | null, refId?: string | null) => {
     if (!refId && !refType) return null;
-    const type = refType?.toUpperCase() || "REF";
+    const type = refType?.toUpperCase() || 'REF';
     let icon = <HelpCircle className="h-3 w-3 mr-1" />;
     let label = refId ? `#${refId.slice(0, 8)}` : type;
 
-    if (type.includes("ORDER")) {
+    if (type.includes('ORDER')) {
       icon = <ShoppingBag className="h-3 w-3 mr-1" />;
-      label = `Order ${refId ? `#${refId}` : ""}`;
-    } else if (type.includes("PRODUCT")) {
+      label = `Order ${refId ? `#${refId}` : ''}`;
+    } else if (type.includes('PRODUCT')) {
       icon = <Package className="h-3 w-3 mr-1" />;
-      label = `Product ${refId ? `#${refId.slice(0, 8)}` : ""}`;
-    } else if (type.includes("DELIVERY")) {
+      label = `Product ${refId ? `#${refId.slice(0, 8)}` : ''}`;
+    } else if (type.includes('DELIVERY')) {
       icon = <Truck className="h-3 w-3 mr-1" />;
-      label = `Delivery ${refId ? `#${refId.slice(0, 8)}` : ""}`;
+      label = `Delivery ${refId ? `#${refId.slice(0, 8)}` : ''}`;
     }
 
     return (
@@ -156,30 +147,22 @@ export function ChatInterface() {
     return conversations
       .filter((conv) => {
         const other = getOtherParticipant(conv.participants);
-        const fullName =
-          `${other?.firstName || ""} ${other?.lastName || ""}`.toLowerCase();
-        const refInfo =
-          `${conv.referenceId || ""} ${conv.referenceType || ""}`.toLowerCase();
+        const fullName = `${other?.firstName || ''} ${other?.lastName || ''}`.toLowerCase();
+        const refInfo = `${conv.referenceId || ''} ${conv.referenceType || ''}`.toLowerCase();
         const search = searchQuery.toLowerCase();
         return fullName.includes(search) || refInfo.includes(search);
       })
-      .sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-      );
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }, [conversations, getOtherParticipant, searchQuery]);
 
   const activeConversation = useMemo(
     () => conversations?.find((c) => c.id === activeConversationId),
-    [conversations, activeConversationId],
+    [conversations, activeConversationId]
   );
 
   const activeOtherParticipant = useMemo(
-    () =>
-      activeConversation
-        ? getOtherParticipant(activeConversation.participants)
-        : null,
-    [activeConversation, getOtherParticipant],
+    () => (activeConversation ? getOtherParticipant(activeConversation.participants) : null),
+    [activeConversation, getOtherParticipant]
   );
 
   if (isConversationsLoading || !user) {
@@ -187,9 +170,7 @@ export function ChatInterface() {
       <div className="flex h-[75vh] min-h-[600px] items-center justify-center border rounded-xl bg-card shadow-sm">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">
-            Loading conversations...
-          </p>
+          <p className="text-sm text-muted-foreground">Loading conversations...</p>
         </div>
       </div>
     );
@@ -215,7 +196,7 @@ export function ChatInterface() {
       {/* Sidebar (Conversation List) */}
       <div
         className={`${
-          activeConversationId ? "hidden md:flex" : "flex"
+          activeConversationId ? 'hidden md:flex' : 'flex'
         } w-full md:w-80 lg:w-96 border-r flex-col bg-muted/15 flex-shrink-0 transition-all`}
       >
         <div className="p-4 border-b bg-card">
@@ -223,10 +204,10 @@ export function ChatInterface() {
             <h2 className="font-semibold text-lg">Messages</h2>
             <div className="flex items-center gap-1.5 text-xs">
               <span
-                className={`h-2 w-2 rounded-full ${isConnected ? "bg-emerald-500" : "bg-amber-500"}`}
+                className={`h-2 w-2 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-amber-500'}`}
               />
               <span className="text-muted-foreground">
-                {isConnected ? "Real-time" : "Reconnecting..."}
+                {isConnected ? 'Real-time' : 'Reconnecting...'}
               </span>
             </div>
           </div>
@@ -259,8 +240,7 @@ export function ChatInterface() {
                   isSelected && messages && messages.length > 0
                     ? messages[messages.length - 1]
                     : conv.lastMessage ||
-                      (conv.messages &&
-                        conv.messages[conv.messages.length - 1]);
+                      (conv.messages && conv.messages[conv.messages.length - 1]);
                 const unreadCount = conv.unreadCount || 0;
 
                 return (
@@ -268,16 +248,14 @@ export function ChatInterface() {
                     key={conv.id}
                     onClick={() => setActiveConversationId(conv.id)}
                     className={`flex items-start gap-3 p-3.5 text-left transition-colors hover:bg-muted/60 ${
-                      isSelected
-                        ? "bg-primary/10 border-l-4 border-primary pl-2.5"
-                        : ""
+                      isSelected ? 'bg-primary/10 border-l-4 border-primary pl-2.5' : ''
                     }`}
                   >
                     <div className="relative flex-shrink-0">
                       <Avatar className="h-11 w-11 border border-border/80">
                         <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                          {other?.firstName?.[0] || "U"}
-                          {other?.lastName?.[0] || ""}
+                          {other?.firstName?.[0] || 'U'}
+                          {other?.lastName?.[0] || ''}
                         </AvatarFallback>
                       </Avatar>
                       {roleName && (
@@ -290,13 +268,13 @@ export function ChatInterface() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-0.5">
                         <span
-                          className={`font-medium text-sm truncate ${unreadCount > 0 ? "text-primary font-bold" : ""}`}
+                          className={`font-medium text-sm truncate ${unreadCount > 0 ? 'text-primary font-bold' : ''}`}
                         >
-                          {other?.firstName || "User"} {other?.lastName || ""}
+                          {other?.firstName || 'User'} {other?.lastName || ''}
                         </span>
                         {lastMsg?.createdAt && (
                           <span className="text-[11px] text-muted-foreground flex-shrink-0 ml-1">
-                            {format(new Date(lastMsg.createdAt), "HH:mm")}
+                            {format(new Date(lastMsg.createdAt), 'HH:mm')}
                           </span>
                         )}
                       </div>
@@ -304,23 +282,18 @@ export function ChatInterface() {
                       {/* Reference Badge if order/product attached */}
                       {(conv.referenceId || conv.referenceType) && (
                         <div className="mb-1">
-                          {getReferenceBadge(
-                            conv.referenceType,
-                            conv.referenceId,
-                          )}
+                          {getReferenceBadge(conv.referenceType, conv.referenceId)}
                         </div>
                       )}
 
                       <div className="flex justify-between items-center gap-2">
                         <p
-                          className={`text-xs truncate ${unreadCount > 0 ? "font-semibold text-foreground" : "text-muted-foreground"}`}
+                          className={`text-xs truncate ${unreadCount > 0 ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}
                         >
                           {lastMsg ? (
                             lastMsg.senderId === user.id ? (
                               <span className="flex items-center gap-1">
-                                <span className="text-muted-foreground">
-                                  You:
-                                </span>{" "}
+                                <span className="text-muted-foreground">You:</span>{' '}
                                 {lastMsg.content}
                               </span>
                             ) : (
@@ -332,7 +305,7 @@ export function ChatInterface() {
                         </p>
                         {unreadCount > 0 && (
                           <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold flex items-center justify-center flex-shrink-0">
-                            {unreadCount > 99 ? "99+" : unreadCount}
+                            {unreadCount > 99 ? '99+' : unreadCount}
                           </span>
                         )}
                       </div>
@@ -348,7 +321,7 @@ export function ChatInterface() {
       {/* Main Chat Area */}
       <div
         className={`${
-          activeConversationId ? "flex" : "hidden md:flex"
+          activeConversationId ? 'flex' : 'hidden md:flex'
         } flex-1 flex-col bg-card relative min-w-0`}
       >
         {activeConversationId ? (
@@ -367,35 +340,33 @@ export function ChatInterface() {
 
                 <Avatar className="h-10 w-10 border border-border/80 flex-shrink-0">
                   <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                    {activeOtherParticipant?.firstName?.[0] || "U"}
-                    {activeOtherParticipant?.lastName?.[0] || ""}
+                    {activeOtherParticipant?.firstName?.[0] || 'U'}
+                    {activeOtherParticipant?.lastName?.[0] || ''}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-sm truncate">
-                      {activeOtherParticipant?.firstName || "User"}{" "}
-                      {activeOtherParticipant?.lastName || ""}
+                      {activeOtherParticipant?.firstName || 'User'}{' '}
+                      {activeOtherParticipant?.lastName || ''}
                     </h3>
-                    {activeOtherParticipant &&
-                      getParticipantRoleName(activeOtherParticipant) && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] uppercase font-bold py-0 h-4"
-                        >
-                          {getParticipantRoleName(activeOtherParticipant)}
-                        </Badge>
-                      )}
+                    {activeOtherParticipant && getParticipantRoleName(activeOtherParticipant) && (
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] uppercase font-bold py-0 h-4"
+                      >
+                        {getParticipantRoleName(activeOtherParticipant)}
+                      </Badge>
+                    )}
                   </div>
 
                   {activeConversation &&
-                    (activeConversation.referenceId ||
-                      activeConversation.referenceType) && (
+                    (activeConversation.referenceId || activeConversation.referenceType) && (
                       <div className="mt-0.5">
                         {getReferenceBadge(
                           activeConversation.referenceType,
-                          activeConversation.referenceId,
+                          activeConversation.referenceId
                         )}
                       </div>
                     )}
@@ -405,9 +376,9 @@ export function ChatInterface() {
               <div className="flex items-center gap-2 flex-shrink-0">
                 <span className="text-xs text-muted-foreground hidden sm:flex items-center gap-1.5">
                   <span
-                    className={`h-2 w-2 rounded-full ${isConnected ? "bg-emerald-500" : "bg-amber-500"}`}
+                    className={`h-2 w-2 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-amber-500'}`}
                   />
-                  {isConnected ? "Connected" : "Offline Mode"}
+                  {isConnected ? 'Connected' : 'Offline Mode'}
                 </span>
               </div>
             </div>
@@ -420,9 +391,7 @@ export function ChatInterface() {
               {isMessagesLoading ? (
                 <div className="flex flex-col items-center justify-center h-full py-16 gap-2">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">
-                    Loading message history...
-                  </p>
+                  <p className="text-xs text-muted-foreground">Loading message history...</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3 py-2">
@@ -442,9 +411,9 @@ export function ChatInterface() {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+                        className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
                       >
-                        {!isMe && senderRole && senderRole !== "CUSTOMER" && (
+                        {!isMe && senderRole && senderRole !== 'CUSTOMER' && (
                           <span className="text-[10px] font-semibold uppercase text-muted-foreground ml-2 mb-0.5 tracking-wider">
                             {senderRole}
                           </span>
@@ -453,23 +422,17 @@ export function ChatInterface() {
                         <div
                           className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm text-sm break-words ${
                             isMe
-                              ? "bg-primary text-primary-foreground rounded-tr-xs"
-                              : "bg-background border rounded-tl-xs text-foreground shadow-xs"
+                              ? 'bg-primary text-primary-foreground rounded-tr-xs'
+                              : 'bg-background border rounded-tl-xs text-foreground shadow-xs'
                           }`}
                         >
-                          <p className="whitespace-pre-wrap leading-relaxed">
-                            {msg.content}
-                          </p>
+                          <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                           <div
                             className={`flex items-center justify-end gap-1 text-[10px] mt-1 ${
-                              isMe
-                                ? "text-primary-foreground/80"
-                                : "text-muted-foreground"
+                              isMe ? 'text-primary-foreground/80' : 'text-muted-foreground'
                             }`}
                           >
-                            <span>
-                              {format(new Date(msg.createdAt), "HH:mm")}
-                            </span>
+                            <span>{format(new Date(msg.createdAt), 'HH:mm')}</span>
                             {isMe && (
                               <span>
                                 {msg.isRead ? (
@@ -495,10 +458,7 @@ export function ChatInterface() {
 
             {/* Message Input */}
             <div className="p-3 sm:p-4 pb-safe border-t bg-card shadow-xs">
-              <form
-                onSubmit={handleSendMessage}
-                className="flex gap-2 items-center"
-              >
+              <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
                 <Input
                   placeholder="Type your message..."
                   value={messageInput}
@@ -525,12 +485,9 @@ export function ChatInterface() {
             <div className="h-16 w-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 shadow-sm">
               <Send className="h-8 w-8 ml-1" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground">
-              Your Messages
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground">Your Messages</h3>
             <p className="text-sm max-w-sm mt-1 text-muted-foreground">
-              Select a conversation from the sidebar to view chat history and
-              reply in real time.
+              Select a conversation from the sidebar to view chat history and reply in real time.
             </p>
           </div>
         )}

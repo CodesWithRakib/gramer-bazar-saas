@@ -10,7 +10,10 @@ export class ProductImageResponseDto {
   @ApiProperty({ example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e', description: 'Product UUID' })
   productId: string;
 
-  @ApiProperty({ example: 'https://storage.gramerbazar.com/products/potato.webp', description: 'Public image URL' })
+  @ApiProperty({
+    example: 'https://storage.gramerbazar.com/products/potato.webp',
+    description: 'Public image URL',
+  })
   url: string;
 
   @ApiProperty({ example: 'products/potato.webp', description: 'Internal cloud storage key' })
@@ -34,7 +37,11 @@ export class ProductImageResponseDto {
   @ApiProperty({ example: 0, description: 'Sorting order index' })
   sortOrder: number;
 
-  @ApiPropertyOptional({ example: 'Fresh local potatoes', nullable: true, description: 'Accessibility alt text' })
+  @ApiPropertyOptional({
+    example: 'Fresh local potatoes',
+    nullable: true,
+    description: 'Accessibility alt text',
+  })
   altText?: string | null;
 
   @ApiProperty({ example: '2026-01-01T00:00:00.000Z' })
@@ -48,7 +55,10 @@ export class ProductVariantResponseDto {
   @ApiProperty({ example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', description: 'Variant UUID' })
   id: string;
 
-  @ApiProperty({ example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e', description: 'Master product UUID' })
+  @ApiProperty({
+    example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e',
+    description: 'Master product UUID',
+  })
   productId: string;
 
   @ApiProperty({ example: '5 kg Pack', description: 'Variant name in English' })
@@ -63,13 +73,21 @@ export class ProductVariantResponseDto {
   @ApiPropertyOptional({ example: 250, nullable: true, description: 'Variant price in BDT' })
   price?: number | null;
 
-  @ApiPropertyOptional({ example: 230, nullable: true, description: 'Promotional discount price in BDT' })
+  @ApiPropertyOptional({
+    example: 230,
+    nullable: true,
+    description: 'Promotional discount price in BDT',
+  })
   discountPrice?: number | null;
 
   @ApiPropertyOptional({ example: 50, description: 'Available variant stock' })
   stock?: number;
 
-  @ApiPropertyOptional({ type: [String], nullable: true, description: 'Array of image URLs for this variant' })
+  @ApiPropertyOptional({
+    type: [String],
+    nullable: true,
+    description: 'Array of image URLs for this variant',
+  })
   images?: string[] | null;
 
   @ApiProperty({ example: '2026-01-01T00:00:00.000Z' })
@@ -92,55 +110,103 @@ export class ProductResponseDto {
   @ApiProperty({ example: 'organic-red-potato', description: 'Unique product URL slug' })
   slug: string;
 
-  @ApiProperty({ example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e', description: 'Primary Category UUID' })
+  @ApiProperty({
+    example: 'b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e',
+    description: 'Primary Category UUID',
+  })
   categoryId: string;
 
   @ApiPropertyOptional({ type: () => CategoryResponseDto, description: 'Primary category details' })
   category?: CategoryResponseDto;
 
-  @ApiPropertyOptional({ example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f', nullable: true, description: 'SubCategory UUID' })
+  @ApiPropertyOptional({
+    example: 'c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f',
+    nullable: true,
+    description: 'SubCategory UUID',
+  })
   subCategoryId: string | null;
 
-  @ApiPropertyOptional({ type: () => CategoryResponseDto, nullable: true, description: 'SubCategory details' })
+  @ApiPropertyOptional({
+    type: () => CategoryResponseDto,
+    nullable: true,
+    description: 'SubCategory details',
+  })
   subCategory?: CategoryResponseDto | null;
 
-  @ApiPropertyOptional({ example: 'd1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a', nullable: true, description: 'Brand UUID' })
+  @ApiPropertyOptional({
+    example: 'd1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a',
+    nullable: true,
+    description: 'Brand UUID',
+  })
   brandId: string | null;
 
-  @ApiPropertyOptional({ type: () => BrandResponseDto, nullable: true, description: 'Brand details' })
+  @ApiPropertyOptional({
+    type: () => BrandResponseDto,
+    nullable: true,
+    description: 'Brand details',
+  })
   brand?: BrandResponseDto | null;
 
-  @ApiPropertyOptional({ example: 'Naturally cultivated red potatoes from Dinajpur', nullable: true })
+  @ApiPropertyOptional({
+    example: 'Naturally cultivated red potatoes from Dinajpur',
+    nullable: true,
+  })
   shortDescriptionEn: string | null;
 
   @ApiPropertyOptional({ example: 'দিনাজপুরের খাঁটি ও বিষমুক্ত লাল আলু', nullable: true })
   shortDescriptionBn: string | null;
 
-  @ApiPropertyOptional({ example: 'Detailed product description and nutritional value...', nullable: true })
+  @ApiPropertyOptional({
+    example: 'Detailed product description and nutritional value...',
+    nullable: true,
+  })
   descriptionEn: string | null;
 
-  @ApiPropertyOptional({ example: 'পুষ্টিগুণ ও সংরক্ষণ পদ্ধতি সম্পর্কিত বিস্তারিত বিবরণ...', nullable: true })
+  @ApiPropertyOptional({
+    example: 'পুষ্টিগুণ ও সংরক্ষণ পদ্ধতি সম্পর্কিত বিস্তারিত বিবরণ...',
+    nullable: true,
+  })
   descriptionBn: string | null;
 
-  @ApiPropertyOptional({ example: 'POT-RED-001', nullable: true, description: 'Stock keeping unit barcode' })
+  @ApiPropertyOptional({
+    example: 'POT-RED-001',
+    nullable: true,
+    description: 'Stock keeping unit barcode',
+  })
   sku: string | null;
 
-  @ApiPropertyOptional({ example: '8901234567890', nullable: true, description: 'GTIN/EAN barcode' })
+  @ApiPropertyOptional({
+    example: '8901234567890',
+    nullable: true,
+    description: 'GTIN/EAN barcode',
+  })
   barcode: string | null;
 
   @ApiPropertyOptional({ example: 45, nullable: true, description: 'Selling price in BDT' })
   price: number | null;
 
-  @ApiPropertyOptional({ example: 55, nullable: true, description: 'Original benchmark / compare-at price in BDT' })
+  @ApiPropertyOptional({
+    example: 55,
+    nullable: true,
+    description: 'Original benchmark / compare-at price in BDT',
+  })
   compareAtPrice: number | null;
 
   @ApiProperty({ example: 250, description: 'Total available stock in base unit' })
   stock: number;
 
-  @ApiPropertyOptional({ example: 'kg', nullable: true, description: 'Selling measurement unit (e.g. kg, liter, piece)' })
+  @ApiPropertyOptional({
+    example: 'kg',
+    nullable: true,
+    description: 'Selling measurement unit (e.g. kg, liter, piece)',
+  })
   unit: string | null;
 
-  @ApiProperty({ enum: ProductStatus, example: ProductStatus.PUBLISHED, description: 'Publication status' })
+  @ApiProperty({
+    enum: ProductStatus,
+    example: ProductStatus.PUBLISHED,
+    description: 'Publication status',
+  })
   status: ProductStatus;
 
   @ApiProperty({ example: true, description: 'Whether featured on marketplace homepage' })
@@ -149,13 +215,20 @@ export class ProductResponseDto {
   @ApiProperty({ example: true, description: 'Whether active and visible in catalog' })
   isActive: boolean;
 
-  @ApiPropertyOptional({ example: 'manual', nullable: true, description: 'Source ingestion mechanism' })
+  @ApiPropertyOptional({
+    example: 'manual',
+    nullable: true,
+    description: 'Source ingestion mechanism',
+  })
   source: string | null;
 
   @ApiProperty({ type: [ProductImageResponseDto], description: 'Gallery of product images' })
   images: ProductImageResponseDto[];
 
-  @ApiPropertyOptional({ type: [ProductVariantResponseDto], description: 'Optional product variation options' })
+  @ApiPropertyOptional({
+    type: [ProductVariantResponseDto],
+    description: 'Optional product variation options',
+  })
   variants?: ProductVariantResponseDto[];
 
   @ApiPropertyOptional({ example: 4.8, description: 'Aggregate review rating out of 5.0' })
@@ -195,7 +268,11 @@ export class ImportResultResponseDto {
   @ApiProperty({ example: 5, description: 'Number of rows failed due to validation' })
   failed: number;
 
-  @ApiProperty({ example: [], description: 'List of failure reason messages per row', type: [String] })
+  @ApiProperty({
+    example: [],
+    description: 'List of failure reason messages per row',
+    type: [String],
+  })
   errors: string[];
 }
 

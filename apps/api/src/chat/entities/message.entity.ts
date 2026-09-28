@@ -13,8 +13,13 @@ import { MessageStatus, MessageType } from '../enums/chat.enum.js';
 
 @Entity('messages')
 @Index('idx_messages_conversation_created', ['conversationId', 'createdAt'])
-@Index('idx_messages_unread', ['conversationId', 'senderId', 'isRead'], { where: '"isRead" = false' })
-@Index('idx_messages_client_id', ['conversationId', 'clientMessageId'], { unique: true, where: '"client_message_id" IS NOT NULL' })
+@Index('idx_messages_unread', ['conversationId', 'senderId', 'isRead'], {
+  where: '"isRead" = false',
+})
+@Index('idx_messages_client_id', ['conversationId', 'clientMessageId'], {
+  unique: true,
+  where: '"client_message_id" IS NOT NULL',
+})
 export class Message {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -35,7 +40,9 @@ export class Message {
   @Column({ name: 'sender_id' })
   senderId: string;
 
-  @ManyToOne('Conversation', (conversation: Conversation) => conversation.messages, { onDelete: 'CASCADE' })
+  @ManyToOne('Conversation', (conversation: Conversation) => conversation.messages, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'conversation_id' })
   conversation: Conversation;
 

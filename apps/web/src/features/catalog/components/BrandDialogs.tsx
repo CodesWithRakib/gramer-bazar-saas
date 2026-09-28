@@ -5,8 +5,21 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -127,10 +140,7 @@ export function AddBrandDialog() {
                       key={cat.id}
                       className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted cursor-pointer text-xs"
                     >
-                      <Checkbox
-                        checked={checked}
-                        onCheckedChange={() => toggleCategory(cat.id)}
-                      />
+                      <Checkbox checked={checked} onCheckedChange={() => toggleCategory(cat.id)} />
                       <span className="truncate">{cat.nameEn}</span>
                     </label>
                   );
@@ -254,10 +264,7 @@ export function EditBrandDialog({
                       key={cat.id}
                       className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted cursor-pointer text-xs"
                     >
-                      <Checkbox
-                        checked={checked}
-                        onCheckedChange={() => toggleCategory(cat.id)}
-                      />
+                      <Checkbox checked={checked} onCheckedChange={() => toggleCategory(cat.id)} />
                       <span className="truncate">{cat.nameEn}</span>
                     </label>
                   );

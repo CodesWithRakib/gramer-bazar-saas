@@ -25,6 +25,9 @@ export class PlatformSettingsResponseDto {
   @ApiProperty({ example: 'https://api.gramerbazar.com' })
   sslczPublicUrl: string;
 
-  @ApiProperty({ example: true, description: 'True if gateway password is configured in settings or environment' })
+  @ApiProperty({
+    example: true,
+    description: 'True if gateway password is configured in settings or environment',
+  })
   hasSslczPassword: boolean;
 }

@@ -31,30 +31,43 @@ export interface Review {
 
 export const reviewsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getProductReviews: builder.query<{ data: Review[], meta: PaginationMeta }, { productId: string, page?: number, limit?: number }>({
-      query: ({ productId, page = 1, limit = 10 }) => `/reviews/product/${productId}?page=${page}&limit=${limit}`,
+    getProductReviews: builder.query<
+      { data: Review[]; meta: PaginationMeta },
+      { productId: string; page?: number; limit?: number }
+    >({
+      query: ({ productId, page = 1, limit = 10 }) =>
+        `/reviews/product/${productId}?page=${page}&limit=${limit}`,
       providesTags: (result, error, { productId }) => [{ type: 'Review', id: productId }],
     }),
-    addReview: builder.mutation<Review, { productId: string, rating: number, comment?: string, images?: string[] }>({
+    addReview: builder.mutation<
+      Review,
+      { productId: string; rating: number; comment?: string; images?: string[] }
+    >({
       query: (body) => ({
         url: '/reviews',
         method: 'POST',
         body,
       }),
-      invalidatesTags: (result, error, { productId }) => [{ type: 'Review', id: productId }, 'Review'],
+      invalidatesTags: (result, error, { productId }) => [
+        { type: 'Review', id: productId },
+        'Review',
+      ],
     }),
     getUserReviews: builder.query<Review[], void>({
       query: () => '/reviews/user',
       providesTags: ['Review'],
     }),
-    getAdminReviews: builder.query<{ data: Review[]; meta: PaginationMeta }, { page?: number; limit?: number; search?: string }>({
+    getAdminReviews: builder.query<
+      { data: Review[]; meta: PaginationMeta },
+      { page?: number; limit?: number; search?: string }
+    >({
       query: (params) => ({
         url: '/reviews/admin',
         params,
       }),
       providesTags: ['Review'],
     }),
-    moderateReview: builder.mutation<Review, { id: string, isApproved: boolean }>({
+    moderateReview: builder.mutation<Review, { id: string; isApproved: boolean }>({
       query: ({ id, isApproved }) => ({
         url: `/reviews/admin/${id}/moderate`,
         method: 'PATCH',

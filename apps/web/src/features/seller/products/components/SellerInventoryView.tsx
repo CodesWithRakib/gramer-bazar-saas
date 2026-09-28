@@ -1,21 +1,27 @@
 'use client';
 
 import React, { use, useState, useMemo } from 'react';
-import { 
-  useGetSellerProductsQuery, 
-  useUpdateInventoryMutation 
+import {
+  useGetSellerProductsQuery,
+  useUpdateInventoryMutation,
 } from '@/features/seller-portal/sellerPortalApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Search, X, Package, Boxes } from 'lucide-react';
 import Link from 'next/link';
 import AdminPagination from '@/components/AdminPagination';
@@ -25,12 +31,11 @@ export interface SellerInventoryViewProps {
 }
 
 export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
-  
   const isBn = lang === 'bn';
 
   const { data: products = [], isLoading } = useGetSellerProductsQuery();
   const [updateInventory] = useUpdateInventoryMutation();
-  
+
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [localQuantities, setLocalQuantities] = useState<Record<string, string>>({});
 
@@ -72,13 +77,13 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
   }, [filteredProducts, currentPage, pageSize]);
 
   const handleQuantityChange = (inventoryId: string, value: string) => {
-    setLocalQuantities(prev => ({ ...prev, [inventoryId]: value }));
+    setLocalQuantities((prev) => ({ ...prev, [inventoryId]: value }));
   };
 
   const handleSave = async (inventoryId: string) => {
     const val = localQuantities[inventoryId];
     if (val === undefined || val === '') return;
-    
+
     setUpdatingId(inventoryId);
     try {
       await updateInventory({ id: inventoryId, quantity: parseInt(val, 10) }).unwrap();
@@ -136,7 +141,9 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                   setSearch(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder={isBn ? 'প্রোডাক্টের নাম বা SKU দিয়ে খুঁজুন...' : 'Search product name or SKU...'}
+                placeholder={
+                  isBn ? 'প্রোডাক্টের নাম বা SKU দিয়ে খুঁজুন...' : 'Search product name or SKU...'
+                }
                 className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
               />
               {search && (
@@ -181,20 +188,34 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                 <TableRow>
                   <TableHead className="py-3.5 px-4">{isBn ? 'প্রোডাক্ট' : 'Product'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'SKU' : 'SKU'}</TableHead>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'বর্তমান স্টক' : 'Current Stock'}</TableHead>
+                  <TableHead className="py-3.5 px-4">
+                    {isBn ? 'বর্তমান স্টক' : 'Current Stock'}
+                  </TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'নতুন স্টক' : 'New Stock'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">{isBn ? 'অ্যাকশন' : 'Action'}</TableHead>
+                  <TableHead className="py-3.5 px-4 text-right">
+                    {isBn ? 'অ্যাকশন' : 'Action'}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-gray-200 dark:divide-border text-sm">
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={`skeleton-${i}`} className="animate-pulse">
-                      <TableCell className="py-4 px-4"><div className="h-4 w-40 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-6 w-12 rounded-full bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4"><div className="h-10 w-24 rounded bg-muted"></div></TableCell>
-                      <TableCell className="py-4 px-4 text-right"><div className="h-9 w-20 ml-auto rounded bg-muted"></div></TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-40 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-4 w-20 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-6 w-12 rounded-full bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4">
+                        <div className="h-10 w-24 rounded bg-muted"></div>
+                      </TableCell>
+                      <TableCell className="py-4 px-4 text-right">
+                        <div className="h-9 w-20 ml-auto rounded bg-muted"></div>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : paginatedProducts.length === 0 ? (
@@ -209,8 +230,12 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || stockFilter !== 'ALL'
-                            ? (isBn ? 'আপনার অনুসন্ধানের সাথে কোনো পণ্য মেলেনি' : 'No products match your search or filter.')
-                            : (isBn ? 'ইনভেন্টরিতে কোনো পণ্য তালিকাভুক্ত নেই' : 'No products in inventory.')}
+                            ? isBn
+                              ? 'আপনার অনুসন্ধানের সাথে কোনো পণ্য মেলেনি'
+                              : 'No products match your search or filter.'
+                            : isBn
+                              ? 'ইনভেন্টরিতে কোনো পণ্য তালিকাভুক্ত নেই'
+                              : 'No products in inventory.'}
                         </p>
                         {(search || stockFilter !== 'ALL') && (
                           <button
@@ -229,19 +254,26 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                   </TableRow>
                 ) : (
                   paginatedProducts.map((item) => (
-                    <TableRow key={item.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <TableRow
+                      key={item.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <TableCell className="font-medium py-3.5 px-4 text-foreground">
-                        {isBn ? item.productVariant.product.nameBn : item.productVariant.product.nameEn}
+                        {isBn
+                          ? item.productVariant.product.nameBn
+                          : item.productVariant.product.nameEn}
                       </TableCell>
                       <TableCell className="py-3.5 px-4 font-mono text-xs text-muted-foreground">
                         {item.sellerSku || item.productVariant.sku}
                       </TableCell>
                       <TableCell className="py-3.5 px-4">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          item.inventory.quantity <= (item.inventory.lowStockThreshold || 5)
-                            ? 'bg-destructive/10 text-destructive'
-                            : 'bg-primary/10 text-primary'
-                        }`}>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                            item.inventory.quantity <= (item.inventory.lowStockThreshold || 5)
+                              ? 'bg-destructive/10 text-destructive'
+                              : 'bg-primary/10 text-primary'
+                          }`}
+                        >
                           {item.inventory.quantity}
                         </span>
                       </TableCell>
@@ -258,12 +290,20 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                         <Button
                           size="sm"
                           className="rounded-full px-4"
-                          disabled={updatingId === item.inventory.id || (localQuantities[item.inventory.id] === undefined || localQuantities[item.inventory.id] === String(item.inventory.quantity))}
+                          disabled={
+                            updatingId === item.inventory.id ||
+                            localQuantities[item.inventory.id] === undefined ||
+                            localQuantities[item.inventory.id] === String(item.inventory.quantity)
+                          }
                           onClick={() => handleSave(item.inventory.id)}
                         >
-                          {updatingId === item.inventory.id 
-                            ? (isBn ? 'সংরক্ষণ হচ্ছে...' : 'Saving...') 
-                            : (isBn ? 'সংরক্ষণ' : 'Save')}
+                          {updatingId === item.inventory.id
+                            ? isBn
+                              ? 'সংরক্ষণ হচ্ছে...'
+                              : 'Saving...'
+                            : isBn
+                              ? 'সংরক্ষণ'
+                              : 'Save'}
                         </Button>
                       </TableCell>
                     </TableRow>

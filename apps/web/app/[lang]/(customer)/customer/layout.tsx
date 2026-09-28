@@ -20,7 +20,11 @@ export default function CustomerDashboardLayout({
 
   if (isFullWidthCustomerRoute) {
     return (
-      <RouteGuard lang={lang} requireAuth={true} allowedRoles={['CUSTOMER', 'ADMIN', 'SUPER_ADMIN']}>
+      <RouteGuard
+        lang={lang}
+        requireAuth={true}
+        allowedRoles={['CUSTOMER', 'ADMIN', 'SUPER_ADMIN']}
+      >
         <div className="min-h-[70vh] py-6">{children}</div>
       </RouteGuard>
     );

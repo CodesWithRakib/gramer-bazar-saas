@@ -20,10 +20,7 @@ import {
   Settings,
   X,
 } from 'lucide-react';
-import {
-  useGetAdminPaymentsQuery,
-  PaymentRecord,
-} from '@/features/payments/paymentsApi';
+import { useGetAdminPaymentsQuery, PaymentRecord } from '@/features/payments/paymentsApi';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,12 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AdminPagination from '@/components/AdminPagination';
 
 export interface AdminPaymentsViewProps {
@@ -257,14 +249,30 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, index) => (
                     <tr key={`skeleton-${index}`} className="animate-pulse">
-                      <td className="py-4 px-4"><div className="h-4 w-28 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-32 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-20 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-6 w-20 rounded-full bg-muted"></div></td>
-                      <td className="py-4 px-4"><div className="h-4 w-24 rounded bg-muted"></div></td>
-                      <td className="py-4 px-4 text-right"><div className="ml-auto h-8 w-16 rounded bg-muted"></div></td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-28 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-24 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-32 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-20 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-20 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-6 w-20 rounded-full bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="h-4 w-24 rounded bg-muted"></div>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      </td>
                     </tr>
                   ))
                 ) : payments.length === 0 ? (
@@ -279,15 +287,22 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
                           {search || statusFilter !== 'ALL' || providerFilter !== 'ALL'
-                            ? (isBn ? 'আপনার অনুসন্ধানের ফিল্টারের সাথে কোনো লেনদেন মেলেনি' : 'No records match your search or filter.')
-                            : (isBn ? 'বর্তমানে কোনো লেনদেনের রেকর্ড নেই' : 'No payments found.')}
+                            ? isBn
+                              ? 'আপনার অনুসন্ধানের ফিল্টারের সাথে কোনো লেনদেন মেলেনি'
+                              : 'No records match your search or filter.'
+                            : isBn
+                              ? 'বর্তমানে কোনো লেনদেনের রেকর্ড নেই'
+                              : 'No payments found.'}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   payments.map((p) => (
-                    <tr key={p.id} className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30">
+                    <tr
+                      key={p.id}
+                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
+                    >
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5 font-mono text-xs font-semibold">
                           <span title={p.transactionId}>{p.transactionId}</span>
@@ -325,7 +340,9 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
                             <p className="font-medium text-foreground">
                               {p.user.firstName} {p.user.lastName}
                             </p>
-                            <p className="text-xs text-muted-foreground font-mono">{p.user.phone}</p>
+                            <p className="text-xs text-muted-foreground font-mono">
+                              {p.user.phone}
+                            </p>
                           </div>
                         ) : (
                           <span className="text-muted-foreground text-xs font-mono">
@@ -402,11 +419,15 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
             <div className="space-y-4 pt-2 text-sm">
               <div className="flex items-center justify-between p-3.5 bg-muted/40 rounded-xl border border-border/50">
                 <div>
-                  <span className="text-xs text-muted-foreground uppercase">{isBn ? 'স্ট্যাটাস' : 'Status'}</span>
+                  <span className="text-xs text-muted-foreground uppercase">
+                    {isBn ? 'স্ট্যাটাস' : 'Status'}
+                  </span>
                   <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-muted-foreground uppercase">{isBn ? 'মোট অর্থ' : 'Total Amount'}</span>
+                  <span className="text-xs text-muted-foreground uppercase">
+                    {isBn ? 'মোট অর্থ' : 'Total Amount'}
+                  </span>
                   <p className="text-xl font-black text-primary">
                     ৳{Number(selectedPayment.amount).toFixed(2)} {selectedPayment.currency}
                   </p>
@@ -415,49 +436,76 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
 
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
-                  <span className="text-muted-foreground">{isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}</span>
-                  <p className="font-mono font-semibold break-all">{selectedPayment.transactionId}</p>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}
+                  </span>
+                  <p className="font-mono font-semibold break-all">
+                    {selectedPayment.transactionId}
+                  </p>
                 </div>
                 <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
                   <span className="text-muted-foreground">{isBn ? 'অর্ডার আইডি' : 'Order ID'}</span>
                   <p className="font-mono font-semibold break-all">{selectedPayment.orderId}</p>
                 </div>
                 <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
-                  <span className="text-muted-foreground">{isBn ? 'ভ্যালিডেশন আইডি' : 'Validation ID (val_id)'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'ভ্যালিডেশন আইডি' : 'Validation ID (val_id)'}
+                  </span>
                   <p className="font-mono">{selectedPayment.validationId || 'N/A'}</p>
                 </div>
                 <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
-                  <span className="text-muted-foreground">{isBn ? 'ব্যাংক রেফারেন্স' : 'Bank Tran ID'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'ব্যাংক রেফারেন্স' : 'Bank Tran ID'}
+                  </span>
                   <p className="font-mono">{selectedPayment.bankTransactionId || 'N/A'}</p>
                 </div>
                 <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
-                  <span className="text-muted-foreground">{isBn ? 'কার্ড টাইপ / মেথড' : 'Card Type / Method'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'কার্ড টাইপ / মেথড' : 'Card Type / Method'}
+                  </span>
                   <p className="font-mono">{selectedPayment.cardType || 'N/A'}</p>
                 </div>
                 <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
-                  <span className="text-muted-foreground">{isBn ? 'কার্ড ইস্যুয়ার' : 'Card Issuer'}</span>
-                  <p className="font-mono">{selectedPayment.cardIssuer || selectedPayment.cardBrand || 'N/A'}</p>
-                </div>
-                <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
-                  <span className="text-muted-foreground">{isBn ? 'ঝুঁকি স্তর' : 'Risk Level'}</span>
-                  <p className="font-mono font-semibold text-emerald-600">
-                    {selectedPayment.riskTitle || (selectedPayment.riskLevel === '0' ? 'Safe (0)' : selectedPayment.riskLevel || 'N/A')}
+                  <span className="text-muted-foreground">
+                    {isBn ? 'কার্ড ইস্যুয়ার' : 'Card Issuer'}
+                  </span>
+                  <p className="font-mono">
+                    {selectedPayment.cardIssuer || selectedPayment.cardBrand || 'N/A'}
                   </p>
                 </div>
                 <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
-                  <span className="text-muted-foreground">{isBn ? 'গেটওয়ে স্ট্যাটাস' : 'Gateway Status'}</span>
+                  <span className="text-muted-foreground">
+                    {isBn ? 'ঝুঁকি স্তর' : 'Risk Level'}
+                  </span>
+                  <p className="font-mono font-semibold text-emerald-600">
+                    {selectedPayment.riskTitle ||
+                      (selectedPayment.riskLevel === '0'
+                        ? 'Safe (0)'
+                        : selectedPayment.riskLevel || 'N/A')}
+                  </p>
+                </div>
+                <div className="p-3 bg-muted/20 rounded-xl border border-border/40 space-y-1">
+                  <span className="text-muted-foreground">
+                    {isBn ? 'গেটওয়ে স্ট্যাটাস' : 'Gateway Status'}
+                  </span>
                   <p className="font-mono">{selectedPayment.gatewayStatus || 'N/A'}</p>
                 </div>
               </div>
 
               <div className="p-3 bg-muted/20 rounded-xl border border-border/40 text-xs space-y-1">
-                <span className="text-muted-foreground">{isBn ? 'তারিখ ও সময়' : 'Timestamps'}</span>
+                <span className="text-muted-foreground">
+                  {isBn ? 'তারিখ ও সময়' : 'Timestamps'}
+                </span>
                 <p>Created: {new Date(selectedPayment.createdAt).toLocaleString()}</p>
                 {selectedPayment.paidAt && (
-                  <p className="text-emerald-600">Paid: {new Date(selectedPayment.paidAt).toLocaleString()}</p>
+                  <p className="text-emerald-600">
+                    Paid: {new Date(selectedPayment.paidAt).toLocaleString()}
+                  </p>
                 )}
                 {selectedPayment.failedAt && (
-                  <p className="text-destructive">Failed: {new Date(selectedPayment.failedAt).toLocaleString()}</p>
+                  <p className="text-destructive">
+                    Failed: {new Date(selectedPayment.failedAt).toLocaleString()}
+                  </p>
                 )}
               </div>
 

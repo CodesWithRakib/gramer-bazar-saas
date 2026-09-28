@@ -1,4 +1,14 @@
-import { IsArray, IsEnum, IsUUID, ValidateNested, ArrayMinSize, Min, IsNumber, IsString, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsUUID,
+  ValidateNested,
+  ArrayMinSize,
+  Min,
+  IsNumber,
+  IsString,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { PaymentMethod } from '../enums/order-status.enum.js';

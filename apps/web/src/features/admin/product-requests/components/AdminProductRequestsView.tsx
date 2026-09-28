@@ -16,13 +16,15 @@ export interface AdminProductRequestsViewProps {
 }
 
 export function AdminProductRequestsView({ lang = 'en' }: AdminProductRequestsViewProps) {
-  
-
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  
-  const { data, isLoading, isError, refetch } = useGetAdminProductRequestsQuery({ page, limit, search });
+
+  const { data, isLoading, isError, refetch } = useGetAdminProductRequestsQuery({
+    page,
+    limit,
+    search,
+  });
 
   const columns: ColumnDef<ProductRequest>[] = [
     {
@@ -49,9 +51,9 @@ export function AdminProductRequestsView({ lang = 'en' }: AdminProductRequestsVi
         if (status === 'PENDING') variant = 'secondary';
         else if (status === 'APPROVED' || status === 'FULFILLED') variant = 'default';
         else if (status === 'REJECTED') variant = 'destructive';
-        
+
         return <Badge variant={variant}>{status}</Badge>;
-      }
+      },
     },
     {
       accessorKey: 'createdAt',
@@ -70,9 +72,9 @@ export function AdminProductRequestsView({ lang = 'en' }: AdminProductRequestsVi
           </p>
         </div>
       </div>
-      
-      <DataTable 
-        columns={columns} 
+
+      <DataTable
+        columns={columns}
         data={data?.data || []}
         pageCount={data?.meta?.totalPages ?? -1}
         pagination={{ pageIndex: page - 1, pageSize: limit }}

@@ -25,12 +25,16 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   const { items } = useSelector((state: RootState) => state.cart);
   const { appliedCoupon } = useSelector((state: RootState) => state.cart);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  
-  const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const deliveryFee = 60; // Hardcoded for now, could be dynamic
-  const total = appliedCoupon ? subtotal - appliedCoupon.discountAmount + deliveryFee : subtotal + deliveryFee;
 
-  const { data: addresses, isLoading: isAddressesLoading } = useGetAddressesQuery(undefined, { skip: !isAuthenticated });
+  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const deliveryFee = 60; // Hardcoded for now, could be dynamic
+  const total = appliedCoupon
+    ? subtotal - appliedCoupon.discountAmount + deliveryFee
+    : subtotal + deliveryFee;
+
+  const { data: addresses, isLoading: isAddressesLoading } = useGetAddressesQuery(undefined, {
+    skip: !isAuthenticated,
+  });
   const [checkoutOrder, { isLoading: isCheckingOut }] = useCheckoutOrderMutation();
 
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
@@ -48,7 +52,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   }, [isAuthenticated, items.length, router, lang]);
 
   if (addresses && addresses.length > 0 && !selectedAddressId) {
-    const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+    const defaultAddress = addresses.find((a) => a.isDefault) || addresses[0];
     setSelectedAddressId(defaultAddress.id);
   } else if (addresses && addresses.length === 0 && !showAddressForm) {
     setShowAddressForm(true);
@@ -58,7 +62,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
 
   const handleCheckout = async () => {
     if (!selectedAddressId) {
-      setErrorMsg(isBn ? 'দয়া করে একটি ডেলিভারি ঠিকানা নির্বাচন করুন' : 'Please select a delivery address');
+      setErrorMsg(
+        isBn ? 'দয়া করে একটি ডেলিভারি ঠিকানা নির্বাচন করুন' : 'Please select a delivery address'
+      );
       return;
     }
 
@@ -67,7 +73,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
       const orderData = {
         addressId: selectedAddressId,
         paymentMethod,
-        items: items.map(item => ({
+        items: items.map((item) => ({
           sellerProductId: item.sellerProductId,
           quantity: item.quantity,
         })),
@@ -85,7 +91,10 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
       }
     } catch (err) {
       setIsRedirecting(false);
-      setErrorMsg(getApiErrorMessage(err) || (isBn ? 'অর্ডার তৈরি করতে সমস্যা হয়েছে' : 'Failed to place order'));
+      setErrorMsg(
+        getApiErrorMessage(err) ||
+          (isBn ? 'অর্ডার তৈরি করতে সমস্যা হয়েছে' : 'Failed to place order')
+      );
     }
   };
 
@@ -111,47 +120,63 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
             </CardHeader>
             <CardContent className="pt-6">
               {isAddressesLoading ? (
-                <div className="py-4 text-center text-muted-foreground">{isBn ? 'লোড হচ্ছে...' : 'Loading addresses...'}</div>
+                <div className="py-4 text-center text-muted-foreground">
+                  {isBn ? 'লোড হচ্ছে...' : 'Loading addresses...'}
+                </div>
               ) : (
                 <div className="space-y-4">
                   {addresses && addresses.length > 0 && !showAddressForm && (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {addresses.map((address) => (
-                      <div key={address.id} className="relative">
-                        <input
-                          type="radio"
-                          name="address"
-                          value={address.id}
-                          id={`addr-${address.id}`}
-                          className="peer sr-only"
-                          checked={selectedAddressId === address.id}
-                          onChange={(e) => setSelectedAddressId(e.target.value)}
-                        />
-                        <Label
-                          htmlFor={`addr-${address.id}`}
-                          className="flex flex-col gap-1 p-4 border-2 rounded-lg cursor-pointer hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5"
-                        >
-                          <span className="font-semibold text-base">{address.title} {address.isDefault && <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full ml-2">Default</span>}</span>
-                          <span className="text-sm">{address.contactName} ({address.contactPhone})</span>
-                          <span className="text-sm text-muted-foreground">{address.streetAddress}</span>
-                          {address.lat != null && address.lng != null && (
-                            <span className="mt-1 inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
-                              <MapPin className="h-3 w-3" />
-                              {isBn ? 'জিপিএস পিন করা আছে' : 'GPS pinned — live tracking enabled'}
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {addresses.map((address) => (
+                        <div key={address.id} className="relative">
+                          <input
+                            type="radio"
+                            name="address"
+                            value={address.id}
+                            id={`addr-${address.id}`}
+                            className="peer sr-only"
+                            checked={selectedAddressId === address.id}
+                            onChange={(e) => setSelectedAddressId(e.target.value)}
+                          />
+                          <Label
+                            htmlFor={`addr-${address.id}`}
+                            className="flex flex-col gap-1 p-4 border-2 rounded-lg cursor-pointer hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5"
+                          >
+                            <span className="font-semibold text-base">
+                              {address.title}{' '}
+                              {address.isDefault && (
+                                <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full ml-2">
+                                  Default
+                                </span>
+                              )}
                             </span>
+                            <span className="text-sm">
+                              {address.contactName} ({address.contactPhone})
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              {address.streetAddress}
+                            </span>
+                            {address.lat != null && address.lng != null && (
+                              <span className="mt-1 inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
+                                <MapPin className="h-3 w-3" />
+                                {isBn ? 'জিপিএস পিন করা আছে' : 'GPS pinned — live tracking enabled'}
+                              </span>
+                            )}
+                          </Label>
+                          {selectedAddressId === address.id && (
+                            <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />
                           )}
-                        </Label>
-                        {selectedAddressId === address.id && (
-                          <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
+                        </div>
+                      ))}
+                    </div>
                   )}
 
                   {!showAddressForm && (
-                    <Button variant="outline" onClick={() => setShowAddressForm(true)} className="mt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAddressForm(true)}
+                      className="mt-4"
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       {isBn ? 'নতুন ঠিকানা যোগ করুন' : 'Add New Address'}
                     </Button>
@@ -162,7 +187,12 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                       <div className="flex justify-between items-center mb-4">
                         <h4 className="font-semibold">{isBn ? 'নতুন ঠিকানা' : 'New Address'}</h4>
                         {addresses && addresses.length > 0 && (
-                          <Button type="button" variant="ghost" size="sm" onClick={() => setShowAddressForm(false)}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowAddressForm(false)}
+                          >
                             {isBn ? 'বাতিল' : 'Cancel'}
                           </Button>
                         )}
@@ -186,12 +216,12 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
             <CardContent className="pt-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="relative">
-                  <input 
-                    type="radio" 
-                    name="paymentMethod" 
-                    value="COD" 
-                    id="cod" 
-                    className="peer sr-only" 
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="COD"
+                    id="cod"
+                    className="peer sr-only"
                     checked={paymentMethod === 'COD'}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
@@ -199,18 +229,26 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                     htmlFor="cod"
                     className="flex flex-col gap-1 p-4 border-2 rounded-lg cursor-pointer hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5"
                   >
-                    <span className="font-semibold text-base">{isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery'}</span>
-                    <span className="text-sm text-muted-foreground">{isBn ? 'পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন' : 'Pay when you receive the product'}</span>
+                    <span className="font-semibold text-base">
+                      {isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery'}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {isBn
+                        ? 'পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন'
+                        : 'Pay when you receive the product'}
+                    </span>
                   </Label>
-                  {paymentMethod === 'COD' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
+                  {paymentMethod === 'COD' && (
+                    <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />
+                  )}
                 </div>
                 <div className="relative">
-                  <input 
-                    type="radio" 
-                    name="paymentMethod" 
-                    value="ONLINE" 
-                    id="digital" 
-                    className="peer sr-only" 
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="ONLINE"
+                    id="digital"
+                    className="peer sr-only"
                     checked={paymentMethod === 'ONLINE'}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
@@ -227,16 +265,28 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                       </span>
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      {isBn ? 'বিকাশ, নগদ, রকেট, কার্ড (ভিসা, মাস্টারকার্ড), ইন্টারনেট ব্যাংকিং' : 'bKash, Nagad, Rocket, Cards (Visa, Mastercard), Net Banking'}
+                      {isBn
+                        ? 'বিকাশ, নগদ, রকেট, কার্ড (ভিসা, মাস্টারকার্ড), ইন্টারনেট ব্যাংকিং'
+                        : 'bKash, Nagad, Rocket, Cards (Visa, Mastercard), Net Banking'}
                     </span>
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">bKash</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">Nagad</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">Rocket</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">Visa/Mastercard</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
+                        bKash
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
+                        Nagad
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
+                        Rocket
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
+                        Visa/Mastercard
+                      </span>
                     </div>
                   </Label>
-                  {paymentMethod === 'ONLINE' && <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />}
+                  {paymentMethod === 'ONLINE' && (
+                    <CheckCircle2 className="absolute top-4 right-4 h-5 w-5 text-primary" />
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -254,17 +304,22 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 mb-6 border-b pb-6">
-                {items.map(item => (
-                  <div key={item.sellerProductId} className="flex justify-between items-start gap-4 text-sm">
+                {items.map((item) => (
+                  <div
+                    key={item.sellerProductId}
+                    className="flex justify-between items-start gap-4 text-sm"
+                  >
                     <div>
                       <p className="font-medium">{isBn ? item.nameBn : item.nameEn}</p>
-                      <p className="text-muted-foreground">{isBn ? 'পরিমাণ:' : 'Qty:'} {item.quantity}</p>
+                      <p className="text-muted-foreground">
+                        {isBn ? 'পরিমাণ:' : 'Qty:'} {item.quantity}
+                      </p>
                     </div>
                     <p className="font-semibold">৳{(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
               </div>
-              
+
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-muted-foreground">
                   <span>{isBn ? 'সাবটোটাল' : 'Subtotal'}</span>
@@ -272,7 +327,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                 </div>
                 {appliedCoupon && (
                   <div className="flex justify-between text-primary font-medium">
-                    <span>{isBn ? 'ডিসকাউন্ট' : 'Discount'} ({appliedCoupon.code})</span>
+                    <span>
+                      {isBn ? 'ডিসকাউন্ট' : 'Discount'} ({appliedCoupon.code})
+                    </span>
                     <span>-৳{appliedCoupon.discountAmount.toFixed(2)}</span>
                   </div>
                 )}
@@ -286,19 +343,29 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                 </div>
               </div>
 
-              <Button 
-                size="lg" 
-                className="w-full text-base sm:text-lg h-14 rounded-xl shadow-lg transition-transform active:scale-[0.98] mt-2 font-semibold" 
-                disabled={isCheckingOut || isRedirecting || !selectedAddressId || isAddressesLoading}
+              <Button
+                size="lg"
+                className="w-full text-base sm:text-lg h-14 rounded-xl shadow-lg transition-transform active:scale-[0.98] mt-2 font-semibold"
+                disabled={
+                  isCheckingOut || isRedirecting || !selectedAddressId || isAddressesLoading
+                }
                 onClick={handleCheckout}
               >
                 {isRedirecting
-                  ? (isBn ? 'SSLCOMMERZ-এ নিয়ে যাওয়া হচ্ছে...' : 'Redirecting to SSLCOMMERZ...')
+                  ? isBn
+                    ? 'SSLCOMMERZ-এ নিয়ে যাওয়া হচ্ছে...'
+                    : 'Redirecting to SSLCOMMERZ...'
                   : isCheckingOut
-                  ? (isBn ? 'প্রক্রিয়াধীন...' : 'Processing...')
-                  : paymentMethod === 'ONLINE'
-                  ? (isBn ? 'অর্ডার প্লেস ও পে করুন' : 'Place Order & Pay with SSLCommerz')
-                  : (isBn ? 'অর্ডার কনফার্ম করুন (ক্যাশ অন ডেলিভারি)' : 'Confirm Order (Cash on Delivery)')}
+                    ? isBn
+                      ? 'প্রক্রিয়াধীন...'
+                      : 'Processing...'
+                    : paymentMethod === 'ONLINE'
+                      ? isBn
+                        ? 'অর্ডার প্লেস ও পে করুন'
+                        : 'Place Order & Pay with SSLCommerz'
+                      : isBn
+                        ? 'অর্ডার কনফার্ম করুন (ক্যাশ অন ডেলিভারি)'
+                        : 'Confirm Order (Cash on Delivery)'}
               </Button>
             </CardContent>
           </Card>
@@ -320,12 +387,20 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
           onClick={handleCheckout}
         >
           {isRedirecting
-            ? (isBn ? ' SSLCOMMERZ...' : 'Redirecting...')
+            ? isBn
+              ? ' SSLCOMMERZ...'
+              : 'Redirecting...'
             : isCheckingOut
-            ? (isBn ? 'প্রক্রিয়াধীন...' : 'Processing...')
-            : paymentMethod === 'ONLINE'
-            ? (isBn ? 'পে করুন' : 'Pay Now')
-            : (isBn ? 'অর্ডার নিশ্চিত করুন' : 'Confirm Order')}
+              ? isBn
+                ? 'প্রক্রিয়াধীন...'
+                : 'Processing...'
+              : paymentMethod === 'ONLINE'
+                ? isBn
+                  ? 'পে করুন'
+                  : 'Pay Now'
+                : isBn
+                  ? 'অর্ডার নিশ্চিত করুন'
+                  : 'Confirm Order'}
         </Button>
       </div>
     </div>

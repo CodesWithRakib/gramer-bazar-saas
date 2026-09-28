@@ -37,7 +37,8 @@ export class InventoryController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Initialize inventory stock record',
-    description: 'Requires SELLER or ADMIN role. Establishes stock balance and threshold alerts for a product.',
+    description:
+      'Requires SELLER or ADMIN role. Establishes stock balance and threshold alerts for a product.',
   })
   @ApiStandardResponse({
     type: InventorySummaryDto,
@@ -87,7 +88,8 @@ export class InventoryController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Adjust inventory stock quantities and thresholds',
-    description: 'Requires SELLER or ADMIN role. Updates stock count, reserved quantity, or threshold values.',
+    description:
+      'Requires SELLER or ADMIN role. Updates stock count, reserved quantity, or threshold values.',
   })
   @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Inventory UUID' })
   @ApiStandardResponse({
@@ -96,10 +98,7 @@ export class InventoryController {
     description: 'Inventory updated successfully',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateInventoryDto: UpdateInventoryDto,
-  ) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateInventoryDto: UpdateInventoryDto) {
     return this.inventoryService.update(id, updateInventoryDto);
   }
 

@@ -15,7 +15,7 @@ const wishlistSlice = createSlice({
     toggleWishlist: (state, action: PayloadAction<string>) => {
       const id = action.payload;
       if (state.items.includes(id)) {
-        state.items = state.items.filter(item => item !== id);
+        state.items = state.items.filter((item) => item !== id);
       } else {
         state.items.push(id);
       }

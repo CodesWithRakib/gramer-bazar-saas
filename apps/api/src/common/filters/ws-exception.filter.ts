@@ -14,16 +14,18 @@ export class AllWsExceptionsFilter extends BaseWsExceptionFilter {
       return;
     }
 
-    const errorResponse = exception instanceof WsException 
-      ? exception.getError() 
-      : (exception?.response || exception?.message || 'Internal server error');
-      
-    const message = typeof errorResponse === 'string' 
-      ? errorResponse 
-      : (Array.isArray(errorResponse?.message) 
-          ? errorResponse.message.join(', ') 
-          : errorResponse?.message || exception?.message || 'Internal server error');
-    
+    const errorResponse =
+      exception instanceof WsException
+        ? exception.getError()
+        : exception?.response || exception?.message || 'Internal server error';
+
+    const message =
+      typeof errorResponse === 'string'
+        ? errorResponse
+        : Array.isArray(errorResponse?.message)
+          ? errorResponse.message.join(', ')
+          : errorResponse?.message || exception?.message || 'Internal server error';
+
     this.logger.error(`[WS Exception] ${message}`, exception?.stack);
 
     client.emit('exception', {
@@ -33,4 +35,3 @@ export class AllWsExceptionsFilter extends BaseWsExceptionFilter {
     });
   }
 }
-

@@ -40,7 +40,10 @@ export interface CreateUserRequest {
 
 export const usersApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<PaginatedUsers, { page?: number; limit?: number; search?: string; role?: string }>({
+    getUsers: builder.query<
+      PaginatedUsers,
+      { page?: number; limit?: number; search?: string; role?: string }
+    >({
       query: (params) => ({
         url: '/users',
         params,

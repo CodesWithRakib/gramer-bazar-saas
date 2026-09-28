@@ -1,10 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import {
-  ValidationPipe,
-  Logger,
-  ClassSerializerInterceptor,
-} from '@nestjs/common';
+import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
 import helmet from 'helmet';
 import { SwaggerModule } from '@nestjs/swagger';
 import { createSwaggerDocument } from './swagger/swagger.config.js';
@@ -67,9 +63,7 @@ async function bootstrap() {
     'https://gramer-bazar-api.onrender.com',
   ];
 
-  const allowedOrigins = Array.from(
-    new Set([...defaultOrigins, ...configuredOrigins]),
-  );
+  const allowedOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
 
   app.enableCors({
     origin: (

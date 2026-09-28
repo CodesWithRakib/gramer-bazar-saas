@@ -21,7 +21,10 @@ import { DisputeResponseDto } from '../disputes/dto/dispute-response.dto.js';
 import { FlashSaleResponseDto } from '../flash-sales/dto/flash-sale-response.dto.js';
 import { AuditLogResponseDto } from '../audit-logs/dto/audit-log-response.dto.js';
 import { PlatformSettingsResponseDto } from '../settings/dto/settings-response.dto.js';
-import { SellerApplicationResponseDto, RiderApplicationResponseDto } from '../applications/dto/application-response.dto.js';
+import {
+  SellerApplicationResponseDto,
+  RiderApplicationResponseDto,
+} from '../applications/dto/application-response.dto.js';
 import { WalletResponseDto } from '../wallets/dto/wallet-response.dto.js';
 import { PayoutResponseDto } from '../payouts/dto/payout-response.dto.js';
 import { ProductSearchResultResponseDto } from '../catalog/dto/product-response.dto.js';
@@ -104,37 +107,61 @@ Standard error responses returned by filters:
     )
     .addTag('Auth', 'Authentication, registration, OTP verification, sessions, and profile')
     .addTag('Users', 'User account management, role assignment, and administrative directory')
-    .addTag('Locations', 'Geographic hierarchy: Divisions, Districts, Upazilas, Unions, and Geolocation detection')
+    .addTag(
+      'Locations',
+      'Geographic hierarchy: Divisions, Districts, Upazilas, Unions, and Geolocation detection',
+    )
     .addTag('Addresses', 'Customer and delivery address book management')
     .addTag('Catalog - Categories', 'Hierarchical category tree and classification')
     .addTag('Catalog - Brands', 'Brand directory and category associations')
     .addTag('Catalog - Products', 'Global marketplace master catalog and product images')
     .addTag('Catalog - Variants', 'Product variation SKUs, attributes, and image mapping')
     .addTag('Catalog - Importer', 'Bulk catalog migration and ingestion tooling')
-    .addTag('Public Catalog', 'High-performance customer-facing search, discovery, and product details')
+    .addTag(
+      'Public Catalog',
+      'High-performance customer-facing search, discovery, and product details',
+    )
     .addTag('Public Categories', 'Public discovery of category taxonomy')
     .addTag('Public Cart', 'Server-side cart pricing and stock validation')
     .addTag('Shops', 'Vendor store profiles, branding, operating locations, and shop catalogs')
     .addTag('Inventory - Seller Products', 'Seller marketplace listings linked to master catalog')
-    .addTag('Inventory - Stock', 'Stock levels, threshold alerts, and inventory transaction auditing')
+    .addTag(
+      'Inventory - Stock',
+      'Stock levels, threshold alerts, and inventory transaction auditing',
+    )
     .addTag('Reviews', 'Verified buyer product and vendor reviews and ratings')
     .addTag('Orders', 'Order lifecycle, checkout, cancellation, tracking, and fulfillment')
     .addTag('Product Requests', 'Customer product request bidding and custom procurement')
-    .addTag('Seller Portal', 'Vendor analytics, shop settings, incoming order management, and catalog control')
+    .addTag(
+      'Seller Portal',
+      'Vendor analytics, shop settings, incoming order management, and catalog control',
+    )
     .addTag('Deliveries', 'Rider dispatch, assignment, live order pickup, and proof of delivery')
     .addTag('Wishlists', 'Customer saved items and wishlist collections')
     .addTag('Notifications', 'In-app notifications and read state synchronization')
     .addTag('Analytics', 'Platform metrics, GMV, sales reports, and top-performing products')
     .addTag('Coupons', 'Promotion engine, discount vouchers, and usage eligibility')
     .addTag('Chat', 'Real-time buyer-seller and customer-rider messaging')
-    .addTag('Payments', 'SSLCOMMERZ gateway integration, transactions, IPN, and status verification')
-    .addTag('Banners (CMS)', 'Homepage hero sliders, promotional carousels, and visual marketing assets')
+    .addTag(
+      'Payments',
+      'SSLCOMMERZ gateway integration, transactions, IPN, and status verification',
+    )
+    .addTag(
+      'Banners (CMS)',
+      'Homepage hero sliders, promotional carousels, and visual marketing assets',
+    )
     .addTag('Wallets (Seller)', 'Seller and rider digital balances and transaction history')
     .addTag('Payouts', 'Vendor and rider withdrawal requests, settlement processing, and receipts')
     .addTag('Disputes', 'Order issue escalation, arbitration, evidence submission, and refunds')
     .addTag('Flash Sales', 'Time-limited promotional campaigns, deal slots, and deep discounts')
-    .addTag('Audit Logs (Admin)', 'Security event trail, administrative actions, and compliance logging')
-    .addTag('Settings (Admin)', 'Platform-wide configuration, business rules, commission rates, and feature flags')
+    .addTag(
+      'Audit Logs (Admin)',
+      'Security event trail, administrative actions, and compliance logging',
+    )
+    .addTag(
+      'Settings (Admin)',
+      'Platform-wide configuration, business rules, commission rates, and feature flags',
+    )
     .addTag('Applications', 'Onboarding pipeline for prospective sellers and delivery riders')
     .addTag('System', 'Health probes, API heartbeat, and operational status')
     .build();

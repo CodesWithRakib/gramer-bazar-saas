@@ -34,7 +34,8 @@ export class AddressesController {
   @Post()
   @ApiOperation({
     summary: 'Save a new delivery address',
-    description: 'Creates a new postal/hyperlocal delivery address linked to the authenticated user account.',
+    description:
+      'Creates a new postal/hyperlocal delivery address linked to the authenticated user account.',
   })
   @ApiStandardResponse({
     type: AddressResponseDto,

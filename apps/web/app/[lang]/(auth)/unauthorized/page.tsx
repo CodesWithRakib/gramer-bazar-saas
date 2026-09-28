@@ -37,7 +37,10 @@ export default function UnauthorizedPage({ params }: { params: Promise<{ lang: s
     <div className="min-h-screen flex flex-col bg-muted/20">
       {/* Brand Top Bar */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card">
-        <Link href={`/${lang}`} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <Link
+          href={`/${lang}`}
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+        >
           <BrandLogo lang={lang} variant="full" width={140} height={38} />
         </Link>
         <LanguageSwitcher currentLocale={lang} />
@@ -67,11 +70,17 @@ export default function UnauthorizedPage({ params }: { params: Promise<{ lang: s
           {user && (
             <div className="mb-6 p-4 rounded-lg bg-muted/40 border text-left text-xs space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{isBn ? 'ব্যবহারকারী' : 'Signed in as'}:</span>
-                <span className="font-semibold text-foreground">{user.firstName} {user.lastName} ({user.phone || user.email})</span>
+                <span className="text-muted-foreground">
+                  {isBn ? 'ব্যবহারকারী' : 'Signed in as'}:
+                </span>
+                <span className="font-semibold text-foreground">
+                  {user.firstName} {user.lastName} ({user.phone || user.email})
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{isBn ? 'বর্তমান রোল' : 'Active Roles'}:</span>
+                <span className="text-muted-foreground">
+                  {isBn ? 'বর্তমান রোল' : 'Active Roles'}:
+                </span>
                 <span className="font-semibold text-primary">{roles.join(', ') || 'CUSTOMER'}</span>
               </div>
             </div>
@@ -92,7 +101,11 @@ export default function UnauthorizedPage({ params }: { params: Promise<{ lang: s
               </Button>
             </Link>
 
-            <Button variant="ghost" onClick={handleLogout} className="w-full sm:w-auto gap-2 text-destructive hover:bg-destructive/10">
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="w-full sm:w-auto gap-2 text-destructive hover:bg-destructive/10"
+            >
               <LogOut className="w-4 h-4" />
               <span>{isBn ? 'অন্য অ্যাকাউন্টে লগইন' : 'Switch Account'}</span>
             </Button>

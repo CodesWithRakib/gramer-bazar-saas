@@ -13,7 +13,11 @@ export function CustomerMessagesView({ lang = 'en' }: CustomerMessagesViewProps)
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{isBn ? 'মেসেজ' : 'Messages'}</h1>
-        <p className="text-muted-foreground">{isBn ? 'সেলার ও ডেলিভারি রাইডারদের সাথে যোগাযোগ করুন।' : 'Chat with sellers and delivery riders.'}</p>
+        <p className="text-muted-foreground">
+          {isBn
+            ? 'সেলার ও ডেলিভারি রাইডারদের সাথে যোগাযোগ করুন।'
+            : 'Chat with sellers and delivery riders.'}
+        </p>
       </div>
       <ChatInterface />
     </div>

@@ -18,21 +18,21 @@ interface StartChatButtonProps {
   referenceType?: string;
   redirectPath?: string; // e.g., /en/messages or /en/seller/messages
   buttonText?: string;
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
-  size?: "default" | "sm" | "lg" | "icon";
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
 }
 
-export function StartChatButton({ 
-  participantId, 
-  lang, 
+export function StartChatButton({
+  participantId,
+  lang,
   referenceId,
   referenceType,
-  redirectPath = `/${lang}/messages`, 
-  buttonText, 
+  redirectPath = `/${lang}/messages`,
+  buttonText,
   variant = 'outline',
   size = 'default',
-  className
+  className,
 }: StartChatButtonProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -44,14 +44,17 @@ export function StartChatButton({
         toast.error(lang === 'bn' ? 'বিক্রেতার তথ্য অনুপস্থিত' : 'Seller information missing');
         return;
       }
-      const conversation = await createConversation({ 
-        participantId, 
-        referenceId, 
-        referenceType 
+      const conversation = await createConversation({
+        participantId,
+        referenceId,
+        referenceType,
       }).unwrap();
-      
-      const isDashboardRoute = redirectPath.includes('/admin') || redirectPath.includes('/seller') || redirectPath.includes('/rider');
-      
+
+      const isDashboardRoute =
+        redirectPath.includes('/admin') ||
+        redirectPath.includes('/seller') ||
+        redirectPath.includes('/rider');
+
       if (isDashboardRoute) {
         router.push(redirectPath);
       } else {
@@ -62,17 +65,15 @@ export function StartChatButton({
       console.error('Failed to start chat:', error);
       const isBn = lang === 'bn';
       const msg = getApiErrorMessage(error);
-      toast.error(
-        msg || (isBn ? 'চ্যাট শুরু করতে সমস্যা হয়েছে' : 'Failed to start chat')
-      );
+      toast.error(msg || (isBn ? 'চ্যাট শুরু করতে সমস্যা হয়েছে' : 'Failed to start chat'));
     }
   };
 
   return (
-    <Button 
-      variant={variant} 
-      size={size} 
-      onClick={handleStartChat} 
+    <Button
+      variant={variant}
+      size={size}
+      onClick={handleStartChat}
       disabled={isLoading}
       className={className}
     >

@@ -2,12 +2,16 @@
 
 import { getApiErrorMessage } from '@/lib/apiError';
 
-import React, { use, useState,  useRef } from 'react';
-import { useGetProfileQuery, useUpdateProfileMutation, useUploadAvatarMutation } from '@/features/auth/authApi';
+import React, { use, useState, useRef } from 'react';
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useUploadAvatarMutation,
+} from '@/features/auth/authApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent,  } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Camera, User, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -38,9 +42,7 @@ export function CustomerProfileView({ lang = 'en' }: CustomerProfileViewProps) {
     email: '',
   });
 
-  const [prevProfileId, setPrevProfileId] = useState<string | undefined>(
-    undefined,
-  );
+  const [prevProfileId, setPrevProfileId] = useState<string | undefined>(undefined);
   if (profile && profile.id !== prevProfileId) {
     setPrevProfileId(profile.id);
     setFormData({
@@ -52,7 +54,7 @@ export function CustomerProfileView({ lang = 'en' }: CustomerProfileViewProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,11 +64,14 @@ export function CustomerProfileView({ lang = 'en' }: CustomerProfileViewProps) {
         firstName: formData.firstName,
         lastName: formData.lastName,
       }).unwrap();
-      
+
       dispatch(setUser(response.user));
       toast.success(isBn ? 'প্রোফাইল সফলভাবে আপডেট হয়েছে' : 'Profile updated successfully');
     } catch (err) {
-      toast.error(getApiErrorMessage(err) || (isBn ? 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে' : 'Failed to update profile'));
+      toast.error(
+        getApiErrorMessage(err) ||
+          (isBn ? 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে' : 'Failed to update profile')
+      );
     }
   };
 
@@ -89,15 +94,18 @@ export function CustomerProfileView({ lang = 'en' }: CustomerProfileViewProps) {
 
     try {
       const response = await uploadAvatar(uploadData).unwrap();
-      
+
       // Update redux store with new avatar
       if (profile) {
         dispatch(setUser({ ...profile, avatar: response.avatarUrl }));
       }
-      
+
       toast.success(isBn ? 'ছবি সফলভাবে আপলোড হয়েছে' : 'Avatar uploaded successfully');
     } catch (err) {
-      toast.error(getApiErrorMessage(err) || (isBn ? 'ছবি আপলোড করতে সমস্যা হয়েছে' : 'Failed to upload avatar'));
+      toast.error(
+        getApiErrorMessage(err) ||
+          (isBn ? 'ছবি আপলোড করতে সমস্যা হয়েছে' : 'Failed to upload avatar')
+      );
     }
   };
 
@@ -156,16 +164,16 @@ export function CustomerProfileView({ lang = 'en' }: CustomerProfileViewProps) {
                 {isUploading ? (
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 ) : profile?.avatar ? (
-                  <CustomImage 
-                    src={getFullAvatarUrl(profile.avatar) as string} 
-                    alt="Avatar" 
-                    fill 
+                  <CustomImage
+                    src={getFullAvatarUrl(profile.avatar) as string}
+                    alt="Avatar"
+                    fill
                     className="object-cover"
                   />
                 ) : (
                   <User className="w-12 h-12 text-muted-foreground" />
                 )}
-                
+
                 {/* Hover overlay */}
                 {!isUploading && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -173,23 +181,33 @@ export function CustomerProfileView({ lang = 'en' }: CustomerProfileViewProps) {
                   </div>
                 )}
               </div>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                className="hidden" 
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
                 accept="image/jpeg, image/png, image/webp"
               />
             </div>
-            
+
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold text-lg">{profile?.firstName} {profile?.lastName}</h3>
+              <h3 className="font-semibold text-lg">
+                {profile?.firstName} {profile?.lastName}
+              </h3>
               <p className="text-muted-foreground text-sm mb-2">{profile?.phone}</p>
-              <Button variant="outline" size="sm" onClick={handleAvatarClick} disabled={isUploading}>
-                {isUploading 
-                  ? (isBn ? 'আপলোড হচ্ছে...' : 'Uploading...') 
-                  : (isBn ? 'ছবি পরিবর্তন করুন' : 'Change Avatar')
-                }
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAvatarClick}
+                disabled={isUploading}
+              >
+                {isUploading
+                  ? isBn
+                    ? 'আপলোড হচ্ছে...'
+                    : 'Uploading...'
+                  : isBn
+                    ? 'ছবি পরিবর্তন করুন'
+                    : 'Change Avatar'}
               </Button>
             </div>
           </div>
@@ -238,7 +256,11 @@ export function CustomerProfileView({ lang = 'en' }: CustomerProfileViewProps) {
                   value={formData.email}
                   disabled
                   className="bg-muted/50"
-                  title={isBn ? 'ইমেইল পরিবর্তন করতে সাপোর্টে যোগাযোগ করুন' : 'Contact support to change email'}
+                  title={
+                    isBn
+                      ? 'ইমেইল পরিবর্তন করতে সাপোর্টে যোগাযোগ করুন'
+                      : 'Contact support to change email'
+                  }
                 />
               </div>
             </div>

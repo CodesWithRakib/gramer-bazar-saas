@@ -62,7 +62,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     if (accessToken) {
       socketInstance.auth = { token: `Bearer ${accessToken}` };
     }
-    
+
     // Disconnect and reconnect to apply new auth payload
     if (socketInstance.connected) {
       socketInstance.disconnect();

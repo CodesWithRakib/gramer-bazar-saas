@@ -14,7 +14,10 @@ export class CreateSellerApplicationDto {
   @MaxLength(200)
   shopNameBn: string;
 
-  @ApiProperty({ example: 'green-agro-farm', description: 'Desired shop slug (alphanumeric and dashes)' })
+  @ApiProperty({
+    example: 'green-agro-farm',
+    description: 'Desired shop slug (alphanumeric and dashes)',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
@@ -30,12 +33,20 @@ export class CreateSellerApplicationDto {
   @IsEmail()
   email?: string;
 
-  @ApiProperty({ example: 'Supplying fresh organic vegetables and dairy products', description: 'Description of the shop', required: false })
+  @ApiProperty({
+    example: 'Supplying fresh organic vegetables and dairy products',
+    description: 'Description of the shop',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: 'Khansama Bazar, Dinajpur', description: 'Physical shop address', required: false })
+  @ApiProperty({
+    example: 'Khansama Bazar, Dinajpur',
+    description: 'Physical shop address',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   address?: string;
