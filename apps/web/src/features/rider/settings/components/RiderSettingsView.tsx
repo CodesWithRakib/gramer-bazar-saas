@@ -1,7 +1,7 @@
 'use client';
 
-import React, { use } from 'react';
-import { Truck, User, MessageSquare, ShieldCheck } from 'lucide-react';
+import React from 'react';
+import { Banknote, Bell, Bike, History, MessageSquare, User } from 'lucide-react';
 import DashboardHubOverview, { HubCardItem } from '@/components/dashboard/DashboardHubOverview';
 
 export interface RiderSettingsViewProps {
@@ -12,52 +12,75 @@ export function RiderSettingsView({ lang = 'en' }: RiderSettingsViewProps) {
   const cards: HubCardItem[] = [
     {
       id: 'profile',
-      title: 'Rider Profile & Vehicle Info',
+      title: 'Rider Profile & Vehicle',
       titleBn: 'রাইডার প্রোফাইল ও যানবাহন',
       description:
-        'Manage personal profile, driving license number, vehicle type, and emergency contacts.',
+        'Manage your contact details, service zone, emergency contact and vehicle information.',
       descriptionBn:
-        'ব্যক্তিগত তথ্য, ড্রাইভিং লাইসেন্স, গাড়ির বিবরণ এবং জরুরি যোগাযোগ নম্বর পরিচালনা করুন।',
-      icon: User,
+        'যোগাযোগের তথ্য, কাজের এলাকা, জরুরি যোগাযোগ এবং যানবাহনের তথ্য পরিচালনা করুন।',
+      icon: Bike,
       href: '/rider/profile',
       badge: 'Account',
       badgeBn: 'অ্যাকাউন্ট',
     },
     {
-      id: 'deliveries',
-      title: 'Delivery History & Completed Orders',
-      titleBn: 'ডেলিভারি ইতিহাস ও সম্পন্ন কাজ',
-      description:
-        'Review past completed parcel drop-offs, delivery timestamps, and customer signatures.',
-      descriptionBn:
-        'পূর্ববর্তী সফল ডেলিভারি তালিকা, ডেলিভারির সময় এবং গ্রাহকের তথ্য পর্যালোচনা করুন।',
-      icon: Truck,
-      href: '/rider/deliveries',
+      id: 'earnings',
+      title: 'Earnings & Payouts',
+      titleBn: 'আয় ও পে-আউট',
+      description: 'Review your delivery earnings and withdraw your available balance.',
+      descriptionBn: 'আপনার ডেলিভারি আয় দেখুন এবং উত্তোলনযোগ্য ব্যালেন্স তুলুন।',
+      icon: Banknote,
+      href: '/rider/earnings',
+      badge: 'Finance',
+      badgeBn: 'আর্থিক',
+    },
+    {
+      id: 'history',
+      title: 'Delivery History',
+      titleBn: 'ডেলিভারি ইতিহাস',
+      description: 'Browse your completed and past deliveries with outcomes and earnings.',
+      descriptionBn: 'সম্পন্ন ও পূর্বের ডেলিভারির রেকর্ড ও আয় দেখুন।',
+      icon: History,
+      href: '/rider/history',
+    },
+    {
+      id: 'notifications',
+      title: 'Notifications',
+      titleBn: 'নোটিফিকেশন',
+      description: 'View delivery assignments, payout updates and account messages.',
+      descriptionBn: 'ডেলিভারি অ্যাসাইনমেন্ট, পে-আউট আপডেট ও অ্যাকাউন্ট বার্তা দেখুন।',
+      icon: Bell,
+      href: '/rider/notifications',
     },
     {
       id: 'messages',
-      title: 'Dispatcher & Admin Messages',
-      titleBn: 'ডিসপ্যাচার ও অ্যাডমিন বার্তা',
-      description:
-        'Communicate directly with marketplace dispatchers, support administrators, and merchants.',
-      descriptionBn:
-        'অর্ডার এবং ডেলিভারি সহায়তার জন্য অ্যাডমিন ও ডিসপ্যাচার দলের সাথে সরাসরি চ্যাট করুন।',
+      title: 'Messages',
+      titleBn: 'বার্তা',
+      description: 'Chat with customers and the dispatch team about active deliveries.',
+      descriptionBn: 'চলমান ডেলিভারি নিয়ে গ্রাহক ও ডিসপ্যাচ টিমের সাথে চ্যাট করুন।',
       icon: MessageSquare,
       href: '/rider/messages',
-      badge: 'Support Chat',
-      badgeBn: 'সাপোর্ট চ্যাট',
+    },
+    {
+      id: 'dashboard',
+      title: 'Account Overview',
+      titleBn: 'অ্যাকাউন্ট সারসংক্ষেপ',
+      description: 'Return to your operational dashboard for assignments and today’s tasks.',
+      descriptionBn: 'আজকের কাজ ও অ্যাসাইনমেন্টের জন্য ড্যাশবোর্ডে ফিরে যান।',
+      icon: User,
+      href: '/rider',
     },
   ];
 
   return (
     <DashboardHubOverview
       lang={lang}
-      sectionTag="Fleet Operations"
-      sectionTagBn="রাইডার পরিচালনা ও সেটিংস"
-      title="Rider Settings & Overview"
-      titleBn="রাইডার সেটিংস ও পরিচালনা"
-      description="Manage your rider fleet account, vehicle details, completed deliveries, and communications."
-      descriptionBn="আপনার রাইডার অ্যাকাউন্ট, যানবাহনের তথ্য, ডেলিভারি রেকর্ড এবং মেসেজসমূহ পরিচালনা করুন।"
+      sectionTag="Account & Support"
+      sectionTagBn="অ্যাকাউন্ট ও সহায়তা"
+      title="Rider Settings"
+      titleBn="রাইডার সেটিংস"
+      description="Manage your rider account, earnings and communication in one place."
+      descriptionBn="আপনার রাইডার অ্যাকাউন্ট, আয় এবং যোগাযোগ এক জায়গায় পরিচালনা করুন।"
       cards={cards}
     />
   );

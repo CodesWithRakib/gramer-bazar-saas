@@ -7,6 +7,7 @@ import { Delivery } from './entities/delivery.entity.js';
 import { Order } from '../orders/entities/order.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { RidersService } from '../riders/riders.service.js';
 
 describe('DeliveriesService', () => {
   let service: DeliveriesService;
@@ -26,6 +27,14 @@ describe('DeliveriesService', () => {
             notifyUser: () => Promise.resolve(null),
             notifyUsers: () => Promise.resolve([]),
             notifyRole: () => Promise.resolve([]),
+          },
+        },
+        {
+          provide: RidersService,
+          useValue: {
+            applySystemAvailability: () => Promise.resolve(),
+            recordDeliveryEarning: () => Promise.resolve(null),
+            getAvailabilityMap: () => Promise.resolve({}),
           },
         },
       ],

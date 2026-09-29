@@ -27,6 +27,7 @@ import { OrdersModule } from './orders/orders.module.js';
 import { ProductRequestsModule } from './product-requests/product-requests.module.js';
 import { SellerPortalModule } from './seller-portal/seller-portal.module.js';
 import { DeliveriesModule } from './deliveries/deliveries.module.js';
+import { RidersModule } from './riders/riders.module.js';
 import { WishlistsModule } from './wishlists/wishlists.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -47,6 +48,7 @@ import { join } from 'path';
 import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
 import { StorageModule } from './storage/storage.module.js';
 import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSchema.js';
+import { RiderSystem1790700000000 } from './migrations/1790700000000-RiderSystem.js';
 
 @Module({
   imports: [
@@ -77,7 +79,7 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
           url: dbUrl,
           autoLoadEntities: true,
           synchronize: syncEnabled,
-          migrations: [InitialSchema1790406745498],
+          migrations: [InitialSchema1790406745498, RiderSystem1790700000000],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,
           logging: nodeEnv === 'development',
@@ -150,6 +152,7 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
     ProductRequestsModule,
     SellerPortalModule,
     DeliveriesModule,
+    RidersModule,
     WishlistsModule,
     NotificationsModule,
     AnalyticsModule,

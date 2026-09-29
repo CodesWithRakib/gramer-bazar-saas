@@ -5,9 +5,15 @@ import { PayoutsController } from './payouts.controller.js';
 import { PayoutRequest } from './entities/payout-request.entity.js';
 import { WalletsModule } from '../wallets/wallets.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
+import { RidersModule } from '../riders/riders.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PayoutRequest]), WalletsModule, NotificationsModule],
+  imports: [
+    TypeOrmModule.forFeature([PayoutRequest]),
+    WalletsModule,
+    NotificationsModule,
+    RidersModule,
+  ],
   controllers: [PayoutsController],
   providers: [PayoutsService],
   exports: [PayoutsService],

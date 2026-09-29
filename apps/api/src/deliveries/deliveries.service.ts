@@ -16,7 +16,10 @@ import {
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
+import { RiderHistoryQueryDto } from './dto/rider-history-query.dto.js';
 import { Role } from '../roles/enums/role.enum.js';
+import { RidersService } from '../riders/riders.service.js';
+import { RiderAvailability } from '../riders/enums/rider-availability.enum.js';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
@@ -32,6 +35,7 @@ export class DeliveriesService {
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
     private readonly notificationsService: NotificationsService,
+    private readonly ridersService: RidersService,
   ) {}
 
   // --- ADMIN ACTIONS ---
@@ -74,12 +78,18 @@ export class DeliveriesService {
   }
 
   async getRiders() {
-    return this.userRepository
+    const riders = await this.userRepository
       .createQueryBuilder('user')
       .innerJoin('user.roles', 'role')
       .where('role.name = :role', { role: Role.RIDER })
       .select(['user.id', 'user.firstName', 'user.lastName', 'user.phone'])
       .getMany();
+
+    const availabilityMap = await this.ridersService.getAvailabilityMap(riders.map((r) => r.id));
+    return riders.map((rider) => ({
+      ...rider,
+      availability: availabilityMap[rider.id] ?? RiderAvailability.OFFLINE,
+    }));
   }
 
   async assignDelivery(adminId: string, dto: AssignDeliveryDto) {
@@ -100,6 +110,8 @@ export class DeliveriesService {
       let delivery = await manager.findOne(Delivery, {
         where: { orderId: order.id },
       });
+
+      const previousRiderId = delivery?.riderId ?? null;
 
       if (delivery) {
         // Re-assign logic
@@ -145,6 +157,19 @@ export class DeliveriesService {
         },
       });
 
+      // Inform a rider who lost the assignment to a re-dispatch.
+      if (previousRiderId && previousRiderId !== dto.riderId) {
+        void this.notificationsService.notifyUser(previousRiderId, {
+          type: NotificationType.DELIVERY_REASSIGNED,
+          title: 'Delivery Reassigned',
+          message: `Order #${orderShortId} has been reassigned to another rider.`,
+          titleKey: 'notifications.delivery_reassigned_rider.title',
+          messageKey: 'notifications.delivery_reassigned_rider.message',
+          priority: NotificationPriority.NORMAL,
+          data: { orderId: order.id, deliveryId: delivery.id, orderNumber: orderShortId },
+        });
+      }
+
       void this.notificationsService.notifyUser(order.userId, {
         type: NotificationType.DELIVERY_ASSIGNED,
         title: 'Rider Assigned',
@@ -174,6 +199,53 @@ export class DeliveriesService {
     });
   }
 
+  async getRiderHistory(riderId: string, query: RiderHistoryQueryDto) {
+    const page = query.page && query.page > 0 ? query.page : 1;
+    const limit = query.limit && query.limit > 0 ? query.limit : 10;
+
+    const qb = this.deliveryRepository
+      .createQueryBuilder('delivery')
+      .leftJoinAndSelect('delivery.order', 'order')
+      .leftJoinAndSelect('order.address', 'address')
+      .leftJoinAndSelect('order.user', 'user')
+      .where('delivery.riderId = :riderId', { riderId })
+      .orderBy('COALESCE(delivery.deliveryTime, delivery.updatedAt)', 'DESC');
+
+    if (query.status) {
+      qb.andWhere('delivery.status = :status', { status: query.status });
+    }
+    if (query.search) {
+      qb.andWhere('(delivery.id::text ILIKE :search OR order.id::text ILIKE :search)', {
+        search: `%${query.search}%`,
+      });
+    }
+    if (query.from) {
+      qb.andWhere('COALESCE(delivery.deliveryTime, delivery.createdAt) >= :from', {
+        from: new Date(query.from),
+      });
+    }
+    if (query.to) {
+      qb.andWhere('COALESCE(delivery.deliveryTime, delivery.createdAt) <= :to', {
+        to: new Date(query.to),
+      });
+    }
+
+    const [data, total] = await qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
+    };
+  }
+
   async getRiderDashboard(riderId: string) {
     const deliveries = await this.deliveryRepository.find({
       where: { riderId },
@@ -191,14 +263,14 @@ export class DeliveriesService {
 
     const totalEarnings = deliveries
       .filter((d) => d.status === DeliveryStatus.DELIVERED)
-      .reduce((sum, d) => sum + (Number(d.order?.deliveryFee) || 50), 0);
+      .reduce((sum, d) => sum + (Number(d.order?.deliveryFee) || 0), 0);
 
     const deliveriesTrendRaw = await this.deliveryRepository.manager.query(
       `
       SELECT TO_CHAR(d.created_at, 'Dy') as name,
              COUNT(CASE WHEN d.status = 'DELIVERED' THEN 1 END)::int as completed,
              COUNT(CASE WHEN d.status != 'DELIVERED' THEN 1 END)::int as pending,
-             SUM(CASE WHEN d.status = 'DELIVERED' THEN COALESCE(o.delivery_fee, 50) ELSE 0 END)::float as earnings
+             SUM(CASE WHEN d.status = 'DELIVERED' THEN COALESCE(o.delivery_fee, 0) ELSE 0 END)::float as earnings
       FROM deliveries d
       LEFT JOIN orders o ON o.id = d.order_id
       WHERE d.rider_id = $1 AND d.created_at >= NOW() - INTERVAL '7 days'
@@ -233,9 +305,13 @@ export class DeliveriesService {
       relations: [
         'order',
         'order.address',
+        'order.address.division',
+        'order.address.district',
+        'order.address.upazila',
         'order.user',
         'order.items',
         'order.items.sellerProduct',
+        'order.items.sellerProduct.shop',
         'order.items.sellerProduct.productVariant',
         'order.items.sellerProduct.productVariant.product',
       ],
@@ -281,6 +357,37 @@ export class DeliveriesService {
         changedById: userId,
         notes: dto.notes,
       });
+
+      // Rider availability is driven by the delivery lifecycle.
+      if (delivery.riderId) {
+        if (dto.status === DeliveryStatus.ACCEPTED) {
+          await this.ridersService.applySystemAvailability(
+            manager,
+            delivery.riderId,
+            RiderAvailability.BUSY,
+          );
+        } else if (
+          dto.status === DeliveryStatus.DELIVERED ||
+          dto.status === DeliveryStatus.FAILED ||
+          dto.status === DeliveryStatus.CANCELLED
+        ) {
+          await this.ridersService.applySystemAvailability(
+            manager,
+            delivery.riderId,
+            RiderAvailability.AVAILABLE,
+          );
+        }
+      }
+
+      // Credit the rider's earning ledger exactly once per completed delivery.
+      if (dto.status === DeliveryStatus.DELIVERED && delivery.riderId) {
+        await this.ridersService.recordDeliveryEarning(manager, {
+          riderId: delivery.riderId,
+          deliveryId: delivery.id,
+          orderId: delivery.orderId,
+          amount: Number(delivery.order?.deliveryFee) || 0,
+        });
+      }
 
       // Synchronize Order status
       const order = delivery.order;
@@ -338,6 +445,23 @@ export class DeliveriesService {
 
         // In-app notifications for customer based on delivery tracking
         const orderShortId = order.id.slice(0, 8).toUpperCase();
+        if (dto.status === DeliveryStatus.DELIVERED && delivery.riderId) {
+          const payout = Number(delivery.order?.deliveryFee) || 0;
+          void this.notificationsService.notifyUser(delivery.riderId, {
+            type: NotificationType.DELIVERY_COMPLETED,
+            title: 'Delivery Completed',
+            message: `Order #${orderShortId} was delivered successfully. ৳${payout.toFixed(2)} added to your earnings.`,
+            titleKey: 'notifications.delivery_completed_rider.title',
+            messageKey: 'notifications.delivery_completed_rider.message',
+            priority: NotificationPriority.NORMAL,
+            data: {
+              orderId: order.id,
+              deliveryId: delivery.id,
+              orderNumber: orderShortId,
+              amount: payout,
+            },
+          });
+        }
         if (dto.status === DeliveryStatus.PICKED_UP) {
           void this.notificationsService.notifyUser(order.userId, {
             type: NotificationType.DELIVERY_STARTED,

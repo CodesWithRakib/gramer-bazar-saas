@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { DeliveryStatus } from '../enums/delivery-status.enum.js';
 import { OrderResponseDto } from '../../orders/dto/order-response.dto.js';
+import { RiderAvailability } from '../../riders/enums/rider-availability.enum.js';
 
 export class RiderSummaryDto {
   @ApiProperty({ example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d' })
@@ -14,6 +15,9 @@ export class RiderSummaryDto {
 
   @ApiProperty({ example: '01712345678' })
   phone: string;
+
+  @ApiProperty({ enum: RiderAvailability, example: RiderAvailability.AVAILABLE })
+  availability: RiderAvailability;
 }
 
 export class DeliveryHistoryResponseDto {

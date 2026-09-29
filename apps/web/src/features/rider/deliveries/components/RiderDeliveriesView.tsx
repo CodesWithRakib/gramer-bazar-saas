@@ -1,122 +1,190 @@
 'use client';
 
-import React from 'react';
-import { useGetRiderDeliveriesQuery } from '@/features/deliveries/deliveriesApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { MapPin, Phone, Truck } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { OrderSkeleton } from '@/components/ui/Skeletons';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EmptyState } from '@/components/common/EmptyState';
-import { MapPin, ArrowRight, Truck } from 'lucide-react';
-import Link from 'next/link';
+import { ErrorState } from '@/components/common/ErrorState';
+import { useGetRiderDeliveriesQuery, DeliveryStatus } from '@/features/deliveries/deliveriesApi';
 
 export interface RiderDeliveriesViewProps {
   lang?: string;
 }
 
+type TabKey = 'new' | 'active' | 'completed' | 'all';
+
+const ACTIVE_STATUSES = [
+  DeliveryStatus.ACCEPTED,
+  DeliveryStatus.PICKED_UP,
+  DeliveryStatus.OUT_FOR_DELIVERY,
+];
+
 export function RiderDeliveriesView({ lang = 'en' }: RiderDeliveriesViewProps) {
   const isBn = lang === 'bn';
+  const [tab, setTab] = useState<TabKey>('new');
 
-  const { data: deliveries, isLoading } = useGetRiderDeliveriesQuery(undefined, {
+  const { data: deliveries, isLoading, isError, refetch } = useGetRiderDeliveriesQuery(undefined, {
     pollingInterval: 30000,
   });
+
+  const grouped = useMemo(() => {
+    const list = deliveries ?? [];
+    return {
+      new: list.filter((d) => d.status === DeliveryStatus.ASSIGNED),
+      active: list.filter((d) => ACTIVE_STATUSES.includes(d.status)),
+      completed: list.filter((d) => d.status === DeliveryStatus.DELIVERED),
+      all: list,
+    };
+  }, [deliveries]);
 
   if (isLoading) {
     return (
       <div className="space-y-6 pt-2">
-        <PageHeader
-          title={isBn ? 'সকল অ্যাসাইনমেন্ট' : 'All Deliveries'}
-          description={
-            isBn
-              ? 'আপনার বর্তমান ডেলিভারি অ্যাসাইনমেন্টসমূহ পর্যালোচনা ও পরিচালনা করুন।'
-              : 'Review and manage your active and assigned deliveries.'
-          }
-        />
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="h-10 w-full max-w-md" />
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <OrderSkeleton key={i} />
+            <Skeleton key={i} className="h-28 w-full rounded-2xl" />
           ))}
         </div>
       </div>
     );
   }
 
-  if (!deliveries || deliveries.length === 0) {
+  if (isError) {
     return (
       <div className="space-y-6 pt-2">
         <PageHeader
-          title={isBn ? 'সকল অ্যাসাইনমেন্ট' : 'All Deliveries'}
-          description={
-            isBn
-              ? 'আপনার বর্তমান ডেলিভারি অ্যাসাইনমেন্টসমূহ পর্যালোচনা ও পরিচালনা করুন।'
-              : 'Review and manage your active and assigned deliveries.'
-          }
+          title={isBn ? 'ডেলিভারি' : 'Deliveries'}
+          description={isBn ? 'আপনার ডেলিভারি অ্যাসাইনমেন্ট দেখুন।' : 'Your delivery assignments.'}
         />
-        <EmptyState
-          icon={<Truck className="w-8 h-8 text-primary" />}
-          title={isBn ? 'কোনো সক্রিয় অ্যাসাইনমেন্ট নেই' : 'No Active Deliveries'}
-          description={
-            isBn
-              ? 'এই মুহূর্তে আপনার জন্য কোনো ডেলিভারি বরাদ্দ নেই। নতুন ডেলিভারি আসলে নোটিফিকেশন পাবেন।'
-              : 'You do not have any assigned deliveries right now. You will be notified when new orders are assigned.'
-          }
-        />
+        <ErrorState isBn={isBn} onRetry={refetch} />
       </div>
     );
   }
 
+  const tabs: { key: TabKey; label: string; count: number }[] = [
+    { key: 'new', label: isBn ? 'নতুন' : 'New', count: grouped.new.length },
+    { key: 'active', label: isBn ? 'চলমান' : 'Active', count: grouped.active.length },
+    { key: 'completed', label: isBn ? 'সম্পন্ন' : 'Completed', count: grouped.completed.length },
+    { key: 'all', label: isBn ? 'সব' : 'All', count: grouped.all.length },
+  ];
+
+  const visible = grouped[tab];
+
   return (
-    <div className="space-y-6 pt-2">
+    <div className="space-y-5 pt-2">
       <PageHeader
-        title={isBn ? 'সকল অ্যাসাইনমেন্ট' : 'All Deliveries'}
+        title={isBn ? 'ডেলিভারি' : 'Deliveries'}
         description={
           isBn
-            ? 'আপনার বর্তমান ডেলিভারি অ্যাসাইনমেন্টসমূহ পর্যালোচনা ও পরিচালনা করুন।'
-            : 'Review and manage your active and assigned deliveries.'
-        }
-        badge={
-          <span className="text-xs bg-primary/10 text-primary font-semibold px-2.5 py-1 rounded-full">
-            {deliveries.length} {isBn ? 'টি ডেলিভারি' : 'deliveries'}
-          </span>
+            ? 'আপনার নতুন, চলমান এবং সম্পন্ন ডেলিভারি দেখুন ও পরিচালনা করুন।'
+            : 'Review and manage your new, active and completed deliveries.'
         }
       />
 
-      <div className="space-y-3">
-        {deliveries.map((delivery) => (
-          <Link
-            key={delivery.id}
-            href={`/${lang}/rider/deliveries/${delivery.id}`}
-            className="block group"
-          >
-            <Card className="rounded-2xl border-border/70 hover:border-primary/40 hover:shadow-md transition-all cursor-pointer bg-card">
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <Badge variant="outline" className="text-xs uppercase font-medium bg-muted/30">
+      <Tabs value={tab} onValueChange={(value) => setTab(value as TabKey)}>
+        <TabsList className="grid w-full grid-cols-4">
+          {tabs.map((item) => (
+            <TabsTrigger key={item.key} value={item.key} className="gap-1.5 text-xs sm:text-sm">
+              <span className="truncate">{item.label}</span>
+              <span className="rounded-full bg-muted px-1.5 text-[10px] font-semibold text-muted-foreground">
+                {item.count}
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {visible.length === 0 ? (
+        <EmptyState
+          className="min-h-[260px] rounded-2xl"
+          icon={<Truck className="h-8 w-8 text-primary" />}
+          title={
+            tab === 'new'
+              ? isBn
+                ? 'নতুন অ্যাসাইনমেন্ট নেই'
+                : 'No new assignments'
+              : tab === 'active'
+                ? isBn
+                  ? 'চলমান ডেলিভারি নেই'
+                  : 'No active deliveries'
+                : tab === 'completed'
+                  ? isBn
+                    ? 'সম্পন্ন ডেলিভারি নেই'
+                    : 'No completed deliveries yet'
+                  : isBn
+                    ? 'কোনো ডেলিভারি নেই'
+                    : 'No deliveries'
+          }
+          description={
+            isBn
+              ? 'নতুন ডেলিভারি এলে এখানে দেখতে পাবেন।'
+              : 'New deliveries assigned to you will appear here.'
+          }
+        />
+      ) : (
+        <div className="space-y-3">
+          {visible.map((delivery) => (
+            <Card key={delivery.id} className="rounded-2xl border-border shadow-none">
+              <CardContent className="space-y-3 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <Badge variant="outline" className="text-[11px] uppercase">
                     {delivery.status.replace(/_/g, ' ')}
                   </Badge>
-                  <span className="text-xs text-muted-foreground font-mono font-medium">
+                  <span className="shrink-0 font-mono text-xs text-muted-foreground">
                     #{delivery.order.id.slice(-6).toUpperCase()}
                   </span>
                 </div>
-                <CardTitle className="text-base sm:text-lg mt-2 flex justify-between items-center text-foreground group-hover:text-primary transition-colors">
-                  <span>
-                    {delivery.order.user?.firstName} {delivery.order.user?.lastName}
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+
+                <p className="truncate font-semibold text-foreground">
+                  {delivery.order.user?.firstName} {delivery.order.user?.lastName}
+                </p>
+
                 <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary/70" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span className="line-clamp-2">
-                    {delivery.order.address?.street}, {delivery.order.address?.city}
+                    {delivery.order.address?.streetAddress}
+                    {delivery.order.address?.contactPhone
+                      ? `, ${delivery.order.address.contactPhone}`
+                      : ''}
                   </span>
+                </div>
+
+                <div className="flex gap-2 pt-1">
+                  <Button asChild className="h-11 flex-1">
+                    <Link href={`/${lang}/rider/deliveries/${delivery.id}`}>
+                      {delivery.status === DeliveryStatus.ASSIGNED
+                        ? isBn
+                          ? 'পর্যালোচনা ও গ্রহণ'
+                          : 'Review & Accept'
+                        : isBn
+                          ? 'বিস্তারিত'
+                          : 'View Details'}
+                    </Link>
+                  </Button>
+                  {delivery.order.user?.phone && (
+                    <Button asChild variant="outline" size="icon" className="h-11 w-11 shrink-0">
+                      <a
+                        href={`tel:${delivery.order.user.phone}`}
+                        aria-label={isBn ? 'গ্রাহককে কল করুন' : 'Call customer'}
+                      >
+                        <Phone className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
-          </Link>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

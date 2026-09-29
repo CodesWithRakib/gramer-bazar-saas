@@ -205,6 +205,8 @@ export const api = createApi({
     'Settings',
     'SellerApplication',
     'RiderApplication',
+    'RiderProfile',
+    'RiderEarning',
     'Payment',
   ],
   endpoints: () => ({}),

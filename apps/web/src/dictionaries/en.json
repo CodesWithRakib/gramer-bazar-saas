@@ -293,6 +293,14 @@
       "title": "Delivery Update",
       "message": "Delivery attempt for order #{{orderNumber}} was unsuccessful."
     },
+    "delivery_completed_rider": {
+      "title": "Delivery Completed",
+      "message": "Order #{{orderNumber}} was delivered. {{amount}} BDT added to your earnings."
+    },
+    "delivery_reassigned_rider": {
+      "title": "Delivery Reassigned",
+      "message": "Order #{{orderNumber}} has been reassigned to another rider."
+    },
     "seller_application_submitted": {
       "title": "Seller Application Received",
       "message": "Your seller application has been received and is under review."
@@ -344,6 +352,10 @@
     "admin_payout_requested": {
       "title": "New Payout Request",
       "message": "Seller {{sellerName}} requested a payout of {{amount}}."
+    },
+    "payout_requested_admin": {
+      "title": "New Payout Request",
+      "message": "A payout of {{amount}} was requested via {{method}}."
     },
     "payout_approved": {
       "title": "Payout Processed",

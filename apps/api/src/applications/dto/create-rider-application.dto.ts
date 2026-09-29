@@ -24,10 +24,13 @@ export class CreateRiderApplicationDto {
   @MaxLength(50)
   nidNumber: string;
 
-  @ApiProperty({ example: 'BIKE', description: 'Vehicle type (BIKE, BICYCLE, SCOOTER, WALKING)' })
+  @ApiProperty({
+    example: 'BIKE',
+    description: 'Vehicle type (BIKE, MOTORCYCLE, BICYCLE, SCOOTER, WALKING)',
+  })
   @IsNotEmpty()
   @IsString()
-  @IsIn(['BIKE', 'BICYCLE', 'SCOOTER', 'WALKING'])
+  @IsIn(['BIKE', 'MOTORCYCLE', 'BICYCLE', 'SCOOTER', 'WALKING'])
   vehicleType: string;
 
   @ApiProperty({

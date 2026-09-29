@@ -6,6 +6,7 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
@@ -24,16 +25,25 @@ export enum PayoutMethod {
 }
 
 @Entity('payout_requests')
+@Index('idx_payout_requests_rider_id', ['riderId'])
+@Index('idx_payout_requests_seller_id', ['sellerId'])
 export class PayoutRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'seller_id' })
-  sellerId: string;
+  @Column({ name: 'seller_id', type: 'uuid', nullable: true })
+  sellerId: string | null;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'seller_id' })
-  seller: Relation<User>;
+  seller: Relation<User> | null;
+
+  @Column({ name: 'rider_id', type: 'uuid', nullable: true })
+  riderId: string | null;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: true })
+  @JoinColumn({ name: 'rider_id' })
+  rider: Relation<User> | null;
 
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   amount: number;

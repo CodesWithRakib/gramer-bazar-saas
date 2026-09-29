@@ -13,6 +13,7 @@ export enum NotificationType {
   DELIVERY_PICKED_UP = 'DELIVERY_PICKED_UP',
   DELIVERY_COMPLETED = 'DELIVERY_COMPLETED',
   DELIVERY_FAILED = 'DELIVERY_FAILED',
+  DELIVERY_REASSIGNED = 'DELIVERY_REASSIGNED',
 
   // Applications
   SELLER_APPLICATION_SUBMITTED = 'SELLER_APPLICATION_SUBMITTED',
@@ -95,4 +96,4 @@ export interface QueryNotificationsParams {
   unreadOnly?: boolean;
 }
 
-export interface RealtimeNotificationPayload extends AppNotification {}
+export type RealtimeNotificationPayload = AppNotification;

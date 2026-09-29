@@ -48,6 +48,8 @@ import { ProductRequestHistory } from '../product-requests/entities/product-requ
 import { Dispute } from '../disputes/entities/dispute.entity.js';
 import { DisputeMessage } from '../disputes/entities/dispute-message.entity.js';
 import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
+import { RiderProfile } from '../riders/entities/rider-profile.entity.js';
+import { RiderEarning } from '../riders/entities/rider-earning.entity.js';
 import { Otp } from '../otp/entities/otp.entity.js';
 import { SeederService } from './seeder.service.js';
 
@@ -117,6 +119,8 @@ describe('SeederService - seedUsersAndShops', () => {
         { provide: getRepositoryToken(Dispute), useValue: makeRepo() },
         { provide: getRepositoryToken(DisputeMessage), useValue: makeRepo() },
         { provide: getRepositoryToken(PayoutRequest), useValue: makeRepo() },
+        { provide: getRepositoryToken(RiderProfile), useValue: makeRepo() },
+        { provide: getRepositoryToken(RiderEarning), useValue: makeRepo() },
         { provide: getRepositoryToken(Otp), useValue: makeRepo() },
       ],
     }).compile();

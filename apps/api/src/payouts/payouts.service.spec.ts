@@ -5,6 +5,7 @@ import { PayoutsService } from './payouts.service.js';
 import { PayoutRequest } from './entities/payout-request.entity.js';
 import { WalletsService } from '../wallets/wallets.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { RidersService } from '../riders/riders.service.js';
 
 describe('PayoutsService', () => {
   let service: PayoutsService;
@@ -21,6 +22,13 @@ describe('PayoutsService', () => {
             notifyUser: vi.fn().mockResolvedValue(null),
             notifyUsers: vi.fn().mockResolvedValue([]),
             notifyRole: vi.fn().mockResolvedValue([]),
+          },
+        },
+        {
+          provide: RidersService,
+          useValue: {
+            getEligibleBalance: vi.fn().mockResolvedValue(0),
+            settleEarnings: vi.fn().mockResolvedValue(0),
           },
         },
       ],

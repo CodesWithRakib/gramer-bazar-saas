@@ -11,6 +11,7 @@ import { Role } from '../roles/enums/role.enum.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
 import { Shop } from '../shops/entities/shop.entity.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { RidersService } from '../riders/riders.service.js';
 import {
   NotificationType,
   NotificationPriority,
@@ -30,6 +31,7 @@ export class ApplicationsService {
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
     private readonly notificationsService: NotificationsService,
+    private readonly ridersService: RidersService,
   ) {}
 
   // ==================== SELLER APPLICATION ====================
@@ -400,6 +402,17 @@ export class ApplicationsService {
       }
 
       await queryRunner.commitTransaction();
+
+      // 3. Provision the operational rider profile from the approved dossier.
+      await this.ridersService.syncFromApplication(app.userId, {
+        fullName: app.fullName,
+        nidNumber: app.nidNumber,
+        vehicleType: app.vehicleType,
+        vehiclePlateNumber: app.vehiclePlateNumber,
+        drivingLicenseNumber: app.drivingLicenseNumber,
+        preferredZone: app.preferredZone,
+        emergencyContact: app.emergencyContact,
+      });
 
       // Notify applicant
       void this.notificationsService.notifyUser(app.userId, {

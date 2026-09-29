@@ -18,6 +18,8 @@ import {
   Star,
   ClipboardList,
   Bell,
+  History,
+  Banknote,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -348,8 +350,46 @@ export const riderRoutes: DashboardRoute[] = [
     sectionBn: 'ডেলিভারি কাজ',
     matchPrefixes: ['/rider/deliveries'],
   },
+  {
+    title: 'Delivery History',
+    titleBn: 'ডেলিভারি ইতিহাস',
+    href: '/rider/history',
+    icon: History,
+    section: 'Operations',
+    sectionBn: 'ডেলিভারি কাজ',
+    matchPrefixes: ['/rider/history'],
+  },
+
+  // Section: Earnings
+  {
+    title: 'Earnings',
+    titleBn: 'আয়',
+    href: '/rider/earnings',
+    icon: Banknote,
+    section: 'Earnings',
+    sectionBn: 'আয় ও পে-আউট',
+    matchPrefixes: ['/rider/earnings'],
+  },
+  {
+    title: 'Payouts',
+    titleBn: 'পে-আউট',
+    href: '/rider/payouts',
+    icon: Wallet,
+    section: 'Earnings',
+    sectionBn: 'আয় ও পে-আউট',
+    matchPrefixes: ['/rider/payouts'],
+  },
 
   // Section: Account & Support
+  {
+    title: 'Notifications',
+    titleBn: 'নোটিফিকেশন',
+    href: '/rider/notifications',
+    icon: Bell,
+    section: 'Account',
+    sectionBn: 'অ্যাকাউন্ট',
+    matchPrefixes: ['/rider/notifications'],
+  },
   {
     title: 'Messages',
     titleBn: 'বার্তা',

@@ -59,7 +59,15 @@ import { ProductRequestHistory } from '../product-requests/entities/product-requ
 import { ProductRequestStatus } from '../product-requests/enums/product-request-status.enum.js';
 import { Dispute } from '../disputes/entities/dispute.entity.js';
 import { DisputeMessage } from '../disputes/entities/dispute-message.entity.js';
-import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
+import {
+  PayoutRequest,
+  PayoutStatus,
+  PayoutMethod,
+} from '../payouts/entities/payout-request.entity.js';
+import { RiderProfile } from '../riders/entities/rider-profile.entity.js';
+import { RiderEarning } from '../riders/entities/rider-earning.entity.js';
+import { RiderAvailability } from '../riders/enums/rider-availability.enum.js';
+import { RiderEarningStatus } from '../riders/enums/rider-earning-status.enum.js';
 import { Otp } from '../otp/entities/otp.entity.js';
 
 import {
@@ -134,6 +142,8 @@ export class SeederService {
     @InjectRepository(Dispute) private disputeRepo: Repository<Dispute>,
     @InjectRepository(DisputeMessage) private disputeMessageRepo: Repository<DisputeMessage>,
     @InjectRepository(PayoutRequest) private payoutRequestRepo: Repository<PayoutRequest>,
+    @InjectRepository(RiderProfile) private riderProfileRepo: Repository<RiderProfile>,
+    @InjectRepository(RiderEarning) private riderEarningRepo: Repository<RiderEarning>,
     @InjectRepository(Otp) private otpRepo: Repository<Otp>,
   ) {}
 
@@ -164,6 +174,7 @@ export class SeederService {
     await this.seedWishlists(users.customers, catalog.products);
     await this.seedWallets(users.customers, users.sellers);
     await this.seedPayoutRequests(users.sellers);
+    await this.seedRiderProfilesAndEarnings(users.riders);
     await this.seedApplications(
       users.superAdmin,
       users.admin,
@@ -1764,6 +1775,122 @@ export class SeederService {
       }
     }
     this.logger.log('Seller payout requests seeded successfully.');
+  }
+
+  async seedRiderProfilesAndEarnings(riders: User[]) {
+    this.logger.log('Seeding rider operational profiles, earnings ledger and rider payouts...');
+
+    // 1. Provision operational profiles from approved/known rider applications.
+    for (const app of SEED_RIDER_APPLICATIONS) {
+      const user = riders.find((r) => r.email === app.userEmail);
+      if (!user) continue;
+
+      let profile = await this.riderProfileRepo.findOne({ where: { userId: user.id } });
+      if (!profile) profile = this.riderProfileRepo.create({ userId: user.id });
+
+      profile.fullName = app.fullName;
+      profile.nidNumber = app.nidNumber;
+      profile.vehicleType = app.vehicleType;
+      profile.vehiclePlateNumber = app.vehiclePlateNumber;
+      profile.drivingLicenseNumber = app.drivingLicenseNumber;
+      profile.preferredZone = app.preferredZone;
+      profile.emergencyContact = app.emergencyContact;
+      profile.address = `${app.preferredZone}, Panchagarh`;
+      profile.isVerified = app.status === ApplicationStatus.APPROVED;
+      await this.riderProfileRepo.save(profile);
+    }
+
+    // 2. Every rider gets an operational profile (lazy-created fallback).
+    for (const user of riders) {
+      const existing = await this.riderProfileRepo.findOne({ where: { userId: user.id } });
+      if (existing) continue;
+      await this.riderProfileRepo.save(
+        this.riderProfileRepo.create({
+          userId: user.id,
+          fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Rider',
+          isVerified: true,
+          availability: RiderAvailability.OFFLINE,
+        }),
+      );
+    }
+
+    // 3. Spread availability across ONLINE / BUSY / OFFLINE for realistic dispatch testing.
+    const availabilityPlan: RiderAvailability[] = [
+      RiderAvailability.AVAILABLE,
+      RiderAvailability.BUSY,
+      RiderAvailability.OFFLINE,
+      RiderAvailability.AVAILABLE,
+      RiderAvailability.OFFLINE,
+      RiderAvailability.AVAILABLE,
+      RiderAvailability.OFFLINE,
+    ];
+    for (let i = 0; i < riders.length; i++) {
+      const profile = await this.riderProfileRepo.findOne({ where: { userId: riders[i].id } });
+      if (!profile) continue;
+      profile.availability = availabilityPlan[i % availabilityPlan.length];
+      if (profile.availability === RiderAvailability.AVAILABLE) profile.lastAvailableAt = new Date();
+      await this.riderProfileRepo.save(profile);
+    }
+
+    // 4. Earnings ledger for every completed delivery.
+    const deliveredDeliveries = await this.deliveryRepo.find({
+      where: { status: DeliveryStatus.DELIVERED },
+      relations: ['order'],
+    });
+
+    let earningsCreated = 0;
+    for (const delivery of deliveredDeliveries) {
+      if (!delivery.riderId) continue;
+      const existing = await this.riderEarningRepo.findOne({
+        where: { deliveryId: delivery.id },
+      });
+      if (existing) continue;
+
+      await this.riderEarningRepo.save(
+        this.riderEarningRepo.create({
+          riderId: delivery.riderId,
+          deliveryId: delivery.id,
+          orderId: delivery.orderId,
+          amount: Number(delivery.order?.deliveryFee) || 0,
+          status: RiderEarningStatus.EARNED,
+          createdAt: delivery.deliveryTime || delivery.createdAt,
+        }),
+      );
+      earningsCreated++;
+    }
+
+    // 5. Small realistic rider payout history (one approved, one pending).
+    const primaryRider = riders[0];
+    if (primaryRider) {
+      const existingPayout = await this.payoutRequestRepo.findOne({
+        where: { riderId: primaryRider.id },
+      });
+      if (!existingPayout) {
+        await this.payoutRequestRepo.save(
+          this.payoutRequestRepo.create({
+            riderId: primaryRider.id,
+            amount: 100,
+            method: PayoutMethod.BKASH,
+            accountDetails: `bKash Personal: ${primaryRider.phone}`,
+            status: PayoutStatus.APPROVED,
+            adminNote: 'Approved and disbursed via bKash.',
+          }),
+        );
+        await this.payoutRequestRepo.save(
+          this.payoutRequestRepo.create({
+            riderId: primaryRider.id,
+            amount: 60,
+            method: PayoutMethod.BKASH,
+            accountDetails: `bKash Personal: ${primaryRider.phone}`,
+            status: PayoutStatus.PENDING,
+          }),
+        );
+      }
+    }
+
+    this.logger.log(
+      `Rider profiles seeded for ${riders.length} riders, ${earningsCreated} earnings credited.`,
+    );
   }
 
   async seedOtps() {

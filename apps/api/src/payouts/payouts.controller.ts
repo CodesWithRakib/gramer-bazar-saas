@@ -12,6 +12,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { PayoutsService } from './payouts.service.js';
 import { CreatePayoutDto } from './dto/create-payout.dto.js';
+import { CreateRiderPayoutDto } from './dto/create-rider-payout.dto.js';
 import { ReviewPayoutDto } from './dto/review-payout.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
@@ -60,6 +61,37 @@ export class PayoutsController {
   })
   getMyPayouts(@Request() req: any) {
     return this.payoutsService.getSellerPayouts(req.user.id);
+  }
+
+  @Post('rider/request')
+  @Roles(Role.RIDER)
+  @ApiOperation({
+    summary: 'Request a new payout (Rider)',
+    description:
+      'Submits a withdrawal request against the rider available delivery-earnings balance.',
+  })
+  @ApiStandardResponse({
+    type: PayoutResponseDto,
+    status: 201,
+    description: 'Rider payout request created successfully',
+  })
+  createRiderPayout(@Request() req: any, @Body() dto: CreateRiderPayoutDto) {
+    return this.payoutsService.requestRiderPayout(req.user.id, dto);
+  }
+
+  @Get('rider/my-requests')
+  @Roles(Role.RIDER)
+  @ApiOperation({
+    summary: 'Get all payout requests for current rider',
+    description: 'Lists all historical rider withdrawal requests and their statuses.',
+  })
+  @ApiStandardResponse({
+    type: PayoutResponseDto,
+    isArray: true,
+    description: 'List of rider payout requests',
+  })
+  getRiderPayouts(@Request() req: any) {
+    return this.payoutsService.getRiderPayouts(req.user.id);
   }
 
   @Get()

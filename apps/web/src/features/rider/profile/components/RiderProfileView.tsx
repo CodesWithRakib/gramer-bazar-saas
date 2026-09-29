@@ -1,116 +1,233 @@
 'use client';
 
-import React, { use } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { BadgeCheck, Bike, Mail, Phone, ShieldCheck, User as UserIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogOut, User as UserIcon, MapPin, Bike } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import { logout } from '@/store/slices/authSlice';
-import { useRouter } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ErrorState } from '@/components/common/ErrorState';
+import {
+  RiderProfile,
+  useGetRiderProfileQuery,
+  useUpdateRiderProfileMutation,
+} from '@/features/riders/ridersApi';
 
 export interface RiderProfileViewProps {
   lang?: string;
 }
 
-export function RiderProfileView({ lang = 'en' }: RiderProfileViewProps) {
-  const isBn = lang === 'bn';
-  const dispatch = useDispatch();
-  const router = useRouter();
+const VEHICLE_TYPES = ['BIKE', 'MOTORCYCLE', 'BICYCLE', 'SCOOTER', 'WALKING'] as const;
 
-  const { user } = useSelector((state: RootState) => state.auth);
+function ProfileEditForm({ profile, isBn }: { profile: RiderProfile; isBn: boolean }) {
+  const [updateProfile, { isLoading: isSaving }] = useUpdateRiderProfileMutation();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    router.push(`/${lang}/login`);
+  const [address, setAddress] = useState(profile.address ?? '');
+  const [preferredZone, setPreferredZone] = useState(profile.preferredZone ?? '');
+  const [emergencyContact, setEmergencyContact] = useState(profile.emergencyContact ?? '');
+  const [vehicleType, setVehicleType] = useState<string>(profile.vehicleType || 'BIKE');
+  const [vehiclePlateNumber, setVehiclePlateNumber] = useState(profile.vehiclePlateNumber ?? '');
+
+  const handleSave = async (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      await updateProfile({
+        address,
+        preferredZone,
+        emergencyContact,
+        vehicleType,
+        vehiclePlateNumber,
+      }).unwrap();
+      toast.success(isBn ? 'প্রোফাইল সংরক্ষণ হয়েছে' : 'Profile updated successfully');
+    } catch {
+      toast.error(isBn ? 'সংরক্ষণ ব্যর্থ হয়েছে' : 'Could not save your profile');
+    }
   };
 
   return (
-    <div className="w-full space-y-6">
-      <div className="flex items-center space-x-4 mb-6">
-        <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-          <UserIcon className="w-8 h-8" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {user?.firstName} {user?.lastName}
-          </h1>
-          <p className="text-muted-foreground">{user?.phone}</p>
-        </div>
-      </div>
+    <Card className="rounded-2xl border-border shadow-none">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Bike className="h-4 w-4 text-primary" />
+          {isBn ? 'যানবাহন ও যোগাযোগ' : 'Vehicle & Contact'}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSave} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>{isBn ? 'যানবাহনের ধরন' : 'Vehicle Type'}</Label>
+              <Select value={vehicleType} onValueChange={setVehicleType}>
+                <SelectTrigger className="h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {VEHICLE_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="plate">{isBn ? 'নম্বর প্লেট' : 'Plate Number'}</Label>
+              <Input
+                id="plate"
+                value={vehiclePlateNumber}
+                onChange={(event) => setVehiclePlateNumber(event.target.value)}
+                placeholder="DHK-METRO-HA-0000"
+                className="h-11"
+              />
+            </div>
+          </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <UserIcon className="w-5 h-5 text-primary" />
-            {isBn ? 'ব্যক্তিগত তথ্য' : 'Personal Information'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>{isBn ? 'পুরো নাম' : 'Full Name'}</Label>
+            <Label htmlFor="zone">{isBn ? 'কাজের এলাকা' : 'Service Zone'}</Label>
             <Input
-              value={`${user?.firstName || ''} ${user?.lastName || ''}`}
-              readOnly
-              className="bg-muted"
+              id="zone"
+              value={preferredZone}
+              onChange={(event) => setPreferredZone(event.target.value)}
+              placeholder={isBn ? 'যেমন: দেবীগঞ্জ সদর' : 'e.g. Debiganj Sadar'}
+              className="h-11"
             />
           </div>
+
           <div className="space-y-2">
-            <Label>{isBn ? 'ইমেইল' : 'Email'}</Label>
-            <Input value={user?.email || 'N/A'} readOnly className="bg-muted" />
+            <Label htmlFor="address">{isBn ? 'ঠিকানা' : 'Address'}</Label>
+            <Input
+              id="address"
+              value={address}
+              onChange={(event) => setAddress(event.target.value)}
+              placeholder={isBn ? 'আপনার ঠিকানা' : 'Your address'}
+              className="h-11"
+            />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="emergency">{isBn ? 'জরুরি যোগাযোগ' : 'Emergency Contact'}</Label>
+            <Input
+              id="emergency"
+              value={emergencyContact}
+              onChange={(event) => setEmergencyContact(event.target.value)}
+              placeholder="017... (Relationship)"
+              className="h-11"
+            />
+          </div>
+
+          <Button type="submit" className="h-11 w-full sm:w-auto" disabled={isSaving}>
+            {isSaving
+              ? isBn
+                ? 'সংরক্ষণ হচ্ছে...'
+                : 'Saving...'
+              : isBn
+                ? 'সংরক্ষণ করুন'
+                : 'Save Changes'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function RiderProfileView({ lang = 'en' }: RiderProfileViewProps) {
+  const isBn = lang === 'bn';
+
+  const { data: profile, isLoading, isError, refetch } = useGetRiderProfileQuery();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-5 pt-2">
+        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-64 w-full rounded-2xl" />
+      </div>
+    );
+  }
+
+  if (isError || !profile) {
+    return (
+      <div className="pt-2">
+        <ErrorState isBn={isBn} onRetry={refetch} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5 pt-2">
+      {/* Identity */}
+      <Card className="rounded-2xl border-border shadow-none">
+        <CardContent className="flex items-center gap-4 p-5">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary">
+            <UserIcon className="h-7 w-7" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="truncate text-xl font-bold text-foreground">{profile.fullName}</h1>
+              {profile.isVerified && (
+                <Badge variant="secondary" className="gap-1 text-[10px]">
+                  <BadgeCheck className="h-3 w-3" />
+                  {isBn ? 'ভেরিফাইড' : 'Verified'}
+                </Badge>
+              )}
+            </div>
+            <div className="mt-1 space-y-0.5 text-sm text-muted-foreground">
+              <p className="flex items-center gap-1.5">
+                <Phone className="h-3.5 w-3.5" />
+                {profile.phone}
+              </p>
+              {profile.email && (
+                <p className="flex items-center gap-1.5">
+                  <Mail className="h-3.5 w-3.5" />
+                  <span className="truncate">{profile.email}</span>
+                </p>
+              )}
+            </div>
+          </div>
+          <Badge
+            variant={profile.availability === 'OFFLINE' ? 'secondary' : 'default'}
+            className="shrink-0 text-[10px] uppercase"
+          >
+            {profile.availability}
+          </Badge>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Bike className="w-5 h-5 text-primary" />
-            {isBn ? 'বাহনের তথ্য' : 'Vehicle Details'}
+      {/* Verified identity (read-only) */}
+      <Card className="rounded-2xl border-border shadow-none">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            {isBn ? 'যাচাইকৃত তথ্য' : 'Verified Information'}
           </CardTitle>
-          <CardDescription>
-            {isBn ? 'ডেলিভারির জন্য ব্যবহৃত বাহন' : 'Vehicle used for deliveries'}
-          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>{isBn ? 'বাহনের ধরন' : 'Vehicle Type'}</Label>
-            <Input defaultValue="Motorcycle" />
+            <Label>{isBn ? 'জাতীয় পরিচয়পত্র নম্বর' : 'National ID'}</Label>
+            <Input value={profile.nidNumber || '—'} readOnly className="bg-muted" />
           </div>
           <div className="space-y-2">
-            <Label>{isBn ? 'লাইসেন্স প্লেট' : 'License Plate'}</Label>
-            <Input defaultValue="DHAKA-H-12-3456" />
-          </div>
-          <Button className="w-full mt-2">{isBn ? 'সংরক্ষণ করুন' : 'Save Details'}</Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-primary" />
-            {isBn ? 'কাজের এলাকা' : 'Service Area'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label>{isBn ? 'বর্তমান এলাকা' : 'Current Area'}</Label>
-            <Input defaultValue="Savar, Dhaka" />
+            <Label>{isBn ? 'ড্রাইভিং লাইসেন্স' : 'Driving License'}</Label>
+            <Input value={profile.drivingLicenseNumber || '—'} readOnly className="bg-muted" />
           </div>
         </CardContent>
       </Card>
 
-      <Button
-        variant="destructive"
-        className="w-full flex items-center gap-2 mt-8"
-        onClick={handleLogout}
-      >
-        <LogOut className="w-4 h-4" />
-        {isBn ? 'লগ আউট' : 'Log Out'}
-      </Button>
+      {/* Remounts when the profile is (re)fetched so the form reflects server state. */}
+      <ProfileEditForm
+        key={`${profile.userId}-${profile.updatedAt}`}
+        profile={profile}
+        isBn={isBn}
+      />
     </div>
   );
 }

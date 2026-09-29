@@ -8,12 +8,14 @@ import { ApplicationsService } from './applications.service.js';
 import { ApplicationsController } from './applications.controller.js';
 import { UsersModule } from '../users/users.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
+import { RidersModule } from '../riders/riders.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SellerApplication, RiderApplication, Shop, RoleEntity]),
     UsersModule,
     NotificationsModule,
+    RidersModule,
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService],

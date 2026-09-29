@@ -46,6 +46,8 @@ import { ProductRequestHistory } from '../product-requests/entities/product-requ
 import { Dispute } from '../disputes/entities/dispute.entity.js';
 import { DisputeMessage } from '../disputes/entities/dispute-message.entity.js';
 import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
+import { RiderProfile } from '../riders/entities/rider-profile.entity.js';
+import { RiderEarning } from '../riders/entities/rider-earning.entity.js';
 import { Otp } from '../otp/entities/otp.entity.js';
 import { SeederController } from './seeder.controller.js';
 import { SeederService } from './seeder.service.js';
@@ -97,6 +99,8 @@ import { SeederService } from './seeder.service.js';
       Dispute,
       DisputeMessage,
       PayoutRequest,
+      RiderProfile,
+      RiderEarning,
       Otp,
     ]),
   ],

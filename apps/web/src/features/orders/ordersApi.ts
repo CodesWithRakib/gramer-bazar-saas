@@ -52,6 +52,15 @@ export interface OrderItem {
   unitPrice: number;
   subtotal: number;
   sellerProduct: {
+    shop?: {
+      id: string;
+      nameEn?: string;
+      nameBn?: string;
+      phone?: string | null;
+      address?: string | null;
+      district?: { nameEn: string; nameBn: string } | null;
+      upazila?: { nameEn: string; nameBn: string } | null;
+    };
     productVariant?: {
       nameEn: string;
       nameBn: string;
@@ -88,6 +97,9 @@ export interface Order {
     country?: string;
     contactName: string;
     contactPhone: string;
+    division?: { nameEn: string; nameBn: string } | null;
+    district?: { nameEn: string; nameBn: string } | null;
+    upazila?: { nameEn: string; nameBn: string } | null;
     lat?: number | string | null;
     lng?: number | string | null;
   };

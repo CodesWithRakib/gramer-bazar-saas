@@ -289,6 +289,14 @@
       "title": "অর্ডার ডেলিভারির জন্য বের হয়েছে",
       "message": "আপনার অর্ডার #{{orderNumber}} পিকআপ সম্পন্ন হয়েছে এবং আপনার ঠিকানায় আসছে।"
     },
+    "delivery_completed_rider": {
+      "title": "ডেলিভারি সম্পন্ন হয়েছে",
+      "message": "অর্ডার #{{orderNumber}} সফলভাবে পৌঁছে দেওয়া হয়েছে। আপনার আয়ে {{amount}} টাকা যোগ হয়েছে।"
+    },
+    "delivery_reassigned_rider": {
+      "title": "ডেলিভারি পুনঃবরাদ্দ হয়েছে",
+      "message": "অর্ডার #{{orderNumber}} অন্য রাইডারকে বরাদ্দ করা হয়েছে।"
+    },
     "delivery_failed": {
       "title": "ডেলিভারি প্রচেষ্টা ব্যর্থ",
       "message": "অর্ডার #{{orderNumber}} ডেলিভারির প্রচেষ্টা সফল হয়নি।"
@@ -344,6 +352,10 @@
     "admin_payout_requested": {
       "title": "নতুন পেআউট অনুরোধ",
       "message": "সেলার {{sellerName}} কর্তৃক {{amount}} টাকা পেআউটের অনুরোধ এসেছে।"
+    },
+    "payout_requested_admin": {
+      "title": "নতুন পেআউট অনুরোধ",
+      "message": "{{method}} মাধ্যমে {{amount}} টাকা পেআউটের অনুরোধ এসেছে।"
     },
     "payout_approved": {
       "title": "পেআউট সম্পন্ন হয়েছে",

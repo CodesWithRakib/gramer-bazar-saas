@@ -18,6 +18,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
+import { RiderHistoryQueryDto } from './dto/rider-history-query.dto.js';
 import {
   DeliveryResponseDto,
   RiderSummaryDto,
@@ -120,6 +121,20 @@ export class DeliveriesController {
   })
   getRiderDeliveries(@Request() req: any) {
     return this.deliveriesService.getRiderDeliveries(req.user.id);
+  }
+
+  @Get('rider/history')
+  @Roles(Role.RIDER)
+  @ApiOperation({
+    summary: 'Rider: Get paginated delivery history',
+    description:
+      'Server-side paginated delivery history for the authenticated rider with status, date-range and keyword filters.',
+  })
+  @ApiStandardPaginatedResponse(DeliveryResponseDto, {
+    description: 'Paginated rider delivery history',
+  })
+  getRiderHistory(@Request() req: any, @Query() query: RiderHistoryQueryDto) {
+    return this.deliveriesService.getRiderHistory(req.user.id, query);
   }
 
   @Get('rider/:id')
