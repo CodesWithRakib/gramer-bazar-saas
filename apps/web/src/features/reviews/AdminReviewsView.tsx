@@ -124,7 +124,7 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
                         onClick={() => handleModerate(review.id, false)}
                         className="w-24"
                       >
-                        <X className="h-4 w-4 mr-1" /> {isBn ? 'রিজেক্ট' : 'Reject'}
+                        <X className="h-4 w-4 me-1" /> {isBn ? 'রিজেক্ট' : 'Reject'}
                       </Button>
                     ) : (
                       <Button
@@ -134,7 +134,7 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
                         onClick={() => handleModerate(review.id, true)}
                         className="w-24 bg-green-600 hover:bg-green-700"
                       >
-                        <Check className="h-4 w-4 mr-1" /> {isBn ? 'অ্যাপ্রুভ' : 'Approve'}
+                        <Check className="h-4 w-4 me-1" /> {isBn ? 'অ্যাপ্রুভ' : 'Approve'}
                       </Button>
                     )}
                   </div>

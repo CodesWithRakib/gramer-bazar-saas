@@ -121,7 +121,7 @@ export default function BecomeARiderPage({ params }: { params: Promise<{ lang: s
                   href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-rider`)}`}
                 >
                   {isBn ? 'লগইন করে আবেদন করুন' : 'Login to Apply'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="rounded-2xl px-8" asChild>
@@ -200,7 +200,7 @@ export default function BecomeARiderPage({ params }: { params: Promise<{ lang: s
               <Button asChild size="lg" className="rounded-2xl px-8 shadow-sm">
                 <Link href={`/${lang}/rider`}>
                   {isBn ? 'রাইডার অ্যাপ খুলুন' : 'Open Rider Portal'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                 </Link>
               </Button>
             </div>
@@ -293,7 +293,7 @@ export default function BecomeARiderPage({ params }: { params: Promise<{ lang: s
                 <Button asChild size="lg" className="rounded-2xl px-8 shadow-sm">
                   <Link href={`/${lang}/rider`}>
                     {isBn ? 'রাইডার অ্যাপ খুলুন' : 'Open Rider Portal'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                   </Link>
                 </Button>
               </div>

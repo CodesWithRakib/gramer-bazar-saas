@@ -1,7 +1,7 @@
 'use client';
 
 import { getApiErrorMessage } from '@/lib/apiError';
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import { useUpdatePasswordMutation, useDeleteAccountMutation } from '@/features/auth/authApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -196,7 +196,7 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-1 group-hover:text-primary transition-transform" />
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-1 group-hover:text-primary transition-transform rtl:rotate-180" />
                   </div>
                 </Card>
               </Link>
@@ -269,7 +269,7 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
             </div>
 
             <Button type="submit" disabled={isUpdating} className="w-full sm:w-auto">
-              {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isUpdating && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {isBn ? 'আপডেট করুন' : 'Update Password'}
             </Button>
           </form>
@@ -297,7 +297,7 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isDeleting}
           >
-            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isDeleting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             {isBn ? 'একাউন্ট মুছে ফেলুন' : 'Delete Account'}
           </Button>
         </CardContent>

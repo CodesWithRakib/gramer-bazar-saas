@@ -158,7 +158,7 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             <Button variant="ghost" className="w-full justify-between group" asChild>
               <Link href={`/${lang}/super-admin/admins`}>
                 <span>{isBn ? 'অ্যাডমিন রোস্টার দেখুন' : 'View Admins'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>
@@ -182,13 +182,13 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             <Button variant="ghost" className="w-full justify-between group" asChild>
               <Link href={`/${lang}/super-admin/seller-applications`}>
                 <span>{isBn ? 'সেলার আবেদনসমূহ' : 'Seller Applications'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
             <Button variant="ghost" className="w-full justify-between group" asChild>
               <Link href={`/${lang}/super-admin/rider-applications`}>
                 <span>{isBn ? 'রাইডার আবেদনসমূহ' : 'Rider Applications'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>
@@ -212,13 +212,13 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             <Button variant="ghost" className="w-full justify-between group" asChild>
               <Link href={`/${lang}/super-admin/audit-logs`}>
                 <span>{isBn ? 'অডিট লগ' : 'Security Audit Logs'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
             <Button variant="ghost" className="w-full justify-between group" asChild>
               <Link href={`/${lang}/super-admin/settings`}>
                 <span>{isBn ? 'প্ল্যাটফর্ম কনফিগ' : 'Platform Settings'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>

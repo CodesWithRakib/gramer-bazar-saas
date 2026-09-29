@@ -157,7 +157,7 @@ function ResetPasswordForm({ lang }: { lang: string }) {
               required
               minLength={6}
               disabled={isResetting}
-              className="pr-10"
+              className="pe-10"
             />
             <button
               type="button"
@@ -205,7 +205,7 @@ function ResetPasswordForm({ lang }: { lang: string }) {
           href={`/${lang}/login`}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
           <span>{isBn ? 'লগইন পৃষ্ঠায় ফিরে যান' : 'Back to Login'}</span>
         </Link>
       </div>

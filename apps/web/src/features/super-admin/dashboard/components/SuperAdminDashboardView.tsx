@@ -50,13 +50,13 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
         <div className="flex items-center gap-2.5 shrink-0">
           <Button size="sm" className="rounded-lg font-medium" asChild>
             <Link href={`/${lang}/super-admin/create-user`}>
-              <UserPlus className="w-4 h-4 mr-2" />
+              <UserPlus className="w-4 h-4 me-2" />
               {isBn ? 'নতুন স্টাফ তৈরি' : 'Create Staff'}
             </Link>
           </Button>
           <Button size="sm" variant="outline" className="rounded-lg" asChild>
             <Link href={`/${lang}/super-admin/admins`}>
-              <ShieldCheck className="w-4 h-4 mr-2" />
+              <ShieldCheck className="w-4 h-4 me-2" />
               {isBn ? 'অ্যাডমিন রোস্টার' : 'Admin Roster'}
             </Link>
           </Button>
@@ -159,7 +159,7 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             >
               <Link href={`/${lang}/super-admin/admins`}>
                 <span>{isBn ? 'অ্যাডমিন রোস্টার দেখুন' : 'View Admins'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>
@@ -188,7 +188,7 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             >
               <Link href={`/${lang}/super-admin/seller-applications`}>
                 <span>{isBn ? 'সেলার আবেদনসমূহ' : 'Seller Applications'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
             <Button
@@ -199,7 +199,7 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             >
               <Link href={`/${lang}/super-admin/rider-applications`}>
                 <span>{isBn ? 'রাইডার আবেদনসমূহ' : 'Rider Applications'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>
@@ -228,7 +228,7 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             >
               <Link href={`/${lang}/super-admin/audit-logs`}>
                 <span>{isBn ? 'অডিট লগ' : 'Security Audit Logs'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
             <Button
@@ -239,7 +239,7 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             >
               <Link href={`/${lang}/super-admin/settings`}>
                 <span>{isBn ? 'প্ল্যাটফর্ম কনফিগ' : 'Platform Settings'}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>

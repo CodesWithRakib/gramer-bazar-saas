@@ -203,7 +203,7 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                   <TableHead className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'বিবরণ' : 'Description'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'ধরন' : 'Type'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">
+                  <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'পরিমাণ' : 'Amount'}
                   </TableHead>
                 </TableRow>
@@ -221,8 +221,8 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                       <TableCell className="py-4 px-4">
                         <div className="h-6 w-16 rounded-full bg-muted"></div>
                       </TableCell>
-                      <TableCell className="py-4 px-4 text-right">
-                        <div className="ml-auto h-4 w-20 rounded bg-muted"></div>
+                      <TableCell className="py-4 px-4 text-end">
+                        <div className="ms-auto h-4 w-20 rounded bg-muted"></div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -285,7 +285,7 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                         </Badge>
                       </TableCell>
                       <TableCell
-                        className={`text-right py-3.5 px-4 font-semibold tabular-nums ${
+                        className={`text-end py-3.5 px-4 font-semibold tabular-nums ${
                           tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-rose-600'
                         }`}
                       >

@@ -264,7 +264,7 @@ export function ProductImporterModal() {
                 Recent import operations and audit trail
               </span>
               <Button variant="ghost" size="sm" onClick={() => refetchLogs()}>
-                <RefreshCw className="h-3.5 w-3.5 mr-1" /> Refresh
+                <RefreshCw className="h-3.5 w-3.5 me-1" /> Refresh
               </Button>
             </div>
 
@@ -297,7 +297,7 @@ export function ProductImporterModal() {
                         <span>Img Failures: {log.imageFailuresCount}</span>
                       </div>
                     </div>
-                    <div className="text-right text-muted-foreground text-[11px] self-end sm:self-center">
+                    <div className="text-end text-muted-foreground text-[11px] self-end sm:self-center">
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {new Date(log.startedAt).toLocaleString()}

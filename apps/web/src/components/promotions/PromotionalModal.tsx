@@ -75,7 +75,7 @@ export function PromotionalModal({ lang }: { lang: string }) {
 
           <div className="relative z-10 space-y-1">
             <Badge className="bg-yellow-400 text-black font-extrabold text-[10px] tracking-wider uppercase mb-1 shadow-xs">
-              <Sparkles className="w-3 h-3 mr-1 inline" />
+              <Sparkles className="w-3 h-3 me-1 inline" />
               {isBn ? 'বিশেষ প্রচারণা' : 'EXCLUSIVE CAMPAIGN'}
             </Badge>
 
@@ -109,7 +109,7 @@ export function PromotionalModal({ lang }: { lang: string }) {
             </div>
           )}
 
-          <div className="space-y-2 text-center sm:text-left">
+          <div className="space-y-2 text-center sm:text-start">
             <h4 className="text-sm font-bold text-foreground">
               {isBn ? 'দারুণ সব ডিসকাউন্ট ও ফ্রি ডেলিভারি' : 'Great Discounts & Village Delivery'}
             </h4>
@@ -128,7 +128,7 @@ export function PromotionalModal({ lang }: { lang: string }) {
             >
               <Link href={activeSale ? `/${lang}/flash-sale` : `/${lang}/offers`}>
                 {isBn ? 'অফার দেখুন' : 'Explore Deals'}
-                <ArrowRight className="w-4 h-4 ml-1.5" />
+                <ArrowRight className="w-4 h-4 ms-1.5 rtl:rotate-180" />
               </Link>
             </Button>
 

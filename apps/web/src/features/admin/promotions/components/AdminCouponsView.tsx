@@ -268,7 +268,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                 onClick={handleOpenCreateModal}
                 className="rounded-full px-6 h-11 whitespace-nowrap"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="me-2 h-4 w-4" />
                 {isBn ? 'নতুন কুপন তৈরি করুন' : 'Create New Coupon'}
               </Button>
             </DialogTrigger>
@@ -406,7 +406,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
         {/* Inner Table Container */}
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xs dark:border-border dark:bg-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
+            <table className="w-full text-sm text-start">
               <thead className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                 <tr>
                   <th className="py-3.5 px-4">{isBn ? 'কোড' : 'Code'}</th>
@@ -414,7 +414,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                   <th className="py-3.5 px-4">{isBn ? 'ব্যবহার' : 'Usage'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'বৈধতা' : 'Validity'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'স্ট্যাটাস' : 'Status'}</th>
-                  <th className="py-3.5 px-4 text-right">{isBn ? 'পদক্ষেপ' : 'Actions'}</th>
+                  <th className="py-3.5 px-4 text-end">{isBn ? 'পদক্ষেপ' : 'Actions'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-border">
@@ -436,8 +436,8 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                       <td className="py-4 px-4">
                         <div className="h-6 w-12 rounded-full bg-muted"></div>
                       </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      <td className="py-4 px-4 text-end">
+                        <div className="ms-auto h-8 w-16 rounded bg-muted"></div>
                       </td>
                     </tr>
                   ))
@@ -494,7 +494,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                         <div className="flex flex-col text-xs gap-0.5">
                           {coupon.startDate && (
                             <span>
-                              <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" />{' '}
+                              <Calendar className="h-3 w-3 inline me-1 text-muted-foreground" />{' '}
                               {new Date(coupon.startDate).toLocaleDateString()}
                             </span>
                           )}
@@ -506,7 +506,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                                   : ''
                               }
                             >
-                              <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" />{' '}
+                              <Calendar className="h-3 w-3 inline me-1 text-muted-foreground" />{' '}
                               {new Date(coupon.endDate).toLocaleDateString()}
                             </span>
                           )}
@@ -521,7 +521,7 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
                           onCheckedChange={(val: boolean) => handleToggleActive(coupon.id, val)}
                         />
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-4 text-end">
                         <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="ghost"

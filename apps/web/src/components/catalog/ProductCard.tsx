@@ -570,7 +570,7 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
           variant={isStaffOrSeller ? 'secondary' : 'default'}
           onClick={handleAddToCart}
         >
-          <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
+          <ShoppingCart className="w-3.5 h-3.5 me-1.5" />
           {isOutOfStock
             ? isBn
               ? 'স্টক শেষ'

@@ -28,7 +28,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ lang: str
           <Home className="h-3.5 w-3.5" />
           <span>{isBn ? 'হোম' : 'Home'}</span>
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
         <span className="text-foreground font-medium">
           {isBn ? 'সকল ক্যাটাগরি' : 'All Categories'}
         </span>
@@ -126,7 +126,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ lang: str
                     className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline group-hover:translate-x-0.5 transition-transform"
                   >
                     <span>{isBn ? 'ক্যাটাগরি পেজ' : 'Explore'}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
                   </Link>
                 </div>
               </div>

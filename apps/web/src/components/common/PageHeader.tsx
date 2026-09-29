@@ -57,7 +57,9 @@ export function PageHeader({
                     {crumb.label}
                   </span>
                 )}
-                {!isLast && <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-50" />}
+                {!isLast && (
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-50 rtl:rotate-180" />
+                )}
               </React.Fragment>
             );
           })}

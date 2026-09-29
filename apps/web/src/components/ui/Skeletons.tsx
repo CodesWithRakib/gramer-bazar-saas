@@ -121,9 +121,9 @@ export function OrderSkeleton() {
           </div>
           <Skeleton className="h-3 w-40" />
         </div>
-        <div className="text-right space-y-1">
-          <Skeleton className="h-5 w-20 ml-auto" />
-          <Skeleton className="h-3 w-12 ml-auto" />
+        <div className="text-end space-y-1">
+          <Skeleton className="h-5 w-20 ms-auto" />
+          <Skeleton className="h-3 w-12 ms-auto" />
         </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

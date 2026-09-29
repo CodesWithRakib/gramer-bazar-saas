@@ -168,7 +168,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
     <div className="space-y-4 pt-2 pb-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="icon" className="-ml-2 shrink-0">
+        <Button asChild variant="ghost" size="icon" className="-ms-2 shrink-0">
           <Link href={`/${lang}/rider/deliveries`} aria-label={isBn ? 'ফিরে যান' : 'Back'}>
             <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
           </Link>
@@ -200,9 +200,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="font-medium text-foreground">
-            {shop?.nameEn || (isBn ? 'দোকান' : 'Shop')}
-          </p>
+          <p className="font-medium text-foreground">{shop?.nameEn || (isBn ? 'দোকান' : 'Shop')}</p>
           <div className="flex items-start gap-2 text-sm text-muted-foreground">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <span>
@@ -218,7 +216,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             {shop?.phone && (
               <Button asChild variant="outline" size="sm" className="h-9">
                 <a href={`tel:${shop.phone}`}>
-                  <Phone className="mr-1.5 h-3.5 w-3.5" />
+                  <Phone className="me-1.5 h-3.5 w-3.5" />
                   {isBn ? 'কল' : 'Call'}
                 </a>
               </Button>
@@ -246,7 +244,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
           </div>
           {delivery.notes && (
             <div className="rounded-lg bg-muted/40 p-2.5 text-sm text-muted-foreground">
-              <MessageSquare className="mr-1.5 inline h-3.5 w-3.5" />
+              <MessageSquare className="me-1.5 inline h-3.5 w-3.5" />
               {delivery.notes}
             </div>
           )}
@@ -254,7 +252,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             {order.address?.contactPhone && (
               <Button asChild variant="outline" size="sm" className="h-9">
                 <a href={`tel:${order.address.contactPhone}`}>
-                  <Phone className="mr-1.5 h-3.5 w-3.5" />
+                  <Phone className="me-1.5 h-3.5 w-3.5" />
                   {isBn ? 'গ্রাহককে কল' : 'Call customer'}
                 </a>
               </Button>
@@ -303,7 +301,9 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
 
           <div className="space-y-1.5 border-t border-border pt-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{isBn ? 'ডেলিভারি চার্জ' : 'Delivery fee'}</span>
+              <span className="text-muted-foreground">
+                {isBn ? 'ডেলিভারি চার্জ' : 'Delivery fee'}
+              </span>
               <span className="text-foreground">{currency(order.deliveryFee)}</span>
             </div>
             <div className="flex justify-between text-base font-semibold">
@@ -375,7 +375,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             onClick={() => handleUpdateStatus(DeliveryStatus.ACCEPTED)}
             disabled={isUpdating}
           >
-            <CheckCircle2 className="mr-2 h-5 w-5" />
+            <CheckCircle2 className="me-2 h-5 w-5" />
             {isBn ? 'অ্যাসাইনমেন্ট গ্রহণ করুন' : 'Accept Assignment'}
           </Button>
         )}
@@ -386,7 +386,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             onClick={() => handleUpdateStatus(DeliveryStatus.PICKED_UP)}
             disabled={isUpdating}
           >
-            <Package className="mr-2 h-5 w-5" />
+            <Package className="me-2 h-5 w-5" />
             {isBn ? 'পিকআপ নিশ্চিত করুন' : 'Confirm Pickup'}
           </Button>
         )}
@@ -397,7 +397,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
             onClick={() => handleUpdateStatus(DeliveryStatus.OUT_FOR_DELIVERY)}
             disabled={isUpdating}
           >
-            <Truck className="mr-2 h-5 w-5" />
+            <Truck className="me-2 h-5 w-5" />
             {isBn ? 'ডেলিভারির জন্য রওনা' : 'Out for Delivery'}
           </Button>
         )}
@@ -409,7 +409,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
               onClick={() => setConfirmAction(DeliveryStatus.DELIVERED)}
               disabled={isUpdating}
             >
-              <CheckCircle2 className="mr-2 h-5 w-5" />
+              <CheckCircle2 className="me-2 h-5 w-5" />
               {isBn ? 'ডেলিভারি সম্পন্ন হয়েছে' : 'Mark as Delivered'}
             </Button>
             <Button
@@ -418,7 +418,7 @@ export function RiderDeliveryDetailsView({ lang = 'en', id }: RiderDeliveryDetai
               onClick={() => setConfirmAction(DeliveryStatus.FAILED)}
               disabled={isUpdating}
             >
-              <AlertTriangle className="mr-2 h-4 w-4" />
+              <AlertTriangle className="me-2 h-4 w-4" />
               {isBn ? 'ডেলিভারি ব্যর্থ' : 'Delivery Failed'}
             </Button>
           </>

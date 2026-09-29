@@ -127,7 +127,7 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
               href={`/${lang}/super-admin`}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             </Link>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
               {isBn ? 'অ্যাডমিন পরিচালনা' : 'Admin Personnel Roster'}
@@ -171,7 +171,7 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
         actionSlot={
           <Button asChild className="!h-11 rounded-full px-6 shadow-xs">
             <Link href={`/${lang}/super-admin/create-user`}>
-              <UserPlus className="w-4 h-4 mr-2" />
+              <UserPlus className="w-4 h-4 me-2" />
               {isBn ? 'নতুন অ্যাডমিন তৈরি' : 'Add Admin User'}
             </Link>
           </Button>

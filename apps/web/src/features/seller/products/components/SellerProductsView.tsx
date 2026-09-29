@@ -80,7 +80,7 @@ export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
         <div>
           <span className="font-semibold text-foreground">৳{row.original.price}</span>
           {row.original.discountPrice && (
-            <span className="ml-2 text-xs text-muted-foreground line-through">
+            <span className="ms-2 text-xs text-muted-foreground line-through">
               ৳{row.original.discountPrice}
             </span>
           )}
@@ -103,7 +103,7 @@ export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
               {qty}
             </span>
             {isLow && (
-              <span className="ml-2 text-xs text-destructive">({isBn ? 'কম স্টক' : 'Low'})</span>
+              <span className="ms-2 text-xs text-destructive">({isBn ? 'কম স্টক' : 'Low'})</span>
             )}
           </div>
         );

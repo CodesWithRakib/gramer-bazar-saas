@@ -224,15 +224,15 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
         <Tabs defaultValue="branding" className="w-full">
           <TabsList className="grid grid-cols-3 w-full max-w-md mb-6">
             <TabsTrigger value="branding" className="text-xs md:text-sm">
-              <Store className="w-4 h-4 mr-1.5 hidden sm:inline" />
+              <Store className="w-4 h-4 me-1.5 hidden sm:inline" />
               {isBn ? 'ব্র্যান্ডিং' : 'Branding'}
             </TabsTrigger>
             <TabsTrigger value="contact" className="text-xs md:text-sm">
-              <Phone className="w-4 h-4 mr-1.5 hidden sm:inline" />
+              <Phone className="w-4 h-4 me-1.5 hidden sm:inline" />
               {isBn ? 'যোগাযোগ' : 'Contact'}
             </TabsTrigger>
             <TabsTrigger value="location" className="text-xs md:text-sm">
-              <MapPin className="w-4 h-4 mr-1.5 hidden sm:inline" />
+              <MapPin className="w-4 h-4 me-1.5 hidden sm:inline" />
               {isBn ? 'লোকেশন' : 'Location'}
             </TabsTrigger>
           </TabsList>
@@ -275,7 +275,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       asChild
                     >
                       <span>
-                        <Upload className="w-3.5 h-3.5 mr-1.5" />
+                        <Upload className="w-3.5 h-3.5 me-1.5" />
                         {logoPreview
                           ? isBn
                             ? 'লোগো পরিবর্তন'
@@ -336,7 +336,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       asChild
                     >
                       <span>
-                        <Upload className="w-3.5 h-3.5 mr-1.5" />
+                        <Upload className="w-3.5 h-3.5 me-1.5" />
                         {bannerPreview
                           ? isBn
                             ? 'ব্যানার পরিবর্তন'

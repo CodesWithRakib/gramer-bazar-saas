@@ -182,7 +182,7 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
             onClick={() => setIsCreateOpen(true)}
             className="!h-11 rounded-full px-6 font-medium shadow-xs"
           >
-            <UserPlus className="mr-2 h-4 w-4" />
+            <UserPlus className="me-2 h-4 w-4" />
             Create User
           </Button>
         }

@@ -133,7 +133,7 @@ export function DataTable<TData, TValue>({
                   value={search ?? ''}
                   onChange={(e) => onSearchChange(e.target.value)}
                   placeholder={searchPlaceholder ?? (isBn ? 'অনুসন্ধান করুন...' : 'Search...')}
-                  className="h-11 w-full rounded-full border border-gray-200 bg-white pl-11 pr-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-border dark:bg-background dark:text-foreground dark:placeholder:text-muted-foreground"
+                  className="h-11 w-full rounded-full border border-gray-200 bg-white ps-11 pe-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-border dark:bg-background dark:text-foreground dark:placeholder:text-muted-foreground"
                 />
                 <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1">
                   {isSearching && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}

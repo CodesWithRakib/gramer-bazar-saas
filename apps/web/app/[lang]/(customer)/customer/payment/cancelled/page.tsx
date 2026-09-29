@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, RefreshCw, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 import { useGetOrderByIdQuery } from '@/features/orders/ordersApi';
+import { getApiErrorMessage } from '@/lib/apiError';
 
 export default function PaymentCancelledPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -32,10 +33,12 @@ export default function PaymentCancelledPage({ params }: { params: Promise<{ lan
       if (res.paymentUrl) {
         window.location.href = res.paymentUrl;
       }
-    } catch (err: any) {
+    } catch (err) {
       setErrorMessage(
-        err?.data?.message ||
-          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to restart payment session.')
+        getApiErrorMessage(
+          err,
+          isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to restart payment session.'
+        )
       );
     }
   };
@@ -118,7 +121,7 @@ export default function PaymentCancelledPage({ params }: { params: Promise<{ lan
               href={`/${lang}/customer/checkout`}
               className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
+              <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
               {isBn
                 ? 'অন্য কোনো পেমেন্ট মেথড দিয়ে অর্ডার করুন'
                 : 'Change payment method at checkout'}

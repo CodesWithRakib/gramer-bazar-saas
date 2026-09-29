@@ -1,149 +1,75 @@
 import React from 'react';
 import Link from 'next/link';
-import { format } from 'date-fns';
-import { enUS, bn } from 'date-fns/locale';
 import { Order } from '@/features/orders/ordersApi';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CustomImage } from '@/components/ui/CustomImage';
+import { StatusBadge } from '@/components/common/StatusBadge';
 import { ChevronRight, Package } from 'lucide-react';
+import { getOrderStatusMeta, getPaymentStatusMeta } from '@/lib/order-status';
+import { formatCurrency, formatDateTime } from '@/lib/format';
 
 interface OrderCardProps {
   order: Order;
   lang: string;
 }
 
-const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'pending':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-500';
-    case 'confirmed':
-    case 'processing':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-500';
-    case 'shipped':
-    case 'out_for_delivery':
-      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-500';
-    case 'delivered':
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500';
-    case 'cancelled':
-    case 'returned':
-      return 'bg-destructive/10 text-destructive dark:bg-destructive/20';
-    default:
-      return 'bg-muted text-muted-foreground';
-  }
-};
-
-const getStatusLabel = (status: string, lang: string) => {
-  const isBn = lang === 'bn';
-  const statusMap: Record<string, { en: string; bn: string }> = {
-    pending: { en: 'Pending', bn: 'অপেক্ষমাণ' },
-    confirmed: { en: 'Confirmed', bn: 'নিশ্চিত করা হয়েছে' },
-    processing: { en: 'Processing', bn: 'প্রক্রিয়াধীন' },
-    shipped: { en: 'Shipped', bn: 'শিপ করা হয়েছে' },
-    out_for_delivery: { en: 'Out for Delivery', bn: 'ডেলিভারির জন্য বের হয়েছে' },
-    delivered: { en: 'Delivered', bn: 'ডেলিভারি সম্পন্ন' },
-    cancelled: { en: 'Cancelled', bn: 'বাতিল' },
-    returned: { en: 'Returned', bn: 'ফেরত' },
-  };
-
-  const lowerStatus = status.toLowerCase();
-  return statusMap[lowerStatus]
-    ? isBn
-      ? statusMap[lowerStatus].bn
-      : statusMap[lowerStatus].en
-    : status;
-};
-
-const getPaymentStatusBadge = (status: string | undefined, lang: string) => {
-  const isBn = lang === 'bn';
-  const s = (status || '').toLowerCase();
-  if (s === 'paid') {
-    return (
-      <Badge
-        variant="outline"
-        className="border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium text-xs"
-      >
-        {isBn ? 'পরিশোধিত' : 'Paid'}
-      </Badge>
-    );
-  }
-  if (s === 'refunded') {
-    return (
-      <Badge
-        variant="outline"
-        className="border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-400 font-medium text-xs"
-      >
-        {isBn ? 'রিফান্ড করা হয়েছে' : 'Refunded'}
-      </Badge>
-    );
-  }
-  return (
-    <Badge
-      variant="outline"
-      className="border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 font-medium text-xs"
-    >
-      {isBn ? 'বকেয়া' : 'Unpaid'}
-    </Badge>
-  );
-};
-
 export function OrderCard({ order, lang }: OrderCardProps) {
   const isBn = lang === 'bn';
-  const dateLocale = isBn ? bn : enUS;
-  const formattedDate = format(new Date(order.createdAt), 'MMM dd, yyyy - hh:mm a', {
-    locale: dateLocale,
-  });
+  const formattedDate = formatDateTime(order.createdAt, lang);
+  const statusMeta = getOrderStatusMeta(order.status);
+  const paymentMeta = getPaymentStatusMeta(order.paymentStatus);
 
-  const rawItems = order?.items || (order as { orderItems?: unknown[] })?.orderItems;
-  const items = Array.isArray(rawItems) ? rawItems : [];
+  const items = Array.isArray(order?.items) ? order.items : [];
 
   // Show first 4 items maximum as thumbnails
   const displayItems = items.slice(0, 4);
   const remainingCount = Math.max(0, items.length - 4);
 
   return (
-    <Card className="w-full overflow-hidden hover:shadow-md transition-all duration-200 border-border group rounded-2xl">
-      <CardHeader className="bg-muted/30 border-b px-4 py-3 md:px-6 flex flex-row items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-sm md:text-base">
-              {isBn ? 'অর্ডার আইডি:' : 'Order ID:'} #{order.id.slice(0, 8).toUpperCase()}
+    <Card className="w-full overflow-hidden rounded-2xl border-border transition-colors hover:border-primary/40">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b bg-muted/30 px-4 py-3 md:px-6">
+        <div className="flex min-w-0 flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold md:text-base">
+              {isBn ? 'অর্ডার নম্বর:' : 'Order ID:'} #{order.id.slice(0, 8).toUpperCase()}
             </span>
-            <Badge variant="outline" className={`border-0 ${getStatusColor(order.status)}`}>
-              {getStatusLabel(order.status, lang)}
-            </Badge>
-            {getPaymentStatusBadge(order.paymentStatus, lang)}
+            <StatusBadge tone={statusMeta.tone} label={isBn ? statusMeta.bn : statusMeta.en} />
+            <StatusBadge tone={paymentMeta.tone} label={isBn ? paymentMeta.bn : paymentMeta.en} />
           </div>
-          <span className="text-xs md:text-sm text-muted-foreground">{formattedDate}</span>
+          <span className="text-xs text-muted-foreground md:text-sm">{formattedDate}</span>
         </div>
-        <div className="text-right">
-          <p className="text-sm md:text-base font-bold text-primary">৳{order.total}</p>
+        <div className="text-end">
+          <p className="text-sm font-bold text-primary md:text-base">
+            {formatCurrency(order.total)}
+          </p>
           <p className="text-xs text-muted-foreground">
-            {items.length} {isBn ? 'পণ্য' : 'Items'}
+            {items.length} {isBn ? 'টি পণ্য' : 'items'}
           </p>
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 md:px-6 md:py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3 w-full overflow-x-auto hide-scrollbar">
+      <CardContent className="flex flex-col items-start justify-between gap-4 p-4 md:flex-row md:items-center md:px-6 md:py-5">
+        <div className="hide-scrollbar flex w-full items-center gap-3 overflow-x-auto">
           {displayItems.map((item, idx) => {
             const variant = item.sellerProduct?.productVariant;
             const name = variant
               ? isBn
                 ? variant.nameBn || variant.product.nameBn
                 : variant.nameEn || variant.product.nameEn
-              : 'Unknown Product';
+              : isBn
+                ? 'অজানা পণ্য'
+                : 'Unknown product';
             const image = variant?.images?.[0] || '/placeholder.jpg';
 
             return (
               <div
                 key={item.id || idx}
-                className="relative w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-md border overflow-hidden bg-muted/20"
+                className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted/20 md:h-20 md:w-20"
                 title={name}
               >
-                <CustomImage src={image} alt={name} fill className="object-cover" />
-                <div className="absolute bottom-0 right-0 bg-background/80 backdrop-blur-sm text-[10px] font-bold px-1 rounded-tl-md">
+                <CustomImage src={image} alt={name} fill sizes="80px" className="object-cover" />
+                <div className="absolute bottom-0 end-0 rounded-ss-md bg-background/85 px-1 text-[10px] font-bold backdrop-blur-sm">
                   x{item.quantity}
                 </div>
               </div>
@@ -151,8 +77,8 @@ export function OrderCard({ order, lang }: OrderCardProps) {
           })}
 
           {remainingCount > 0 && (
-            <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-md border flex flex-col items-center justify-center bg-muted/30 text-muted-foreground">
-              <Package className="w-5 h-5 mb-1 opacity-50" />
+            <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-lg border bg-muted/30 text-muted-foreground md:h-20 md:w-20">
+              <Package className="mb-1 h-5 w-5 opacity-50" />
               <span className="text-xs font-semibold">+{remainingCount}</span>
             </div>
           )}
@@ -160,12 +86,12 @@ export function OrderCard({ order, lang }: OrderCardProps) {
 
         <Button
           variant="ghost"
-          className="w-full md:w-auto mt-2 md:mt-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors"
+          className="mt-2 w-full transition-colors group-hover:bg-primary/10 group-hover:text-primary md:mt-0 md:w-auto"
           asChild
         >
           <Link href={`/${lang}/customer/orders/${order.id}`}>
-            {isBn ? 'বিস্তারিত দেখুন' : 'View Details'}
-            <ChevronRight className="w-4 h-4 ml-1" />
+            {isBn ? 'বিস্তারিত দেখুন' : 'View details'}
+            <ChevronRight className="ms-1 h-4 w-4 rtl:rotate-180" />
           </Link>
         </Button>
       </CardContent>

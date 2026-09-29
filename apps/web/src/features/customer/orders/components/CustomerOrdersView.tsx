@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useGetOrdersQuery } from '@/features/orders/ordersApi';
 import { OrderCard } from '@/components/orders/OrderCard';
@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, ShoppingBag } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 export interface CustomerOrdersViewProps {
   lang?: string;
@@ -19,20 +19,12 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get('status') || 'all';
+  // The active tab lives in the URL — no local state to keep in sync.
+  const activeTab = searchParams.get('status') || 'all';
 
-  const [activeTab, setActiveTab] = useState(initialTab);
   const { data: orders, isLoading, error, refetch } = useGetOrdersQuery();
 
-  useEffect(() => {
-    const status = searchParams.get('status');
-    if (status && status !== activeTab) {
-      setActiveTab(status);
-    }
-  }, [searchParams, activeTab]);
-
   const handleTabChange = (val: string) => {
-    setActiveTab(val);
     const params = new URLSearchParams(searchParams.toString());
     if (val === 'all') {
       params.delete('status');

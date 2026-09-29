@@ -95,7 +95,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
               ? 'পণ্য, ক্যাটাগরি বা ব্র্যান্ড খুঁজুন...'
               : 'Search for products, categories or brands...')
           }
-          className="w-full pr-20 pl-4 py-2 text-sm rounded-full bg-muted/60 border-muted focus-visible:ring-2 focus-visible:ring-primary shadow-xs transition-all"
+          className="w-full pe-20 ps-4 py-2 text-sm rounded-full bg-muted/60 border-muted focus-visible:ring-2 focus-visible:ring-primary shadow-xs transition-all"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -164,7 +164,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                         <span className="font-medium text-foreground group-hover:text-primary transition-colors">
                           {isBn ? cat.nameBn : cat.nameEn}
                         </span>
-                        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all rtl:rotate-180" />
                       </Link>
                     ))}
                   </div>
@@ -210,7 +210,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                             {item.unit && <span>/ {item.unit}</span>}
                           </div>
                         </div>
-                        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-all opacity-0 group-hover:opacity-100" />
+                        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-all opacity-0 group-hover:opacity-100 rtl:rotate-180" />
                       </Link>
                     ))}
                   </div>
@@ -229,7 +229,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                       ? `"${searchTerm}" এর সব ফলাফল দেখুন`
                       : `View all results for "${searchTerm}"`}
                   </span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
                 </button>
               </div>
             </div>
@@ -246,7 +246,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                 className="mt-2 text-xs text-primary font-medium hover:underline inline-flex items-center gap-1"
               >
                 <span>{isBn ? 'সার্চ পেজে সব দেখুন' : 'Search in catalog'}</span>
-                <ArrowRight className="h-3 w-3" />
+                <ArrowRight className="h-3 w-3 rtl:rotate-180" />
               </button>
             </div>
           )}

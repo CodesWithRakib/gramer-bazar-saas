@@ -277,7 +277,7 @@ function LoginForm({ lang }: { lang: string }) {
                 }
                 disabled={isPasswordLoading}
                 required
-                className="h-10 pr-10 text-sm"
+                className="h-10 pe-10 text-sm"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                 <Mail className="w-4 h-4" />
@@ -307,7 +307,7 @@ function LoginForm({ lang }: { lang: string }) {
                 placeholder="••••••••"
                 disabled={isPasswordLoading}
                 required
-                className="h-10 pr-10 text-sm"
+                className="h-10 pe-10 text-sm"
               />
               <button
                 type="button"
@@ -368,7 +368,7 @@ function LoginForm({ lang }: { lang: string }) {
                     placeholder="01XXXXXXXXX"
                     disabled={isSendingOtp}
                     required
-                    className="h-10 pr-10 text-sm"
+                    className="h-10 pe-10 text-sm"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                     <Phone className="w-4 h-4" />
@@ -411,7 +411,7 @@ function LoginForm({ lang }: { lang: string }) {
                     autoFocus
                     required
                     maxLength={6}
-                    className="h-10 pr-10 text-center tracking-widest text-base font-mono"
+                    className="h-10 pe-10 text-center tracking-widest text-base font-mono"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                     <Lock className="w-4 h-4" />

@@ -47,7 +47,7 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
             <div className="pt-2">
               <Button asChild size="sm" variant="outline" className="w-full rounded-lg">
                 <a href="tel:+8801767476724">
-                  <Phone className="w-3.5 h-3.5 mr-1.5" />
+                  <Phone className="w-3.5 h-3.5 me-1.5" />
                   <span>{isBn ? 'সরাসরি কল করুন' : 'Call Helpline'}</span>
                 </a>
               </Button>
@@ -73,7 +73,7 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
             <div className="pt-2">
               <Button asChild size="sm" variant="outline" className="w-full rounded-lg">
                 <a href="mailto:codeswithrakib@gmail.com">
-                  <Mail className="w-3.5 h-3.5 mr-1.5" />
+                  <Mail className="w-3.5 h-3.5 me-1.5" />
                   <span>{isBn ? 'ইমেইল পাঠান' : 'Send Email'}</span>
                 </a>
               </Button>

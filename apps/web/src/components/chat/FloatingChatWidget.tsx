@@ -103,14 +103,14 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
   const getReferenceBadge = (refType?: string | null, refId?: string | null) => {
     if (!refId && !refType) return null;
     const type = refType?.toUpperCase() || 'REF';
-    let icon = <ShoppingBag className="h-2.5 w-2.5 mr-0.5" />;
+    let icon = <ShoppingBag className="h-2.5 w-2.5 me-0.5" />;
     let label = refId ? `#${refId.slice(0, 6)}` : type;
 
     if (type.includes('PRODUCT')) {
-      icon = <Package className="h-2.5 w-2.5 mr-0.5" />;
+      icon = <Package className="h-2.5 w-2.5 me-0.5" />;
       label = `Product`;
     } else if (type.includes('DELIVERY')) {
-      icon = <Truck className="h-2.5 w-2.5 mr-0.5" />;
+      icon = <Truck className="h-2.5 w-2.5 me-0.5" />;
       label = `Delivery`;
     }
 
@@ -141,10 +141,10 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground -ml-2"
+                  className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground -ms-2"
                   onClick={() => dispatch(setActiveConversation(null))}
                 >
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
                 </Button>
               )}
               <h3 className="font-semibold text-base">
@@ -158,7 +158,7 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
               </h3>
               {!activeConversationId && isConnected && (
                 <span
-                  className="flex h-2 w-2 rounded-full bg-emerald-400 ml-1"
+                  className="flex h-2 w-2 rounded-full bg-emerald-400 ms-1"
                   title="Connected"
                 ></span>
               )}
@@ -166,7 +166,7 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground -mr-1"
+              className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground -me-1"
               onClick={() => dispatch(closeChatWidget())}
             >
               <X className="h-5 w-5" />
@@ -262,7 +262,7 @@ export function FloatingChatWidget({ lang }: { lang: string }) {
                             >
                               <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                               <span
-                                className={`text-[10px] mt-1 block ${isMine ? 'text-primary-foreground/75 text-right' : 'text-muted-foreground'}`}
+                                className={`text-[10px] mt-1 block ${isMine ? 'text-primary-foreground/75 text-end' : 'text-muted-foreground'}`}
                               >
                                 {new Date(msg.createdAt).toLocaleTimeString([], {
                                   hour: '2-digit',

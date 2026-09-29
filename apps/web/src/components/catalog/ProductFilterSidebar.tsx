@@ -213,7 +213,7 @@ export function ProductFilterSidebar({
               </span>
               <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
             </summary>
-            <div className="space-y-1 mt-2 max-h-48 overflow-y-auto pr-1">
+            <div className="space-y-1 mt-2 max-h-48 overflow-y-auto pe-1">
               {tree
                 ?.filter((c) => c.slug !== currentCategory?.slug)
                 .map((other) => (
@@ -242,7 +242,7 @@ export function ProductFilterSidebar({
           <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">
             {isBn ? 'ক্যাটাগরি' : 'Categories'}
           </h4>
-          <div className="space-y-1 max-h-60 overflow-y-auto pr-1">
+          <div className="space-y-1 max-h-60 overflow-y-auto pe-1">
             <div
               role="button"
               tabIndex={0}
@@ -376,7 +376,7 @@ export function ProductFilterSidebar({
               placeholder={isBn ? 'সর্বনিম্ন' : 'Min'}
               value={localMin}
               onChange={(e) => setLocalMin(e.target.value)}
-              className="h-8 text-xs pl-6 rounded-lg"
+              className="h-8 text-xs ps-6 rounded-lg"
             />
           </div>
           <span className="text-muted-foreground text-xs font-bold">-</span>
@@ -389,7 +389,7 @@ export function ProductFilterSidebar({
               placeholder={isBn ? 'সর্বোচ্চ' : 'Max'}
               value={localMax}
               onChange={(e) => setLocalMax(e.target.value)}
-              className="h-8 text-xs pl-6 rounded-lg"
+              className="h-8 text-xs ps-6 rounded-lg"
             />
           </div>
         </div>
@@ -421,7 +421,7 @@ export function ProductFilterSidebar({
             )}
           </div>
 
-          <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
+          <div className="space-y-1 max-h-40 overflow-y-auto pe-1">
             {brands.map((brand) => {
               const isSelected = currentBrandId === brand.id;
               return (
@@ -496,7 +496,7 @@ export function ProductFilterSidebar({
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-muted-foreground ml-1">
+                  <span className="text-xs text-muted-foreground ms-1">
                     {isBn ? `ও তদূর্ধ্ব` : `& above`}
                   </span>
                 </div>
@@ -518,7 +518,10 @@ export function ProductFilterSidebar({
             {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-primary" />}
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[85vw] max-w-[320px] p-5 overflow-y-auto">
+        <SheetContent
+          side={isBn ? 'right' : 'left'}
+          className="w-[85vw] max-w-[320px] overflow-y-auto p-5"
+        >
           <SheetHeader className="sr-only">
             <SheetTitle>{isBn ? 'পণ্য ফিল্টার' : 'Product Filters'}</SheetTitle>
           </SheetHeader>

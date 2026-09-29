@@ -195,7 +195,7 @@ export function NotificationBell({ lang = 'bn' }: { lang?: string }) {
                     onClick={handleMarkAllAsRead}
                     className="h-7 text-xs px-2 text-primary hover:text-primary/80 shrink-0"
                   >
-                    <Check className="w-3.5 h-3.5 mr-1" />
+                    <Check className="w-3.5 h-3.5 me-1" />
                     <span>{isBn ? 'সব পড়ুন' : 'Mark all'}</span>
                   </Button>
                 )}
@@ -295,7 +295,7 @@ export function NotificationBell({ lang = 'bn' }: { lang?: string }) {
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 py-1 px-3 transition-colors"
               >
                 <span>{isBn ? 'সব নোটিফিকেশন দেখুন' : 'View all notifications'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
               </Link>
             </div>
           </div>

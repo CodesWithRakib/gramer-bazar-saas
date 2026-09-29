@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { useCreateDisputeMutation, DisputeReason } from '@/features/disputes/disputesApi';
+import { DISPUTE_REASON_LABELS } from '@/features/disputes/dispute-display';
 import { Button } from '@/components/ui/button';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -14,12 +16,27 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+/**
+ * Reasons must match the backend `DisputeReason` enum exactly — the previous
+ * option values (`ITEM_NOT_AS_DESCRIBED`, `ITEM_DEFECTIVE`, `NOT_DELIVERED`)
+ * were rejected by API validation.
+ */
+const REASON_OPTIONS: DisputeReason[] = [
+  DisputeReason.DAMAGED,
+  DisputeReason.MISSING_ITEM,
+  DisputeReason.NOT_AS_DESCRIBED,
+  DisputeReason.WRONG_ITEM,
+  DisputeReason.OTHER,
+];
+
 interface OpenDisputeDialogProps {
   orderId: string;
   isBn: boolean;
+  /** Optional custom trigger element. Defaults to a destructive-toned button. */
+  trigger?: React.ReactNode;
 }
 
-export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
+export function OpenDisputeDialog({ orderId, isBn, trigger }: OpenDisputeDialogProps) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<DisputeReason | ''>('');
   const [description, setDescription] = useState('');
@@ -33,21 +50,24 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
     try {
       await createDispute({
         orderId,
-        reason: reason as DisputeReason,
-        description,
+        reason,
+        description: description.trim(),
       }).unwrap();
 
       setOpen(false);
-      // Reset form
       setReason('');
       setDescription('');
-      toast.success(isBn ? 'অভিযোগ সফলভাবে দায়ের করা হয়েছে।' : 'Dispute opened successfully.');
+      toast.success(
+        isBn ? 'অভিযোগ সফলভাবে দায়ের করা হয়েছে।' : 'Your dispute has been submitted.'
+      );
     } catch (error) {
-      console.error('Failed to create dispute:', error);
       toast.error(
-        isBn
-          ? 'অভিযোগ দায়ের করতে সমস্যা হয়েছে।'
-          : 'Failed to open dispute. You may already have an active dispute for this order.'
+        getApiErrorMessage(
+          error,
+          isBn
+            ? 'অভিযোগ দায়ের করা যায়নি।'
+            : 'Could not submit the dispute. You may already have an open dispute for this order.'
+        )
       );
     }
   };
@@ -55,57 +75,59 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-        >
-          {isBn ? 'অভিযোগ করুন (Dispute)' : 'Open Dispute'}
-        </Button>
+        {trigger ?? (
+          <Button variant="outline" className="w-full rounded-xl">
+            {isBn ? 'সমস্যা জানান' : 'Report an issue'}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isBn ? 'অভিযোগ দায়ের করুন' : 'Open a Dispute'}</DialogTitle>
+          <DialogTitle>{isBn ? 'অভিযোগ দায়ের করুন' : 'Open a dispute'}</DialogTitle>
           <DialogDescription>
             {isBn
-              ? 'আপনার অর্ডারের সমস্যার বিস্তারিত তথ্য দিন। আমাদের সাপোর্ট টিম এটি পর্যালোচনা করবে।'
-              : 'Provide details about the issue with your order. Our support team will review it.'}
+              ? 'অর্ডারের সমস্যাটি বিস্তারিত লিখুন। আমাদের সাপোর্ট টিম পর্যালোচনা করে জানাবে।'
+              : 'Tell us what went wrong. Our support team will review and respond.'}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+        <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-              {isBn ? 'অভিযোগের কারণ' : 'Reason for Dispute'}
+            <label htmlFor="dispute-reason" className="text-sm font-medium">
+              {isBn ? 'সমস্যার ধরন' : 'What went wrong?'}
             </label>
             <select
+              id="dispute-reason"
               value={reason}
               onChange={(e) => setReason(e.target.value as DisputeReason)}
               required
-              className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="" disabled>
-                {isBn ? 'কারণ নির্বাচন করুন' : 'Select a reason'}
+                {isBn ? 'একটি কারণ নির্বাচন করুন' : 'Select a reason'}
               </option>
-              <option value="ITEM_NOT_AS_DESCRIBED">
-                {isBn ? 'পণ্য বর্ণনার সাথে মিলেনি' : 'Item not as described'}
-              </option>
-              <option value="ITEM_DEFECTIVE">{isBn ? 'পণ্য ত্রুটিপূর্ণ' : 'Item defective'}</option>
-              <option value="NOT_DELIVERED">{isBn ? 'ডেলিভারি পাইনি' : 'Not delivered'}</option>
-              <option value="WRONG_ITEM">{isBn ? 'ভুল পণ্য পেয়েছি' : 'Wrong item received'}</option>
-              <option value="OTHER">{isBn ? 'অন্যান্য' : 'Other'}</option>
+              {REASON_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {isBn ? DISPUTE_REASON_LABELS[option].bn : DISPUTE_REASON_LABELS[option].en}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-              {isBn ? 'বিস্তারিত বর্ণনা' : 'Detailed Description'}
+            <label htmlFor="dispute-description" className="text-sm font-medium">
+              {isBn ? 'বিস্তারিত বর্ণনা' : 'Describe the issue'}
             </label>
             <textarea
+              id="dispute-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
               rows={4}
-              placeholder={isBn ? 'সমস্যাটি বিস্তারিত লিখুন...' : 'Describe the issue in detail...'}
-              className="w-full flex rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+              minLength={5}
+              placeholder={
+                isBn ? 'কী সমস্যা হয়েছে বিস্তারিত লিখুন...' : 'Explain what happened...'
+              }
+              className="w-full resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
 
@@ -118,14 +140,14 @@ export function OpenDisputeDialog({ orderId, isBn }: OpenDisputeDialogProps) {
             >
               {isBn ? 'বাতিল' : 'Cancel'}
             </Button>
-            <Button type="submit" disabled={isLoading || !reason || !description.trim()}>
+            <Button type="submit" disabled={isLoading || !reason || description.trim().length < 5}>
               {isLoading
                 ? isBn
-                  ? 'দায়ের হচ্ছে...'
+                  ? 'পাঠানো হচ্ছে...'
                   : 'Submitting...'
                 : isBn
-                  ? 'দায়ের করুন'
-                  : 'Submit Dispute'}
+                  ? 'অভিযোগ জমা দিন'
+                  : 'Submit dispute'}
             </Button>
           </DialogFooter>
         </form>

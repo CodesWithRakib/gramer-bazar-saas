@@ -71,7 +71,7 @@ export function SuperAdminCreateUserView({ lang = 'en' }: SuperAdminCreateUserVi
           href={`/${lang}/super-admin`}
           className="text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
         </Link>
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">

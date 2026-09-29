@@ -140,7 +140,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
               {isBn ? 'গত ৭ দিনের বিক্রয় অগ্রগতি' : 'Sales performance over the last 7 days'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pl-0 pt-6 pr-6">
+          <CardContent className="ps-0 pt-6 pe-6">
             <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
@@ -224,7 +224,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
+                  <div className="text-end shrink-0">
                     <p className="text-sm font-bold text-foreground">
                       ৳{Number(order.totalAmount).toLocaleString()}
                     </p>

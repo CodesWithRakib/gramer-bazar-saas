@@ -107,7 +107,7 @@ export function Header({ lang }: HeaderProps) {
               variant="ghost"
               size="icon"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden h-9 w-9 -ml-1 text-foreground hover:bg-muted shrink-0"
+              className="md:hidden h-9 w-9 -ms-1 text-foreground hover:bg-muted shrink-0"
             >
               <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
               <span className="sr-only">{isBn ? 'মেনু' : 'Menu'}</span>

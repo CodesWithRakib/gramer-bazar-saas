@@ -116,7 +116,7 @@ export function NotificationToast({
       <div className="flex-shrink-0 mt-0.5 p-1.5 rounded-md bg-muted/80">{icon}</div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 pr-1">
+      <div className="flex-1 min-w-0 pe-1">
         <div className="flex items-center gap-2 mb-0.5">
           <span className={`w-2 h-2 rounded-full ${dotColor} flex-shrink-0`} />
           <h4 className="text-sm font-semibold text-foreground truncate leading-tight">{title}</h4>
@@ -132,7 +132,7 @@ export function NotificationToast({
               className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
             >
               <span>{getActionLabel()}</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 rtl:rotate-180" />
             </Link>
           </div>
         )}

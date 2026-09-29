@@ -86,7 +86,7 @@ export function CategorySections({ lang }: CategorySectionsProps) {
                 className="inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold text-primary hover:text-primary/80 transition-colors group self-start sm:self-auto"
               >
                 <span>{isBn ? `সব ${categoryName} দেখুন` : `View all ${categoryName}`}</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
               </Link>
             </div>
 

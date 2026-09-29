@@ -130,7 +130,7 @@ export function CustomerAddressesView({ lang = 'en' }: CustomerAddressesViewProp
         }
         primaryAction={
           <Button onClick={() => setIsAdding(true)} className="rounded-xl shadow-xs">
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 me-2" />
             {isBn ? 'নতুন ঠিকানা' : 'Add New'}
           </Button>
         }
@@ -188,7 +188,7 @@ export function CustomerAddressesView({ lang = 'en' }: CustomerAddressesViewProp
                     onClick={() => setEditingAddress(primaryAddress)}
                     className="rounded-xl shadow-xs"
                   >
-                    <Edit2 className="w-4 h-4 mr-1.5" />
+                    <Edit2 className="w-4 h-4 me-1.5" />
                     {isBn ? 'এডিট' : 'Edit'}
                   </Button>
                 </div>

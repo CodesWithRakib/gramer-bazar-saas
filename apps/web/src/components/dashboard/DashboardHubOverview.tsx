@@ -91,7 +91,7 @@ export function DashboardHubOverview({
                             {isBn ? card.badgeBn || card.badge : card.badge}
                           </Badge>
                         )}
-                        <ChevronRight className="h-5 w-5 text-muted-foreground/60 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary" />
+                        <ChevronRight className="h-5 w-5 text-muted-foreground/60 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary rtl:rotate-180" />
                       </div>
                     </div>
 
@@ -109,7 +109,7 @@ export function DashboardHubOverview({
                   {/* Bottom link hint */}
                   <div className="pt-4 mt-2 border-t border-border/40 flex items-center text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                     <span>{isBn ? 'প্রবেশ করুন' : 'Manage & View'}</span>
-                    <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                    <ChevronRight className="w-3.5 h-3.5 ms-1 rtl:rotate-180" />
                   </div>
                 </CardContent>
               </Card>

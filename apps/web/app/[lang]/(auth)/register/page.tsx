@@ -203,7 +203,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                       placeholder={isBn ? 'আব্দুর' : 'John'}
                       required
                       disabled={isLoading}
-                      className="h-10 pr-9 text-sm"
+                      className="h-10 pe-9 text-sm"
                     />
                     <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
@@ -220,7 +220,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                       placeholder={isBn ? 'রহিম' : 'Doe'}
                       required
                       disabled={isLoading}
-                      className="h-10 pr-9 text-sm"
+                      className="h-10 pe-9 text-sm"
                     />
                     <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
@@ -240,7 +240,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                     placeholder="01XXXXXXXXX"
                     required
                     disabled={isLoading}
-                    className="h-10 pr-9 text-sm"
+                    className="h-10 pe-9 text-sm"
                   />
                   <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
@@ -258,7 +258,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                     onChange={handleChange}
                     placeholder="user@example.com"
                     disabled={isLoading}
-                    className="h-10 pr-9 text-sm"
+                    className="h-10 pe-9 text-sm"
                   />
                   <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
@@ -278,7 +278,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                     required
                     minLength={6}
                     disabled={isLoading}
-                    className="h-10 pr-9 text-sm"
+                    className="h-10 pe-9 text-sm"
                   />
                   <button
                     type="button"

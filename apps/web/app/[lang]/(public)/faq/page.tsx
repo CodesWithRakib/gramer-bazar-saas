@@ -148,7 +148,7 @@ export default async function FaqPage({ params }: { params: Promise<{ lang: stri
                         <span>{item.q}</span>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-4 sm:p-5 pt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed pl-8 sm:pl-9">
+                    <CardContent className="p-4 sm:p-5 pt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed ps-8 sm:ps-9">
                       {item.a}
                     </CardContent>
                   </Card>
@@ -172,7 +172,7 @@ export default async function FaqPage({ params }: { params: Promise<{ lang: stri
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Button asChild className="rounded-full">
             <Link href={`/${lang}/contact`}>
-              <Phone className="w-4 h-4 mr-2" />
+              <Phone className="w-4 h-4 me-2" />
               <span>{isBn ? 'যোগাযোগ করুন' : 'Contact Us'}</span>
             </Link>
           </Button>

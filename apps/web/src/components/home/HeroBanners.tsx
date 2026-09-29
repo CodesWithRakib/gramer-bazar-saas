@@ -227,14 +227,14 @@ export function HeroBanners({ lang }: { lang: string }) {
             aria-label={isBn ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
             className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-background/70 hover:bg-background/95 backdrop-blur-md flex items-center justify-center opacity-80 md:opacity-0 md:group-hover:opacity-100 transition-all shadow-md z-10"
           >
-            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-foreground rtl:rotate-180" />
           </button>
           <button
             onClick={nextSlide}
             aria-label={isBn ? 'পরবর্তী স্লাইড' : 'Next slide'}
             className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-background/70 hover:bg-background/95 backdrop-blur-md flex items-center justify-center opacity-80 md:opacity-0 md:group-hover:opacity-100 transition-all shadow-md z-10"
           >
-            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-foreground rtl:rotate-180" />
           </button>
 
           {/* Indicators / Dots */}

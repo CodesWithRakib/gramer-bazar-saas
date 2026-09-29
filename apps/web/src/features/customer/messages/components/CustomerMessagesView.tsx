@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ChatInterface } from '@/components/chat/ChatInterface';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export interface CustomerMessagesViewProps {
   lang?: string;
@@ -11,14 +12,14 @@ export function CustomerMessagesView({ lang = 'en' }: CustomerMessagesViewProps)
   const isBn = lang === 'bn';
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{isBn ? 'মেসেজ' : 'Messages'}</h1>
-        <p className="text-muted-foreground">
-          {isBn
-            ? 'সেলার ও ডেলিভারি রাইডারদের সাথে যোগাযোগ করুন।'
-            : 'Chat with sellers and delivery riders.'}
-        </p>
-      </div>
+      <PageHeader
+        title={isBn ? 'বার্তা' : 'Messages'}
+        description={
+          isBn
+            ? 'সেলার ও ডেলিভারি রাইডারের সাথে সরাসরি যোগাযোগ করুন।'
+            : 'Chat directly with sellers and delivery riders.'
+        }
+      />
       <ChatInterface />
     </div>
   );

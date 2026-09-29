@@ -232,7 +232,7 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
         {/* Transactions Table Inner Container */}
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xs dark:border-border dark:bg-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                 <tr>
                   <th className="py-3.5 px-4">{isBn ? 'ট্রানজ্যাকশন আইডি' : 'Transaction ID'}</th>
@@ -242,7 +242,7 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
                   <th className="py-3.5 px-4">{isBn ? 'মেথড / কার্ড' : 'Method'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'স্ট্যাটাস' : 'Status'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</th>
-                  <th className="py-3.5 px-4 text-right">{isBn ? 'পদক্ষেপ' : 'Action'}</th>
+                  <th className="py-3.5 px-4 text-end">{isBn ? 'পদক্ষেপ' : 'Action'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-border">
@@ -270,8 +270,8 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
                       <td className="py-4 px-4">
                         <div className="h-4 w-24 rounded bg-muted"></div>
                       </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      <td className="py-4 px-4 text-end">
+                        <div className="ms-auto h-8 w-16 rounded bg-muted"></div>
                       </td>
                     </tr>
                   ))
@@ -353,7 +353,7 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
 
                       <td className="py-3.5 px-4 font-bold text-foreground">
                         ৳{Number(p.amount).toFixed(2)}
-                        <span className="text-[10px] text-muted-foreground ml-1">{p.currency}</span>
+                        <span className="text-[10px] text-muted-foreground ms-1">{p.currency}</span>
                       </td>
 
                       <td className="py-3.5 px-4 text-xs font-mono">
@@ -372,7 +372,7 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
                         })}
                       </td>
 
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-4 text-end">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -424,7 +424,7 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
                   </span>
                   <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <span className="text-xs text-muted-foreground uppercase">
                     {isBn ? 'মোট অর্থ' : 'Total Amount'}
                   </span>

@@ -138,11 +138,11 @@ export default function CategoryDetailsPage({
           <Home className="h-3.5 w-3.5" />
           <span>{isBn ? 'হোম' : 'Home'}</span>
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
         <Link href={`/${lang}/categories`} className="hover:text-primary transition-colors">
           {isBn ? 'সকল ক্যাটাগরি' : 'All Categories'}
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
         <span className="text-foreground font-semibold truncate">{categoryName}</span>
       </nav>
 
@@ -294,7 +294,7 @@ export default function CategoryDetailsPage({
                     disabled={page <= 1}
                     onClick={() => updateUrl('page', page - 1)}
                   >
-                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    <ChevronLeft className="w-4 h-4 me-1 rtl:rotate-180" />
                     {isBn ? 'পূর্ববর্তী' : 'Prev'}
                   </Button>
                   <span className="text-xs md:text-sm font-semibold text-muted-foreground">
@@ -307,7 +307,7 @@ export default function CategoryDetailsPage({
                     onClick={() => updateUrl('page', page + 1)}
                   >
                     {isBn ? 'পরবর্তী' : 'Next'}
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                    <ChevronRight className="w-4 h-4 ms-1 rtl:rotate-180" />
                   </Button>
                 </div>
               )}

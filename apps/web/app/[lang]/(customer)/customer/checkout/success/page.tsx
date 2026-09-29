@@ -92,7 +92,7 @@ export default function CheckoutSuccessPage({ params }: { params: Promise<{ lang
             <Button asChild variant="outline" size="lg" className="flex-1 rounded-xl h-12 gap-2">
               <Link href={`/${lang}`}>
                 {isBn ? 'কেনাকাটা চালিয়ে যান' : 'Continue Shopping'}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
             </Button>
           </div>

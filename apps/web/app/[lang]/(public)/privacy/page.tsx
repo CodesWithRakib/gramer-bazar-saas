@@ -83,7 +83,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
                 </div>
                 <h2 className="text-base sm:text-lg font-bold text-foreground">{sec.title}</h2>
               </div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed pl-10.5">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed ps-10.5">
                 {sec.content}
               </p>
             </div>

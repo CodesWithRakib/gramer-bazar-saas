@@ -233,7 +233,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                 onClick={() => handleOpenModal()}
                 className="rounded-full px-6 h-11 whitespace-nowrap"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="me-2 h-4 w-4" />
                 {isBn ? 'নতুন ব্যানার যোগ করুন' : 'Add Banner'}
               </Button>
             </DialogTrigger>
@@ -352,7 +352,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                   <TableHead className="py-3.5 px-4 w-24 text-center">
                     {isBn ? 'স্ট্যাটাস' : 'Status'}
                   </TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">
+                  <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'পদক্ষেপ' : 'Actions'}
                   </TableHead>
                 </TableRow>
@@ -376,8 +376,8 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                       <TableCell className="py-3.5 px-4 text-center">
                         <div className="h-6 w-12 rounded-full bg-muted mx-auto"></div>
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-right">
-                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      <TableCell className="py-3.5 px-4 text-end">
+                        <div className="ms-auto h-8 w-16 rounded bg-muted"></div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -438,7 +438,7 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
                           onCheckedChange={() => handleToggleStatus(banner)}
                         />
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-right">
+                      <TableCell className="py-3.5 px-4 text-end">
                         <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="ghost"

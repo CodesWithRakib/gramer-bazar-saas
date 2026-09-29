@@ -48,7 +48,8 @@ interface AddressFormProps {
   initialData?: Address;
   isBn: boolean;
   onSuccess: () => void;
-  onCancel: () => void;
+  /** When omitted the form renders no cancel button (e.g. first-time checkout). */
+  onCancel?: () => void;
 }
 
 export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressFormProps) {
@@ -317,7 +318,7 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
               </div>
               <div className="flex gap-2">
                 <Button type="button" size="sm" onClick={handleManualPin} className="flex-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5 me-1.5" />
                   {isBn ? 'পিন করুন' : 'Pin Location'}
                 </Button>
                 <Button
@@ -366,9 +367,9 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
               disabled={isGettingLocation}
             >
               {isGettingLocation ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 me-2 animate-spin" />
               ) : (
-                <LocateFixed className="w-4 h-4 mr-2" />
+                <LocateFixed className="w-4 h-4 me-2" />
               )}
               {isGettingLocation
                 ? isBn
@@ -399,11 +400,13 @@ export function AddressForm({ initialData, isBn, onSuccess, onCancel }: AddressF
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
-            {isBn ? 'বাতিল' : 'Cancel'}
-          </Button>
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
+              {isBn ? 'বাতিল' : 'Cancel'}
+            </Button>
+          )}
           <Button type="submit" disabled={isSaving}>
-            {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {isSaving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             {initialData
               ? isBn
                 ? 'আপডেট করুন'

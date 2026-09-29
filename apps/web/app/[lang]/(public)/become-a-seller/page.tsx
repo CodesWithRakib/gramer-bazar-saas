@@ -135,7 +135,7 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
                   href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-seller`)}`}
                 >
                   {isBn ? 'লগইন করে আবেদন করুন' : 'Login to Apply'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="rounded-2xl px-8" asChild>
@@ -214,7 +214,7 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
               <Button asChild size="lg" className="rounded-2xl px-8 shadow-sm">
                 <Link href={`/${lang}/seller`}>
                   {isBn ? 'সেলার পোর্টাল খুলুন' : 'Go to Seller Portal'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                 </Link>
               </Button>
             </div>
@@ -320,7 +320,7 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
                 <Button asChild size="lg" className="rounded-2xl px-8 shadow-sm">
                   <Link href={`/${lang}/seller`}>
                     {isBn ? 'সেলার পোর্টাল খুলুন' : 'Launch Seller Portal'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                   </Link>
                 </Button>
               </div>

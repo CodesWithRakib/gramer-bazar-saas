@@ -169,14 +169,14 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
         {/* Inner Table Container */}
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xs dark:border-border dark:bg-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                 <tr>
                   <th className="py-3.5 px-4">{isBn ? 'অর্ডার আইডি' : 'Order ID'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'কারণ' : 'Reason'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'স্ট্যাটাস' : 'Status'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Created Date'}</th>
-                  <th className="py-3.5 px-4 text-right">{isBn ? 'পদক্ষেপ' : 'Actions'}</th>
+                  <th className="py-3.5 px-4 text-end">{isBn ? 'পদক্ষেপ' : 'Actions'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-border">
@@ -195,8 +195,8 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                       <td className="py-4 px-4">
                         <div className="h-4 w-24 rounded bg-muted"></div>
                       </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="ml-auto h-8 w-20 rounded bg-muted"></div>
+                      <td className="py-4 px-4 text-end">
+                        <div className="ms-auto h-8 w-20 rounded bg-muted"></div>
                       </td>
                     </tr>
                   ))
@@ -266,7 +266,7 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                       <td className="py-3.5 px-4 text-muted-foreground whitespace-nowrap">
                         {new Date(dispute.createdAt).toLocaleDateString(isBn ? 'bn-BD' : 'en-US')}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-4 text-end">
                         <Button
                           asChild
                           variant="outline"

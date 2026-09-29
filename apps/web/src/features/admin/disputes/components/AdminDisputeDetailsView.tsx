@@ -91,7 +91,7 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
           href={`/${lang}/admin/disputes`}
           className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
         >
-          <ArrowLeft className="mr-2" /> Back to Disputes
+          <ArrowLeft className="me-2 rtl:rotate-180" /> Back to Disputes
         </Link>
 
         {!isResolved && !showResolutionForm && (
@@ -162,7 +162,7 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
-                    className="mr-2 text-primary-600 focus:ring-primary-500"
+                    className="me-2 text-primary-600 focus:ring-primary-500"
                     name="resolution"
                     checked={resolutionStatus === DisputeStatus.RESOLVED_REFUNDED}
                     onChange={() => setResolutionStatus(DisputeStatus.RESOLVED_REFUNDED)}
@@ -172,7 +172,7 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
-                    className="mr-2 text-red-600 focus:ring-red-500"
+                    className="me-2 text-red-600 focus:ring-red-500"
                     name="resolution"
                     checked={resolutionStatus === DisputeStatus.RESOLVED_REJECTED}
                     onChange={() => setResolutionStatus(DisputeStatus.RESOLVED_REJECTED)}
@@ -222,9 +222,9 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-blue-800 dark:text-blue-300 flex items-center mb-2">
               {dispute.status === 'RESOLVED_REFUNDED' ? (
-                <CheckCircle className="mr-2" />
+                <CheckCircle className="me-2" />
               ) : (
-                <AlertCircle className="mr-2" />
+                <AlertCircle className="me-2" />
               )}
               Admin Decision
             </h3>
@@ -277,7 +277,7 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
         {!isResolved ? (
           <form onSubmit={handleSendMessage} className="relative">
             <textarea
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 pe-12 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
               rows={3}
               placeholder="Type your reply as Admin..."
               value={message}

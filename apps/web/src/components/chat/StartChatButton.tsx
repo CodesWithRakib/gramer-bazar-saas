@@ -77,7 +77,7 @@ export function StartChatButton({
       disabled={isLoading}
       className={className}
     >
-      <MessageSquare className="h-4 w-4 mr-2" />
+      <MessageSquare className="h-4 w-4 me-2" />
       {buttonText || (lang === 'bn' ? 'মেসেজ দিন' : 'Message')}
     </Button>
   );

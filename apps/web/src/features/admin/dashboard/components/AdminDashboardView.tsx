@@ -98,8 +98,8 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                 ৳{metrics.totalSales.toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground flex items-center mt-1.5 font-medium">
-                <TrendingUp className="h-3.5 w-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold mr-1">
+                <TrendingUp className="h-3.5 w-3.5 me-1 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold me-1">
                   {isBn ? 'মোট অর্জিত' : 'GMV to date'}
                 </span>
               </p>
@@ -177,7 +177,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
               {isBn ? 'গত ৭ দিনের প্ল্যাটফর্ম জিএমভি' : 'Platform GMV performance over 7 days'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pl-0 pt-6 pr-6">
+          <CardContent className="ps-0 pt-6 pe-6">
             <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -239,7 +239,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
               {isBn ? 'লাইভ অর্ডার স্থিতি বিভাজন' : 'Live breakdown of all platform orders'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pl-0 pt-6 pr-6">
+          <CardContent className="ps-0 pt-6 pe-6">
             {orderStatusDistribution.length > 0 ? (
               <div className="h-[280px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -318,7 +318,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
+                  <div className="text-end shrink-0">
                     <p className="text-sm font-bold text-foreground">
                       ৳{Number(prod.revenue).toLocaleString()}
                     </p>
@@ -364,7 +364,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
+                  <div className="text-end shrink-0">
                     <p className="text-sm font-bold text-foreground">
                       ৳{Number(order.totalAmount).toLocaleString()}
                     </p>

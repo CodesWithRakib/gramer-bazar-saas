@@ -155,7 +155,7 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
           href={`/${lang}/${basePath}/settings`}
           className="inline-flex items-center text-xs font-semibold text-muted-foreground hover:text-primary transition-colors mb-3"
         >
-          <ArrowLeft className="w-4 h-4 mr-1.5" />
+          <ArrowLeft className="w-4 h-4 me-1.5 rtl:rotate-180" />
           {isBn ? 'সেটিংস হাবে ফিরে যান' : 'Back to Settings Hub'}
         </Link>
         <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
@@ -244,7 +244,7 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
                         <Input
                           {...field}
                           placeholder="https://your-tunnel.ngrok-free.app"
-                          className="font-mono text-sm pl-9"
+                          className="font-mono text-sm ps-9"
                         />
                         <Globe className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
                       </div>
@@ -279,7 +279,7 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
 
                 <div className="space-y-1.5 pt-1">
                   <div className="flex items-center justify-between bg-slate-900/80 px-2.5 py-1.5 rounded border border-slate-800/80">
-                    <span className="truncate pr-2">
+                    <span className="truncate pe-2">
                       <span className="text-emerald-400 font-semibold">SUCCESS: </span>
                       {cleanPublicUrl}/api/v1/payments/sslcommerz/success
                     </span>
@@ -302,7 +302,7 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
                   </div>
 
                   <div className="flex items-center justify-between bg-slate-900/80 px-2.5 py-1.5 rounded border border-slate-800/80">
-                    <span className="truncate pr-2">
+                    <span className="truncate pe-2">
                       <span className="text-amber-400 font-semibold">IPN WEBHOOK: </span>
                       {cleanPublicUrl}/api/v1/payments/sslcommerz/ipn
                     </span>
@@ -374,7 +374,7 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
                                 ? '•••••••• (Leave blank to keep existing password)'
                                 : 'Enter store password'
                             }
-                            className="font-mono text-sm pr-10"
+                            className="font-mono text-sm pe-10"
                           />
                           <button
                             type="button"

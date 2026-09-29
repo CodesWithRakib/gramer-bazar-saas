@@ -53,8 +53,8 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                 ৳{metrics.totalSales.toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground flex items-center mt-1.5">
-                <TrendingUp className="h-3.5 w-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold mr-1">
+                <TrendingUp className="h-3.5 w-3.5 me-1 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold me-1">
                   +20.1%
                 </span>{' '}
                 {isBn ? 'গত মাস থেকে' : 'from last month'}
@@ -74,7 +74,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
             <CardContent>
               <div className="text-2xl font-bold tracking-tight">{metrics.totalOrders}</div>
               <p className="text-xs text-muted-foreground flex items-center mt-1.5">
-                <span className="font-medium text-amber-600 dark:text-amber-400 mr-1">
+                <span className="font-medium text-amber-600 dark:text-amber-400 me-1">
                   {metrics.pendingOrders}
                 </span>{' '}
                 {isBn ? 'অপেক্ষমাণ' : 'pending'}
@@ -128,7 +128,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
               {isBn ? 'গত ৭ দিনের বিক্রয়' : 'Sales over the last 7 days'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pl-0 pt-6 pr-6">
+          <CardContent className="ps-0 pt-6 pe-6">
             <div className="h-[320px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -207,7 +207,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="text-sm font-medium">
                           ৳{Number(order.totalAmount).toLocaleString()}
                         </p>

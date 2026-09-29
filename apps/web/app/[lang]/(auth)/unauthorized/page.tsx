@@ -68,7 +68,7 @@ export default function UnauthorizedPage({ params }: { params: Promise<{ lang: s
           </p>
 
           {user && (
-            <div className="mb-6 p-4 rounded-lg bg-muted/40 border text-left text-xs space-y-1.5">
+            <div className="mb-6 p-4 rounded-lg bg-muted/40 border text-start text-xs space-y-1.5">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   {isBn ? 'ব্যবহারকারী' : 'Signed in as'}:

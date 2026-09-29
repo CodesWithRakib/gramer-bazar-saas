@@ -117,17 +117,17 @@ export function ChatInterface() {
   const getReferenceBadge = (refType?: string | null, refId?: string | null) => {
     if (!refId && !refType) return null;
     const type = refType?.toUpperCase() || 'REF';
-    let icon = <HelpCircle className="h-3 w-3 mr-1" />;
+    let icon = <HelpCircle className="h-3 w-3 me-1" />;
     let label = refId ? `#${refId.slice(0, 8)}` : type;
 
     if (type.includes('ORDER')) {
-      icon = <ShoppingBag className="h-3 w-3 mr-1" />;
+      icon = <ShoppingBag className="h-3 w-3 me-1" />;
       label = `Order ${refId ? `#${refId}` : ''}`;
     } else if (type.includes('PRODUCT')) {
-      icon = <Package className="h-3 w-3 mr-1" />;
+      icon = <Package className="h-3 w-3 me-1" />;
       label = `Product ${refId ? `#${refId.slice(0, 8)}` : ''}`;
     } else if (type.includes('DELIVERY')) {
-      icon = <Truck className="h-3 w-3 mr-1" />;
+      icon = <Truck className="h-3 w-3 me-1" />;
       label = `Delivery ${refId ? `#${refId.slice(0, 8)}` : ''}`;
     }
 
@@ -215,7 +215,7 @@ export function ChatInterface() {
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search conversations..."
-              className="pl-9 bg-background/80"
+              className="ps-9 bg-background/80"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -247,8 +247,8 @@ export function ChatInterface() {
                   <button
                     key={conv.id}
                     onClick={() => setActiveConversationId(conv.id)}
-                    className={`flex items-start gap-3 p-3.5 text-left transition-colors hover:bg-muted/60 ${
-                      isSelected ? 'bg-primary/10 border-l-4 border-primary pl-2.5' : ''
+                    className={`flex items-start gap-3 p-3.5 text-start transition-colors hover:bg-muted/60 ${
+                      isSelected ? 'bg-primary/10 border-l-4 border-primary ps-2.5' : ''
                     }`}
                   >
                     <div className="relative flex-shrink-0">
@@ -273,7 +273,7 @@ export function ChatInterface() {
                           {other?.firstName || 'User'} {other?.lastName || ''}
                         </span>
                         {lastMsg?.createdAt && (
-                          <span className="text-[11px] text-muted-foreground flex-shrink-0 ml-1">
+                          <span className="text-[11px] text-muted-foreground flex-shrink-0 ms-1">
                             {format(new Date(lastMsg.createdAt), 'HH:mm')}
                           </span>
                         )}
@@ -332,10 +332,10 @@ export function ChatInterface() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="md:hidden h-9 w-9 -ml-2 text-muted-foreground"
+                  className="md:hidden h-9 w-9 -ms-2 text-muted-foreground"
                   onClick={() => setActiveConversationId(null)}
                 >
-                  <ArrowLeft className="h-5 w-5" />
+                  <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
                 </Button>
 
                 <Avatar className="h-10 w-10 border border-border/80 flex-shrink-0">
@@ -414,7 +414,7 @@ export function ChatInterface() {
                         className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
                       >
                         {!isMe && senderRole && senderRole !== 'CUSTOMER' && (
-                          <span className="text-[10px] font-semibold uppercase text-muted-foreground ml-2 mb-0.5 tracking-wider">
+                          <span className="text-[10px] font-semibold uppercase text-muted-foreground ms-2 mb-0.5 tracking-wider">
                             {senderRole}
                           </span>
                         )}
@@ -483,7 +483,7 @@ export function ChatInterface() {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground h-full p-6 text-center">
             <div className="h-16 w-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 shadow-sm">
-              <Send className="h-8 w-8 ml-1" />
+              <Send className="h-8 w-8 ms-1" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">Your Messages</h3>
             <p className="text-sm max-w-sm mt-1 text-muted-foreground">

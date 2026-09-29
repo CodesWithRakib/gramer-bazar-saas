@@ -43,7 +43,7 @@ export default function ShopsPage({ params }: { params: Promise<{ lang: string }
             placeholder={isBn ? 'দোকান খুঁজুন...' : 'Search shops...'}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="ps-10"
           />
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         </div>

@@ -302,7 +302,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
                     </div>
 
                     {/* Main content */}
-                    <div className="flex-1 min-w-0 pr-2">
+                    <div className="flex-1 min-w-0 pe-2">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                         <h4
                           className={`text-sm leading-snug break-words ${
@@ -333,7 +333,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
                             className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
                           >
                             <span>{getActionLabel(notif.type)}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                           </Link>
                         )}
 
@@ -366,7 +366,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               className="gap-1 h-8 text-xs"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3.5 h-3.5 rtl:rotate-180" />
               <span>{isBn ? 'আগের পৃষ্ঠা' : 'Previous'}</span>
             </Button>
 
@@ -382,7 +382,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
               className="gap-1 h-8 text-xs"
             >
               <span>{isBn ? 'পরের পৃষ্ঠা' : 'Next'}</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3.5 h-3.5 rtl:rotate-180" />
             </Button>
           </div>
         )}

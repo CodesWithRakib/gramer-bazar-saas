@@ -65,7 +65,7 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
               </div>
             )}
 
-            <div className="relative z-10 flex items-center gap-4 text-center md:text-left">
+            <div className="relative z-10 flex items-center gap-4 text-center md:text-start">
               <div className="bg-primary-foreground/15 p-3.5 rounded-2xl backdrop-blur-md shrink-0 shadow-xs">
                 <Zap className="w-8 h-8 text-primary-foreground fill-current" />
               </div>

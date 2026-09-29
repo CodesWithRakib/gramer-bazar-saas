@@ -252,7 +252,7 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                 onClick={handleOpenCreateModal}
                 className="rounded-full px-6 h-11 whitespace-nowrap"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="me-2 h-4 w-4" />
                 {isBn ? 'নতুন ফ্ল্যাশ সেল' : 'Create Flash Sale'}
               </Button>
             </DialogTrigger>
@@ -321,14 +321,14 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
         {/* Inner Table Container */}
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xs dark:border-border dark:bg-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
+            <table className="w-full text-sm text-start">
               <thead className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                 <tr>
                   <th className="py-3.5 px-4">{isBn ? 'নাম' : 'Name'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'আইটেম' : 'Items'}</th>
                   <th className="py-3.5 px-4">{isBn ? 'স্ট্যাটাস' : 'Status'}</th>
-                  <th className="py-3.5 px-4 text-right">{isBn ? 'পদক্ষেপ' : 'Actions'}</th>
+                  <th className="py-3.5 px-4 text-end">{isBn ? 'পদক্ষেপ' : 'Actions'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-border">
@@ -347,8 +347,8 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                       <td className="py-4 px-4">
                         <div className="h-6 w-12 rounded-full bg-muted"></div>
                       </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="ml-auto h-8 w-16 rounded bg-muted"></div>
+                      <td className="py-4 px-4 text-end">
+                        <div className="ms-auto h-8 w-16 rounded bg-muted"></div>
                       </td>
                     </tr>
                   ))
@@ -391,11 +391,11 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                       <td className="py-3.5 px-4">
                         <div className="flex flex-col text-xs gap-0.5 text-muted-foreground">
                           <span>
-                            <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" />{' '}
+                            <Calendar className="h-3 w-3 inline me-1 text-muted-foreground" />{' '}
                             Start: {new Date(sale.startDate).toLocaleDateString()}
                           </span>
                           <span>
-                            <Calendar className="h-3 w-3 inline mr-1 text-muted-foreground" /> End:{' '}
+                            <Calendar className="h-3 w-3 inline me-1 text-muted-foreground" /> End:{' '}
                             {new Date(sale.endDate).toLocaleDateString()}
                           </span>
                         </div>
@@ -416,7 +416,7 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
                           onCheckedChange={(val: boolean) => handleToggleActive(sale.id, val)}
                         />
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-4 text-end">
                         <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="ghost"

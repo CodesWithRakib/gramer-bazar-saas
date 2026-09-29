@@ -155,7 +155,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                   {isBn ? 'দৈনিক অর্জিত বিক্রয়' : 'Daily sales volume across your shop'}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pl-0 pt-6 pr-6">
+              <CardContent className="ps-0 pt-6 pe-6">
                 <div className="h-[280px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
@@ -214,7 +214,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                   {isBn ? 'বর্তমান অর্ডারের অবস্থা' : 'Breakdown of your shop orders'}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pl-0 pt-6 pr-6">
+              <CardContent className="ps-0 pt-6 pe-6">
                 {orderStatusDistribution.length > 0 ? (
                   <div className="h-[280px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
@@ -375,7 +375,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right shrink-0">
+                      <div className="text-end shrink-0">
                         <p className="text-sm font-bold text-foreground">
                           ৳{Number(order.totalAmount).toLocaleString()}
                         </p>

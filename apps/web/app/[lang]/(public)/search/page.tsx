@@ -48,6 +48,7 @@ function SearchPageContent({ lang }: { lang: string }) {
     data: searchResults,
     isLoading: isSearchLoading,
     isError,
+    refetch,
   } = useSearchProductsQuery({
     q,
     categoryId: categoryId || undefined,
@@ -134,8 +135,10 @@ function SearchPageContent({ lang }: { lang: string }) {
                       : categories?.find((c) => c.id === categoryId)?.nameEn || 'Unknown'}
                   </span>
                   <button
+                    type="button"
                     onClick={() => updateUrl('categoryId', '')}
-                    className="ml-1 hover:text-foreground"
+                    aria-label={isBn ? 'ক্যাটাগরি ফিল্টার সরান' : 'Remove category filter'}
+                    className="ms-1 rounded-full p-0.5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -150,8 +153,10 @@ function SearchPageContent({ lang }: { lang: string }) {
                       : brands?.find((b) => b.id === brandId)?.nameEn || 'Unknown'}
                   </span>
                   <button
+                    type="button"
                     onClick={() => updateUrl('brandId', '')}
-                    className="ml-1 hover:text-foreground"
+                    aria-label={isBn ? 'ব্র্যান্ড ফিল্টার সরান' : 'Remove brand filter'}
+                    className="ms-1 rounded-full p-0.5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -164,6 +169,8 @@ function SearchPageContent({ lang }: { lang: string }) {
                     ৳{minPrice || '0'} - {maxPrice ? `৳${maxPrice}` : isBn ? 'যেকোন' : 'Any'}
                   </span>
                   <button
+                    type="button"
+                    aria-label={isBn ? 'মূল্য ফিল্টার সরান' : 'Remove price filter'}
                     onClick={() => {
                       const params = new URLSearchParams(searchParams.toString());
                       params.delete('minPrice');
@@ -171,7 +178,7 @@ function SearchPageContent({ lang }: { lang: string }) {
                       params.delete('page');
                       router.push(`${pathname}?${params.toString()}`);
                     }}
-                    className="ml-1 hover:text-foreground"
+                    className="ms-1 rounded-full p-0.5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -185,7 +192,8 @@ function SearchPageContent({ lang }: { lang: string }) {
               <Input
                 type="search"
                 placeholder={isBn ? 'পণ্য খুঁজুন...' : 'Search products...'}
-                className="w-full pr-10"
+                aria-label={isBn ? 'পণ্য খুঁজুন' : 'Search products'}
+                className="w-full pe-10"
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
               />
@@ -193,7 +201,8 @@ function SearchPageContent({ lang }: { lang: string }) {
                 type="submit"
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-0 h-full"
+                aria-label={isBn ? 'অনুসন্ধান করুন' : 'Search'}
+                className="absolute end-0 top-0 h-full focus-visible:rounded-lg"
               >
                 <Search className="h-4 w-4" />
               </Button>
@@ -207,7 +216,7 @@ function SearchPageContent({ lang }: { lang: string }) {
                   ? 'দুঃখিত, কোনো ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
                   : 'Sorry, an error occurred. Please try again.'}
               </p>
-              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+              <Button variant="outline" className="mt-4" onClick={() => refetch()}>
                 {isBn ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
               </Button>
             </div>
@@ -243,7 +252,7 @@ function SearchPageContent({ lang }: { lang: string }) {
                     disabled={page <= 1}
                     onClick={() => updateUrl('page', page - 1)}
                   >
-                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    <ChevronLeft className="me-1 h-4 w-4 rtl:rotate-180" />
                     {isBn ? 'পূর্ববর্তী' : 'Prev'}
                   </Button>
                   <span className="text-sm font-medium">
@@ -256,7 +265,7 @@ function SearchPageContent({ lang }: { lang: string }) {
                     onClick={() => updateUrl('page', page + 1)}
                   >
                     {isBn ? 'পরবর্তী' : 'Next'}
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                    <ChevronRight className="ms-1 h-4 w-4 rtl:rotate-180" />
                   </Button>
                 </div>
               )}

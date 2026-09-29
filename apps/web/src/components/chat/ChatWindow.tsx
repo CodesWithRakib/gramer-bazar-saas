@@ -89,7 +89,7 @@ export function ChatWindow({ conversationId, participantName }: ChatWindowProps)
                 >
                   <p className="text-sm">{msg.content}</p>
                   <span
-                    className={`text-[10px] block mt-1 ${isMe ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground text-left'}`}
+                    className={`text-[10px] block mt-1 ${isMe ? 'text-primary-foreground/70 text-end' : 'text-muted-foreground text-start'}`}
                   >
                     {new Intl.DateTimeFormat('en-US', {
                       hour: 'numeric',

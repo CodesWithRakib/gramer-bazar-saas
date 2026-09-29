@@ -80,9 +80,12 @@ export function MobileCategoryDrawer({ lang, isOpen, onOpenChange }: MobileCateg
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-[85vw] max-w-[340px] p-0 flex flex-col bg-background">
+      <SheetContent
+        side={isBn ? 'right' : 'left'}
+        className="flex w-[85vw] max-w-[340px] flex-col bg-background p-0"
+      >
         {/* Clean Header with Logo only */}
-        <SheetHeader className="p-4 border-b border-border/70 bg-background text-left">
+        <SheetHeader className="p-4 border-b border-border/70 bg-background text-start">
           <div className="flex items-center">
             <BrandLogo
               href={`/${lang}`}
@@ -236,7 +239,7 @@ export function MobileCategoryDrawer({ lang, isOpen, onOpenChange }: MobileCateg
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors text-left"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors text-start"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   <span>{isBn ? 'লগআউট' : 'Logout'}</span>
@@ -372,7 +375,7 @@ export function MobileCategoryDrawer({ lang, isOpen, onOpenChange }: MobileCateg
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 text-muted-foreground ml-1 p-0"
+                            className="h-6 w-6 text-muted-foreground -ms-1 p-0"
                             onClick={() => toggleCategory(cat.slug)}
                           >
                             <ChevronDown
@@ -397,7 +400,7 @@ export function MobileCategoryDrawer({ lang, isOpen, onOpenChange }: MobileCateg
                               className="flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-background transition-colors"
                             >
                               <span className="truncate">{isBn ? sub.nameBn : sub.nameEn}</span>
-                              <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
+                              <ChevronRight className="h-3 w-3 text-muted-foreground/60 rtl:rotate-180" />
                             </Link>
                           ))}
                         </div>

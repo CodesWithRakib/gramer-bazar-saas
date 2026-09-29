@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Clock, Package, Truck, Inbox, XCircle, Undo2 } from 'lucide-react';
+import { Check, Clock, Package, Truck, Inbox, XCircle, Undo2, Store } from 'lucide-react';
 import { OrderStatusHistoryItem } from '@/features/orders/ordersApi';
 import { format } from 'date-fns';
 import { enUS, bn } from 'date-fns/locale';
@@ -10,6 +10,36 @@ interface OrderTrackingTimelineProps {
   lang: string;
 }
 
+/**
+ * The real fulfilment flow coming from the API is:
+ * PENDING → CONFIRMED → PROCESSING → READY_FOR_PICKUP → OUT_FOR_DELIVERY → DELIVERED.
+ * (`ASSIGNED_TO_RIDER` is an in-between state of READY_FOR_PICKUP.)
+ *
+ * Earlier this timeline used a `SHIPPED` step that the API never emits and
+ * treated `PICKED_UP` as `DELIVERED`, so an order that was only picked up from
+ * the shop showed as delivered to the customer.
+ */
+const FLOW = [
+  { id: 'PENDING', label: { en: 'Order Placed', bn: 'অর্ডার করা হয়েছে' }, icon: Clock },
+  { id: 'CONFIRMED', label: { en: 'Confirmed', bn: 'নিশ্চিত হয়েছে' }, icon: Check },
+  { id: 'PROCESSING', label: { en: 'Packing', bn: 'প্যাকিং চলছে' }, icon: Package },
+  { id: 'READY_FOR_PICKUP', label: { en: 'Ready', bn: 'প্রস্তুত' }, icon: Store },
+  { id: 'OUT_FOR_DELIVERY', label: { en: 'On the way', bn: 'পথে আছে' }, icon: Truck },
+  { id: 'DELIVERED', label: { en: 'Delivered', bn: 'ডেলিভারি সম্পন্ন' }, icon: Inbox },
+] as const;
+
+/** Legacy / intermediate statuses mapped onto their nearest visible step. */
+const STATUS_ALIASES: Record<string, string> = {
+  ASSIGNED_TO_RIDER: 'READY_FOR_PICKUP',
+  PICKED_UP: 'OUT_FOR_DELIVERY',
+  SHIPPED: 'OUT_FOR_DELIVERY',
+};
+
+function normalize(status: string): string {
+  const upper = status.toUpperCase();
+  return STATUS_ALIASES[upper] ?? upper;
+}
+
 export function OrderTrackingTimeline({
   statusHistory,
   currentStatus,
@@ -18,49 +48,35 @@ export function OrderTrackingTimeline({
   const isBn = lang === 'bn';
   const dateLocale = isBn ? bn : enUS;
 
-  // The standard linear flow
-  const flow = [
-    { id: 'PENDING', label: { en: 'Order Placed', bn: 'অর্ডার করা হয়েছে' }, icon: Clock },
-    { id: 'CONFIRMED', label: { en: 'Confirmed', bn: 'নিশ্চিত করা হয়েছে' }, icon: Check },
-    { id: 'PROCESSING', label: { en: 'Processing', bn: 'প্রক্রিয়াধীন' }, icon: Package },
-    { id: 'SHIPPED', label: { en: 'Shipped', bn: 'শিপ করা হয়েছে' }, icon: Truck },
-    { id: 'DELIVERED', label: { en: 'Delivered', bn: 'ডেলিভারি সম্পন্ন' }, icon: Inbox },
-  ];
-
   const currentStatusUpper = currentStatus.toUpperCase();
   const isCancelled = currentStatusUpper === 'CANCELLED' || currentStatusUpper === 'FAILED';
-  const isReturned = currentStatusUpper === 'RETURNED';
+  const isReturned = currentStatusUpper === 'RETURNED' || currentStatusUpper === 'REFUNDED';
 
-  // Find the index of the current status in the normal flow
-  const currentFlowIndex = flow.findIndex(
-    (f) =>
-      f.id === currentStatusUpper ||
-      (f.id === 'SHIPPED' && currentStatusUpper === 'OUT_FOR_DELIVERY') ||
-      (f.id === 'DELIVERED' && currentStatusUpper === 'PICKED_UP')
-  );
+  const normalizedCurrent = normalize(currentStatusUpper);
+  const currentFlowIndex = FLOW.findIndex((step) => step.id === normalizedCurrent);
 
   return (
-    <div className="py-8">
+    <div className="py-6 sm:py-8">
       {/* Edge cases: Cancelled or Returned */}
       {(isCancelled || isReturned) && (
-        <div className="flex flex-col items-center justify-center py-6 px-4 bg-destructive/10 rounded-xl border border-destructive/20 mb-8">
+        <div className="mb-8 flex flex-col items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-6">
           {isCancelled ? (
             <>
-              <XCircle className="w-12 h-12 text-destructive mb-3" />
+              <XCircle className="mb-3 h-12 w-12 text-destructive" />
               <h3 className="text-lg font-bold text-destructive">
-                {isBn ? 'অর্ডারটি বাতিল করা হয়েছে' : 'Order Cancelled'}
+                {isBn ? 'অর্ডারটি বাতিল করা হয়েছে' : 'Order cancelled'}
               </h3>
             </>
           ) : (
             <>
-              <Undo2 className="w-12 h-12 text-destructive mb-3" />
+              <Undo2 className="mb-3 h-12 w-12 text-destructive" />
               <h3 className="text-lg font-bold text-destructive">
-                {isBn ? 'অর্ডারটি ফেরত দেওয়া হয়েছে' : 'Order Returned'}
+                {isBn ? 'অর্ডারটি ফেরত নেওয়া হয়েছে' : 'Order returned'}
               </h3>
             </>
           )}
           {statusHistory.length > 0 && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="mt-2 text-sm text-muted-foreground">
               {format(new Date(statusHistory[statusHistory.length - 1].createdAt), 'PPP p', {
                 locale: dateLocale,
               })}
@@ -69,67 +85,71 @@ export function OrderTrackingTimeline({
         </div>
       )}
 
-      {/* Normal Timeline */}
-      <div className="relative flex flex-col md:flex-row justify-between w-full">
-        {/* Horizontal Line for Desktop */}
-        <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-[2px] bg-muted -z-10" />
+      <div className="relative flex w-full flex-col md:flex-row md:justify-between">
+        {/* Horizontal rail (desktop) — symmetric inset keeps it RTL-safe */}
+        <div className="absolute inset-x-[8%] top-6 -z-10 hidden h-[2px] bg-muted md:block" />
 
-        {/* Vertical Line for Mobile */}
-        <div className="block md:hidden absolute left-6 top-6 bottom-6 w-[2px] bg-muted -z-10" />
+        {/* Vertical rail (mobile) */}
+        <div className="absolute bottom-6 start-6 top-6 -z-10 block w-[2px] bg-muted md:hidden" />
 
-        {flow.map((step, index) => {
-          // A step is completed if it exists in history OR if the current flow index is past this step
-          const historyItem = statusHistory.find(
-            (h) =>
-              h.status === step.id ||
-              (step.id === 'SHIPPED' && h.status === 'OUT_FOR_DELIVERY') ||
-              (step.id === 'DELIVERED' && h.status === 'PICKED_UP')
-          );
+        {FLOW.map((step, index) => {
+          const historyItem = statusHistory.find((h) => normalize(h.status) === step.id);
 
           const isCompleted =
-            !!historyItem || (currentFlowIndex !== -1 && index <= currentFlowIndex);
-          const isCurrent = currentFlowIndex === index && !isCancelled && !isReturned;
+            !!historyItem ||
+            (!isCancelled && !isReturned && currentFlowIndex !== -1 && index <= currentFlowIndex);
+          const isCurrent =
+            currentFlowIndex === index &&
+            !isCancelled &&
+            !isReturned &&
+            step.id === normalizedCurrent;
 
           const Icon = step.icon;
 
           return (
             <div
               key={step.id}
-              className="relative flex md:flex-col items-start md:items-center gap-4 md:gap-3 mb-8 md:mb-0 w-full md:w-1/5 group"
+              className="group relative mb-8 flex w-full items-start gap-4 md:mb-0 md:w-[16.6%] md:flex-col md:items-center md:gap-3"
             >
-              {/* Desktop Progress Line Fill */}
+              {/* Progress fill (desktop) */}
               {index > 0 && isCompleted && (
-                <div className="hidden md:block absolute top-6 right-[50%] w-full h-[2px] bg-primary -z-10" />
+                <div className="absolute end-[50%] top-6 -z-10 hidden h-[2px] w-full bg-primary md:block" />
               )}
-              {/* Mobile Progress Line Fill */}
+              {/* Progress fill (mobile) */}
               {index > 0 && isCompleted && (
-                <div className="block md:hidden absolute left-6 bottom-[50%] h-full w-[2px] bg-primary -z-10" />
+                <div className="absolute start-6 bottom-[50%] -z-10 block h-full w-[2px] bg-primary md:hidden" />
               )}
 
               <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center border-4 transition-colors duration-300 z-10
-                ${isCompleted ? 'bg-primary border-primary/20 text-primary-foreground' : 'bg-background border-muted text-muted-foreground'}
-                ${isCurrent ? 'ring-4 ring-primary/20 scale-110' : ''}
-                ${(isCancelled || isReturned) && isCompleted && !historyItem ? 'opacity-50 grayscale' : ''}
-              `}
+                className={`z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-4 transition-colors duration-300 ${
+                  isCompleted
+                    ? 'border-primary/20 bg-primary text-primary-foreground'
+                    : 'border-muted bg-background text-muted-foreground'
+                } ${isCurrent ? 'ring-4 ring-primary/20 scale-110' : ''}`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="h-5 w-5" />
               </div>
 
-              <div className="flex flex-col md:items-center text-left md:text-center mt-1">
+              <div className="mt-1 flex min-w-0 flex-col text-start md:items-center md:text-center">
                 <span
-                  className={`font-semibold text-sm md:text-base ${isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}
+                  className={`text-sm font-semibold md:text-base ${
+                    isCompleted ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
                 >
                   {isBn ? step.label.bn : step.label.en}
                 </span>
 
-                {historyItem && (
-                  <span className="text-xs text-muted-foreground mt-1 whitespace-nowrap">
+                {historyItem ? (
+                  <span className="mt-1 text-xs text-muted-foreground">
                     {format(new Date(historyItem.createdAt), 'MMM dd, hh:mm a', {
                       locale: dateLocale,
                     })}
                   </span>
-                )}
+                ) : isCurrent ? (
+                  <span className="mt-1 text-xs font-medium text-primary">
+                    {isBn ? 'চলছে' : 'In progress'}
+                  </span>
+                ) : null}
               </div>
             </div>
           );

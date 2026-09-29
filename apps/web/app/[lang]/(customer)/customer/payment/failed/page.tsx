@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { XCircle, RefreshCw, ShoppingCart, HelpCircle, AlertTriangle } from 'lucide-react';
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 import { useGetOrderByIdQuery } from '@/features/orders/ordersApi';
+import { getApiErrorMessage } from '@/lib/apiError';
 
 export default function PaymentFailedPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -33,10 +34,12 @@ export default function PaymentFailedPage({ params }: { params: Promise<{ lang: 
       if (res.paymentUrl) {
         window.location.href = res.paymentUrl;
       }
-    } catch (err: any) {
+    } catch (err) {
       setErrorMessage(
-        err?.data?.message ||
-          (isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to retry payment session.')
+        getApiErrorMessage(
+          err,
+          isBn ? 'পেমেন্ট পুনরায় শুরু করতে সমস্যা হয়েছে।' : 'Failed to retry payment session.'
+        )
       );
     }
   };

@@ -159,7 +159,7 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
               className="h-8 rounded-lg"
               onClick={() => setSelectedApp(app)}
             >
-              <Eye className="w-3.5 h-3.5 mr-1" />
+              <Eye className="w-3.5 h-3.5 me-1" />
               {isBn ? 'বিস্তারিত' : 'View'}
             </Button>
             {app.status === 'PENDING' && (

@@ -71,7 +71,7 @@ export function FlashSalesSection({ lang }: { lang: string }) {
               href={`/${lang}/flash-sale`}
               className="text-rose-600 hover:text-rose-700 font-semibold text-xs md:text-sm flex items-center gap-1 transition-colors shrink-0"
             >
-              {isBn ? 'সবগুলো দেখুন' : 'View All'} <ArrowRight className="h-4 w-4" />
+              {isBn ? 'সবগুলো দেখুন' : 'View All'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </Link>
           </div>
         </div>

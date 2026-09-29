@@ -43,6 +43,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
     data: searchResults,
     isLoading,
     isError,
+    refetch,
   } = useSearchProductsQuery({
     q: q || undefined,
     categoryId: categoryId || undefined,
@@ -170,7 +171,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
           {/* Active Filter Chips */}
           {hasActiveFilters && (
             <div className="flex flex-wrap items-center gap-2 mb-6 p-3 rounded-lg bg-muted/40 border border-border/50 text-xs">
-              <span className="font-semibold text-muted-foreground flex items-center gap-1 mr-1">
+              <span className="me-1 flex items-center gap-1 font-semibold text-muted-foreground">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 {isBn ? 'ফিল্টারসমূহ:' : 'Active Filters:'}
               </span>
@@ -179,9 +180,10 @@ function ProductsPageContent({ lang }: { lang: string }) {
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                   <span>{isBn ? `অনুসন্ধান: "${q}"` : `Keyword: "${q}"`}</span>
                   <button
+                    type="button"
                     onClick={() => updateUrl('q', null)}
-                    className="hover:text-primary/70 ml-1"
-                    aria-label="Remove search filter"
+                    className="ms-1 rounded-full p-0.5 hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={isBn ? 'সার্চ ফিল্টার সরান' : 'Remove search filter'}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -196,8 +198,8 @@ function ProductsPageContent({ lang }: { lang: string }) {
                       updateUrl('categoryId', null);
                       updateUrl('categorySlug', null);
                     }}
-                    className="hover:text-primary/70 ml-1"
-                    aria-label="Remove category filter"
+                    className="ms-1 rounded-full p-0.5 hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={isBn ? 'ক্যাটাগরি ফিল্টার সরান' : 'Remove category filter'}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -209,8 +211,8 @@ function ProductsPageContent({ lang }: { lang: string }) {
                   <span>{isBn ? selectedBrand.nameBn : selectedBrand.nameEn}</span>
                   <button
                     onClick={() => updateUrl('brandId', null)}
-                    className="hover:text-primary/70 ml-1"
-                    aria-label="Remove brand filter"
+                    className="ms-1 rounded-full p-0.5 hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={isBn ? 'ব্র্যান্ড ফিল্টার সরান' : 'Remove brand filter'}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -227,8 +229,8 @@ function ProductsPageContent({ lang }: { lang: string }) {
                       updateUrl('minPrice', null);
                       updateUrl('maxPrice', null);
                     }}
-                    className="hover:text-primary/70 ml-1"
-                    aria-label="Remove price filter"
+                    className="ms-1 rounded-full p-0.5 hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={isBn ? 'মূল্য ফিল্টার সরান' : 'Remove price filter'}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -240,8 +242,8 @@ function ProductsPageContent({ lang }: { lang: string }) {
                   <span>{isBn ? 'ইন-স্টক পণ্য' : 'In Stock Only'}</span>
                   <button
                     onClick={() => updateUrl('inStock', null)}
-                    className="hover:text-primary/70 ml-1"
-                    aria-label="Remove in-stock filter"
+                    className="ms-1 rounded-full p-0.5 hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={isBn ? 'স্টক ফিল্টার সরান' : 'Remove in-stock filter'}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -253,8 +255,8 @@ function ProductsPageContent({ lang }: { lang: string }) {
                   <span>★ {minRating}+</span>
                   <button
                     onClick={() => updateUrl('minRating', null)}
-                    className="hover:text-primary/70 ml-1"
-                    aria-label="Remove rating filter"
+                    className="ms-1 rounded-full p-0.5 hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={isBn ? 'রেটিং ফিল্টার সরান' : 'Remove rating filter'}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -265,7 +267,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
                 variant="ghost"
                 size="sm"
                 onClick={clearAllFilters}
-                className="text-xs h-7 px-2 text-muted-foreground hover:text-foreground underline ml-auto"
+                className="ms-auto h-7 px-2 text-xs text-muted-foreground underline hover:text-foreground"
               >
                 {isBn ? 'সব মুছুন' : 'Reset all'}
               </Button>
@@ -280,7 +282,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
                   ? 'দুঃখিত, পণ্য লোড করতে সমস্যা হয়েছে।'
                   : 'Unable to load products at this moment.'}
               </p>
-              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>
                 {isBn ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
               </Button>
             </div>
@@ -330,8 +332,8 @@ function ProductsPageContent({ lang }: { lang: string }) {
                     onClick={() => updateUrl('page', page - 1)}
                     className="font-medium"
                   >
-                    <ChevronLeft className="w-4 h-4 mr-1" />
-                    {isBn ? 'পূর্ববর্তী' : 'Prev'}
+                    <ChevronLeft className="me-1 h-4 w-4 rtl:rotate-180" />
+                    {isBn ? 'আগের পৃষ্ঠা' : 'Prev'}
                   </Button>
                   <span className="text-xs md:text-sm font-semibold text-muted-foreground px-2">
                     {page} / {meta.totalPages}
@@ -343,8 +345,8 @@ function ProductsPageContent({ lang }: { lang: string }) {
                     onClick={() => updateUrl('page', page + 1)}
                     className="font-medium"
                   >
-                    {isBn ? 'পরবর্তী' : 'Next'}
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                    {isBn ? 'পরের পৃষ্ঠা' : 'Next'}
+                    <ChevronRight className="ms-1 h-4 w-4 rtl:rotate-180" />
                   </Button>
                 </div>
               )}

@@ -75,7 +75,7 @@ export function CategoryMegaMenu({ lang }: CategoryMegaMenuProps) {
                       onMouseEnter={() => setSelectedCategorySlug(cat.slug)}
                       onClick={() => setSelectedCategorySlug(cat.slug)}
                       className={cn(
-                        'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-sm font-medium transition-all group',
+                        'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-start text-sm font-medium transition-all group',
                         isActive
                           ? 'bg-primary text-primary-foreground shadow-sm'
                           : 'text-foreground hover:bg-accent/70'
@@ -85,7 +85,7 @@ export function CategoryMegaMenu({ lang }: CategoryMegaMenuProps) {
                         <span className="text-base flex-shrink-0">{cat.icon || '📦'}</span>
                         <span className="truncate">{isBn ? cat.nameBn : cat.nameEn}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                      <div className="flex items-center gap-1.5 flex-shrink-0 ms-2">
                         {cat.productCount !== undefined && cat.productCount > 0 && (
                           <span
                             className={cn(
@@ -136,13 +136,13 @@ export function CategoryMegaMenu({ lang }: CategoryMegaMenuProps) {
                         className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
                       >
                         <span>{isBn ? 'সব পণ্য দেখুন' : 'View All'}</span>
-                        <ArrowRight className="h-3 w-3" />
+                        <ArrowRight className="h-3 w-3 rtl:rotate-180" />
                       </Link>
                     </div>
 
                     {/* Subcategories Grid */}
                     {activeCategory.children && activeCategory.children.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2 max-h-[260px] overflow-y-auto pr-1">
+                      <div className="grid grid-cols-2 gap-2 max-h-[260px] overflow-y-auto pe-1">
                         {activeCategory.children.map((sub) => (
                           <Link
                             key={sub.id}
@@ -156,7 +156,7 @@ export function CategoryMegaMenu({ lang }: CategoryMegaMenuProps) {
                             {sub.productCount !== undefined && sub.productCount > 0 && (
                               <Badge
                                 variant="secondary"
-                                className="text-[10px] h-4 px-1.5 ml-2 font-normal"
+                                className="text-[10px] h-4 px-1.5 ms-2 font-normal"
                               >
                                 {sub.productCount}
                               </Badge>
@@ -195,7 +195,7 @@ export function CategoryMegaMenu({ lang }: CategoryMegaMenuProps) {
                           ? `${activeCategory.nameBn}-এর পেজে যান`
                           : `Browse ${activeCategory.nameEn}`}
                       </span>
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
                     </Link>
                   </div>
                 )}

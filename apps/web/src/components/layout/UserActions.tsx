@@ -143,7 +143,7 @@ export function UserActions({ lang }: UserActionsProps) {
 
       {/* Auth / Profile */}
       {!mounted ? (
-        <div className="w-8 sm:w-20 h-9 sm:h-10 bg-muted animate-pulse rounded-full ml-0.5 sm:ml-1 shrink-0" />
+        <div className="w-8 sm:w-20 h-9 sm:h-10 bg-muted animate-pulse rounded-full ms-0.5 sm:ms-1 shrink-0" />
       ) : isAuthenticated ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -274,7 +274,7 @@ export function UserActions({ lang }: UserActionsProps) {
                 <Heart className="h-4 w-4 text-muted-foreground" />
                 <span>{isBn ? 'উইশলিস্ট' : 'Wishlist'}</span>
                 {wishlistCount > 0 && (
-                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1.5">
+                  <Badge variant="secondary" className="ms-auto text-[10px] h-4 px-1.5">
                     {wishlistCount}
                   </Badge>
                 )}

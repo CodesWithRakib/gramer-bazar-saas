@@ -241,13 +241,13 @@ export function ProductDetailsClient({
           <Link href={`/${lang}`} className="hover:text-primary transition-colors">
             {isBn ? 'হোম' : 'Home'}
           </Link>
-          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
           <Link href={`/${lang}/categories`} className="hover:text-primary transition-colors">
             {isBn ? 'ক্যাটাগরি' : 'Categories'}
           </Link>
           {category && (
             <>
-              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
               <Link
                 href={`/${lang}/categories/${category.slug}`}
                 className="hover:text-primary transition-colors"
@@ -258,7 +258,7 @@ export function ProductDetailsClient({
           )}
           {category && subCategory && (
             <>
-              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
               <Link
                 href={`/${lang}/categories/${category.slug}/${subCategory.slug}`}
                 className="hover:text-primary transition-colors"
@@ -267,7 +267,7 @@ export function ProductDetailsClient({
               </Link>
             </>
           )}
-          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
           <span className="text-foreground font-semibold truncate max-w-[200px] sm:max-w-xs">
             {displayName}
           </span>
@@ -518,7 +518,7 @@ export function ProductDetailsClient({
                     className="text-xs md:text-sm text-primary font-semibold hover:underline flex items-center gap-1"
                   >
                     <span>{isBn ? 'আরও দেখুন' : 'View more'}</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
+                    <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
                   </Link>
                 )}
               </div>
@@ -568,7 +568,7 @@ export function ProductDetailsClient({
                   <Star
                     className={`h-4 w-4 ${avgRating > 0 ? 'fill-current' : 'text-muted-foreground/30'}`}
                   />
-                  <span className="text-sm font-bold text-foreground ml-1.5">
+                  <span className="text-sm font-bold text-foreground ms-1.5">
                     {avgRating > 0 ? avgRating.toFixed(1) : isBn ? 'নতুন' : 'New'}
                   </span>
                 </div>
@@ -616,7 +616,7 @@ export function ProductDetailsClient({
                     <span className="text-xs text-muted-foreground font-medium">/ {unit}</span>
                   )}
                   {discountPercent !== null && discountPercent > 0 && (
-                    <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md ml-auto">
+                    <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md ms-auto">
                       {isBn ? `${discountPercent}% ছাড়` : `${discountPercent}% OFF`}
                     </span>
                   )}
@@ -647,7 +647,7 @@ export function ProductDetailsClient({
                             setSelectedVariantIdx(idx);
                             setQuantity(1);
                           }}
-                          className={`p-2.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                          className={`p-2.5 rounded-xl border text-start transition-all flex flex-col justify-between ${
                             isSelected
                               ? 'border-primary bg-primary/10 shadow-xs'
                               : 'border-border/70 hover:border-primary/40 bg-card'
@@ -802,7 +802,7 @@ export function ProductDetailsClient({
                   className="flex-1 text-xs rounded-xl h-8"
                 >
                   <Link href={`/${lang}/shops/${product.shop.id}`}>
-                    <Store className="h-3.5 w-3.5 mr-1" />
+                    <Store className="h-3.5 w-3.5 me-1" />
                     <span>{isBn ? 'দোকান ভিজিট করুন' : 'Visit Shop'}</span>
                   </Link>
                 </Button>
@@ -824,7 +824,7 @@ export function ProductDetailsClient({
 
       {/* Mobile Sticky Bottom Floating Order Bar */}
       <div className="lg:hidden fixed bottom-[56px] md:bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur-md border-t border-border shadow-lg z-40 flex items-center justify-between gap-3">
-        <div className="flex flex-col pl-1">
+        <div className="flex flex-col ps-1">
           <span className="text-[10px] text-muted-foreground font-semibold">
             {isBn ? 'মোট মূল্য' : 'Total'}
           </span>
@@ -838,7 +838,7 @@ export function ProductDetailsClient({
             disabled={isOutOfStock}
             onClick={handleAddToCart}
           >
-            <ShoppingCart className="h-3.5 w-3.5 mr-1" />
+            <ShoppingCart className="h-3.5 w-3.5 me-1" />
             <span>{isBn ? 'কার্ট' : 'Cart'}</span>
           </Button>
           <Button
@@ -847,7 +847,7 @@ export function ProductDetailsClient({
             disabled={isOutOfStock}
             onClick={handleBuyNow}
           >
-            <Zap className="h-3.5 w-3.5 fill-current mr-1" />
+            <Zap className="h-3.5 w-3.5 fill-current me-1" />
             <span>{isBn ? 'অর্ডার করুন' : 'Buy Now'}</span>
           </Button>
         </div>

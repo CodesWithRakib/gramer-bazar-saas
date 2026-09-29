@@ -93,7 +93,7 @@ export default function ForgotPasswordPage({ params }: { params: Promise<{ lang:
                   placeholder="01XXXXXXXXX"
                   required
                   disabled={isLoading}
-                  className="pr-10"
+                  className="pe-10"
                 />
                 <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               </div>
@@ -124,7 +124,7 @@ export default function ForgotPasswordPage({ params }: { params: Promise<{ lang:
               href={`/${lang}/login`}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               <span>{isBn ? 'লগইন পৃষ্ঠায় ফিরে যান' : 'Back to Login'}</span>
             </Link>
           </div>

@@ -173,7 +173,7 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                     {isBn ? 'বর্তমান স্টক' : 'Current Stock'}
                   </TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'নতুন স্টক' : 'New Stock'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">
+                  <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'অ্যাকশন' : 'Action'}
                   </TableHead>
                 </TableRow>
@@ -194,8 +194,8 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                       <TableCell className="py-4 px-4">
                         <div className="h-10 w-24 rounded bg-muted"></div>
                       </TableCell>
-                      <TableCell className="py-4 px-4 text-right">
-                        <div className="h-9 w-20 ml-auto rounded bg-muted"></div>
+                      <TableCell className="py-4 px-4 text-end">
+                        <div className="h-9 w-20 ms-auto rounded bg-muted"></div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -267,7 +267,7 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                           onChange={(e) => handleQuantityChange(item.inventory.id, e.target.value)}
                         />
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-right">
+                      <TableCell className="py-3.5 px-4 text-end">
                         <Button
                           size="sm"
                           className="rounded-full px-4"

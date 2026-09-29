@@ -85,7 +85,7 @@ export function RouteGuard({ children, allowedRoles, lang, requireAuth = true }:
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button variant="outline" className="w-full sm:w-auto" asChild>
                 <Link href={`/${lang}`}>
-                  <Home className="w-4 h-4 mr-2" />
+                  <Home className="w-4 h-4 me-2" />
                   {isBn ? 'হোম পেজ' : 'Go Home'}
                 </Link>
               </Button>

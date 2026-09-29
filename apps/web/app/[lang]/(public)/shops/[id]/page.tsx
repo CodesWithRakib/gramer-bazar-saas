@@ -209,7 +209,7 @@ export default function ShopProfilePage({
         </p>
         <Button asChild>
           <Link href={`/${lang}/shops`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="me-2 h-4 w-4 rtl:rotate-180" />
             {isBn ? 'সব দোকানে ফিরে যান' : 'Back to all shops'}
           </Link>
         </Button>
@@ -276,7 +276,7 @@ export default function ShopProfilePage({
             </div>
 
             {/* Info */}
-            <div className="flex-1 text-center md:text-left">
+            <div className="flex-1 text-center md:text-start">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1.5">
                 <h1 className="text-2xl md:text-3xl font-extrabold text-foreground">
                   {isBn ? shop.nameBn : shop.nameEn}
@@ -367,7 +367,7 @@ export default function ShopProfilePage({
               {shopPhone && (
                 <Button asChild variant="default" size="sm" className="flex-1 md:flex-none">
                   <a href={`tel:${shopPhone}`}>
-                    <Phone className="h-4 w-4 mr-2" />
+                    <Phone className="h-4 w-4 me-2" />
                     {isBn ? 'কল করুন' : 'Call'}
                   </a>
                 </Button>
@@ -386,7 +386,7 @@ export default function ShopProfilePage({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <MessageCircle className="h-4 w-4 mr-2" />
+                    <MessageCircle className="h-4 w-4 me-2" />
                     WhatsApp
                   </a>
                 </Button>
@@ -399,7 +399,7 @@ export default function ShopProfilePage({
                 onClick={handleShare}
                 className="flex-1 md:flex-none"
               >
-                <Share2 className="h-4 w-4 mr-2" />
+                <Share2 className="h-4 w-4 me-2" />
                 {isBn ? 'শেয়ার' : 'Share'}
               </Button>
 
@@ -485,7 +485,7 @@ export default function ShopProfilePage({
                 className="rounded-full text-xs font-semibold px-3 h-8 shrink-0"
               >
                 {isBn ? 'সকল পণ্য' : 'All Products'}
-                <span className="ml-1 opacity-80 text-[11px]">
+                <span className="ms-1 opacity-80 text-[11px]">
                   ({productsResponse.meta?.total || 0})
                 </span>
               </Button>
@@ -502,10 +502,10 @@ export default function ShopProfilePage({
                   }
                   className="rounded-full text-xs font-semibold px-3 h-8 shrink-0"
                 >
-                  <span className="mr-1">{cat.icon || '🏷️'}</span>
+                  <span className="me-1">{cat.icon || '🏷️'}</span>
                   {isBn ? cat.nameBn : cat.nameEn}
-                  <span className="ml-1 opacity-80 text-[11px]">
-                    ({cat.count ?? (cat as any).productCount ?? 0})
+                  <span className="ms-1 opacity-80 text-[11px]">
+                    ({cat.count ?? cat.productCount ?? 0})
                   </span>
                 </Button>
               ))}
@@ -536,7 +536,7 @@ export default function ShopProfilePage({
                   )}
                 </div>
 
-                <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+                <div className="space-y-1 max-h-72 overflow-y-auto pe-1">
                   <button
                     type="button"
                     onClick={() => updateFilters({ category: null })}
@@ -571,8 +571,8 @@ export default function ShopProfilePage({
                         <span>{cat.icon || '🏷️'}</span>
                         <span className="truncate">{isBn ? cat.nameBn : cat.nameEn}</span>
                       </span>
-                      <span className="opacity-80 text-[11px] ml-1 shrink-0">
-                        {cat.count ?? (cat as any).productCount ?? 0}
+                      <span className="opacity-80 text-[11px] ms-1 shrink-0">
+                        {cat.count ?? cat.productCount ?? 0}
                       </span>
                     </button>
                   ))}
@@ -604,7 +604,7 @@ export default function ShopProfilePage({
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">
                     {isBn ? 'ব্র্যান্ড' : 'Brand'}
                   </label>
-                  <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
+                  <div className="space-y-1 max-h-48 overflow-y-auto pe-1">
                     {productsResponse.brands.map((b) => (
                       <button
                         key={b.id}
@@ -621,7 +621,7 @@ export default function ShopProfilePage({
                         }`}
                       >
                         <span className="truncate">{isBn ? b.nameBn : b.nameEn}</span>
-                        <span className="opacity-80 text-[11px] ml-1 shrink-0">{b.count ?? 0}</span>
+                        <span className="opacity-80 text-[11px] ms-1 shrink-0">{b.count ?? 0}</span>
                       </button>
                     ))}
                   </div>
@@ -703,7 +703,7 @@ export default function ShopProfilePage({
                     }
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-9 pr-8 h-10 text-sm rounded-xl"
+                    className="ps-9 pe-8 h-10 text-sm rounded-xl"
                   />
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   {searchInput && (
@@ -747,17 +747,17 @@ export default function ShopProfilePage({
                         variant="outline"
                         className="h-10 text-xs rounded-xl relative lg:hidden shrink-0"
                       >
-                        <SlidersHorizontal className="w-4 h-4 mr-1.5" />
+                        <SlidersHorizontal className="w-4 h-4 me-1.5" />
                         {isBn ? 'ফিল্টার' : 'Filters'}
                         {activeFiltersCount > 0 && (
-                          <span className="ml-1.5 bg-primary text-primary-foreground text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                          <span className="ms-1.5 bg-primary text-primary-foreground text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
                             {activeFiltersCount}
                           </span>
                         )}
                       </Button>
                     </SheetTrigger>
                     <SheetContent
-                      side="right"
+                      side={isBn ? 'left' : 'right'}
                       className="w-[320px] sm:w-[380px] p-6 overflow-y-auto"
                     >
                       <SheetHeader className="mb-6">
@@ -786,7 +786,7 @@ export default function ShopProfilePage({
                             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">
                               {isBn ? 'ক্যাটাগরি' : 'Category'}
                             </label>
-                            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                            <div className="space-y-1.5 max-h-48 overflow-y-auto pe-1">
                               <button
                                 type="button"
                                 onClick={() => updateFilters({ category: null })}
@@ -823,7 +823,7 @@ export default function ShopProfilePage({
                                     </span>
                                   </span>
                                   <span className="opacity-80">
-                                    ({cat.count ?? (cat as any).productCount ?? 0})
+                                    ({cat.count ?? cat.productCount ?? 0})
                                   </span>
                                 </button>
                               ))}
@@ -837,7 +837,7 @@ export default function ShopProfilePage({
                             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">
                               {isBn ? 'ব্র্যান্ড' : 'Brand'}
                             </label>
-                            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                            <div className="space-y-1.5 max-h-48 overflow-y-auto pe-1">
                               {productsResponse.brands.map((b) => (
                                 <button
                                   key={b.id}

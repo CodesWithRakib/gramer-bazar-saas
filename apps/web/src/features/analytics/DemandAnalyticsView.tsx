@@ -80,7 +80,7 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
                     <TableHead className="py-3 px-4">
                       {isBn ? 'কীওয়ার্ড' : 'Search Query'}
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-right">
+                    <TableHead className="py-3 px-4 text-end">
                       {isBn ? 'পরিমাণ' : 'Volume'}
                     </TableHead>
                   </TableRow>
@@ -95,7 +95,7 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
                         <TableCell className="py-3 px-4 font-medium text-foreground">
                           {search.query}
                         </TableCell>
-                        <TableCell className="py-3 px-4 text-right">
+                        <TableCell className="py-3 px-4 text-end">
                           <Badge variant="secondary">{search.count}</Badge>
                         </TableCell>
                       </TableRow>
@@ -133,7 +133,7 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
                 <TableHeader className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                   <TableRow>
                     <TableHead className="py-3 px-4">{isBn ? 'পণ্যের নাম' : 'Product'}</TableHead>
-                    <TableHead className="py-3 px-4 text-right">
+                    <TableHead className="py-3 px-4 text-end">
                       {isBn ? 'দেখা হয়েছে' : 'Missed Views'}
                     </TableHead>
                   </TableRow>
@@ -148,7 +148,7 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
                         <TableCell className="py-3 px-4 font-medium text-foreground">
                           {item.productName}
                         </TableCell>
-                        <TableCell className="py-3 px-4 text-right text-destructive font-semibold">
+                        <TableCell className="py-3 px-4 text-end text-destructive font-semibold">
                           {item.views}
                         </TableCell>
                       </TableRow>
@@ -191,13 +191,13 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
                   <TableHead className="py-3.5 px-4">
                     {isBn ? 'অনুরোধ আইডি' : 'Request ID'}
                   </TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">
+                  <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'অনুরোধের সংখ্যা' : 'Total Requests'}
                   </TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">
+                  <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'ক্রয়' : 'Resulting Purchases'}
                   </TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">
+                  <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'রূপান্তর হার' : 'Conversion Rate'}
                   </TableHead>
                 </TableRow>
@@ -212,13 +212,13 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
                       <TableCell className="py-3.5 px-4 font-mono font-medium text-foreground">
                         #{req.productRequestId.substring(0, 8)}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-right text-muted-foreground">
+                      <TableCell className="py-3.5 px-4 text-end text-muted-foreground">
                         {req.requests}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-right text-emerald-600 font-semibold">
+                      <TableCell className="py-3.5 px-4 text-end text-emerald-600 font-semibold">
                         {req.purchases}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-right">
+                      <TableCell className="py-3.5 px-4 text-end">
                         <Badge
                           variant={req.conversionRate > 20 ? 'default' : 'secondary'}
                           className={req.conversionRate > 20 ? 'bg-emerald-600' : ''}

@@ -105,7 +105,7 @@ export function HomeClient({
                   className="absolute left-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-background/50 hover:bg-background/90 border-0"
                   onClick={prevBanner}
                 >
-                  <ChevronLeft className="h-6 w-6" />
+                  <ChevronLeft className="h-6 w-6 rtl:rotate-180" />
                 </Button>
                 <Button
                   variant="outline"
@@ -113,7 +113,7 @@ export function HomeClient({
                   className="absolute right-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-background/50 hover:bg-background/90 border-0"
                   onClick={nextBanner}
                 >
-                  <ChevronRight className="h-6 w-6" />
+                  <ChevronRight className="h-6 w-6 rtl:rotate-180" />
                 </Button>
 
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">

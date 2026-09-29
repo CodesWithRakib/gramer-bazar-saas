@@ -124,7 +124,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild className="rounded-full">
           <Link href={`/${lang}/seller/wallet`}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
           </Link>
         </Button>
         <div>
@@ -194,7 +194,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
               </div>
 
               <Button type="submit" className="w-full rounded-full" disabled={isRequesting}>
-                {isRequesting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isRequesting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                 {isBn ? 'অনুরোধ পাঠান' : 'Submit Request'}
               </Button>
             </form>

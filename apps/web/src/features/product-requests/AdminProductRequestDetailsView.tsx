@@ -114,7 +114,7 @@ export function AdminProductRequestDetailsView({
         href={`/${lang}/admin/product-requests`}
         className="flex items-center text-sm text-primary hover:underline w-fit"
       >
-        <ArrowLeft className="h-4 w-4 mr-1" />
+        <ArrowLeft className="h-4 w-4 me-1 rtl:rotate-180" />
         {isBn ? 'অনুরোধ তালিকায় ফিরে যান' : 'Back to Requests'}
       </Link>
 

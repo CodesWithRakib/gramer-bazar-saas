@@ -220,7 +220,7 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                   <TableHead className="py-3.5 px-4">{isBn ? 'বিস্তারিত' : 'Details'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</TableHead>
                   <TableHead className="py-3.5 px-4">{isBn ? 'অবস্থা' : 'Status'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-right">
+                  <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'অ্যাকশন' : 'Actions'}
                   </TableHead>
                 </TableRow>
@@ -247,8 +247,8 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                       <TableCell className="py-4 px-4">
                         <div className="h-6 w-16 rounded-full bg-muted"></div>
                       </TableCell>
-                      <TableCell className="py-4 px-4 text-right">
-                        <div className="ml-auto h-8 w-24 rounded bg-muted"></div>
+                      <TableCell className="py-4 px-4 text-end">
+                        <div className="ms-auto h-8 w-24 rounded bg-muted"></div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -312,7 +312,7 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                           </p>
                         )}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 text-right">
+                      <TableCell className="py-3.5 px-4 text-end">
                         {payout.status === 'PENDING' ? (
                           <div className="flex items-center justify-end gap-1.5">
                             <Button
@@ -321,7 +321,7 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                               className="h-8 rounded-full border-emerald-500/40 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 text-xs px-2.5"
                               onClick={() => handleReviewClick(payout.id, 'APPROVED')}
                             >
-                              <CheckCircle className="mr-1 h-3.5 w-3.5" />
+                              <CheckCircle className="me-1 h-3.5 w-3.5" />
                               {isBn ? 'অনুমোদন' : 'Approve'}
                             </Button>
                             <Button
@@ -330,7 +330,7 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
                               className="h-8 rounded-full border-destructive/40 text-destructive hover:bg-destructive/10 text-xs px-2.5"
                               onClick={() => handleReviewClick(payout.id, 'REJECTED')}
                             >
-                              <XCircle className="mr-1 h-3.5 w-3.5" />
+                              <XCircle className="me-1 h-3.5 w-3.5" />
                               {isBn ? 'বাতিল' : 'Reject'}
                             </Button>
                           </div>
@@ -420,7 +420,7 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
               variant={reviewDialog.status === 'APPROVED' ? 'default' : 'destructive'}
               className="rounded-full"
             >
-              {isReviewing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isReviewing && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {isBn ? 'নিশ্চিত করুন' : 'Confirm'}
             </Button>
           </DialogFooter>

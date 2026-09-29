@@ -57,7 +57,7 @@ export default function OffersPage({ params }: { params: Promise<{ lang: string 
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-xl shadow-md"
             >
               <Link href={`/${lang}/flash-sale`}>
-                <Flame className="w-4 h-4 mr-2 text-red-600 fill-current" />
+                <Flame className="w-4 h-4 me-2 text-red-600 fill-current" />
                 {isBn ? 'ফ্ল্যাশ সেল দেখুন' : 'Explore Flash Sale'}
               </Link>
             </Button>
@@ -68,7 +68,7 @@ export default function OffersPage({ params }: { params: Promise<{ lang: string 
               className="bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-xl"
             >
               <Link href={`/${lang}/categories`}>
-                <ShoppingBag className="w-4 h-4 mr-2" />
+                <ShoppingBag className="w-4 h-4 me-2" />
                 {isBn ? 'ক্যাটাগরি ব্রাউজ করুন' : 'Browse Categories'}
               </Link>
             </Button>
@@ -102,7 +102,7 @@ export default function OffersPage({ params }: { params: Promise<{ lang: string 
             >
               <Link href={`/${lang}/flash-sale`} className="flex items-center justify-between">
                 <span>{isBn ? 'এখনই কিনুন' : 'Shop Flash Sale'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>
@@ -132,7 +132,7 @@ export default function OffersPage({ params }: { params: Promise<{ lang: string 
             >
               <Link href={`/${lang}/categories`} className="flex items-center justify-between">
                 <span>{isBn ? 'সবজি ও মুদি দেখুন' : 'Explore Grocery'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>
@@ -162,7 +162,7 @@ export default function OffersPage({ params }: { params: Promise<{ lang: string 
             >
               <Link href={`/${lang}/shops`} className="flex items-center justify-between">
                 <span>{isBn ? 'কাছের দোকান খুঁজুন' : 'Browse Local Shops'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
             </Button>
           </CardContent>
@@ -227,7 +227,7 @@ export default function OffersPage({ params }: { params: Promise<{ lang: string 
                     className="h-7 text-xs px-2.5 hover:bg-primary/10 text-primary"
                     onClick={() => copyCouponCode(coupon.code)}
                   >
-                    <Scissors className="w-3 h-3 mr-1" />
+                    <Scissors className="w-3 h-3 me-1" />
                     {isBn ? 'কপি' : 'Copy'}
                   </Button>
                 </div>
@@ -259,7 +259,8 @@ export default function OffersPage({ params }: { params: Promise<{ lang: string 
           </div>
           <Button asChild variant="ghost" size="sm">
             <Link href={`/${lang}/products`} className="text-xs font-semibold">
-              {isBn ? 'সব দেখুন' : 'View All'} <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              {isBn ? 'সব দেখুন' : 'View All'}{' '}
+              <ArrowRight className="w-3.5 h-3.5 ms-1 rtl:rotate-180" />
             </Link>
           </Button>
         </div>
