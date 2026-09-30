@@ -143,7 +143,7 @@ export function HomeClient({
           </h2>
         </div>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:grid md:grid-cols-4 lg:grid-cols-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 md:mx-0 md:px-0 gap-4 md:grid md:grid-cols-4 lg:grid-cols-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] overscroll-x-contain">
           {isLoadingFeatured
             ? Array.from({ length: 5 }).map((_, i) => (
                 <div
@@ -174,7 +174,7 @@ export function HomeClient({
           </h2>
         </div>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:grid md:grid-cols-4 lg:grid-cols-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 md:mx-0 md:px-0 gap-4 md:grid md:grid-cols-4 lg:grid-cols-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] overscroll-x-contain">
           {isLoadingCategories
             ? Array.from({ length: 6 }).map((_, i) => (
                 <div

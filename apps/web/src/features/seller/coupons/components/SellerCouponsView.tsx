@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import {
   Calendar,
   Edit,

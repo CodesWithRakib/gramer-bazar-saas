@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +35,7 @@ import {
   useAddProductToWishlistMutation,
   useRemoveProductFromWishlistMutation,
 } from '@/features/wishlists/wishlistsApi';
+import { formatCurrency } from '@/lib/format';
 
 interface ProductCardProps {
   product: SellerProduct;
@@ -416,7 +417,7 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
 
   return (
     <Card
-      className={`h-full flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-card ${categoryTheme.accentBorder} hover:shadow-lg transition-all duration-300 group relative`}
+      className={`h-full flex flex-col justify-between overflow-hidden rounded-xl sm:rounded-2xl border border-border/80 bg-card ${categoryTheme.accentBorder} hover:shadow-md transition-all duration-200 group relative w-full min-w-0 max-w-full`}
     >
       {/* Product Image Container */}
       <Link
@@ -427,33 +428,23 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
           src={image}
           alt={displayName}
           fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
         {/* Top Badges */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
+        <div className="absolute top-2 start-2 flex flex-col gap-1 z-10">
           {discountPercent !== null && discountPercent > 0 && !isOutOfStock && (
-            <div className="bg-destructive text-destructive-foreground text-[10px] md:text-[11px] font-extrabold px-2 py-0.5 rounded-md shadow-xs">
+            <div className="bg-destructive text-destructive-foreground text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-md shadow-xs tracking-tight">
               -{discountPercent}%
             </div>
-          )}
-
-          {categoryBadgeLabel && !isOutOfStock && (
-            <Badge
-              variant="secondary"
-              className={`${categoryTheme.badgeClass} border-none text-[9px] px-1.5 py-0 font-medium flex items-center gap-0.5 shadow-xs`}
-            >
-              {renderCategoryIcon()}
-              <span>{categoryBadgeLabel}</span>
-            </Badge>
           )}
         </div>
 
         {/* Out of Stock Overlay */}
         {isOutOfStock && (
-          <div className="absolute inset-0 bg-background/65 backdrop-blur-[2px] flex items-center justify-center z-10">
-            <span className="bg-zinc-900/90 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] flex items-center justify-center z-10">
+            <span className="bg-zinc-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
               {isBn ? 'স্টক শেষ' : 'Out of Stock'}
             </span>
           </div>
@@ -465,123 +456,123 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
           size="icon"
           onClick={toggleWishlist}
           disabled={isAddingWishlist || isRemovingWishlist}
-          className="absolute top-2.5 right-2.5 h-8 w-8 bg-background/90 hover:bg-background shadow-xs z-10 rounded-full transition-all opacity-85 group-hover:opacity-100"
+          className="absolute top-1.5 end-1.5 h-6.5 w-6.5 sm:h-7 sm:w-7 bg-background/90 hover:bg-background shadow-xs z-10 rounded-full transition-all opacity-85 group-hover:opacity-100"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Heart
-            className={`h-4 w-4 ${isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground/70'}`}
+            className={`h-3.5 w-3.5 ${isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground/70'}`}
           />
         </Button>
 
         {/* Unit Tag on Image */}
         {formattedUnit && (
-          <div className="absolute bottom-2 left-2 bg-background/90 backdrop-blur-xs text-[10px] font-semibold text-foreground px-2 py-0.5 rounded shadow-xs z-10">
+          <div className="absolute bottom-1.5 start-1.5 bg-black/60 backdrop-blur-xs text-[9px] sm:text-[10px] font-semibold text-white px-1.5 py-0.5 rounded shadow-xs z-10">
             {formattedUnit}
           </div>
         )}
       </Link>
 
       {/* Product Details Content */}
-      <CardContent className="p-3.5 flex-grow flex flex-col justify-between">
-        <div>
-          {/* Brand or Category Tag */}
-          <div className="flex items-center justify-between gap-1 mb-1">
+      <CardContent className="p-2 sm:p-2.5 flex-1 flex flex-col justify-between min-w-0">
+        <div className="min-w-0 flex flex-col">
+          {/* Row 1: Brand / Category on Left, Star Rating OR New Badge on Right */}
+          <div className="h-4 min-h-[1rem] flex items-center justify-between gap-1 mb-1">
             {brandName ? (
-              <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground truncate">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-muted-foreground truncate">
                 {brandName}
               </span>
-            ) : productData?.category ? (
-              <span className="text-[10px] text-muted-foreground truncate flex items-center gap-0.5">
-                <Tag className="w-2.5 h-2.5" />
-                {isBn
-                  ? productData.category.nameBn || productData.category.nameEn
-                  : productData.category.nameEn}
+            ) : categoryBadgeLabel ? (
+              <span className="text-[9px] sm:text-[10px] text-muted-foreground truncate flex items-center gap-0.5 font-medium">
+                {renderCategoryIcon()}
+                <span className="truncate">{categoryBadgeLabel}</span>
               </span>
             ) : (
-              <span />
+              <span className="text-[9px] sm:text-[10px] text-muted-foreground/70">
+                {isBn ? 'খাঁটি পণ্য' : 'Local Item'}
+              </span>
             )}
 
-            {/* Rating */}
-            {avgRating > 0 && (
-              <div className="flex items-center text-amber-500 text-[10px] font-semibold gap-0.5 shrink-0">
-                <Star className="h-3 w-3 fill-current" />
+            {/* Rating OR New Pill */}
+            {avgRating > 0 ? (
+              <div className="flex items-center text-amber-500 text-[9px] sm:text-[10px] font-semibold gap-0.5 shrink-0">
+                <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-current" />
                 <span>{avgRating.toFixed(1)}</span>
                 {totalReviews > 0 && (
-                  <span className="text-muted-foreground">({totalReviews})</span>
+                  <span className="text-muted-foreground text-[8px] sm:text-[9px]">({totalReviews})</span>
                 )}
               </div>
+            ) : (
+              <span className="text-[9px] sm:text-[10px] font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-1.5 py-0.2 rounded-full shrink-0">
+                {isBn ? 'নতুন' : 'New'}
+              </span>
             )}
           </div>
 
-          {/* Product Title */}
+          {/* Row 2: Product Title (Compact h-7 sm:h-8 min-h-[1.75rem] sm:min-h-[2rem]) */}
           <Link
             href={`/${lang}/products/${slug}`}
-            className="line-clamp-2 text-sm font-semibold text-foreground hover:text-primary transition-colors leading-snug mb-1.5"
+            className="h-7 sm:h-8 min-h-[1.75rem] sm:min-h-[2rem] line-clamp-2 text-[11px] sm:text-xs font-semibold text-foreground hover:text-primary transition-colors leading-snug break-words flex items-start"
             title={displayName}
           >
             {displayName}
           </Link>
-
-          {/* Electronics / Specs snippet */}
-          {categoryTheme.type === 'electronics' && productData?.shortDescriptionEn && (
-            <p className="text-[11px] text-muted-foreground line-clamp-1 mb-2">
-              {isBn && productData.shortDescriptionBn
-                ? productData.shortDescriptionBn
-                : productData.shortDescriptionEn}
-            </p>
-          )}
-
-          {categoryTheme.type !== 'electronics' && avgRating === 0 && (
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="text-[10px] font-medium text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">
-                {isBn ? 'নতুন পণ্য' : 'New'}
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Price & Shop Section */}
-        <div className="pt-2 border-t border-border/40 mt-1">
-          <div className="flex items-baseline flex-wrap gap-1.5">
-            <span className="text-base md:text-lg font-bold text-primary">৳{currentPrice}</span>
+        {/* Row 3: Price & Shop Section */}
+        <div className="pt-1.5 border-t border-border/40 mt-1.5 min-w-0">
+          <div className="h-5 sm:h-5.5 flex items-baseline flex-wrap gap-1 min-w-0">
+            <span className="text-xs sm:text-sm font-bold text-primary tabular-nums tracking-tight">
+              {formatCurrency(currentPrice, lang)}
+            </span>
             {originalPrice && originalPrice > currentPrice && (
-              <span className="text-xs text-muted-foreground line-through">৳{originalPrice}</span>
+              <span className="text-[10px] sm:text-[11px] text-muted-foreground line-through tabular-nums">
+                {formatCurrency(originalPrice, lang)}
+              </span>
             )}
             {formattedUnit && (
-              <span className="text-xs text-muted-foreground">/ {formattedUnit}</span>
+              <span className="text-[10px] text-muted-foreground">/ {formattedUnit}</span>
             )}
           </div>
 
           {/* Shop */}
-          {shopName && (
-            <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1 truncate">
-              <Store className="h-3 w-3 shrink-0 text-muted-foreground/70" />
-              <span className="truncate">{shopName}</span>
-            </div>
-          )}
+          <div className="h-3.5 min-h-[0.875rem] flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5 truncate">
+            {shopName ? (
+              <>
+                <Store className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0 text-muted-foreground/70" />
+                <span className="truncate">{shopName}</span>
+              </>
+            ) : (
+              <span className="text-[9px] text-muted-foreground/60">
+                {isBn ? 'ভেরিফাইড বিক্রেতা' : 'Verified Seller'}
+              </span>
+            )}
+          </div>
         </div>
       </CardContent>
 
       {/* Footer Add to Cart Button */}
-      <CardFooter className="p-3.5 pt-0">
+      <CardFooter className="p-2 sm:p-2.5 pt-0 w-full min-w-0">
         <Button
-          className="w-full h-9 text-xs font-semibold rounded-xl shadow-xs"
+          size="sm"
+          className="w-full h-7 sm:h-8 text-[10px] sm:text-[11px] font-semibold px-2 rounded-lg sm:rounded-xl shadow-2xs hover:shadow-xs transition-all duration-200 min-w-0 overflow-hidden"
           disabled={isOutOfStock}
           variant={isStaffOrSeller ? 'secondary' : 'default'}
           onClick={handleAddToCart}
         >
-          <ShoppingCart className="w-3.5 h-3.5 me-1.5" />
-          {isOutOfStock
-            ? isBn
-              ? 'স্টক শেষ'
-              : 'Out of Stock'
-            : isStaffOrSeller
+          <ShoppingCart className="w-3 h-3 sm:w-3.5 sm:h-3.5 me-1 sm:me-1.5 shrink-0" />
+          <span className="truncate min-w-0">
+            {isOutOfStock
               ? isBn
-                ? 'কাস্টমার ফিচার'
-                : 'Customer Feature'
-              : isBn
-                ? 'কার্টে যোগ করুন'
-                : 'Add to Cart'}
+                ? 'স্টক শেষ'
+                : 'Out of Stock'
+              : isStaffOrSeller
+                ? isBn
+                  ? 'কাস্টমার ফিচার'
+                  : 'Customer Feature'
+                : isBn
+                  ? 'কার্টে যোগ'
+                  : 'Add to Cart'}
+          </span>
         </Button>
       </CardFooter>
     </Card>

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import {
   AlertTriangle,
   ArrowLeft,

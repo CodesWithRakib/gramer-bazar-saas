@@ -49,13 +49,13 @@ export function ClientLayoutWrapper({
   ].some((prefix) => pathname === `/${lang}${prefix}` || pathname.startsWith(`/${lang}${prefix}/`));
 
   if (isDashboardRoute || isAuthRoute) {
-    return <main className="flex-grow flex flex-col">{children}</main>;
+    return <main className="flex-grow flex flex-col w-full min-w-0 max-w-full overflow-x-clip">{children}</main>;
   }
 
   return (
     <>
       <Header lang={lang} />
-      <main className="flex-grow flex flex-col pb-16 md:pb-0">{children}</main>
+      <main className="flex-grow flex flex-col pb-16 md:pb-0 w-full min-w-0 max-w-full overflow-x-clip">{children}</main>
       <Footer lang={lang} />
       <MobileBottomNav lang={lang} />
       <FloatingChatWidget lang={lang} />

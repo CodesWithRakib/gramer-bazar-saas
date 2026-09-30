@@ -54,13 +54,13 @@ export function CategoryMegaMenu({ lang }: CategoryMegaMenuProps) {
 
       {/* Mega Menu Dropdown */}
       {isOpen && (
-        <div className="absolute left-0 top-full mt-2 w-[720px] bg-card border border-border rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150">
+        <div className="absolute start-0 top-full mt-2 w-[720px] bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150">
           {isLoading ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
               {isBn ? 'ক্যাটাগরি লোড হচ্ছে...' : 'Loading categories...'}
             </div>
           ) : (
-            <div className="flex divide-x divide-border/60 min-h-[380px]">
+            <div className="flex divide-x rtl:divide-x-reverse divide-border/60 min-h-[380px]">
               {/* Left Column: Categories List */}
               <div className="w-[280px] p-2 bg-muted/20 space-y-1">
                 <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">

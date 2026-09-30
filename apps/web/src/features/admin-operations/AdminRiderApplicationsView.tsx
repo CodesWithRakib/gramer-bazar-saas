@@ -29,7 +29,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { CheckCircle2, XCircle, Eye, Truck, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 export interface AdminRiderApplicationsViewProps {
   lang?: string;

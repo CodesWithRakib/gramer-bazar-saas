@@ -39,7 +39,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MoreHorizontal } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 export interface AdminOrdersViewProps {
   lang?: string;

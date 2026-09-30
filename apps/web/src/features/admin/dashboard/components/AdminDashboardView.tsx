@@ -16,6 +16,7 @@ import { DashboardSkeleton } from '@/components/ui/Skeletons';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Badge } from '@/components/ui/badge';
+import { formatCurrency } from '@/lib/format';
 import {
   AreaChart,
   Area,
@@ -94,8 +95,8 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold tracking-tight text-foreground">
-                ৳{metrics.totalSales.toLocaleString()}
+              <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
+                {formatCurrency(metrics.totalSales, lang)}
               </div>
               <p className="text-xs text-muted-foreground flex items-center mt-1.5 font-medium">
                 <TrendingUp className="h-3.5 w-3.5 me-1 text-emerald-600 dark:text-emerald-400" />
@@ -319,8 +320,8 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                     </div>
                   </div>
                   <div className="text-end shrink-0">
-                    <p className="text-sm font-bold text-foreground">
-                      ৳{Number(prod.revenue).toLocaleString()}
+                    <p className="text-sm font-bold text-foreground tabular-nums">
+                      {formatCurrency(prod.revenue, lang)}
                     </p>
                     <span className="text-[10px] text-muted-foreground">GMV</span>
                   </div>
@@ -351,7 +352,7 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                   key={order.id}
                   className="flex items-center justify-between p-2 rounded-xl hover:bg-muted/40 transition-colors"
                 >
-                  <div className="flex items-center space-x-3 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 ring-1 ring-primary/20">
                       {order.customerName ? order.customerName.charAt(0) : 'C'}
                     </div>
@@ -365,8 +366,8 @@ export function AdminDashboardView({ lang = 'en' }: AdminDashboardViewProps) {
                     </div>
                   </div>
                   <div className="text-end shrink-0">
-                    <p className="text-sm font-bold text-foreground">
-                      ৳{Number(order.totalAmount).toLocaleString()}
+                    <p className="text-sm font-bold text-foreground tabular-nums">
+                      {formatCurrency(order.totalAmount, lang)}
                     </p>
                     <Badge
                       variant="outline"

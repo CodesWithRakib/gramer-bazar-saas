@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { MessageSquare } from 'lucide-react';
 import { useCreateConversationMutation } from '@/features/chat/chatApi';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { useAppDispatch } from '@/store/hooks';
 import { openChatWidget } from '@/store/slices/chatSlice';
 

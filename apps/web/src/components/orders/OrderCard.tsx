@@ -49,51 +49,82 @@ export function OrderCard({ order, lang }: OrderCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col items-start justify-between gap-4 p-4 md:flex-row md:items-center md:px-6 md:py-5">
-        <div className="hide-scrollbar flex w-full items-center gap-3 overflow-x-auto">
-          {displayItems.map((item, idx) => {
-            const variant = item.sellerProduct?.productVariant;
-            const name = variant
-              ? isBn
-                ? variant.nameBn || variant.product.nameBn
-                : variant.nameEn || variant.product.nameEn
-              : isBn
-                ? 'অজানা পণ্য'
-                : 'Unknown product';
-            const image = variant?.images?.[0] || '/placeholder.jpg';
+      <CardContent className="p-4 md:px-6 md:py-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Thumbnails or item fallback */}
+          <div className="flex-1 min-w-0">
+            {displayItems.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-2.5">
+                {displayItems.map((item, idx) => {
+                  const variant = item.sellerProduct?.productVariant;
+                  const name = variant
+                    ? isBn
+                      ? variant.nameBn || variant.product.nameBn
+                      : variant.nameEn || variant.product.nameEn
+                    : isBn
+                      ? 'অর্ডারকৃত পণ্য'
+                      : 'Ordered product';
+                  const image = variant?.images?.[0] || '/placeholder.jpg';
 
-            return (
-              <div
-                key={item.id || idx}
-                className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted/20 md:h-20 md:w-20"
-                title={name}
-              >
-                <CustomImage src={image} alt={name} fill sizes="80px" className="object-cover" />
-                <div className="absolute bottom-0 end-0 rounded-ss-md bg-background/85 px-1 text-[10px] font-bold backdrop-blur-sm">
-                  x{item.quantity}
+                  return (
+                    <div
+                      key={item.id || idx}
+                      className="group/thumb relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-border/70 bg-muted/20 transition-all hover:scale-105 sm:h-18 sm:w-18"
+                      title={name}
+                    >
+                      <CustomImage
+                        src={image}
+                        alt={name}
+                        fill
+                        sizes="72px"
+                        className="object-cover"
+                      />
+                      <div className="absolute bottom-0 end-0 rounded-ss-md bg-background/90 px-1.5 py-0.5 text-[10px] font-bold text-foreground backdrop-blur-xs shadow-xs">
+                        x{item.quantity}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {remainingCount > 0 && (
+                  <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 text-muted-foreground sm:h-18 sm:w-18">
+                    <Package className="mb-0.5 h-4 w-4 opacity-60" />
+                    <span className="text-xs font-bold">+{remainingCount}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5 text-xs text-muted-foreground py-1">
+                <div className="p-2 rounded-lg bg-muted/50">
+                  <Package className="h-4 w-4 text-muted-foreground/70" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground/80">
+                    {isBn ? 'পণ্য বিবরণ প্রস্তুত হচ্ছে' : 'Order details available'}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {isBn ? 'বিস্তারিত দেখতে ডানপাশের বাটনে ক্লিক করুন' : 'Click view details to see the full breakdown'}
+                  </p>
                 </div>
               </div>
-            );
-          })}
+            )}
+          </div>
 
-          {remainingCount > 0 && (
-            <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-lg border bg-muted/30 text-muted-foreground md:h-20 md:w-20">
-              <Package className="mb-1 h-5 w-5 opacity-50" />
-              <span className="text-xs font-semibold">+{remainingCount}</span>
-            </div>
-          )}
+          {/* Action button */}
+          <div className="shrink-0 pt-2 sm:pt-0">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full sm:w-auto h-9 gap-1.5 text-xs font-semibold hover:border-primary hover:text-primary hover:bg-primary/5 transition-all"
+              asChild
+            >
+              <Link href={`/${lang}/customer/orders/${order.id}`}>
+                <span>{isBn ? 'বিস্তারিত দেখুন' : 'View details'}</span>
+                <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
+              </Link>
+            </Button>
+          </div>
         </div>
-
-        <Button
-          variant="ghost"
-          className="mt-2 w-full transition-colors group-hover:bg-primary/10 group-hover:text-primary md:mt-0 md:w-auto"
-          asChild
-        >
-          <Link href={`/${lang}/customer/orders/${order.id}`}>
-            {isBn ? 'বিস্তারিত দেখুন' : 'View details'}
-            <ChevronRight className="ms-1 h-4 w-4 rtl:rotate-180" />
-          </Link>
-        </Button>
       </CardContent>
     </Card>
   );

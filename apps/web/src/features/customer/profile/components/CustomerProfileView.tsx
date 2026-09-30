@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { Camera, Loader2, User, ShieldCheck } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CustomImage } from '@/components/ui/CustomImage';

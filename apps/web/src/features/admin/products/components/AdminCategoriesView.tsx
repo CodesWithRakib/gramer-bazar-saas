@@ -12,7 +12,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { getApiErrorMessage } from '@/lib/apiError';
 import { AddCategoryDialog, EditCategoryDialog } from './CategoryDialogs';
 import { PageHeader } from '@/components/common/PageHeader';

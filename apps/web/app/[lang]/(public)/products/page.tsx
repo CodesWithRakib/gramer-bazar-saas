@@ -13,6 +13,8 @@ import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { Button } from '@/components/ui/button';
 import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
 import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
+import { MarketplacePagination } from '@/components/catalog/MarketplacePagination';
+import { formatNumber } from '@/lib/format';
 import { ChevronLeft, ChevronRight, Home, SlidersHorizontal, X, Package } from 'lucide-react';
 
 function ProductsPageContent({ lang }: { lang: string }) {
@@ -35,6 +37,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
     ? Number(searchParams.get('minRating'))
     : undefined;
   const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = parseInt(searchParams.get('limit') || '24', 10);
 
   const { data: categories } = useGetPublicCategoriesQuery();
   const { data: brands } = useGetPublicBrandsQuery();
@@ -57,7 +60,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
     inStock,
     minRating,
     page,
-    limit: 20,
+    limit,
   });
 
   const updateUrl = (key: string, value: string | number | null) => {
@@ -79,6 +82,24 @@ function ProductsPageContent({ lang }: { lang: string }) {
 
   const isEmpty = searchResults?.data?.length === 0;
   const meta = searchResults?.meta;
+
+  // Real active values from API meta or fallback to searchParams
+  const activePage = meta?.page !== undefined ? Number(meta.page) : page;
+  const activeLimit = meta?.limit !== undefined ? Number(meta.limit) : limit;
+  const activeTotal = meta?.total !== undefined ? Number(meta.total) : 0;
+  const activeTotalPages = meta?.totalPages !== undefined ? Number(meta.totalPages) : Math.ceil(activeTotal / activeLimit) || 1;
+
+  // Build clean page URL for native Next.js link navigation
+  const createPageUrl = (targetPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (targetPage > 1) {
+      params.set('page', targetPage.toString());
+    } else {
+      params.delete('page');
+    }
+    const qs = params.toString();
+    return qs ? `${pathname}?${qs}` : pathname;
+  };
 
   // Selected category & brand labels for badge display
   const selectedCategory = categories?.find((c) => c.id === categoryId || c.slug === categorySlug);
@@ -116,54 +137,81 @@ function ProductsPageContent({ lang }: { lang: string }) {
       </nav>
 
       {/* Main Title & Description */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border/40 pb-5">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card/70 border border-border/80 rounded-2xl p-4 sm:p-6 shadow-2xs">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+              <Package className="w-3.5 h-3.5" />
+              {isBn ? 'গ্রামীণ হাট ও বাজার' : 'Local Produce Market'}
+            </span>
+          </div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-foreground">
             {isBn ? 'পণ্য ব্রাউজ ও ফিল্টার করুন' : 'Explore Marketplace Products'}
           </h1>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">
+          <p className="text-xs md:text-sm text-muted-foreground leading-relaxed max-w-2xl">
             {isBn
-              ? 'সরাসরি স্থানীয় বিশ্বস্ত বিক্রেতা ও খামারিদের পণ্য মূল্য, ক্যাটাগরি এবং রেটিং অনুযায়ী খুঁজে নিন।'
+              ? 'সরাসরি স্থানীয় বিশ্বস্ত বিক্রেতা ও খামারিদের খাঁটি পণ্য মূল্য, ক্যাটাগরি এবং রেটিং অনুযায়ী সহজে খুঁজে নিন।'
               : 'Browse farm-fresh groceries, vegetables, and everyday products from trusted local shops.'}
           </p>
         </div>
 
-        {/* Total Count Badge */}
+        {/* Total Count Pill */}
         {meta && (
-          <div className="text-xs md:text-sm text-muted-foreground font-medium shrink-0">
-            {isLoading ? (
-              <span>{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</span>
-            ) : (
+          <div className="shrink-0">
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-muted/70 border border-border/80 text-xs sm:text-sm font-bold text-foreground shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>
-                {isBn
-                  ? `মোট ${meta.total} টি পণ্য পাওয়া গেছে`
-                  : `${meta.total} products available`}
+                {isLoading
+                  ? isBn
+                    ? 'লোড হচ্ছে...'
+                    : 'Loading...'
+                  : isBn
+                    ? `মোট ${formatNumber(meta.total, lang)} টি পণ্য পাওয়া গেছে`
+                    : `${meta.total} products available`}
               </span>
-            )}
+            </div>
           </div>
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Desktop Filter Sidebar */}
-        <aside className="hidden md:block w-64 lg:w-72 shrink-0">
+      <div className="flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
+        {/* Desktop Filter Sidebar - Sticky with independent scroll for tall content */}
+        <div className="hidden md:block w-64 lg:w-72 shrink-0 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
           <ProductFilterSidebar lang={lang} />
-        </aside>
+        </div>
 
         {/* Products Listing Area */}
         <main className="flex-1 min-w-0">
-          {/* Controls Bar: Mobile filter button + Sort dropdown */}
-          <div className="flex items-center justify-between gap-3 mb-6 bg-card border border-border/60 rounded-xl p-3 shadow-xs">
-            <div className="flex items-center gap-2">
+          {/* Controls Bar: Mobile filter button + Showing info + Sort dropdown */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-card border border-border/80 rounded-2xl p-3 sm:p-3.5 shadow-2xs">
+            <div className="flex items-center gap-2.5">
               <div className="md:hidden">
                 <ProductFilterSidebar lang={lang} isMobile />
               </div>
-              <span className="hidden sm:inline-block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {isBn ? 'সর্ট করুন' : 'Sort By'}
-              </span>
+              {meta && activeTotal > 0 && (
+                <div className="text-xs text-muted-foreground hidden sm:block font-medium">
+                  {isBn ? (
+                    <>
+                      মোট <strong className="text-foreground">{formatNumber(activeTotal, lang)}</strong> টি পণ্যের মধ্যে{' '}
+                      <strong className="text-foreground">
+                        {formatNumber(Math.min((activePage - 1) * activeLimit + 1, activeTotal), lang)}–{formatNumber(Math.min(activePage * activeLimit, activeTotal), lang)}
+                      </strong>{' '}
+                      দেখানো হচ্ছে
+                    </>
+                  ) : (
+                    <>
+                      Showing <strong className="text-foreground">{Math.min((activePage - 1) * activeLimit + 1, activeTotal)}–{Math.min(activePage * activeLimit, activeTotal)}</strong> of{' '}
+                      <strong className="text-foreground">{activeTotal}</strong> products
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ms-auto">
+              <span className="hidden sm:inline-block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {isBn ? 'সর্ট করুন:' : 'Sort By:'}
+              </span>
               <ProductSortSelect lang={lang} />
             </div>
           </div>
@@ -322,32 +370,20 @@ function ProductsPageContent({ lang }: { lang: string }) {
             <>
               <ProductGrid products={searchResults?.data} isLoading={isLoading} lang={lang} />
 
-              {/* URL-driven Pagination */}
-              {meta && meta.totalPages > 1 && (
-                <div className="mt-10 flex justify-center items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => updateUrl('page', page - 1)}
-                    className="font-medium"
-                  >
-                    <ChevronLeft className="me-1 h-4 w-4 rtl:rotate-180" />
-                    {isBn ? 'আগের পৃষ্ঠা' : 'Prev'}
-                  </Button>
-                  <span className="text-xs md:text-sm font-semibold text-muted-foreground px-2">
-                    {page} / {meta.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= meta.totalPages}
-                    onClick={() => updateUrl('page', page + 1)}
-                    className="font-medium"
-                  >
-                    {isBn ? 'পরের পৃষ্ঠা' : 'Next'}
-                    <ChevronRight className="ms-1 h-4 w-4 rtl:rotate-180" />
-                  </Button>
+              {/* Enhanced Marketplace Pagination */}
+              {meta && (
+                <div className="mt-8 pt-2">
+                  <MarketplacePagination
+                    currentPage={activePage}
+                    totalPages={activeTotalPages}
+                    totalItems={activeTotal}
+                    itemsPerPage={activeLimit}
+                    lang={lang}
+                    buildHref={createPageUrl}
+                    onPageChange={(newPage) => updateUrl('page', newPage > 1 ? newPage : null)}
+                    onLimitChange={(newLimit) => updateUrl('limit', newLimit)}
+                    limitOptions={[24, 48, 72]}
+                  />
                 </div>
               )}
             </>

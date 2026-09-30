@@ -78,10 +78,26 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
+  const getPasswordStrength = (pass: string) => {
+    if (!pass) return { score: 0, label: '', color: 'bg-muted' };
+    let score = 0;
+    if (pass.length >= 6) score += 1;
+    if (pass.length >= 8) score += 1;
+    if (/[0-9]/.test(pass)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+
+    if (score <= 1) return { score: 1, label: isBn ? 'দুর্বল' : 'Weak', color: 'bg-destructive' };
+    if (score === 2) return { score: 2, label: isBn ? 'মোটামুটি' : 'Fair', color: 'bg-amber-500' };
+    if (score === 3) return { score: 3, label: isBn ? 'ভালো' : 'Good', color: 'bg-blue-500' };
+    return { score: 4, label: isBn ? 'খুব শক্তিশালী' : 'Strong', color: 'bg-emerald-500' };
+  };
+
+  const passwordStrength = getPasswordStrength(formData.password);
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Top Bar with Language Switcher */}
-      <header className="h-16 px-4 sm:px-8 flex items-center justify-between border-b border-border/40 shrink-0">
+      <header className="h-16 px-4 sm:px-8 flex items-center justify-between border-b border-border/40 shrink-0 bg-background/80 backdrop-blur-md">
         <Link
           href={`/${lang}`}
           className="flex items-center gap-2 group hover:opacity-90 transition-opacity"
@@ -95,70 +111,91 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
 
       {/* Main Content: Split-Screen on Desktop */}
       <main className="flex-1 flex min-h-0">
-        {/* Left Visual Area (Desktop Only) */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-muted/30 border-r border-border/60">
-          <div className="space-y-4 max-w-lg">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-primary/10 text-primary text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              {isBn ? 'নতুন গ্রাহক নিবন্ধন' : 'Join Gramer Bazar'}
+        {/* Left Visual Showcase - Dedicated Membership & Harvest Theme */}
+        <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-10 xl:p-14 overflow-hidden text-white border-e border-border/40">
+          {/* Background Image: Pure Honey, Ghee & Rural Harvest */}
+          <Image
+            src="/banners/banner-honey-ghee.jpg"
+            alt={isBn ? 'খাঁটি গ্রাম্য পণ্য' : 'Authentic Rural Products'}
+            fill
+            className="object-cover"
+            priority
+            sizes="50vw"
+          />
+          {/* Warm Dark Gradient Scrim */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/75 to-black/40 z-0" />
+
+          {/* Top Pill - Welcome Offer */}
+          <div className="relative z-10 flex items-center gap-2.5">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 text-xs font-bold text-emerald-300 shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              </span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{isBn ? 'নতুন সদস্য অফার • স্বাগতম বোনাস' : 'New Member Perks • Welcome Bonus'}</span>
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-foreground leading-tight">
+          </div>
+
+          {/* Center Editorial Narrative with Welcome Voucher */}
+          <div className="relative z-10 space-y-5 max-w-lg my-auto py-6">
+            <h2 className="text-3xl xl:text-4xl 2xl:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-md">
               {isBn
-                ? 'তাজা ও খাঁটি গ্রাম্য পণ্যের সাথে যুক্ত হোন'
-                : 'Discover authentic, fresh products direct from local farms'}
+                ? 'খাঁটি ও প্রাকৃতিক গ্রামীণ পণ্যের সাথে যুক্ত হোন'
+                : 'Experience 100% Pure Village Produce Directly'}
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm xl:text-base text-white/85 leading-relaxed font-medium">
               {isBn
-                ? 'একটি অ্যাকাউন্ট খুলে সহজেই আপনার পছন্দের পণ্য অর্ডার করুন, অর্ডার ট্র্যাক করুন এবং সেরা অফার উপভোগ করুন।'
-                : 'Create an account to track orders in real-time, save your favourite local sellers, and enjoy seamless doorstep delivery.'}
+                ? 'সুন্দরবনের প্রাকৃতিক মধু, খাঁটি গাওয়া ঘি, ঘানিভাঙা সরিষার তেল ও টাটকা শাকসবজি সরাসরি খামারিদের কাছ থেকে ঘরে বসেই সংগ্রহ করুন।'
+                : 'Direct access to raw organic honey, cold-pressed mustard oil, and pure farm harvests delivered right to your doorstep.'}
             </p>
-          </div>
 
-          <div className="my-8 relative rounded-xl overflow-hidden border border-border/60 shadow-xs aspect-[16/10] max-w-lg">
-            <Image
-              src="/banners/banner-village-market.jpg"
-              alt={isBn ? 'গ্রামের বাজার' : 'Gramer Bazar Marketplace'}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border/60 max-w-lg text-xs text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-foreground">
-                  {isBn ? 'সহজ অর্ডার' : 'Easy Ordering'}
+            {/* Special Welcome Voucher Card */}
+            <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-between gap-3 shadow-lg">
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-semibold text-emerald-300 uppercase tracking-wider">
+                  {isBn ? 'প্রথম অর্ডারে বিশেষ ছাড়' : 'First Order Special'}
+                </span>
+                <p className="text-sm font-bold text-white">
+                  {isBn ? 'নিশ্চিত ৫০ টাকা ছাড় পেতে ব্যবহার করুন' : 'Get ৳50 Instant Discount with code'}
                 </p>
-                <p className="text-[11px] mt-0.5">{isBn ? 'দ্রুত কেনাকাটা' : 'Fast checkout'}</p>
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs tracking-wider border border-emerald-300 shrink-0">
+                WELCOME50
               </div>
             </div>
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-foreground">
-                  {isBn ? 'লাইভ ট্র্যাকিং' : 'Live Tracking'}
-                </p>
-                <p className="text-[11px] mt-0.5">{isBn ? 'অর্ডার আপডেট' : 'Real-time updates'}</p>
+          </div>
+
+          {/* Bottom Trust & Satisfaction Metric */}
+          <div className="relative z-10 space-y-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
+                <p className="text-base sm:text-lg font-black text-emerald-300">১০০% খাঁটি</p>
+                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'রাসায়নিকমুক্ত' : 'Chemical-Free'}</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
+                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'ন্যায্য মূল্য' : 'Fair Price'}</p>
+                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'মধ্যস্বত্বভোগীহীন' : 'Zero Middlemen'}</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
+                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'সহজ রিটার্ন' : 'Easy Return'}</p>
+                <p className="text-[11px] text-white/80 font-medium">{isBn ? '১০০% সন্তুষ্টি' : '100% Satisfaction'}</p>
               </div>
             </div>
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-foreground">
-                  {isBn ? 'গ্রাহক সহায়তা' : 'Help & Support'}
-                </p>
-                <p className="text-[11px] mt-0.5">{isBn ? 'সার্বক্ষণিক সেবা' : 'Dedicated care'}</p>
-              </div>
+
+            {/* Testimonial Banner */}
+            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-between text-xs text-white/90">
+              <span className="font-semibold">
+                {isBn ? 'দিনাজপুর ও উত্তরাঞ্চলের শীর্ষ প্রশংসিত মার্কেটপ্লেস' : 'Top rated rural marketplace in Dinajpur'}
+              </span>
+              <span className="text-amber-300 font-bold tracking-wider">৪.৯ ★★★★★</span>
             </div>
           </div>
         </div>
 
-        {/* Right Form Area */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-12 overflow-y-auto">
-          <div className="w-full max-w-md mx-auto">
+        {/* Right Form Area with Framed Card */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12 bg-muted/25 dark:bg-muted/5 overflow-y-auto">
+          <div className="w-full max-w-md mx-auto bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/5">
             {/* Mobile Brand Link */}
             <div className="lg:hidden mb-6">
               <Link href={`/${lang}`} className="inline-flex items-center gap-2.5">
@@ -183,7 +220,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
             </div>
 
             {errorMsg && (
-              <div className="mb-5 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium flex items-start gap-2">
+              <div className="mb-5 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
@@ -192,7 +229,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="firstName" className="text-xs font-medium">
+                  <Label htmlFor="firstName" className="text-xs font-semibold text-foreground/90">
                     {isBn ? 'নামের প্রথমাংশ' : 'First Name'}
                   </Label>
                   <div className="relative">
@@ -203,13 +240,13 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                       placeholder={isBn ? 'আব্দুর' : 'John'}
                       required
                       disabled={isLoading}
-                      className="h-10 pe-9 text-sm"
+                      className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
                     />
-                    <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <User className="absolute end-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="lastName" className="text-xs font-medium">
+                  <Label htmlFor="lastName" className="text-xs font-semibold text-foreground/90">
                     {isBn ? 'নামের শেষাংশ' : 'Last Name'}
                   </Label>
                   <div className="relative">
@@ -220,15 +257,15 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                       placeholder={isBn ? 'রহিম' : 'Doe'}
                       required
                       disabled={isLoading}
-                      className="h-10 pe-9 text-sm"
+                      className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
                     />
-                    <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <User className="absolute end-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="phone" className="text-xs font-medium">
+                <Label htmlFor="phone" className="text-xs font-semibold text-foreground/90">
                   {isBn ? 'মোবাইল নম্বর' : 'Phone Number'}
                 </Label>
                 <div className="relative">
@@ -240,14 +277,14 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                     placeholder="01XXXXXXXXX"
                     required
                     disabled={isLoading}
-                    className="h-10 pe-9 text-sm"
+                    className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
                   />
-                  <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <Phone className="absolute end-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-medium">
+                <Label htmlFor="email" className="text-xs font-semibold text-foreground/90">
                   {isBn ? 'ইমেইল (ঐচ্ছিক)' : 'Email (Optional)'}
                 </Label>
                 <div className="relative">
@@ -258,16 +295,23 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                     onChange={handleChange}
                     placeholder="user@example.com"
                     disabled={isLoading}
-                    className="h-10 pe-9 text-sm"
+                    className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
                   />
-                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <Mail className="absolute end-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-xs font-medium">
-                  {isBn ? 'পাসওয়ার্ড' : 'Password'}
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-xs font-semibold text-foreground/90">
+                    {isBn ? 'পাসওয়ার্ড' : 'Password'}
+                  </Label>
+                  {formData.password && (
+                    <span className="text-[11px] font-semibold text-muted-foreground">
+                      {isBn ? 'শক্তি:' : 'Strength:'} <span className="text-foreground">{passwordStrength.label}</span>
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <Input
                     id="password"
@@ -278,25 +322,42 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                     required
                     minLength={6}
                     disabled={isLoading}
-                    className="h-10 pe-9 text-sm"
+                    className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute end-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+
+                {/* Password Strength Progress Bar */}
+                {formData.password && (
+                  <div className="grid grid-cols-4 gap-1.5 pt-1">
+                    {[1, 2, 3, 4].map((step) => (
+                      <div
+                        key={step}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          passwordStrength.score >= step
+                            ? passwordStrength.color
+                            : 'bg-muted'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+
                 <p className="text-[11px] text-muted-foreground">
-                  {isBn ? 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন' : 'Must be at least 6 characters'}
+                  {isBn ? 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন (সংখ্যা বা অক্ষরের মিশ্রণ)' : 'Must be at least 6 characters (mix letters & numbers)'}
                 </p>
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-10 text-sm font-medium mt-3"
+                className="w-full h-11 text-sm font-bold shadow-md shadow-primary/20 hover:shadow-primary/30 rounded-xl transition-all mt-2"
                 disabled={isLoading}
               >
                 {isLoading
@@ -319,7 +380,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
             </div>
 
             {/* Partner Program Links */}
-            <div className="mt-5 p-3.5 rounded-lg bg-muted/40 border border-border/50 text-xs">
+            <div className="mt-5 p-3.5 rounded-2xl bg-muted/40 border border-border/50 text-xs">
               <p className="font-semibold text-foreground mb-1">
                 {isBn ? 'ব্যবসায়ী বা রাইডার হতে চান?' : 'Want to Sell or Deliver?'}
               </p>
@@ -331,17 +392,17 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
               <div className="grid grid-cols-2 gap-2">
                 <Link
                   href={`/${lang}/become-a-seller`}
-                  className="flex items-center justify-center gap-1.5 p-2 rounded-md bg-background border border-border hover:bg-muted text-foreground font-medium transition-colors"
+                  className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-background border border-border/80 hover:bg-muted text-foreground font-semibold transition-all shadow-2xs"
                 >
-                  <Store className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? 'সেলার আবেদন' : 'Seller Program'}</span>
+                  <Store className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <span className="truncate">{isBn ? 'সেলার আবেদন' : 'Seller Program'}</span>
                 </Link>
                 <Link
                   href={`/${lang}/become-a-rider`}
-                  className="flex items-center justify-center gap-1.5 p-2 rounded-md bg-background border border-border hover:bg-muted text-foreground font-medium transition-colors"
+                  className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-background border border-border/80 hover:bg-muted text-foreground font-semibold transition-all shadow-2xs"
                 >
-                  <Bike className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{isBn ? 'রাইডার আবেদন' : 'Rider Program'}</span>
+                  <Bike className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <span className="truncate">{isBn ? 'রাইডার আবেদন' : 'Rider Program'}</span>
                 </Link>
               </div>
             </div>

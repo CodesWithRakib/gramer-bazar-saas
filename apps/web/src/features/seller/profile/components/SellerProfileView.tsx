@@ -27,7 +27,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ImageUploader } from '@/components/upload/ImageUploader';
 import { CustomImage } from '@/components/ui/CustomImage';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 const shopSchema = z.object({
   nameEn: z.string().min(2, 'Shop name is required').max(150),

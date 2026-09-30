@@ -47,6 +47,7 @@ export class FlashSalesService {
       .leftJoinAndSelect('items.sellerProduct', 'sp')
       .leftJoinAndSelect('sp.productVariant', 'pv')
       .leftJoinAndSelect('pv.product', 'p')
+      .leftJoinAndSelect('p.images', 'images')
       .leftJoinAndSelect('sp.shop', 'shop')
       .leftJoinAndSelect('sp.inventory', 'inventory')
       .where('fs.isActive = :isActive', { isActive: true })
@@ -76,34 +77,42 @@ export class FlashSalesService {
   }
 
   async findOne(id: string) {
-    const flashSale = await this.flashSaleRepository.findOne({
-      where: { id },
-      relations: ['items', 'items.sellerProduct', 'items.sellerProduct.product'],
-    });
+    const flashSale = await this.flashSaleRepository
+      .createQueryBuilder('fs')
+      .leftJoinAndSelect('fs.items', 'items')
+      .leftJoinAndSelect('items.sellerProduct', 'sp')
+      .leftJoinAndSelect('sp.productVariant', 'pv')
+      .leftJoinAndSelect('pv.product', 'p')
+      .leftJoinAndSelect('p.images', 'images')
+      .leftJoinAndSelect('sp.shop', 'shop')
+      .leftJoinAndSelect('sp.inventory', 'inventory')
+      .where('fs.id = :id', { id })
+      .getOne();
 
     if (!flashSale) throw new NotFoundException('Flash sale not found');
     return flashSale;
   }
 
   async update(id: string, updateDto: UpdateFlashSaleDto) {
-    const flashSale = await this.findOne(id);
+    await this.findOne(id);
 
-    if (updateDto.name !== undefined) flashSale.name = updateDto.name;
-    if (updateDto.startDate !== undefined) flashSale.startDate = new Date(updateDto.startDate);
-    if (updateDto.endDate !== undefined) flashSale.endDate = new Date(updateDto.endDate);
-    if (updateDto.isActive !== undefined) flashSale.isActive = updateDto.isActive;
-    if (updateDto.bannerImage !== undefined) flashSale.bannerImage = updateDto.bannerImage;
+    const updatePayload: Partial<FlashSale> = {};
+    if (updateDto.name !== undefined) updatePayload.name = updateDto.name;
+    if (updateDto.startDate !== undefined) updatePayload.startDate = new Date(updateDto.startDate);
+    if (updateDto.endDate !== undefined) updatePayload.endDate = new Date(updateDto.endDate);
+    if (updateDto.isActive !== undefined) updatePayload.isActive = updateDto.isActive;
+    if (updateDto.bannerImage !== undefined) updatePayload.bannerImage = updateDto.bannerImage;
 
-    await this.flashSaleRepository.save(flashSale);
-
-    // Simplistic handling of items: delete old, insert new. Or just handle items separately.
-    // In a real scenario, you'd want a separate endpoint to add/remove items to avoid deleting sales stats.
+    if (Object.keys(updatePayload).length > 0) {
+      await this.flashSaleRepository.update(id, updatePayload);
+    }
 
     return this.findOne(id);
   }
 
   async remove(id: string) {
-    const flashSale = await this.findOne(id);
+    const flashSale = await this.flashSaleRepository.findOne({ where: { id } });
+    if (!flashSale) throw new NotFoundException('Flash sale not found');
     await this.flashSaleRepository.remove(flashSale);
     return { success: true };
   }

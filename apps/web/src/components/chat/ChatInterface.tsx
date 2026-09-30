@@ -197,7 +197,7 @@ export function ChatInterface() {
       <div
         className={`${
           activeConversationId ? 'hidden md:flex' : 'flex'
-        } w-full md:w-80 lg:w-96 border-r flex-col bg-muted/15 flex-shrink-0 transition-all`}
+        } w-full md:w-80 lg:w-96 border-e flex-col bg-muted/15 flex-shrink-0 transition-all`}
       >
         <div className="p-4 border-b bg-card">
           <div className="flex items-center justify-between mb-3">
@@ -248,7 +248,7 @@ export function ChatInterface() {
                     key={conv.id}
                     onClick={() => setActiveConversationId(conv.id)}
                     className={`flex items-start gap-3 p-3.5 text-start transition-colors hover:bg-muted/60 ${
-                      isSelected ? 'bg-primary/10 border-l-4 border-primary ps-2.5' : ''
+                      isSelected ? 'bg-primary/10 border-s-4 border-primary ps-2.5' : ''
                     }`}
                   >
                     <div className="relative flex-shrink-0">

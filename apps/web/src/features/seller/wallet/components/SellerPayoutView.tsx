@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Loader2, Search, Wallet, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 import { getApiErrorMessage } from '@/lib/apiError';
 import { useGetMyWalletQuery } from '@/features/wallets/walletsApi';

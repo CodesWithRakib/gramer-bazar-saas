@@ -140,17 +140,17 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
   }
 
   return (
-    <div className="flex flex-col gap-10 pb-24 md:gap-14 md:pb-16">
+    <div className="flex flex-col gap-10 pb-24 md:gap-14 md:pb-16 w-full min-w-0 max-w-full overflow-x-hidden">
       {/* Promotional Campaign Modal (frequency controlled) */}
       <PromotionalModal lang={lang} />
 
       {/* 1. Header / Hero / Search / Banners (Strictly NO Gradients) */}
-      <section className="container mx-auto mt-4 px-4">
+      <section className="container mx-auto mt-4 px-4 max-w-7xl">
         <MarketplaceHero lang={lang} />
       </section>
 
       {/* 2. Trust USPs */}
-      <section className="container mx-auto px-4">
+      <section className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-2 gap-4 rounded-2xl border border-border/80 bg-card p-5 shadow-xs md:grid-cols-4 md:gap-6 md:p-6">
           {[
             {
@@ -200,7 +200,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
       </section>
 
       {/* 3. Category Discovery (Shop by Category) */}
-      <section className="container mx-auto px-4">
+      <section className="container mx-auto px-4 max-w-7xl">
         <SectionHeader
           title={isBn ? 'ক্যাটাগরি ব্রাউজ করুন' : 'Shop by category'}
           description={
@@ -229,7 +229,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
 
       {/* 4. Featured Products (Curated small set) */}
       {isLoading ? (
-        <section className="container mx-auto px-4">
+        <section className="container mx-auto px-4 max-w-7xl">
           <Skeleton className="mb-4 h-8 w-48 rounded-lg" />
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -238,7 +238,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
           </div>
         </section>
       ) : featuredProducts.length > 0 ? (
-        <motion.section {...motionProps} className="container mx-auto px-4">
+        <motion.section {...motionProps} className="container mx-auto px-4 max-w-7xl overflow-hidden">
           <SectionHeader
             icon={<Sparkles className="h-5 w-5" />}
             title={isBn ? 'নির্বাচিত পণ্যসমূহ' : 'Featured products'}
@@ -256,7 +256,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
 
       {/* 5. Today's offers / coupons — a deliberately different presentation */}
       {activeCoupons.length > 0 && (
-        <motion.section {...motionProps} className="container mx-auto px-4">
+        <section className="container mx-auto px-4 max-w-7xl">
           <SectionHeader
             icon={<Ticket className="h-5 w-5" />}
             title={isBn ? 'আজকের কুপন ও অফার' : "Today's coupons & offers"}
@@ -268,61 +268,68 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
             viewAllLabel={isBn ? 'সব অফার' : 'All offers'}
             viewAllHref={`/${lang}/offers`}
           />
-          <div className="hide-scrollbar flex snap-x gap-3 overflow-x-auto pb-2">
-            {activeCoupons.slice(0, 6).map((coupon) => {
-              const value =
-                coupon.discountType === 'PERCENTAGE'
-                  ? `${coupon.discountValue}% ${isBn ? 'ছাড়' : 'OFF'}`
-                  : `${formatCurrency(coupon.discountValue)} ${isBn ? 'ছাড়' : 'OFF'}`;
-              return (
-                <Card
-                  key={coupon.id}
-                  className="w-64 shrink-0 snap-start rounded-2xl border-dashed border-primary/40 bg-primary/5 p-4 shadow-xs"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Ticket className="h-4 w-4" />
-                    </span>
-                    <span className="text-sm font-bold text-foreground">{value}</span>
-                  </div>
-                  <p className="mt-1.5 text-xs text-muted-foreground">
-                    {isBn ? 'সর্বনিম্ম অর্ডার' : 'Min. order'}{' '}
-                    {formatCurrency(coupon.minOrderAmount)}
-                    {coupon.endDate ? (
-                      <>
-                        <span aria-hidden className="mx-1.5">
-                          •
-                        </span>
-                        {isBn ? 'শেষ তারিখ' : 'ends'} {formatDate(coupon.endDate, lang, 'short')}
-                      </>
-                    ) : null}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => copyCoupon(coupon.code)}
-                    className="mt-3 flex w-full items-center justify-between gap-2 rounded-xl border border-dashed border-primary/50 bg-background px-3 py-2 text-start transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          <div className="w-full min-w-0 max-w-full overflow-hidden">
+            <div
+              className="hide-scrollbar scrollbar-none flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 w-full min-w-0 max-w-full overscroll-x-contain"
+              data-scroll-x
+            >
+              {activeCoupons.slice(0, 6).map((coupon) => {
+                const value =
+                  coupon.discountType === 'PERCENTAGE'
+                    ? `${coupon.discountValue}% ${isBn ? 'ছাড়' : 'OFF'}`
+                    : `${formatCurrency(coupon.discountValue)} ${isBn ? 'ছাড়' : 'OFF'}`;
+                return (
+                  <div
+                    key={coupon.id}
+                    className="w-[190px] min-w-[190px] sm:w-[220px] sm:min-w-[220px] snap-start shrink-0 flex flex-col"
                   >
-                    <span className="font-mono text-xs font-bold tracking-wide text-primary">
-                      {coupon.code}
-                    </span>
-                    <Copy className="h-3.5 w-3.5 shrink-0 text-primary" />
-                    <span className="sr-only">
-                      {isBn ? `${coupon.code} কপি করুন` : `Copy code ${coupon.code}`}
-                    </span>
-                  </button>
-                </Card>
-              );
-            })}
+                    <Card className="w-full h-full rounded-xl sm:rounded-2xl border-dashed border-primary/40 bg-primary/5 p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Ticket className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="text-xs sm:text-sm font-bold text-foreground">{value}</span>
+                        </div>
+                        <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground line-clamp-1">
+                          {isBn ? 'সর্বনিম্ন অর্ডার' : 'Min. order'}{' '}
+                          {formatCurrency(coupon.minOrderAmount)}
+                          {coupon.endDate ? (
+                            <>
+                              <span aria-hidden className="mx-1">
+                                •
+                              </span>
+                              {isBn ? 'মেয়াদ' : 'ends'}{' '}
+                              {formatDate(coupon.endDate, lang, 'short')}
+                            </>
+                          ) : null}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => copyCoupon(coupon.code)}
+                        className="mt-2.5 flex w-full items-center justify-between gap-1.5 rounded-lg border border-dashed border-primary/50 bg-background px-2.5 py-1.5 text-start transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <span className="font-mono text-[11px] sm:text-xs font-bold tracking-wide text-primary">
+                          {coupon.code}
+                        </span>
+                        <Copy className="h-3 w-3 shrink-0 text-primary" />
+                        <span className="sr-only">
+                          {isBn ? `${coupon.code} কপি করুন` : `Copy code ${coupon.code}`}
+                        </span>
+                      </button>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </motion.section>
+        </section>
       )}
 
       {/* 6. Popular Products */}
       {!isLoading && popularProducts.length > 0 ? (
-        <motion.section
-          {...motionProps}
-          className="container mx-auto border-t border-border/40 px-4 pt-10"
-        >
+        <section className="container mx-auto border-t border-border/40 px-4 pt-10 max-w-7xl overflow-hidden">
           <SectionHeader
             icon={<Flame className="h-5 w-5 fill-current" />}
             title={isBn ? 'জনপ্রিয় পণ্য' : 'Popular products'}
@@ -331,14 +338,14 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
             viewAllHref={`/${lang}/products?sort=popular`}
           />
           <ProductGrid products={popularProducts} isLoading={false} lang={lang} />
-        </motion.section>
+        </section>
       ) : null}
 
       {/* 7. Featured Local Shops */}
       {!isLoading && featuredShops.length > 0 ? (
         <motion.section
           {...motionProps}
-          className="container mx-auto border-t border-border/40 px-4 pt-10"
+          className="container mx-auto border-t border-border/40 px-4 pt-10 max-w-7xl overflow-hidden"
         >
           <SectionHeader
             icon={<Store className="h-5 w-5" />}
@@ -365,7 +372,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
 
       {/* 9. Independent Category Shelves */}
       {categorySections.length > 0 && (
-        <div className="container mx-auto space-y-12 border-t border-border/40 px-4 pt-10">
+        <div className="container mx-auto space-y-12 border-t border-border/40 px-4 pt-10 max-w-7xl overflow-hidden">
           {categorySections.map((sec) => {
             const { category, products } = sec;
             const categoryName = isBn ? category.nameBn : category.nameEn;
@@ -374,7 +381,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
               : category.descriptionEn;
 
             return (
-              <section key={category.id} className="space-y-4">
+              <section key={category.id} className="space-y-4 max-w-7xl overflow-hidden">
                 <SectionHeader
                   icon={
                     <span className="text-base leading-none" aria-hidden>
@@ -398,7 +405,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
       {!isLoading && recentlyAdded.length > 0 ? (
         <motion.section
           {...motionProps}
-          className="container mx-auto border-t border-border/40 px-4 pt-10"
+          className="container mx-auto border-t border-border/40 px-4 pt-10 max-w-7xl overflow-hidden"
         >
           <SectionHeader
             icon={<PackagePlus className="h-5 w-5" />}
@@ -414,7 +421,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
       ) : null}
 
       {/* 11. Product Request Banner CTA (Solid Primary Surface - Strictly NO Gradients) */}
-      <motion.section {...motionProps} className="container mx-auto px-4">
+      <motion.section {...motionProps} className="container mx-auto px-4 max-w-7xl overflow-hidden">
         <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-primary p-8 text-center text-primary-foreground shadow-md md:p-12">
           <div className="relative z-10 mx-auto max-w-2xl space-y-4">
             <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">

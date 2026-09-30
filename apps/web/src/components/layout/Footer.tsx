@@ -29,7 +29,7 @@ export function Footer({ lang }: FooterProps) {
 
   return (
     <footer className="bg-background border-t mt-auto pt-16">
-      <div className="container mx-auto px-4 pb-12">
+      <div className="container mx-auto max-w-7xl px-4 pb-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
           {/* Col 1: Brand & Contact Info */}
           <div className="lg:col-span-1 space-y-4">
@@ -284,8 +284,8 @@ export function Footer({ lang }: FooterProps) {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t bg-muted/30">
-        <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="border-t bg-muted/30 pb-20 md:pb-0">
+        <div className="container mx-auto max-w-7xl px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground font-medium text-center md:text-start">
             © {year}{' '}
             {isBn ? 'গ্রামের বাজার। সর্বস্বত্ব সংরক্ষিত।' : 'Gramer Bazar. All rights reserved.'}

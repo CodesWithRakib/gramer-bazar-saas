@@ -92,7 +92,7 @@ export function CategorySections({ lang }: CategorySectionsProps) {
 
             {/* Subcategory Pills Navigation (Phase 5, 25 & 42) */}
             {category.subCategories && category.subCategories.length > 0 && (
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 md:mx-0 md:px-0 overscroll-x-contain">
                 <Link
                   href={`/${lang}/categories/${category.slug}`}
                   className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-primary-foreground shadow-xs whitespace-nowrap"

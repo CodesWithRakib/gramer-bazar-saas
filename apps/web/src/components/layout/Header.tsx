@@ -45,7 +45,7 @@ export function Header({ lang }: HeaderProps) {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-xs">
         {/* Top Utility Bar (Desktop only, role & auth aware) */}
         <div className="hidden md:block bg-muted/40 border-b border-border/40 py-1.5 px-4 text-xs text-muted-foreground">
-          <div className="container mx-auto flex items-center justify-between gap-4">
+          <div className="container mx-auto max-w-7xl flex items-center justify-between gap-4">
             {/* Left: Contact Hotline */}
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5 font-medium hover:text-foreground transition-colors">
@@ -100,7 +100,7 @@ export function Header({ lang }: HeaderProps) {
         </div>
 
         {/* Main Header Bar */}
-        <div className="container mx-auto px-2.5 sm:px-4 h-16 flex items-center justify-between gap-1 sm:gap-6">
+        <div className="container mx-auto max-w-7xl px-2.5 sm:px-4 h-16 flex items-center justify-between gap-1 sm:gap-6">
           {/* Left Section: Logo & Mobile Menu Trigger */}
           <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             <Button
@@ -170,7 +170,7 @@ export function Header({ lang }: HeaderProps) {
 
         {/* Desktop Category Navigation Sub-bar */}
         <div className="hidden md:block border-t border-border/50 bg-background/90 py-1.5 px-4 text-xs font-medium">
-          <div className="container mx-auto flex items-center justify-between gap-4">
+          <div className="container mx-auto max-w-7xl flex items-center justify-between gap-4">
             {/* Left: Mega Menu Trigger & Category Quick Links */}
             <div className="flex items-center gap-3 lg:gap-4 overflow-x-auto no-scrollbar">
               <CategoryMegaMenu lang={lang} />

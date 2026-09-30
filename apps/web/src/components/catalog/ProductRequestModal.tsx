@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCreateProductRequestMutation } from '@/features/product-requests/productRequestsApi';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 

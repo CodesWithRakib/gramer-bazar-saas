@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Loader2, ArrowRight, Tag, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGetSearchSuggestionsQuery } from '@/features/catalog/catalogApi';
+import { formatCurrency } from '@/lib/format';
 
 interface SearchBarProps {
   lang: string;
@@ -115,7 +116,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
               setDebouncedTerm('');
               setIsOpen(false);
             }}
-            className="absolute right-12 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors"
+            className="absolute end-12 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors"
             aria-label={isBn ? 'অনুসন্ধান মুছুন' : 'Clear search'}
           >
             <X className="h-3.5 w-3.5" />
@@ -125,7 +126,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
           type="submit"
           variant="ghost"
           size="icon"
-          className="absolute right-0 top-0 h-full w-12 rounded-r-full text-muted-foreground hover:text-primary hover:bg-transparent"
+          className="absolute end-0 top-0 h-full w-12 rounded-e-full text-muted-foreground hover:text-primary hover:bg-transparent"
         >
           {isFetching ? (
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -138,7 +139,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
 
       {/* Live Suggestions Dropdown */}
       {isOpen && debouncedTerm.length >= 2 && (
-        <div className="absolute left-0 right-0 top-full mt-2 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 duration-150">
+        <div className="absolute inset-x-0 top-full mt-2 bg-card border border-border rounded-2xl shadow-xl overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 duration-150">
           {isFetching && !suggestions ? (
             <div className="p-4 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -206,7 +207,9 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
                             {isBn ? item.nameBn : item.nameEn}
                           </p>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <span className="font-semibold text-primary">৳{item.price}</span>
+                            <span className="font-semibold text-primary tabular-nums">
+                              {formatCurrency(item.price, lang)}
+                            </span>
                             {item.unit && <span>/ {item.unit}</span>}
                           </div>
                         </div>

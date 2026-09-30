@@ -177,7 +177,7 @@ export class SellerPortalService {
       }>
     >(
       `SELECT o.id,
-              NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), '')
+              NULLIF(TRIM(CONCAT(COALESCE(u."firstName", ''), ' ', COALESCE(u."lastName", ''))), '')
                 AS customer_name,
               u.phone AS customer_phone,
               COALESCE(SUM(oi.subtotal), 0)::float AS seller_subtotal,
@@ -189,7 +189,7 @@ export class SellerPortalService {
          JOIN seller_products sp ON sp.id = oi.seller_product_id
          LEFT JOIN users u ON u.id = o.user_id
         WHERE sp.shop_id = $1
-        GROUP BY o.id, u.first_name, u.last_name, u.phone, o.status, o.created_at
+        GROUP BY o.id, u."firstName", u."lastName", u.phone, o.status, o.created_at
         ORDER BY o.created_at DESC
         LIMIT $2`,
       [shopId, limit],
@@ -305,7 +305,7 @@ export class SellerPortalService {
       where += ` AND (
         o.id::text ILIKE $${idx}
         OR COALESCE(u.phone, '') ILIKE $${idx}
-        OR COALESCE(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')), '') ILIKE $${idx}
+        OR COALESCE(CONCAT(COALESCE(u."firstName", ''), ' ', COALESCE(u."lastName", '')), '') ILIKE $${idx}
       )`;
     }
 
@@ -327,7 +327,7 @@ export class SellerPortalService {
               COALESCE(SUM(oi.subtotal), 0)::float AS seller_subtotal,
               COUNT(oi.id)::int AS item_count,
               o.created_at,
-              NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), '')
+              NULLIF(TRIM(CONCAT(COALESCE(u."firstName", ''), ' ', COALESCE(u."lastName", ''))), '')
                 AS customer_name,
               u.phone AS customer_phone,
               a.contact_name,
@@ -342,7 +342,7 @@ export class SellerPortalService {
          LEFT JOIN districts d ON d.id = a.district_id
          LEFT JOIN upazilas uz ON uz.id = a.upazila_id
         WHERE sp.shop_id = $1${where}
-        GROUP BY o.id, u.first_name, u.last_name, u.phone,
+        GROUP BY o.id, u."firstName", u."lastName", u.phone,
                  a.contact_name, a.street_address, d.name_en, uz.name_en
         ORDER BY o.created_at DESC
         LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,

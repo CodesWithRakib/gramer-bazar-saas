@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger'
 import { NotificationsService } from './notifications.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import {
+  ApiStandardPaginatedResponse,
   ApiStandardResponse,
   ApiStandardMessageResponse,
   ApiCommonErrors,
@@ -34,10 +35,8 @@ export class NotificationsController {
     description:
       'Returns all notifications received by the authenticated user in reverse chronological order with optional filtering and pagination.',
   })
-  @ApiStandardResponse({
-    type: NotificationResponseDto,
-    isArray: true,
-    description: 'List of user notifications',
+  @ApiStandardPaginatedResponse(NotificationResponseDto, {
+    description: 'List of user notifications with pagination metadata',
   })
   getUserNotifications(
     @Request() req: AuthenticatedUserRequest,

@@ -203,13 +203,13 @@ function LoginForm({ lang }: { lang: string }) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/5">
       {/* Header Info */}
-      <div className="mb-6 space-y-1.5">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+      <div className="mb-6 space-y-1.5 text-center sm:text-start">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
           {isBn ? 'স্বাগতম' : 'Welcome back'}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground font-medium">
           {isBn
             ? 'আপনার অ্যাকাউন্টে প্রবেশ করতে লগইন করুন।'
             : 'Sign in to access your Gramer Bazar account.'}
@@ -217,16 +217,16 @@ function LoginForm({ lang }: { lang: string }) {
       </div>
 
       {/* Mode Switcher */}
-      <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-lg mb-6 text-xs font-medium">
+      <div className="grid grid-cols-2 gap-1 p-1 bg-muted/80 rounded-xl mb-6 text-xs font-semibold">
         <button
           type="button"
           onClick={() => {
             setAuthMode('password');
             setErrorMsg('');
           }}
-          className={`flex items-center justify-center gap-2 py-2 rounded-md transition-colors ${
+          className={`flex items-center justify-center gap-2 py-2 rounded-lg transition-all duration-200 ${
             authMode === 'password'
-              ? 'bg-background text-foreground shadow-xs font-semibold'
+              ? 'bg-background text-primary shadow-xs font-bold'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -239,9 +239,9 @@ function LoginForm({ lang }: { lang: string }) {
             setAuthMode('otp');
             setErrorMsg('');
           }}
-          className={`flex items-center justify-center gap-2 py-2 rounded-md transition-colors ${
+          className={`flex items-center justify-center gap-2 py-2 rounded-lg transition-all duration-200 ${
             authMode === 'otp'
-              ? 'bg-background text-foreground shadow-xs font-semibold'
+              ? 'bg-background text-primary shadow-xs font-bold'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -252,7 +252,7 @@ function LoginForm({ lang }: { lang: string }) {
 
       {/* Error Message */}
       {errorMsg && (
-        <div className="mb-5 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium flex items-start gap-2">
+        <div className="mb-5 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold flex items-start gap-2">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMsg}</span>
         </div>
@@ -262,7 +262,7 @@ function LoginForm({ lang }: { lang: string }) {
       {authMode === 'password' ? (
         <form onSubmit={handlePasswordLogin} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="emailOrPhone" className="text-xs font-medium">
+            <Label htmlFor="emailOrPhone" className="text-xs font-semibold text-foreground/90">
               {isBn ? 'ইমেইল বা মোবাইল নম্বর' : 'Email or Mobile Number'}
             </Label>
             <div className="relative">
@@ -277,9 +277,9 @@ function LoginForm({ lang }: { lang: string }) {
                 }
                 disabled={isPasswordLoading}
                 required
-                className="h-10 pe-10 text-sm"
+                className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                 <Mail className="w-4 h-4" />
               </div>
             </div>
@@ -287,12 +287,12 @@ function LoginForm({ lang }: { lang: string }) {
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-xs font-medium">
+              <Label htmlFor="password" className="text-xs font-semibold text-foreground/90">
                 {isBn ? 'পাসওয়ার্ড' : 'Password'}
               </Label>
               <Link
                 href={`/${lang}/forgot-password`}
-                className="text-xs text-primary hover:underline font-medium"
+                className="text-xs text-primary hover:underline font-semibold"
               >
                 {isBn ? 'পাসওয়ার্ড ভুলে গেছেন?' : 'Forgot password?'}
               </Link>
@@ -307,12 +307,12 @@ function LoginForm({ lang }: { lang: string }) {
                 placeholder="••••••••"
                 disabled={isPasswordLoading}
                 required
-                className="h-10 pe-10 text-sm"
+                className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute end-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -320,7 +320,7 @@ function LoginForm({ lang }: { lang: string }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-0.5">
             <input
               type="checkbox"
               id="rememberMe"
@@ -330,7 +330,7 @@ function LoginForm({ lang }: { lang: string }) {
             />
             <Label
               htmlFor="rememberMe"
-              className="text-xs text-muted-foreground cursor-pointer font-normal select-none"
+              className="text-xs text-muted-foreground cursor-pointer font-medium select-none"
             >
               {isBn ? 'আমাকে মনে রাখুন' : 'Remember me'}
             </Label>
@@ -338,7 +338,7 @@ function LoginForm({ lang }: { lang: string }) {
 
           <Button
             type="submit"
-            className="w-full h-10 text-sm font-medium mt-2"
+            className="w-full h-11 rounded-xl text-sm font-bold mt-2 shadow-md shadow-primary/25 hover:shadow-lg hover:shadow-primary/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
             disabled={isPasswordLoading}
           >
             {isPasswordLoading
@@ -355,7 +355,7 @@ function LoginForm({ lang }: { lang: string }) {
           {otpStep === 'phone' ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="otpPhone" className="text-xs font-medium">
+                <Label htmlFor="otpPhone" className="text-xs font-semibold text-foreground/90">
                   {isBn ? 'মোবাইল নম্বর' : 'Mobile Number'}
                 </Label>
                 <div className="relative">
@@ -368,9 +368,9 @@ function LoginForm({ lang }: { lang: string }) {
                     placeholder="01XXXXXXXXX"
                     disabled={isSendingOtp}
                     required
-                    className="h-10 pe-10 text-sm"
+                    className="h-11 rounded-xl pe-10 text-sm border-border/80 focus-visible:ring-primary/20 focus-visible:border-primary shadow-2xs"
                   />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                  <div className="absolute end-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                     <Phone className="w-4 h-4" />
                   </div>
                 </div>
@@ -383,7 +383,7 @@ function LoginForm({ lang }: { lang: string }) {
 
               <Button
                 type="submit"
-                className="w-full h-10 text-sm font-medium mt-2"
+                className="w-full h-11 rounded-xl text-sm font-bold mt-2 shadow-md shadow-primary/25 hover:shadow-lg transition-all"
                 disabled={isSendingOtp}
               >
                 {isSendingOtp
@@ -398,7 +398,7 @@ function LoginForm({ lang }: { lang: string }) {
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="otpCode" className="text-xs font-medium">
+                <Label htmlFor="otpCode" className="text-xs font-semibold text-foreground/90">
                   {isBn ? 'ওটিপি কোড দিন' : 'Enter Verification Code'}
                 </Label>
                 <div className="relative">
@@ -411,9 +411,9 @@ function LoginForm({ lang }: { lang: string }) {
                     autoFocus
                     required
                     maxLength={6}
-                    className="h-10 pe-10 text-center tracking-widest text-base font-mono"
+                    className="h-11 rounded-xl pe-10 text-center tracking-widest text-base font-mono border-border/80 shadow-2xs"
                   />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                  <div className="absolute end-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                     <Lock className="w-4 h-4" />
                   </div>
                 </div>
@@ -424,7 +424,7 @@ function LoginForm({ lang }: { lang: string }) {
 
               <Button
                 type="submit"
-                className="w-full h-10 text-sm font-medium"
+                className="w-full h-11 rounded-xl text-sm font-bold shadow-md shadow-primary/25"
                 disabled={isVerifyingOtp}
               >
                 {isVerifyingOtp
@@ -442,7 +442,7 @@ function LoginForm({ lang }: { lang: string }) {
                   setOtpStep('phone');
                   setErrorMsg('');
                 }}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-1"
+                className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-1 font-medium"
               >
                 {isBn ? '← মোবাইল নম্বর পরিবর্তন করুন' : '← Change mobile number'}
               </button>
@@ -452,30 +452,30 @@ function LoginForm({ lang }: { lang: string }) {
       )}
 
       {/* Register Prompt */}
-      <div className="mt-8 pt-6 border-t border-border/60 text-center text-xs">
+      <div className="mt-6 pt-5 border-t border-border/60 text-center text-xs">
         <span className="text-muted-foreground">
           {isBn ? 'নতুন ব্যবহারকারী?' : "Don't have an account?"}{' '}
         </span>
-        <Link href={`/${lang}/register`} className="font-semibold text-primary hover:underline">
+        <Link href={`/${lang}/register`} className="font-bold text-primary hover:underline ms-1">
           {isBn ? 'রেজিস্টার করুন' : 'Create an Account'}
         </Link>
       </div>
 
       {/* Partner Links */}
-      <div className="mt-6 pt-4 border-t border-border/40 grid grid-cols-2 gap-2 text-xs text-center text-muted-foreground">
+      <div className="mt-5 pt-4 border-t border-border/40 grid grid-cols-2 gap-2.5 text-xs text-center text-muted-foreground">
         <Link
           href={`/${lang}/become-a-seller`}
-          className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-muted/40 hover:bg-muted transition-colors text-foreground font-medium"
+          className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-muted/50 hover:bg-primary/10 hover:text-primary transition-all text-foreground font-semibold border border-border/60"
         >
-          <Store className="w-3.5 h-3.5 text-muted-foreground" />
-          <span>{isBn ? 'সেলার হতে আবেদন' : 'Become a Seller'}</span>
+          <Store className="w-3.5 h-3.5 text-primary shrink-0" />
+          <span className="truncate">{isBn ? 'সেলার হতে আবেদন' : 'Become a Seller'}</span>
         </Link>
         <Link
           href={`/${lang}/become-a-rider`}
-          className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-muted/40 hover:bg-muted transition-colors text-foreground font-medium"
+          className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-muted/50 hover:bg-primary/10 hover:text-primary transition-all text-foreground font-semibold border border-border/60"
         >
-          <Bike className="w-3.5 h-3.5 text-muted-foreground" />
-          <span>{isBn ? 'রাইডার হতে আবেদন' : 'Become a Rider'}</span>
+          <Bike className="w-3.5 h-3.5 text-primary shrink-0" />
+          <span className="truncate">{isBn ? 'রাইডার হতে আবেদন' : 'Become a Rider'}</span>
         </Link>
       </div>
     </div>
@@ -489,7 +489,7 @@ export default function LoginPage({ params }: { params: Promise<{ lang: string }
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Top Bar with Language Switcher */}
-      <header className="h-16 px-4 sm:px-8 flex items-center justify-between border-b border-border/40 shrink-0">
+      <header className="h-16 px-4 sm:px-8 flex items-center justify-between border-b border-border/40 shrink-0 bg-background/80 backdrop-blur-md">
         <Link
           href={`/${lang}`}
           className="flex items-center gap-2 group hover:opacity-90 transition-opacity"
@@ -503,73 +503,75 @@ export default function LoginPage({ params }: { params: Promise<{ lang: string }
 
       {/* Main Content: Split-Screen on Desktop */}
       <main className="flex-1 flex min-h-0">
-        {/* Left Visual Area (Desktop Only, Spacious & Professional, NO gradients) */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-muted/30 border-r border-border/60">
-          <div className="space-y-4 max-w-lg">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-primary/10 text-primary text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              {isBn ? 'হাইপার-লোকাল মার্কেটপ্লেস' : 'Hyperlocal Rural Marketplace'}
+        {/* Left Visual Showcase (Desktop Only, Full-Bleed with Atmospheric Overlay) */}
+        <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-10 xl:p-14 overflow-hidden text-white border-e border-border/40">
+          {/* Background Image */}
+          <Image
+            src="/banners/banner-village-market.jpg"
+            alt={isBn ? 'গ্রামের বাজার' : 'Gramer Bazar Marketplace'}
+            fill
+            className="object-cover"
+            priority
+            sizes="50vw"
+          />
+          {/* Directional Gradient Scrim */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/35 z-0" />
+
+          {/* Top Pill */}
+          <div className="relative z-10">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-white shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              </span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{isBn ? 'হাইপার-লোকাল গ্রামীণ মার্কেটপ্লেস' : 'Hyperlocal Rural Commerce'}</span>
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-foreground leading-tight">
+          </div>
+
+          {/* Center Editorial Narrative */}
+          <div className="relative z-10 space-y-4 max-w-lg my-auto py-8">
+            <h2 className="text-3xl xl:text-4xl 2xl:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-md">
               {isBn
-                ? 'স্থানীয় পণ্যের বিশ্বস্ত বাজার ও উদ্যোক্তাদের মিলনমেলা'
-                : 'Empowering authentic rural commerce from villages to doorsteps'}
+                ? 'স্থানীয় কৃষক ও উদ্যোক্তাদের সেরা পণ্য আপনার দোরগোড়ায়'
+                : 'Authentic Rural Commerce Direct from Farms to Doorsteps'}
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm xl:text-base text-white/85 leading-relaxed font-medium">
               {isBn
-                ? 'সরাসরি কৃষক ও গ্রামীণ উদ্যোক্তাদের কাছ থেকে শতভাগ খাঁটি, সতেজ খাদ্য ও দৈনন্দিন সামগ্রী সহজে ক্রয় ও বিক্রয় করুন।'
+                ? 'শতভাগ খাঁটি মধু, ঘানিভাঙা সরিষার তেল, তাজা শাকসবজি ও দেশি মাছ সরাসরি খামারিদের কাছ থেকে দ্রুত ডেলিভারিতে পান।'
                 : 'Direct access to authentic village produce, local harvests, and verified merchants delivered with speed and care.'}
             </p>
           </div>
 
-          {/* Curated Marketplace Visual (Flat, clean framing, NO gradient overlays) */}
-          <div className="my-8 relative rounded-xl overflow-hidden border border-border/60 shadow-xs aspect-[16/10] max-w-lg">
-            <Image
-              src="/banners/banner-village-market.jpg"
-              alt={isBn ? 'গ্রামের বাজার' : 'Gramer Bazar Marketplace'}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
+          {/* Bottom Floating Glassmorphic Trust Metric Cards */}
+          <div className="relative z-10 space-y-4">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
+                <p className="text-base sm:text-lg font-black text-white">১০০% খাঁটি</p>
+                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'খামার উৎপাদিত' : 'Farm Fresh'}</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
+                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'নিরাপদ' : 'Safe'}</p>
+                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery'}</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
+                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'দ্রুত' : 'Speedy'}</p>
+                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'লোকাল রাইডার' : 'Local Riders'}</p>
+              </div>
+            </div>
 
-          {/* Value Highlights */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border/60 max-w-lg text-xs text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-foreground">
-                  {isBn ? '১০০% খাঁটি পণ্য' : '100% Authentic'}
-                </p>
-                <p className="text-[11px] mt-0.5">{isBn ? 'গ্রামীণ উৎপাদক' : 'Village produce'}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-foreground">
-                  {isBn ? 'নিরাপদ লেনদেন' : 'Safe Payments'}
-                </p>
-                <p className="text-[11px] mt-0.5">
-                  {isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash or Online'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-foreground">
-                  {isBn ? 'দ্রুত ডেলিভারি' : 'Fast Delivery'}
-                </p>
-                <p className="text-[11px] mt-0.5">{isBn ? 'রাইডার নেটওয়ার্ক' : 'Local riders'}</p>
-              </div>
+            {/* Testimonial Banner */}
+            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-between text-xs text-white/90">
+              <span className="font-semibold">
+                {isBn ? 'খানসামা ও দিনাজপুরের বিশ্বস্ত মার্কেটপ্লেস' : 'Serving Dinajpur & rural markets'}
+              </span>
+              <span className="text-amber-300 font-bold tracking-wider">★★★★★</span>
             </div>
           </div>
         </div>
 
-        {/* Right Form Area */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-12 overflow-y-auto">
+        {/* Right Form Area with Framed Card */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12 bg-muted/25 dark:bg-muted/5 overflow-y-auto">
           <Suspense
             fallback={
               <div className="w-full max-w-md mx-auto p-8 text-center text-xs text-muted-foreground">

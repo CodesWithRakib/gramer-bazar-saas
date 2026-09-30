@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AdminPagination } from '@/components/ui/AdminPagination';
 import {
   useGetUserNotificationsQuery,
   useGetUnreadCountQuery,
@@ -57,7 +58,12 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
   const { data: unreadData } = useGetUnreadCountQuery();
   const unreadCount = unreadData?.count ?? 0;
 
-  const { data: notifData, isLoading } = useGetUserNotificationsQuery({
+  const {
+    data: notifData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetUserNotificationsQuery({
     page,
     limit: 20,
     unreadOnly: activeTab === 'unread',
@@ -84,14 +90,16 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
 
   const allItems = notifData?.items ?? [];
   const filteredItems = allItems.filter((item) => {
+    if (!item?.type) return activeTab === 'all' || activeTab === 'unread';
+    const typeStr = String(item.type);
     if (activeTab === 'orders') {
-      return item.type.includes('ORDER') || item.type.includes('DELIVERY');
+      return typeStr.includes('ORDER') || typeStr.includes('DELIVERY');
     }
     if (activeTab === 'applications') {
       return (
-        item.type.includes('APPLICATION') ||
-        item.type.includes('PAYOUT') ||
-        item.type.includes('PAYMENT')
+        typeStr.includes('APPLICATION') ||
+        typeStr.includes('PAYOUT') ||
+        typeStr.includes('PAYMENT')
       );
     }
     return true;
@@ -99,40 +107,44 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
 
   const totalPages = notifData?.totalPages ?? 1;
 
-  const getNotificationIcon = (type: NotificationType) => {
-    if (type.includes('ORDER')) {
+  const getNotificationIcon = (type?: NotificationType | string) => {
+    if (!type) return <AlertCircle className="w-4 h-4 text-muted-foreground" />;
+    const typeStr = String(type);
+    if (typeStr.includes('ORDER')) {
       return <Package className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
     }
-    if (type.includes('DELIVERY')) {
+    if (typeStr.includes('DELIVERY')) {
       return <Truck className="w-4 h-4 text-sky-600 dark:text-sky-400" />;
     }
-    if (type.includes('APPLICATION')) {
+    if (typeStr.includes('APPLICATION')) {
       return <FileText className="w-4 h-4 text-violet-600 dark:text-violet-400" />;
     }
-    if (type.includes('PAYMENT') || type.includes('PAYOUT')) {
+    if (typeStr.includes('PAYMENT') || typeStr.includes('PAYOUT')) {
       return <CreditCard className="w-4 h-4 text-amber-600 dark:text-amber-400" />;
     }
     return <AlertCircle className="w-4 h-4 text-muted-foreground" />;
   };
 
-  const getActionLabel = (type: NotificationType) => {
-    if (type.includes('ORDER')) {
+  const getActionLabel = (type?: NotificationType | string) => {
+    if (!type) return isBn ? 'বিস্তারিত দেখুন' : 'View Details';
+    const typeStr = String(type);
+    if (typeStr.includes('ORDER')) {
       return isBn ? 'অর্ডার দেখুন' : 'View Order';
     }
-    if (type.includes('DELIVERY')) {
+    if (typeStr.includes('DELIVERY')) {
       return isBn ? 'ডেলিভারি দেখুন' : 'View Delivery';
     }
-    if (type.includes('APPLICATION')) {
+    if (typeStr.includes('APPLICATION')) {
       return isBn ? 'আবেদন দেখুন' : 'View Application';
     }
-    if (type.includes('PAYOUT')) {
+    if (typeStr.includes('PAYOUT')) {
       return isBn ? 'উত্তোলন দেখুন' : 'View Payout';
     }
     return isBn ? 'বিস্তারিত দেখুন' : 'View Details';
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6">
+    <div className="w-full space-y-4">
       {/* Top Header Card */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
         <div>
@@ -253,10 +265,48 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
       </div>
 
       {/* Notifications List Content */}
-      <div className="py-4">
-        {isLoading ? (
-          <div className="py-16 text-center text-sm text-muted-foreground">
-            {isBn ? 'নোটিফিকেশন লোড হচ্ছে...' : 'Loading notifications...'}
+      <div className="py-2">
+        {isError ? (
+          <div className="py-12 text-center text-muted-foreground border border-dashed rounded-xl my-4 p-6">
+            <AlertCircle className="w-10 h-10 mx-auto mb-3 text-destructive/70" />
+            <h3 className="text-base font-semibold text-foreground">
+              {isBn ? 'নোটিফিকেশন লোড করতে সমস্যা হয়েছে' : 'Failed to load notifications'}
+            </h3>
+            <p className="text-xs text-muted-foreground/80 mt-1 max-w-sm mx-auto">
+              {isBn
+                ? 'সার্ভার থেকে নোটিফিকেশন তথ্য সংগ্রহ করা যায়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
+                : 'Could not load notifications from the server. Please try again.'}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="mt-4 text-xs"
+            >
+              {isBn ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
+            </Button>
+          </div>
+        ) : isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="w-full rounded-xl border border-border/60 bg-card p-4 sm:p-5 animate-pulse"
+              >
+                <div className="flex items-start gap-3.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-muted mt-1.5 shrink-0" />
+                  <div className="w-9 h-9 rounded-lg bg-muted shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 bg-muted rounded w-1/3" />
+                      <div className="h-3 bg-muted rounded w-20" />
+                    </div>
+                    <div className="h-3.5 bg-muted rounded w-4/5" />
+                    <div className="h-3 bg-muted rounded w-1/2" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground border border-dashed rounded-xl my-4">
@@ -271,7 +321,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 w-full">
             {filteredItems.map((notif) => {
               const { title, message } = formatNotificationText(notif, lang);
               const targetUrl = getNotificationActionUrl(notif, roles, lang);
@@ -280,7 +330,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
               return (
                 <div
                   key={notif.id}
-                  className={`group relative rounded-xl border p-4 transition-all duration-150 hover:shadow-sm ${
+                  className={`group relative rounded-xl border p-4 sm:p-5 transition-all duration-150 hover:shadow-sm w-full ${
                     !notif.isRead
                       ? 'bg-card border-primary/20 shadow-xs'
                       : 'bg-card/60 border-border/70 text-muted-foreground'
@@ -357,33 +407,20 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
         )}
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-6 border-t border-border mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="gap-1 h-8 text-xs"
-            >
-              <ChevronLeft className="w-3.5 h-3.5 rtl:rotate-180" />
-              <span>{isBn ? 'আগের পৃষ্ঠা' : 'Previous'}</span>
-            </Button>
-
-            <span className="text-xs text-muted-foreground">
-              {isBn ? `পৃষ্ঠা ${page} / ${totalPages}` : `Page ${page} of ${totalPages}`}
-            </span>
-
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="gap-1 h-8 text-xs"
-            >
-              <span>{isBn ? 'পরের পৃষ্ঠা' : 'Next'}</span>
-              <ChevronRight className="w-3.5 h-3.5 rtl:rotate-180" />
-            </Button>
+        {notifData && (notifData.total > 0 || totalPages > 1) && (
+          <div className="pt-4 border-t border-border mt-4">
+            <AdminPagination
+              totalItems={notifData.total || filteredItems.length}
+              itemsPerPage={notifData.limit || 20}
+              currentPage={page}
+              lang={lang}
+              limitOptions={[10, 20, 50]}
+              itemLabel={{
+                singular: isBn ? 'নোটিফিকেশন' : 'notification',
+                plural: isBn ? 'নোটিফিকেশন' : 'notifications',
+              }}
+              onPageChange={(newPage) => setPage(newPage)}
+            />
           </div>
         )}
       </div>

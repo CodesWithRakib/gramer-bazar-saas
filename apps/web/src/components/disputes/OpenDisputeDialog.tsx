@@ -5,7 +5,7 @@ import { useCreateDisputeMutation, DisputeReason } from '@/features/disputes/dis
 import { DISPUTE_REASON_LABELS } from '@/features/disputes/dispute-display';
 import { Button } from '@/components/ui/button';
 import { getApiErrorMessage } from '@/lib/apiError';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import {
   Dialog,
   DialogContent,

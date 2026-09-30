@@ -9,8 +9,9 @@ import {
 } from '@/features/wishlists/wishlistsApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CustomImage } from '@/components/ui/CustomImage';
+import { AdminPagination } from '@/components/ui/AdminPagination';
 import { Heart, Star, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -24,6 +25,15 @@ export interface CustomerWishlistViewProps {
 export function CustomerWishlistView({ lang = 'en' }: CustomerWishlistViewProps) {
   const isBn = lang === 'bn';
   const { data: wishlist, isLoading, isError, refetch } = useGetUserWishlistQuery();
+
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(8);
+
+  const totalItems = wishlist?.length ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const startIndex = (safePage - 1) * pageSize;
+  const paginatedWishlist = (wishlist ?? []).slice(startIndex, startIndex + pageSize);
 
   const header = (
     <PageHeader
@@ -97,10 +107,31 @@ export function CustomerWishlistView({ lang = 'en' }: CustomerWishlistViewProps)
     <div className="w-full space-y-6">
       {header}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {wishlist.map((item) => (
+        {paginatedWishlist.map((item) => (
           <WishlistCard key={item.id} item={item} lang={lang} isBn={isBn} />
         ))}
       </div>
+
+      {totalItems > pageSize && (
+        <div className="pt-2">
+          <AdminPagination
+            totalItems={totalItems}
+            itemsPerPage={pageSize}
+            currentPage={safePage}
+            lang={lang}
+            limitOptions={[8, 16, 24]}
+            itemLabel={{
+              singular: isBn ? 'পণ্য' : 'item',
+              plural: isBn ? 'পণ্য' : 'items',
+            }}
+            onPageChange={(newPage) => setPage(newPage)}
+            onLimitChange={(newLimit) => {
+              setPageSize(newLimit);
+              setPage(1);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -108,7 +139,9 @@ export function CustomerWishlistView({ lang = 'en' }: CustomerWishlistViewProps)
 function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; isBn: boolean }) {
   const [removeFromWishlist, { isLoading }] = useRemoveProductFromWishlistMutation();
 
-  const handleRemove = async () => {
+  const handleRemove = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     try {
       await removeFromWishlist(item.productId).unwrap();
       toast.success(isBn ? 'পছন্দের তালিকা থেকে সরানো হয়েছে' : 'Removed from wishlist');
@@ -131,13 +164,15 @@ function WishlistCard({ item, lang, isBn }: { item: WishlistItem; lang: string; 
       : null;
 
   return (
-    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-colors hover:border-primary/40">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-all hover:border-primary/40 hover:shadow-xs">
+      {/* Remove from wishlist button */}
       <button
         type="button"
         onClick={handleRemove}
         disabled={isLoading}
+        title={isBn ? 'পছন্দের তালিকা থেকে মুছুন' : 'Remove from wishlist'}
         aria-label={isBn ? `${name} সরিয়ে ফেলুন` : `Remove ${name} from wishlist`}
-        className="absolute end-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background/90 text-muted-foreground shadow-xs backdrop-blur-sm transition-colors hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+        className="absolute end-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/90 text-rose-500 shadow-xs backdrop-blur-xs transition-transform hover:scale-110 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 border border-border/40"
       >
         <Trash2 className="h-4 w-4" />
       </button>

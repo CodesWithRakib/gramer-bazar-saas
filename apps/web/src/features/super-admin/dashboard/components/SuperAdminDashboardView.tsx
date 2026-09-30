@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { formatNumber } from '@/lib/format';
 
 export interface SuperAdminDashboardViewProps {
   lang?: string;
@@ -75,7 +76,9 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tracking-tight text-foreground">{totalAdmins}</div>
+            <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
+              {formatNumber(totalAdmins, lang)}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'প্ল্যাটফর্ম নিয়ন্ত্রক' : 'Platform operators'}
             </p>
@@ -92,7 +95,9 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tracking-tight text-foreground">{totalSellers}</div>
+            <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
+              {formatNumber(totalSellers, lang)}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'সক্রিয় দোকানদার' : 'Active village merchants'}
             </p>
@@ -109,7 +114,9 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tracking-tight text-foreground">{totalRiders}</div>
+            <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
+              {formatNumber(totalRiders, lang)}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'ডেলিভারি নেটওয়ার্ক' : 'Delivery force'}
             </p>
@@ -126,7 +133,9 @@ export function SuperAdminDashboardView({ lang = 'en' }: SuperAdminDashboardView
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tracking-tight text-foreground">{totalUsers}</div>
+            <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
+              {formatNumber(totalUsers, lang)}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {isBn ? 'সকল অ্যাকাউন্ট' : 'All accounts combined'}
             </p>

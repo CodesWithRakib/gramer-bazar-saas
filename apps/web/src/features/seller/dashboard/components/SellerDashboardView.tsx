@@ -105,24 +105,24 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MetricCard
           label={isBn ? 'আজকের বিক্রয়' : "Today's sales"}
-          value={formatCurrency(metrics.todaySales)}
+          value={formatCurrency(metrics.todaySales, lang)}
           icon={<CircleDollarSign className="h-4 w-4" />}
           highlight
         />
         <MetricCard
           label={isBn ? 'আজকের অর্ডার' : "Today's orders"}
-          value={formatNumber(metrics.todayOrders)}
+          value={formatNumber(metrics.todayOrders, lang)}
           icon={<ShoppingCart className="h-4 w-4" />}
         />
         <MetricCard
           label={isBn ? 'কার্যক্রম প্রয়োজন' : 'Awaiting action'}
-          value={formatNumber(metrics.awaitingActionCount)}
+          value={formatNumber(metrics.awaitingActionCount, lang)}
           icon={<Receipt className="h-4 w-4" />}
           tone={metrics.awaitingActionCount > 0 ? 'warning' : 'neutral'}
         />
         <MetricCard
           label={isBn ? 'মোট আয় (নিষ্পত্তিকৃত)' : 'Lifetime settled sales'}
-          value={formatCurrency(metrics.totalSales)}
+          value={formatCurrency(metrics.totalSales, lang)}
           icon={<CircleDollarSign className="h-4 w-4" />}
         />
       </div>
@@ -130,22 +130,22 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MetricCard
           label={isBn ? 'এই মাসের বিক্রয়' : 'Sales this month'}
-          value={formatCurrency(metrics.monthSales)}
+          value={formatCurrency(metrics.monthSales, lang)}
           icon={<CircleDollarSign className="h-4 w-4" />}
         />
         <MetricCard
           label={isBn ? 'ডেলিভারি সম্পন্ন' : 'Completed orders'}
-          value={formatNumber(metrics.completedOrdersCount)}
+          value={formatNumber(metrics.completedOrdersCount, lang)}
           icon={<Receipt className="h-4 w-4" />}
         />
         <MetricCard
           label={isBn ? 'সক্রিয় পণ্য' : 'Active listings'}
-          value={formatNumber(metrics.totalProducts)}
+          value={formatNumber(metrics.totalProducts, lang)}
           icon={<Package className="h-4 w-4" />}
         />
         <MetricCard
           label={isBn ? 'স্টকের মূল্য' : 'Stock value'}
-          value={formatCurrency(metrics.stockValue)}
+          value={formatCurrency(metrics.stockValue, lang)}
           icon={<Boxes className="h-4 w-4" />}
         />
       </div>

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Star, Upload, X } from 'lucide-react';
 import { useAddReviewMutation } from '@/features/reviews/reviewsApi';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { CustomImage } from '@/components/ui/CustomImage';
 
 interface AddReviewModalProps {

@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin, Receipt, Phone, User, Ban, Star, CreditCard, Store, Package } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { AddReviewModal } from '@/components/reviews/AddReviewModal';
 import { useRetryPaymentMutation } from '@/features/payments/paymentsApi';
 import { OpenDisputeDialog } from '@/components/disputes/OpenDisputeDialog';

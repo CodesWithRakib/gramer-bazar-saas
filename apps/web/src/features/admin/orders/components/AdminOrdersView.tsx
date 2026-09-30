@@ -40,7 +40,7 @@ import {
 } from '@/components/ui/select';
 import { MoreHorizontal, ShoppingCart, Truck } from 'lucide-react';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 export interface AdminOrdersViewProps {
   lang?: string;

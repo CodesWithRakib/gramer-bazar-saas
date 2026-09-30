@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import {
   Banknote,
   CheckCircle2,
@@ -24,15 +24,15 @@ import {
   useUpdateRiderAvailabilityMutation,
 } from '@/features/riders/ridersApi';
 import { DeliveryStatus } from '@/features/deliveries/deliveriesApi';
+import { formatCurrency } from '@/lib/format';
 
 export interface RiderDashboardViewProps {
   lang?: string;
 }
 
-const currency = (value: number) => `\u09F3${Number(value || 0).toFixed(2)}`;
-
 export function RiderDashboardView({ lang = 'en' }: RiderDashboardViewProps) {
   const isBn = lang === 'bn';
+  const currency = (value: number) => formatCurrency(value, lang);
 
   const { data, isLoading, isError, refetch } = useGetRiderOperationalDashboardQuery(undefined, {
     pollingInterval: 20000,

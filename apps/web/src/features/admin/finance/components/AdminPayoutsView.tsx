@@ -32,7 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { Loader2, CheckCircle, XCircle, Search, X, Check, Eye } from 'lucide-react';
 import AdminPagination from '@/components/AdminPagination';
 

@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AdminPagination } from '@/components/ui/AdminPagination';
 import { Package } from 'lucide-react';
 
 export interface CustomerOrdersViewProps {
@@ -22,9 +23,13 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
   // The active tab lives in the URL — no local state to keep in sync.
   const activeTab = searchParams.get('status') || 'all';
 
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(5);
+
   const { data: orders, isLoading, error, refetch } = useGetOrdersQuery();
 
   const handleTabChange = (val: string) => {
+    setPage(1);
     const params = new URLSearchParams(searchParams.toString());
     if (val === 'all') {
       params.delete('status');
@@ -61,6 +66,21 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
   };
 
   const filteredOrders = filterOrders(activeTab);
+
+  // Tab counts
+  const allCount = orders?.length ?? 0;
+  const toPayCount = filterOrders('to-pay').length;
+  const toShipCount = filterOrders('to-ship').length;
+  const toReceiveCount = filterOrders('to-receive').length;
+  const completedCount = filterOrders('completed').length;
+  const cancelledCount = filterOrders('cancelled').length;
+
+  // Pagination
+  const totalItems = filteredOrders.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const startIndex = (safePage - 1) * pageSize;
+  const paginatedOrders = filteredOrders.slice(startIndex, startIndex + pageSize);
 
   if (isLoading) {
     return (
@@ -129,39 +149,67 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
             <TabsList className="w-max sm:w-full justify-start sm:justify-between bg-transparent h-auto p-0 rounded-none border-b-0 space-x-2 md:space-x-0">
               <TabsTrigger
                 value="all"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors gap-1.5"
               >
-                {isBn ? 'সব' : 'All Orders'}
+                <span>{isBn ? 'সব' : 'All'}</span>
+                <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-muted text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+                  {allCount}
+                </span>
               </TabsTrigger>
               <TabsTrigger
                 value="to-pay"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors gap-1.5"
               >
-                {isBn ? 'পেমেন্ট বাকি' : 'To Pay'}
+                <span>{isBn ? 'পেমেন্ট বাকি' : 'To Pay'}</span>
+                {toPayCount > 0 && (
+                  <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">
+                    {toPayCount}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value="to-ship"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors gap-1.5"
               >
-                {isBn ? 'শিপিং বাকি' : 'To Ship'}
+                <span>{isBn ? 'শিপিং বাকি' : 'To Ship'}</span>
+                {toShipCount > 0 && (
+                  <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold">
+                    {toShipCount}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value="to-receive"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors gap-1.5"
               >
-                {isBn ? 'রিসিভ বাকি' : 'To Receive'}
+                <span>{isBn ? 'রিসিভ বাকি' : 'To Receive'}</span>
+                {toReceiveCount > 0 && (
+                  <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
+                    {toReceiveCount}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value="completed"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors gap-1.5"
               >
-                {isBn ? 'সম্পন্ন' : 'Completed'}
+                <span>{isBn ? 'সম্পন্ন' : 'Completed'}</span>
+                {completedCount > 0 && (
+                  <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold">
+                    {completedCount}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value="cancelled"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-4 py-3 font-medium transition-colors gap-1.5"
               >
-                {isBn ? 'বাতিল' : 'Cancelled'}
+                <span>{isBn ? 'বাতিল' : 'Cancelled'}</span>
+                {cancelledCount > 0 && (
+                  <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold">
+                    {cancelledCount}
+                  </span>
+                )}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -169,14 +217,37 @@ export function CustomerOrdersView({ lang = 'en' }: CustomerOrdersViewProps) {
 
         <TabsContent
           value={activeTab}
-          className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+          className="mt-0 focus-visible:outline-none focus-visible:ring-0 space-y-4"
         >
-          {filteredOrders.length > 0 ? (
-            <div className="space-y-4">
-              {filteredOrders.map((order) => (
-                <OrderCard key={order.id} order={order} lang={lang} />
-              ))}
-            </div>
+          {paginatedOrders.length > 0 ? (
+            <>
+              <div className="space-y-3.5">
+                {paginatedOrders.map((order) => (
+                  <OrderCard key={order.id} order={order} lang={lang} />
+                ))}
+              </div>
+
+              {totalItems > pageSize && (
+                <div className="pt-2">
+                  <AdminPagination
+                    totalItems={totalItems}
+                    itemsPerPage={pageSize}
+                    currentPage={safePage}
+                    lang={lang}
+                    limitOptions={[5, 10, 20]}
+                    itemLabel={{
+                      singular: isBn ? 'অর্ডার' : 'order',
+                      plural: isBn ? 'অর্ডার' : 'orders',
+                    }}
+                    onPageChange={(newPage) => setPage(newPage)}
+                    onLimitChange={(newLimit) => {
+                      setPageSize(newLimit);
+                      setPage(1);
+                    }}
+                  />
+                </div>
+              )}
+            </>
           ) : (
             <EmptyState
               icon={<Package className="w-8 h-8 text-muted-foreground opacity-60" />}

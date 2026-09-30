@@ -34,11 +34,12 @@ import {
   useRemoveProductFromWishlistMutation,
 } from '@/features/wishlists/wishlistsApi';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { StartChatButton } from '@/components/chat/StartChatButton';
 import { getUserRoles } from '@/lib/roles';
+import { formatCurrency } from '@/lib/format';
 
 export function ProductDetailsClient({
   products,
@@ -231,7 +232,7 @@ export function ProductDetailsClient({
   };
 
   return (
-    <div className="bg-muted/10 min-h-screen pb-24 md:pb-16">
+    <div className="bg-muted/10 min-h-screen pb-36 md:pb-16">
       <div className="container mx-auto px-4 py-5 max-w-7xl">
         {/* Breadcrumb Navigation */}
         <nav
@@ -323,7 +324,7 @@ export function ProductDetailsClient({
 
                   {/* Badges */}
                   {discountPercent !== null && discountPercent > 0 && !isOutOfStock && (
-                    <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-xs font-black px-3 py-1 rounded-full shadow-md z-10 flex items-center gap-1">
+                    <div className="absolute top-4 start-4 bg-destructive text-destructive-foreground text-xs font-black px-3 py-1 rounded-full shadow-md z-10 flex items-center gap-1">
                       <Sparkles className="h-3 w-3" />
                       <span>-{discountPercent}% ছাড়</span>
                     </div>
@@ -604,12 +605,12 @@ export function ProductDetailsClient({
               {/* Pricing Box */}
               <div className="bg-primary/5 border border-primary/15 rounded-2xl p-4 mb-5">
                 <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl md:text-4xl font-black text-primary">
-                    ৳{currentPrice}
+                  <span className="text-3xl md:text-4xl font-black text-primary tabular-nums">
+                    {formatCurrency(currentPrice, lang)}
                   </span>
                   {originalPrice && originalPrice > currentPrice && (
-                    <span className="text-base text-muted-foreground line-through">
-                      ৳{originalPrice}
+                    <span className="text-base text-muted-foreground line-through tabular-nums">
+                      {formatCurrency(originalPrice, lang)}
                     </span>
                   )}
                   {unit && (
@@ -658,7 +659,9 @@ export function ProductDetailsClient({
                           >
                             {pName}
                           </span>
-                          <span className="text-xs font-bold text-foreground mt-1">৳{pPrice}</span>
+                          <span className="text-xs font-bold text-foreground mt-1 tabular-nums">
+                            {formatCurrency(pPrice, lang)}
+                          </span>
                         </button>
                       );
                     })}
@@ -823,12 +826,14 @@ export function ProductDetailsClient({
       </div>
 
       {/* Mobile Sticky Bottom Floating Order Bar */}
-      <div className="lg:hidden fixed bottom-[56px] md:bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur-md border-t border-border shadow-lg z-40 flex items-center justify-between gap-3">
+      <div className="lg:hidden fixed bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 inset-x-0 p-3 bg-background/95 backdrop-blur-md border-t border-border shadow-md z-40 flex items-center justify-between gap-3">
         <div className="flex flex-col ps-1">
           <span className="text-[10px] text-muted-foreground font-semibold">
             {isBn ? 'মোট মূল্য' : 'Total'}
           </span>
-          <span className="text-base font-black text-primary">৳{currentPrice * quantity}</span>
+          <span className="text-base font-black text-primary tabular-nums">
+            {formatCurrency(currentPrice * quantity, lang)}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Button

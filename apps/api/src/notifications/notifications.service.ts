@@ -13,6 +13,7 @@ import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { CreateNotificationDto, NotifyRoleOptions } from './dto/create-notification.dto.js';
 import { QueryNotificationsDto } from './dto/notification-response.dto.js';
+import { PaginationMetaDto } from '../common/dto/api-response.dto.js';
 
 @Injectable()
 export class NotificationsService {
@@ -211,8 +212,8 @@ export class NotificationsService {
   async getUserNotifications(
     userId: string,
     query?: QueryNotificationsDto,
-  ): Promise<Notification[]> {
-    const limit = query?.limit ? Math.min(Math.max(Number(query.limit), 1), 100) : 50;
+  ): Promise<{ data: Notification[]; meta: PaginationMetaDto }> {
+    const limit = query?.limit ? Math.min(Math.max(Number(query.limit), 1), 100) : 20;
     const page = query?.page ? Math.max(Number(query.page), 1) : 1;
     const skip = (page - 1) * limit;
 
@@ -227,7 +228,19 @@ export class NotificationsService {
       qb.andWhere('n.isRead = :isRead', { isRead: false });
     }
 
-    return qb.getMany();
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   /**

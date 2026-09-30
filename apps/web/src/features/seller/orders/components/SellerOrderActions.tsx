@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 import { Button } from '@/components/ui/button';
 import {

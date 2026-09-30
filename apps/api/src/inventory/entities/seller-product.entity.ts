@@ -34,7 +34,7 @@ export class SellerProduct {
   @Column({ name: 'product_variant_id' })
   productVariantId: string;
 
-  @ManyToOne(() => ProductVariant, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => ProductVariant, (variant) => variant.sellerProducts, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'product_variant_id' })
   productVariant: Relation<ProductVariant>;
 

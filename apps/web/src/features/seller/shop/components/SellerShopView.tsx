@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import {
   Store,
   ExternalLink,

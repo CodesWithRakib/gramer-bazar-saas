@@ -127,7 +127,7 @@ export function DataTable<TData, TValue>({
           <div className="flex w-full flex-1 flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
             {onSearchChange && (
               <div className="relative w-full max-w-md min-w-[220px] flex-1 sm:w-auto">
-                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-muted-foreground" />
+                <Search className="absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-muted-foreground" />
                 <input
                   type="text"
                   value={search ?? ''}
@@ -135,7 +135,7 @@ export function DataTable<TData, TValue>({
                   placeholder={searchPlaceholder ?? (isBn ? 'অনুসন্ধান করুন...' : 'Search...')}
                   className="h-11 w-full rounded-full border border-gray-200 bg-white ps-11 pe-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-border dark:bg-background dark:text-foreground dark:placeholder:text-muted-foreground"
                 />
-                <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1">
+                <div className="absolute end-3 top-1/2 flex -translate-y-1/2 items-center gap-1">
                   {isSearching && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
                   {search && (
                     <button

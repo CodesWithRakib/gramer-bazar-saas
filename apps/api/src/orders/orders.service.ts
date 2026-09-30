@@ -317,6 +317,13 @@ export class OrdersService {
   async findCustomerOrders(userId: string) {
     return this.dataSource.getRepository(Order).find({
       where: { userId },
+      relations: [
+        'items',
+        'items.sellerProduct',
+        'items.sellerProduct.productVariant',
+        'items.sellerProduct.productVariant.product',
+        'address',
+      ],
       order: { createdAt: 'DESC' },
     });
   }

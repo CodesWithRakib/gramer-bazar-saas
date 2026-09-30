@@ -53,7 +53,7 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
   };
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t pb-safe">
+    <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-background border-t pb-safe">
       <nav className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => (
           <Link
@@ -79,7 +79,7 @@ export function MobileBottomNav({ lang }: MobileBottomNavProps) {
             <div className="relative">
               <ShoppingCart className="h-5 w-5" />
               {cartItemsCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center border border-background">
+                <span className="absolute -top-1.5 -end-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center border border-background">
                   {cartItemsCount}
                 </span>
               )}

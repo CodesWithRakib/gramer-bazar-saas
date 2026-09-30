@@ -368,7 +368,7 @@ export function ProductFilterSidebar({
         {/* Custom Min / Max Inputs */}
         <div className="flex items-center gap-2 pt-1">
           <div className="relative flex-1">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+            <span className="absolute start-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
               ৳
             </span>
             <Input
@@ -381,7 +381,7 @@ export function ProductFilterSidebar({
           </div>
           <span className="text-muted-foreground text-xs font-bold">-</span>
           <div className="relative flex-1">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+            <span className="absolute start-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
               ৳
             </span>
             <Input

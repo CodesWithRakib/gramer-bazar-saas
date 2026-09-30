@@ -3,12 +3,14 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
   type Relation,
 } from 'typeorm';
 import { Product } from './product.entity.js';
+import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
 
 @Entity('product_variants')
 export class ProductVariant {
@@ -21,6 +23,9 @@ export class ProductVariant {
   @ManyToOne(() => Product, (product) => product.variants, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'product_id' })
   product: Relation<Product>;
+
+  @OneToMany(() => SellerProduct, (sp) => sp.productVariant)
+  sellerProducts: Relation<SellerProduct[]>;
 
   @Column({ name: 'name_en', length: 150 })
   nameEn: string;

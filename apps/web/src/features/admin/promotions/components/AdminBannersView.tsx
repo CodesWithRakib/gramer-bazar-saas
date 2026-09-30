@@ -38,7 +38,7 @@ import { Plus, Image as ImageIcon, Trash2, Edit, Search, X } from 'lucide-react'
 import Image from 'next/image';
 import { AdminPagination } from '@/components/ui/AdminPagination';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 export interface AdminBannersViewProps {
   lang?: string;

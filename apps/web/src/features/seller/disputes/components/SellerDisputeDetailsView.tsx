@@ -12,7 +12,7 @@ import {
   ShieldAlert,
   User,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 import {
   useAddSellerDisputeMessageMutation,

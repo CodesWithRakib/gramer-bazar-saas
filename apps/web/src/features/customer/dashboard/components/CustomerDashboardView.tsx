@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { RootState } from '@/store/store';
 import { useGetOrdersQuery } from '@/features/orders/ordersApi';
 import { useGetUserWishlistQuery } from '@/features/wishlists/wishlistsApi';

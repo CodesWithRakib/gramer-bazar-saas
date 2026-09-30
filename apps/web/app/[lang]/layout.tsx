@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Noto_Sans_Bengali } from 'next/font/google';
+import { Plus_Jakarta_Sans, Hind_Siliguri, Noto_Sans_Bengali } from 'next/font/google';
 import '../globals.css';
 import { getDirection } from '@/config/i18n';
 import { Toaster } from '@/components/ui/sonner';
@@ -7,9 +7,17 @@ import { ReduxProvider } from '@/store/provider';
 import { SocketProvider } from '@/providers/SocketProvider';
 import { ClientLayoutWrapper } from '@/components/layout/ClientLayoutWrapper';
 
-const inter = Inter({
-  variable: '--font-inter',
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-plus-jakarta',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+});
+
+const hindSiliguri = Hind_Siliguri({
+  variable: '--font-hind-siliguri',
+  weight: ['400', '500', '600', '700'],
+  subsets: ['bengali'],
   display: 'swap',
 });
 
@@ -73,16 +81,20 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
-  const dir = getDirection();
+  const isBn = lang === 'bn';
+  const dir = getDirection(lang);
 
   return (
     <html
       lang={lang}
       dir={dir}
       suppressHydrationWarning
-      className={`${inter.variable} ${notoSansBengali.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${hindSiliguri.variable} ${notoSansBengali.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+      <body
+        className={`min-h-full flex flex-col ${isBn ? 'font-bengali' : 'font-sans'} w-full max-w-full`}
+        suppressHydrationWarning
+      >
         <CSPostHogProvider>
           <ReduxProvider>
             <AuthProvider>

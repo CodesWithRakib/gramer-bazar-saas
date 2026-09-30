@@ -28,7 +28,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { formatCurrency, formatDate } from '@/lib/format';
+import { formatCurrency, formatDate, type AppLang } from '@/lib/format';
 import { getOrderStatusMeta, getPaymentStatusMeta } from '@/lib/order-status';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { useGetSellerOrdersQuery, type SellerOrderSummary } from '@/features/seller';
@@ -327,7 +327,7 @@ function OrderRow({
       </TableCell>
       <TableCell className="text-muted-foreground tabular-nums">{order.itemCount}</TableCell>
       <TableCell className="font-semibold tabular-nums">
-        {formatCurrency(order.sellerSubtotal)}
+        {formatCurrency(order.sellerSubtotal, isBn ? 'bn' : 'en')}
       </TableCell>
       <TableCell>
         <StatusBadge tone={paymentMeta.tone} label={isBn ? paymentMeta.bn : paymentMeta.en} />
@@ -403,7 +403,7 @@ function OrderCard({
               )}
             </div>
             <span className="text-foreground shrink-0 font-bold tabular-nums">
-              {formatCurrency(order.sellerSubtotal)}
+              {formatCurrency(order.sellerSubtotal, isBn ? 'bn' : 'en')}
             </span>
           </div>
 

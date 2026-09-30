@@ -9,7 +9,7 @@ import { useGetAdminReviewsQuery, useModerateReviewMutation } from '@/features/r
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, Check, X, ShieldAlert } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 export interface AdminReviewsViewProps {
   lang?: string;

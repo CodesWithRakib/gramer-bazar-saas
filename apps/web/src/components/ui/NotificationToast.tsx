@@ -42,28 +42,28 @@ export function NotificationToast({
       return {
         icon: <Package className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
         dotColor: 'bg-emerald-500',
-        borderColor: 'border-l-emerald-500',
+        borderColor: 'border-s-emerald-500',
       };
     }
     if (type.includes('DELIVERY')) {
       return {
         icon: <Truck className="w-4 h-4 text-sky-600 dark:text-sky-400" />,
         dotColor: 'bg-sky-500',
-        borderColor: 'border-l-sky-500',
+        borderColor: 'border-s-sky-500',
       };
     }
     if (type.includes('APPLICATION')) {
       return {
         icon: <FileText className="w-4 h-4 text-violet-600 dark:text-violet-400" />,
         dotColor: 'bg-violet-500',
-        borderColor: 'border-l-violet-500',
+        borderColor: 'border-s-violet-500',
       };
     }
     if (type.includes('PAYMENT') || type.includes('PAYOUT')) {
       return {
         icon: <CreditCard className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
         dotColor: 'bg-amber-500',
-        borderColor: 'border-l-amber-500',
+        borderColor: 'border-s-amber-500',
       };
     }
     if (
@@ -73,13 +73,13 @@ export function NotificationToast({
       return {
         icon: <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
         dotColor: 'bg-rose-500',
-        borderColor: 'border-l-rose-500',
+        borderColor: 'border-s-rose-500',
       };
     }
     return {
       icon: <CheckCircle2 className="w-4 h-4 text-primary" />,
       dotColor: 'bg-primary',
-      borderColor: 'border-l-primary',
+      borderColor: 'border-s-primary',
     };
   };
 
@@ -110,7 +110,7 @@ export function NotificationToast({
     <div
       role="alert"
       aria-live="polite"
-      className={`w-full max-w-sm sm:max-w-md bg-card border border-border border-l-4 ${borderColor} rounded-lg shadow-md p-3.5 flex items-start gap-3 transition-all duration-200 select-none`}
+      className={`w-full max-w-sm sm:max-w-md bg-card border border-border border-s-4 ${borderColor} rounded-lg shadow-md p-3.5 flex items-start gap-3 transition-all duration-200 select-none`}
     >
       {/* Icon badge */}
       <div className="flex-shrink-0 mt-0.5 p-1.5 rounded-md bg-muted/80">{icon}</div>

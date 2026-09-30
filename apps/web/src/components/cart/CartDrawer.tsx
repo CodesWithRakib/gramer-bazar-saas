@@ -19,10 +19,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, ShoppingBag, Plus, Minus, Tag, X } from 'lucide-react';
 import { CustomImage } from '@/components/ui/CustomImage';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
+import { formatCurrency } from '@/lib/format';
+import { getDirection } from '@/config/i18n';
 
 export function CartDrawer({ lang }: { lang: string }) {
   const isBn = lang === 'bn';
+  const dir = getDirection(lang);
   const dispatch = useDispatch();
   const { items, isOpen, appliedCoupon } = useSelector((state: RootState) => state.cart);
   const [couponCode, setCouponCode] = useState('');
@@ -45,8 +48,8 @@ export function CartDrawer({ lang }: { lang: string }) {
       setCouponCode('');
       toast.success(isBn ? 'কুপন প্রয়োগ করা হয়েছে' : 'Coupon applied', {
         description: isBn
-          ? `আপনি ৳${result.discountAmount} ছাড় পেয়েছেন`
-          : `You got a discount of ৳${result.discountAmount}`,
+          ? `আপনি ${formatCurrency(result.discountAmount, lang)} ছাড় পেয়েছেন`
+          : `You got a discount of ${formatCurrency(result.discountAmount, lang)}`,
       });
     } catch (error) {
       toast.error(isBn ? 'কুপন প্রয়োগে ত্রুটি' : 'Coupon Error', {
@@ -57,7 +60,10 @@ export function CartDrawer({ lang }: { lang: string }) {
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => dispatch(setCartOpen(open))}>
-      <SheetContent className="w-full sm:max-w-md flex flex-col">
+      <SheetContent
+        side={dir === 'rtl' ? 'left' : 'right'}
+        className="w-full sm:max-w-md flex flex-col"
+      >
         <SheetHeader className="pb-4 border-b">
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
@@ -113,8 +119,8 @@ export function CartDrawer({ lang }: { lang: string }) {
                         </p>
                       </div>
                       <div className="flex items-end justify-between mt-2">
-                        <div className="font-bold text-primary">
-                          ৳{item.price}{' '}
+                        <div className="font-bold text-primary tabular-nums">
+                          {formatCurrency(item.price, lang)}{' '}
                           <span className="text-xs text-muted-foreground font-normal">
                             x {item.quantity}
                           </span>
@@ -186,8 +192,8 @@ export function CartDrawer({ lang }: { lang: string }) {
                       <Tag className="h-4 w-4" />
                       <span className="font-semibold text-sm">{appliedCoupon.code}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-primary font-medium text-sm">
-                      -৳{appliedCoupon.discountAmount.toFixed(2)}
+                    <div className="flex items-center gap-2 text-primary font-medium text-sm tabular-nums">
+                      -{formatCurrency(appliedCoupon.discountAmount, lang)}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -220,17 +226,21 @@ export function CartDrawer({ lang }: { lang: string }) {
               <div className="flex flex-col gap-1 w-full mt-2">
                 <div className="flex items-center justify-between w-full text-sm text-muted-foreground">
                   <span>{isBn ? 'সাবটোটাল:' : 'Subtotal:'}</span>
-                  <span>৳{subtotal.toFixed(2)}</span>
+                  <span className="tabular-nums">{formatCurrency(subtotal, lang)}</span>
                 </div>
                 {appliedCoupon && (
                   <div className="flex items-center justify-between w-full text-sm text-primary font-medium">
                     <span>{isBn ? 'ডিসকাউন্ট:' : 'Discount:'}</span>
-                    <span>-৳{appliedCoupon.discountAmount.toFixed(2)}</span>
+                    <span className="tabular-nums">
+                      -{formatCurrency(appliedCoupon.discountAmount, lang)}
+                    </span>
                   </div>
                 )}
                 <div className="flex items-center justify-between w-full font-bold text-lg border-t pt-2 mt-1">
                   <span>{isBn ? 'মোট:' : 'Total:'}</span>
-                  <span className="text-primary text-xl">৳{total.toFixed(2)}</span>
+                  <span className="text-primary text-xl tabular-nums">
+                    {formatCurrency(total, lang)}
+                  </span>
                 </div>
               </div>
 

@@ -39,9 +39,6 @@ export class SellerReviewsService {
       .innerJoin('review.product', 'product')
       .innerJoin('product.variants', 'variant')
       .innerJoin('variant.sellerProducts', 'sp')
-      .innerJoin('review.user', 'customer')
-      .leftJoinAndSelect('review.product', 'productDetail')
-      .leftJoinAndSelect('productDetail.images', 'productImage')
       .where('sp.shopId = :shopId', { shopId });
   }
 
@@ -54,7 +51,11 @@ export class SellerReviewsService {
       return { data: [], meta: { total: 0, page, limit, totalPages: 1 } };
     }
 
-    const qb = this.buildScopedQuery(shopId).distinct(true);
+    const qb = this.buildScopedQuery(shopId)
+      .distinct(true)
+      .leftJoinAndSelect('review.product', 'productDetail')
+      .leftJoinAndSelect('productDetail.images', 'productImage')
+      .leftJoinAndSelect('review.user', 'customer');
 
     const search = query.search?.trim();
     if (search) {
@@ -138,6 +139,9 @@ export class SellerReviewsService {
 
     const review = await this.buildScopedQuery(shopId)
       .andWhere('review.id = :reviewId', { reviewId })
+      .leftJoinAndSelect('review.product', 'productDetail')
+      .leftJoinAndSelect('productDetail.images', 'productImage')
+      .leftJoinAndSelect('review.user', 'customer')
       .distinct(true)
       .getOne();
 
@@ -160,14 +164,14 @@ export class SellerReviewsService {
 
     const rows = await this.buildScopedQuery(shopId)
       .select('review.rating', 'rating')
-      .addSelect('COUNT(*)::int', 'count')
+      .addSelect('COUNT(DISTINCT review.id)::int', 'count')
       .groupBy('review.rating')
       .getRawMany<{ rating: string; count: string }>();
 
     const unreplied = await this.buildScopedQuery(shopId)
       .andWhere('review.sellerReply IS NULL')
-      .distinct(true)
-      .getCount();
+      .select('COUNT(DISTINCT review.id)::int', 'count')
+      .getRawOne<{ count: string }>();
 
     const totalReviews = rows.reduce((sum, row) => sum + Number(row.count), 0);
     const weighted = rows.reduce((sum, row) => sum + Number(row.rating) * Number(row.count), 0);
@@ -175,7 +179,7 @@ export class SellerReviewsService {
     return {
       averageRating: totalReviews > 0 ? Math.round((weighted / totalReviews) * 10) / 10 : 0,
       totalReviews,
-      unrepliedCount: unreplied,
+      unrepliedCount: Number(unreplied?.count ?? 0),
       distribution: rows
         .map((row) => ({ rating: Number(row.rating), count: Number(row.count) }))
         .sort((a, b) => b.rating - a.rating),

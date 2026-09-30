@@ -32,7 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
   useCreateAdminProductMutation,

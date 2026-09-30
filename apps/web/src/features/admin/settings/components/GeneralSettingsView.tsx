@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { useGetSettingsQuery, useUpdateSettingsMutation } from '@/features/settings/settingsApi';
 import { getApiErrorMessage } from '@/lib/apiError';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

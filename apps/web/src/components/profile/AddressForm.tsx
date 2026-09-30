@@ -23,7 +23,7 @@ import {
   Address,
 } from '@/features/addresses/addressApi';
 import { LocationSelector } from '@/features/addresses/components/LocationSelector';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { Loader2, LocateFixed, CheckCircle2, MapPin } from 'lucide-react';
 
 const addressSchema = z.object({

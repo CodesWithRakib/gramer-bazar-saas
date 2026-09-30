@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { Textarea } from '@/components/ui/textarea';
 
 export interface AdminProductRequestDetailsViewProps {

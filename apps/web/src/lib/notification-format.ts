@@ -70,6 +70,25 @@ export function formatNotificationText(
     }
   }
 
+  // Intelligent Bangla fallback translation for unkeyed notifications
+  if (currentLang === 'bn') {
+    const lowerTitle = title?.toLowerCase().trim();
+    if (lowerTitle === 'new delivery assigned') {
+      title = 'নতুন ডেলিভারি দায়িত্ব বরাদ্দ';
+      if (message.includes('assigned to you for delivery')) {
+        const orderMatch = message.match(/#([a-zA-Z0-9]+)/);
+        const orderNum = orderMatch ? orderMatch[1] : '';
+        message = `অর্ডার #${orderNum} ডেলিভারির জন্য আপনাকে দায়িত্ব প্রদান করা হয়েছে।`;
+      }
+    } else if (lowerTitle === 'order dispatched' || lowerTitle === 'delivery started') {
+      title = 'অর্ডার ডেলিভারির জন্য বের হয়েছে';
+    } else if (lowerTitle === 'delivery completed' || lowerTitle === 'order delivered') {
+      title = 'ডেলিভারি সফলভাবে সম্পন্ন হয়েছে';
+    } else if (lowerTitle === 'payout requested') {
+      title = 'টাকা উত্তোলনের অনুরোধ গৃহীত হয়েছে';
+    }
+  }
+
   return { title, message };
 }
 

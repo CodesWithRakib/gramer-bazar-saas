@@ -22,6 +22,7 @@ import { NotificationBell } from '@/components/ui/NotificationBell';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { getUserRoles } from '@/lib/roles';
+import { getDirection } from '@/config/i18n';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,7 +61,7 @@ function NavItem({ href, icon: Icon, title, isActive, onClick }: NavItemProps) {
       onClick={onClick}
       className={`group flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors font-medium ${
         isActive
-          ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary ps-2.5'
+          ? 'bg-primary/10 text-primary font-semibold border-s-2 border-primary ps-2.5'
           : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
       }`}
     >
@@ -105,7 +106,7 @@ function SidebarContent({
   });
 
   return (
-    <div className="flex flex-col h-full bg-card border-r border-border">
+    <div className="flex flex-col h-full bg-card border-e border-border">
       {/* Brand Header */}
       <div className="h-16 flex items-center px-5 border-b border-border shrink-0">
         <Link
@@ -173,6 +174,7 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
   };
   const routes = routesMap[routeType] || adminRoutes;
   const isBn = lang === 'bn';
+  const dir = getDirection(lang);
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -245,7 +247,7 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
                   <span className="sr-only">Toggle Navigation Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side={isBn ? 'right' : 'left'} className="w-64 p-0">
+              <SheetContent side={dir === 'rtl' ? 'right' : 'left'} className="w-64 p-0">
                 <SheetHeader className="sr-only">
                   <SheetTitle>{isBn ? 'ন্যাভিগেশন মেনু' : 'Navigation Menu'}</SheetTitle>
                 </SheetHeader>

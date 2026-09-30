@@ -7,7 +7,7 @@ import { useValidateCouponMutation } from '@/features/coupons/couponsApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Ticket, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 interface ValidatedCoupon {
   discountAmount: number;

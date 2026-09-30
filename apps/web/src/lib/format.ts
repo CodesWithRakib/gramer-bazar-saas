@@ -23,21 +23,23 @@ function toNumber(value: number | string | null | undefined): number {
 }
 
 /**
- * Formats a BDT amount as `৳1,250` (grouped, trailing zeros trimmed).
+ * Formats a BDT amount as `৳1,250` (or `৳১,২৫০` if Bangla locale requested).
  * Prices in the catalog are whole taka in practice, so decimals only appear
  * when they actually exist.
  */
-export function formatCurrency(value: number | string | null | undefined): string {
+export function formatCurrency(value: number | string | null | undefined, lang?: AppLang): string {
   const amount = toNumber(value);
-  return `৳${new Intl.NumberFormat('en-US', {
+  const locale = isBangla(lang) ? 'bn-BD' : 'en-US';
+  return `৳${new Intl.NumberFormat(locale, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(amount)}`;
 }
 
-/** Grouped plain number, e.g. `1,250`. */
-export function formatNumber(value: number | string | null | undefined): string {
-  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(toNumber(value));
+/** Grouped plain number, e.g. `1,250` or `১,২৫০`. */
+export function formatNumber(value: number | string | null | undefined, lang?: AppLang): string {
+  const locale = isBangla(lang) ? 'bn-BD' : 'en-US';
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(toNumber(value));
 }
 
 export function formatDate(

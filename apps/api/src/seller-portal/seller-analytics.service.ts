@@ -200,9 +200,9 @@ export class SellerAnalyticsService {
     >(
       `SELECT
          COUNT(*) FILTER (
-           WHERE is_active = true
-             AND (start_date IS NULL OR start_date <= NOW())
-             AND (end_date IS NULL OR end_date >= NOW())
+           WHERE "isActive" = true
+             AND ("startDate" IS NULL OR "startDate" <= NOW())
+             AND ("endDate" IS NULL OR "endDate" >= NOW())
          )::int AS active_coupons,
          COUNT(*)::int AS total_coupons
        FROM coupons

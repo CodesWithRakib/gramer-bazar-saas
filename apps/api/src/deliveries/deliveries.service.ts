@@ -209,7 +209,8 @@ export class DeliveriesService {
       .leftJoinAndSelect('order.address', 'address')
       .leftJoinAndSelect('order.user', 'user')
       .where('delivery.riderId = :riderId', { riderId })
-      .orderBy('COALESCE(delivery.deliveryTime, delivery.updatedAt)', 'DESC');
+      .orderBy('delivery.updatedAt', 'DESC')
+      .addOrderBy('delivery.id', 'DESC');
 
     if (query.status) {
       qb.andWhere('delivery.status = :status', { status: query.status });
@@ -220,12 +221,12 @@ export class DeliveriesService {
       });
     }
     if (query.from) {
-      qb.andWhere('COALESCE(delivery.deliveryTime, delivery.createdAt) >= :from', {
+      qb.andWhere('COALESCE(delivery.delivery_time, delivery.created_at) >= :from', {
         from: new Date(query.from),
       });
     }
     if (query.to) {
-      qb.andWhere('COALESCE(delivery.deliveryTime, delivery.createdAt) <= :to', {
+      qb.andWhere('COALESCE(delivery.delivery_time, delivery.created_at) <= :to', {
         to: new Date(query.to),
       });
     }

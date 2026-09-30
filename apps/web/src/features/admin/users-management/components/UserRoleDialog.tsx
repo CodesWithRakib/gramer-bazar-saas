@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { useUpdateUserRolesMutation, Role, User } from '@/features/users/usersApi';
 import { Checkbox } from '@/components/ui/checkbox';
 

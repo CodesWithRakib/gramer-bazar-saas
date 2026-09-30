@@ -9,7 +9,7 @@ import {
 } from '@/features/disputes/disputesApi';
 import { getDisputeReasonLabel, getDisputeStatusMeta } from '@/features/disputes/dispute-display';
 import { RootState } from '@/store/store';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import {
   ArrowLeft,
   CheckCircle2,

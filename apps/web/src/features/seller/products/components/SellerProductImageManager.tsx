@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { ImageOff, Star, Trash2, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
-import { toast } from 'sonner';
+import { customToast as toast } from '@/components/ui/custom-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomImage } from '@/components/ui/CustomImage';
