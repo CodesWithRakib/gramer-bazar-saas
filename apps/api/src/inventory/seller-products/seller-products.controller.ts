@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
   UseGuards,
   UseInterceptors,
   ParseUUIDPipe,
@@ -27,6 +28,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
+import type { AuthenticatedRequest } from '../../common/types/authenticated-request.js';
+import { toActor } from '../../common/utils/actor.js';
 
 @ApiTags('Inventory - Seller Products')
 @Controller('inventory/seller-products')
@@ -48,8 +51,11 @@ export class SellerProductsController {
     description: 'Seller product listing created successfully',
   })
   @ApiCommonErrors([400, 401, 403, 409, 500])
-  create(@Body() createSellerProductDto: CreateSellerProductDto) {
-    return this.sellerProductsService.create(createSellerProductDto);
+  create(
+    @Request() req: AuthenticatedRequest,
+    @Body() createSellerProductDto: CreateSellerProductDto,
+  ) {
+    return this.sellerProductsService.create(createSellerProductDto, toActor(req));
   }
 
   @Get()
@@ -66,8 +72,8 @@ export class SellerProductsController {
     description: 'List of seller product offers',
   })
   @ApiCommonErrors([500])
-  findAll() {
-    return this.sellerProductsService.findAll();
+  findAll(@Request() req: AuthenticatedRequest) {
+    return this.sellerProductsService.findAll(toActor(req));
   }
 
   @Get(':id')
@@ -85,8 +91,8 @@ export class SellerProductsController {
     description: 'Seller product details',
   })
   @ApiCommonErrors([404, 500])
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.sellerProductsService.findOne(id);
+  findOne(@Request() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string) {
+    return this.sellerProductsService.findOne(id, toActor(req));
   }
 
   @Patch(':id')
@@ -105,10 +111,11 @@ export class SellerProductsController {
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
   update(
+    @Request() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateSellerProductDto: UpdateSellerProductDto,
   ) {
-    return this.sellerProductsService.update(id, updateSellerProductDto);
+    return this.sellerProductsService.update(id, updateSellerProductDto, toActor(req));
   }
 
   @Delete(':id')
@@ -126,7 +133,7 @@ export class SellerProductsController {
     description: 'Seller product deleted successfully',
   })
   @ApiCommonErrors([401, 403, 404, 500])
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.sellerProductsService.remove(id);
+  remove(@Request() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string) {
+    return this.sellerProductsService.remove(id, toActor(req));
   }
 }

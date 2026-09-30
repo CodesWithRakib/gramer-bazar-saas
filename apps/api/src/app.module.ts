@@ -49,6 +49,7 @@ import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
 import { StorageModule } from './storage/storage.module.js';
 import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSchema.js';
 import { RiderSystem1790700000000 } from './migrations/1790700000000-RiderSystem.js';
+import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSystem.js';
 
 @Module({
   imports: [
@@ -79,7 +80,11 @@ import { RiderSystem1790700000000 } from './migrations/1790700000000-RiderSystem
           url: dbUrl,
           autoLoadEntities: true,
           synchronize: syncEnabled,
-          migrations: [InitialSchema1790406745498, RiderSystem1790700000000],
+          migrations: [
+            InitialSchema1790406745498,
+            RiderSystem1790700000000,
+            SellerSystem1790800000000,
+          ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,
           logging: nodeEnv === 'development',

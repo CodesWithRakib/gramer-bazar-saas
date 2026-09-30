@@ -4,9 +4,10 @@ import { CouponsService } from './coupons.service.js';
 import { CouponsController } from './coupons.controller.js';
 import { Coupon } from './entities/coupon.entity.js';
 import { CouponUsage } from './entities/coupon-usage.entity.js';
+import { ShopsModule } from '../shops/shops.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Coupon, CouponUsage])],
+  imports: [TypeOrmModule.forFeature([Coupon, CouponUsage]), ShopsModule],
   controllers: [CouponsController],
   providers: [CouponsService],
   exports: [CouponsService],

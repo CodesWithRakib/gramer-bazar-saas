@@ -1,25 +1,13 @@
 'use client';
 
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
-import {
-  useGetSellerShopQuery,
-  useUpdateSellerShopMutation,
-  useUploadShopLogoMutation,
-  useUploadShopBannerMutation,
-} from '@/features/seller-portal/sellerPortalApi';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { toast } from 'sonner';
 import {
   Store,
-  Upload,
   ExternalLink,
   CheckCircle,
   Phone,
@@ -33,29 +21,47 @@ import {
   Save,
   Loader2,
 } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { toast } from 'sonner';
+
+import {
+  useGetSellerShopQuery,
+  useUpdateSellerShopMutation,
+  useUploadShopLogoMutation,
+  useUploadShopBannerMutation,
+} from '@/features/seller';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { CustomImage } from '@/components/ui/CustomImage';
+import { PageHeader } from '@/components/common/PageHeader';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
+import { ImageUploader } from '@/components/upload/ImageUploader';
+import { getApiErrorMessage } from '@/lib/apiError';
+import { formatNumber } from '@/lib/format';
 
 const shopFormSchema = z.object({
   nameEn: z.string().min(2, 'Shop name (English) is required').max(150),
   nameBn: z.string().min(2, 'Shop name (Bangla) is required').max(200),
-  shortDescription: z.string().max(300).optional().nullable(),
-  description: z.string().max(3000).optional().nullable(),
-  phone: z.string().max(20).optional().nullable(),
-  secondaryPhone: z.string().max(20).optional().nullable(),
-  whatsapp: z.string().max(20).optional().nullable(),
-  email: z.string().email('Invalid email address').optional().nullable().or(z.literal('')),
-  website: z.string().url('Invalid URL').optional().nullable().or(z.literal('')),
-  facebook: z.string().url('Invalid URL').optional().nullable().or(z.literal('')),
-  instagram: z.string().url('Invalid URL').optional().nullable().or(z.literal('')),
-  district: z.string().max(100).optional().nullable(),
-  upazila: z.string().max(100).optional().nullable(),
-  union: z.string().max(100).optional().nullable(),
-  village: z.string().max(100).optional().nullable(),
-  address: z.string().max(255).optional().nullable(),
-  openingHours: z.string().max(255).optional().nullable(),
-  deliveryInfo: z.string().max(255).optional().nullable(),
+  shortDescription: z.string().max(300).optional(),
+  description: z.string().max(3000).optional(),
+  phone: z.string().max(20).optional(),
+  secondaryPhone: z.string().max(20).optional(),
+  whatsapp: z.string().max(20).optional(),
+  email: z.union([z.string().email('Invalid email address'), z.literal('')]).optional(),
+  website: z.union([z.string().url('Invalid URL'), z.literal('')]).optional(),
+  facebook: z.union([z.string().url('Invalid URL'), z.literal('')]).optional(),
+  instagram: z.union([z.string().url('Invalid URL'), z.literal('')]).optional(),
+  district: z.string().max(100).optional(),
+  upazila: z.string().max(100).optional(),
+  union: z.string().max(100).optional(),
+  village: z.string().max(100).optional(),
+  address: z.string().max(255).optional(),
+  openingHours: z.string().max(255).optional(),
+  deliveryInfo: z.string().max(255).optional(),
 });
 
 type ShopFormValues = z.infer<typeof shopFormSchema>;
@@ -67,13 +73,10 @@ export interface SellerShopViewProps {
 export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
   const isBn = lang === 'bn';
 
-  const { data: shop, isLoading } = useGetSellerShopQuery();
+  const { data: shop, isLoading, isError, refetch } = useGetSellerShopQuery();
   const [updateShop, { isLoading: isUpdating }] = useUpdateSellerShopMutation();
   const [uploadLogo, { isLoading: isUploadingLogo }] = useUploadShopLogoMutation();
   const [uploadBanner, { isLoading: isUploadingBanner }] = useUploadShopBannerMutation();
-
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
 
   const {
     register,
@@ -85,311 +88,289 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
   });
 
   useEffect(() => {
-    if (shop) {
-      reset({
-        nameEn: shop.nameEn || '',
-        nameBn: shop.nameBn || '',
-        shortDescription: shop.shortDescription || '',
-        description: shop.description || '',
-        phone: shop.phone || '',
-        secondaryPhone: shop.secondaryPhone || '',
-        whatsapp: shop.whatsapp || '',
-        email: shop.email || '',
-        website: shop.website || '',
-        facebook: shop.facebook || '',
-        instagram: shop.instagram || '',
-        district: shop.district || '',
-        upazila: shop.upazila || '',
-        union: shop.union || '',
-        village: shop.village || '',
-        address: shop.address || '',
-        openingHours: shop.openingHours || '',
-        deliveryInfo: shop.deliveryInfo || '',
-      });
-      setLogoPreview(shop.logo);
-      setBannerPreview(shop.banner);
-    }
+    if (!shop) return;
+    reset({
+      nameEn: shop.nameEn || '',
+      nameBn: shop.nameBn || '',
+      shortDescription: shop.shortDescription || '',
+      description: shop.description || '',
+      phone: shop.phone || '',
+      secondaryPhone: shop.secondaryPhone || '',
+      whatsapp: shop.whatsapp || '',
+      email: shop.email || '',
+      website: shop.website || '',
+      facebook: shop.facebook || '',
+      instagram: shop.instagram || '',
+      district: shop.district || '',
+      upazila: shop.upazila || '',
+      union: shop.union || '',
+      village: shop.village || '',
+      address: shop.address || '',
+      openingHours: shop.openingHours || '',
+      deliveryInfo: shop.deliveryInfo || '',
+    });
   }, [shop, reset]);
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error(
-        isBn ? 'শুধুমাত্র JPG, PNG বা WEBP ফাইল গ্রহণযোগ্য' : 'Only JPG, PNG or WEBP allowed'
-      );
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(isBn ? 'ফাইলের আকার ৫MB এর কম হতে হবে' : 'File size must be under 5MB');
-      return;
-    }
-
+  const uploadShopImage = async (
+    files: File[],
+    mutation: (body: FormData) => { unwrap: () => Promise<unknown> },
+  ) => {
     const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await uploadLogo(formData).unwrap();
-      setLogoPreview(res.logoUrl);
-      toast.success(isBn ? 'লোগো সফলভাবে আপলোড হয়েছে' : 'Logo uploaded successfully');
-    } catch {
-      toast.error(isBn ? 'লোগো আপলোড ব্যর্থ হয়েছে' : 'Failed to upload logo');
-    }
-  };
-
-  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error(
-        isBn ? 'শুধুমাত্র JPG, PNG বা WEBP ফাইল গ্রহণযোগ্য' : 'Only JPG, PNG or WEBP allowed'
-      );
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(isBn ? 'ফাইলের আকার ৫MB এর কম হতে হবে' : 'File size must be under 5MB');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await uploadBanner(formData).unwrap();
-      setBannerPreview(res.bannerUrl);
-      toast.success(isBn ? 'ব্যানার সফলভাবে আপলোড হয়েছে' : 'Cover banner uploaded successfully');
-    } catch {
-      toast.error(isBn ? 'ব্যানার আপলোড ব্যর্থ হয়েছে' : 'Failed to upload cover banner');
-    }
+    formData.append('file', files[0]);
+    await mutation(formData).unwrap();
   };
 
   const onSubmit = async (data: ShopFormValues) => {
     try {
       await updateShop(data).unwrap();
       toast.success(
-        isBn ? 'শপ প্রোফাইল সফলভাবে আপডেট করা হয়েছে' : 'Shop profile updated successfully'
+        isBn ? 'শপ প্রোফাইল সফলভাবে আপডেট করা হয়েছে' : 'Shop profile updated successfully',
       );
-    } catch {
-      toast.error(isBn ? 'শপ প্রোফাইল আপডেট করতে সমস্যা হয়েছে' : 'Failed to update shop profile');
+    } catch (error) {
+      toast.error(
+        getApiErrorMessage(
+          error,
+          isBn ? 'শপ প্রোফাইল আপডেট করা যায়নি' : 'Failed to update shop profile',
+        ),
+      );
     }
   };
 
   if (isLoading) {
+    return <LoadingState message={isBn ? 'শপ তথ্য লোড হচ্ছে...' : 'Loading shop profile...'} />;
+  }
+
+  if (isError || !shop) {
     return (
-      <div className="p-12 text-center flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">
-          {isBn ? 'শপ তথ্য লোড হচ্ছে...' : 'Loading shop profile...'}
-        </p>
-      </div>
+      <ErrorState
+        title={isBn ? 'শপ তথ্য লোড করা যায়নি' : 'Could not load shop profile'}
+        message={
+          isBn
+            ? 'আপনার দোকানের তথ্য আনতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+            : 'There was a problem loading your shop details. Please try again.'
+        }
+        onRetry={refetch}
+        isBn={isBn}
+      />
     );
   }
 
   return (
-    <div className="space-y-6 w-full max-w-6xl pb-16">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              {isBn ? 'দোকান প্রোফাইল ও সেটিংস' : 'Shop Profile & Settings'}
-            </h1>
-            {shop?.isVerified && (
-              <Badge variant="secondary" className="bg-blue-600 text-white gap-1 py-0.5 text-xs">
-                <CheckCircle className="w-3 h-3" />
-                {isBn ? 'ভেরিফাইড' : 'Verified'}
-              </Badge>
-            )}
-          </div>
-          <p className="text-muted-foreground text-sm mt-1">
-            {isBn
-              ? 'আপনার দোকানের ব্র্যান্ডিং, যোগাযোগের তথ্য এবং লোকেশন সাজান'
-              : 'Customize your storefront branding, public contacts, and location'}
-          </p>
-        </div>
-
-        {shop && (
-          <Button asChild variant="outline" className="gap-2 shrink-0">
+    <div className="w-full max-w-5xl space-y-6 pb-16">
+      <PageHeader
+        breadcrumbs={[
+          { label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', href: `/${lang}/seller` },
+          { label: isBn ? 'দোকান প্রোফাইল' : 'Shop Profile' },
+        ]}
+        title={isBn ? 'দোকান প্রোফাইল' : 'Shop Profile'}
+        description={
+          isBn
+            ? 'আপনার দোকানের ব্র্যান্ডিং, যোগাযোগের তথ্য এবং লোকেশন পরিচালনা করুন'
+            : 'Manage your storefront branding, public contacts and location'
+        }
+        badge={
+          shop.isVerified ? (
+            <Badge variant="secondary" className="gap-1 text-xs">
+              <CheckCircle className="h-3 w-3" />
+              {isBn ? 'ভেরিফাইড' : 'Verified'}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="gap-1 text-xs">
+              {isBn ? 'যাচাই চলছে' : 'Verification pending'}
+            </Badge>
+          )
+        }
+        secondaryActions={
+          <Button asChild variant="outline" className="gap-2">
             <Link href={`/${lang}/shops/${shop.id}`} target="_blank">
-              <ExternalLink className="w-4 h-4" />
-              {isBn ? 'পাবলিক স্টোরফ্রন্ট দেখুন' : 'View Public Storefront'}
+              <ExternalLink className="h-4 w-4" />
+              {isBn ? 'পাবলিক স্টোরফ্রন্ট' : 'View storefront'}
             </Link>
           </Button>
-        )}
+        }
+      />
+
+      {/* Shop health summary */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <Card>
+          <CardContent className="pt-5">
+            <p className="text-muted-foreground text-xs">{isBn ? 'সক্রিয় পণ্য' : 'Products'}</p>
+            <p className="text-foreground mt-1 text-2xl font-bold">
+              {formatNumber(shop.productCount ?? 0)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <p className="text-muted-foreground text-xs">{isBn ? 'মোট অর্ডার' : 'Orders'}</p>
+            <p className="text-foreground mt-1 text-2xl font-bold">
+              {formatNumber(shop.totalOrders ?? 0)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="col-span-2 sm:col-span-1">
+          <CardContent className="pt-5">
+            <p className="text-muted-foreground text-xs">
+              {isBn ? 'শপ স্ট্যাটাস' : 'Shop status'}
+            </p>
+            <p className="text-foreground mt-1 text-sm font-semibold">
+              {shop.isActive
+                ? isBn
+                  ? 'সক্রিয়'
+                  : 'Active'
+                : isBn
+                  ? 'নিষ্ক্রিয়'
+                  : 'Inactive'}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <Tabs defaultValue="branding" className="w-full">
-          <TabsList className="grid grid-cols-3 w-full max-w-md mb-6">
+          <TabsList className="mb-6 grid w-full max-w-md grid-cols-3">
             <TabsTrigger value="branding" className="text-xs md:text-sm">
-              <Store className="w-4 h-4 me-1.5 hidden sm:inline" />
+              <Store className="me-1.5 hidden h-4 w-4 sm:inline" />
               {isBn ? 'ব্র্যান্ডিং' : 'Branding'}
             </TabsTrigger>
             <TabsTrigger value="contact" className="text-xs md:text-sm">
-              <Phone className="w-4 h-4 me-1.5 hidden sm:inline" />
+              <Phone className="me-1.5 hidden h-4 w-4 sm:inline" />
               {isBn ? 'যোগাযোগ' : 'Contact'}
             </TabsTrigger>
             <TabsTrigger value="location" className="text-xs md:text-sm">
-              <MapPin className="w-4 h-4 me-1.5 hidden sm:inline" />
+              <MapPin className="me-1.5 hidden h-4 w-4 sm:inline" />
               {isBn ? 'লোকেশন' : 'Location'}
             </TabsTrigger>
           </TabsList>
 
           {/* TAB 1: BRANDING & IDENTITY */}
           <TabsContent value="branding" className="space-y-6">
-            {/* Visual Media Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Logo Upload Card */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {/* Logo */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-bold flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-primary" />
-                    {isBn ? 'দোকানের লোগো' : 'Shop Logo'}
+                  <CardTitle className="flex items-center gap-2 text-base font-bold">
+                    <ImageIcon className="text-primary h-4 w-4" />
+                    {isBn ? 'দোকানের লোগো' : 'Shop logo'}
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    {isBn ? 'বর্গাকার ছবি (সর্বোচ্চ ৫MB)' : 'Square image recommended (Max 5MB)'}
+                    {isBn
+                      ? 'বর্গাকার ছবি প্রস্তাবিত, আপলোডের আগে ছোট করা হবে'
+                      : 'Square image recommended — resized before upload'}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-4">
-                  <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-border flex items-center justify-center overflow-hidden relative bg-muted/30">
-                    {logoPreview ? (
-                      <Image src={logoPreview} alt="Shop Logo" fill className="object-cover" />
+                <CardContent className="space-y-4">
+                  <div className="border-border bg-muted/30 relative mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-xl border">
+                    {shop.logo ? (
+                      <CustomImage src={shop.logo} alt="Shop logo" fill className="object-cover" />
                     ) : (
-                      <Store className="w-10 h-10 text-muted-foreground/40" />
+                      <Store className="text-muted-foreground/40 h-10 w-10" />
                     )}
                     {isUploadingLogo && (
-                      <div className="absolute inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center">
-                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      <div className="bg-background/70 absolute inset-0 flex items-center justify-center">
+                        <Loader2 className="text-primary h-6 w-6 animate-spin" />
                       </div>
                     )}
                   </div>
-
-                  <label className="cursor-pointer">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={isUploadingLogo}
-                      asChild
-                    >
-                      <span>
-                        <Upload className="w-3.5 h-3.5 me-1.5" />
-                        {logoPreview
-                          ? isBn
-                            ? 'লোগো পরিবর্তন'
-                            : 'Change Logo'
-                          : isBn
-                            ? 'লোগো আপলোড'
-                            : 'Upload Logo'}
-                      </span>
-                    </Button>
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      className="hidden"
-                      onChange={handleLogoUpload}
-                    />
-                  </label>
+                  <ImageUploader
+                    profile="shopLogo"
+                    maxFiles={1}
+                    minWidth={128}
+                    minHeight={128}
+                    isBn={isBn}
+                    disabled={isUploadingLogo}
+                    compact
+                    title={shop.logo ? (isBn ? 'লোগো পরিবর্তন' : 'Change logo') : undefined}
+                    upload={(files) => uploadShopImage(files, uploadLogo)}
+                    onUploaded={() => {
+                      toast.success(isBn ? 'লোগো আপডেট হয়েছে' : 'Logo updated');
+                    }}
+                  />
                 </CardContent>
               </Card>
 
-              {/* Banner Cover Upload Card */}
+              {/* Cover */}
               <Card className="md:col-span-2">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-bold flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-primary" />
-                    {isBn ? 'কভার ব্যানার' : 'Cover Banner'}
+                  <CardTitle className="flex items-center gap-2 text-base font-bold">
+                    <ImageIcon className="text-primary h-4 w-4" />
+                    {isBn ? 'কভার ব্যানার' : 'Cover banner'}
                   </CardTitle>
                   <CardDescription className="text-xs">
                     {isBn
                       ? 'প্রশস্ত ল্যান্ডস্কেপ ব্যানার (১৬:৯ অনুপাত)'
-                      : 'Wide landscape banner (16:9 ratio, max 5MB)'}
+                      : 'Wide landscape banner (16:9 ratio)'}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-4">
-                  <div className="w-full h-32 md:h-36 rounded-2xl border-2 border-dashed border-border flex items-center justify-center overflow-hidden relative bg-muted/30">
-                    {bannerPreview ? (
-                      <Image src={bannerPreview} alt="Cover Banner" fill className="object-cover" />
+                <CardContent className="space-y-4">
+                  <div className="border-border bg-muted/30 relative flex h-32 w-full items-center justify-center overflow-hidden rounded-xl border md:h-36">
+                    {shop.banner ? (
+                      <CustomImage
+                        src={shop.banner}
+                        alt="Cover banner"
+                        fill
+                        className="object-cover"
+                      />
                     ) : (
-                      <div className="flex flex-col items-center text-muted-foreground/40 gap-1">
-                        <ImageIcon className="w-8 h-8" />
-                        <span className="text-xs">
-                          {isBn ? 'কোন ব্যানার নেই' : 'No banner set'}
-                        </span>
+                      <div className="text-muted-foreground/40 flex flex-col items-center gap-1">
+                        <ImageIcon className="h-8 w-8" />
+                        <span className="text-xs">{isBn ? 'কোন ব্যানার নেই' : 'No banner set'}</span>
                       </div>
                     )}
                     {isUploadingBanner && (
-                      <div className="absolute inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center">
-                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      <div className="bg-background/70 absolute inset-0 flex items-center justify-center">
+                        <Loader2 className="text-primary h-6 w-6 animate-spin" />
                       </div>
                     )}
                   </div>
-
-                  <label className="cursor-pointer">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={isUploadingBanner}
-                      asChild
-                    >
-                      <span>
-                        <Upload className="w-3.5 h-3.5 me-1.5" />
-                        {bannerPreview
-                          ? isBn
-                            ? 'ব্যানার পরিবর্তন'
-                            : 'Change Banner'
-                          : isBn
-                            ? 'ব্যানার আপলোড'
-                            : 'Upload Banner'}
-                      </span>
-                    </Button>
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      className="hidden"
-                      onChange={handleBannerUpload}
-                    />
-                  </label>
+                  <ImageUploader
+                    profile="shopCover"
+                    maxFiles={1}
+                    minWidth={640}
+                    isBn={isBn}
+                    disabled={isUploadingBanner}
+                    compact
+                    title={shop.banner ? (isBn ? 'ব্যানার পরিবর্তন' : 'Change banner') : undefined}
+                    upload={(files) => uploadShopImage(files, uploadBanner)}
+                    onUploaded={() => {
+                      toast.success(isBn ? 'কভার ব্যানার আপডেট হয়েছে' : 'Cover banner updated');
+                    }}
+                  />
                 </CardContent>
               </Card>
             </div>
 
-            {/* Names and Descriptions */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {isBn ? 'দোকানের নাম ও পরিচিতি' : 'Shop Name & Descriptions'}
+                  {isBn ? 'দোকানের নাম ও পরিচিতি' : 'Shop name & descriptions'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
                     <Label htmlFor="nameEn">
-                      {isBn ? 'দোকানের নাম (English)' : 'Shop Name (English)'} *
+                      {isBn ? 'দোকানের নাম (English)' : 'Shop name (English)'} *
                     </Label>
                     <Input id="nameEn" {...register('nameEn')} />
                     {errors.nameEn && (
-                      <p className="text-xs text-destructive">{errors.nameEn.message}</p>
+                      <p className="text-destructive text-xs">{errors.nameEn.message}</p>
                     )}
                   </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="nameBn">
-                      {isBn ? 'দোকানের নাম (বাংলা)' : 'Shop Name (Bangla)'} *
+                      {isBn ? 'দোকানের নাম (বাংলা)' : 'Shop name (Bangla)'} *
                     </Label>
                     <Input id="nameBn" {...register('nameBn')} />
                     {errors.nameBn && (
-                      <p className="text-xs text-destructive">{errors.nameBn.message}</p>
+                      <p className="text-destructive text-xs">{errors.nameBn.message}</p>
                     )}
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <Label htmlFor="shortDescription">
-                    {isBn ? 'সংক্ষিপ্ত স্লোগান / বিশেষত্ব' : 'Short Tagline / Specialization'}
+                    {isBn ? 'সংক্ষিপ্ত স্লোগান' : 'Short tagline'}
                   </Label>
                   <Input
                     id="shortDescription"
@@ -400,39 +381,31 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                     }
                     {...register('shortDescription')}
                   />
-                  {errors.shortDescription && (
-                    <p className="text-xs text-destructive">{errors.shortDescription.message}</p>
-                  )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="description">
-                    {isBn ? 'বিস্তারিত বিবরণ ও শপের গল্প' : 'Detailed Shop Description / About'}
-                  </Label>
+                  <Label htmlFor="description">{isBn ? 'বিস্তারিত বিবরণ' : 'Description'}</Label>
                   <Textarea
                     id="description"
                     rows={4}
                     placeholder={
                       isBn
                         ? 'আপনার দোকান ও পণ্য সম্পর্কে বিস্তারিত লিখুন...'
-                        : 'Tell customers about your shop history, quality promise, and services...'
+                        : 'Tell customers about your shop, quality and services...'
                     }
                     {...register('description')}
                   />
-                  {errors.description && (
-                    <p className="text-xs text-destructive">{errors.description.message}</p>
-                  )}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* TAB 2: CONTACT & SOCIAL */}
+          {/* TAB 2: CONTACT */}
           <TabsContent value="contact" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {isBn ? 'যোগাযোগের মাধ্যম' : 'Public Contact Channels'}
+                  {isBn ? 'যোগাযোগের মাধ্যম' : 'Public contact channels'}
                 </CardTitle>
                 <CardDescription className="text-xs">
                   {isBn
@@ -441,22 +414,18 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
                     <Label htmlFor="phone" className="flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-primary" />
-                      {isBn ? 'প্রধান ফোন নম্বর' : 'Primary Phone'}
+                      <Phone className="text-primary h-3.5 w-3.5" />
+                      {isBn ? 'প্রধান ফোন নম্বর' : 'Primary phone'}
                     </Label>
                     <Input id="phone" placeholder="017XXXXXXXX" {...register('phone')} />
-                    {errors.phone && (
-                      <p className="text-xs text-destructive">{errors.phone.message}</p>
-                    )}
                   </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="secondaryPhone" className="flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-muted-foreground" />
-                      {isBn ? 'বিকল্প ফোন নম্বর' : 'Secondary Phone'}
+                      <Phone className="text-muted-foreground h-3.5 w-3.5" />
+                      {isBn ? 'বিকল্প ফোন নম্বর' : 'Secondary phone'}
                     </Label>
                     <Input
                       id="secondaryPhone"
@@ -464,22 +433,17 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       {...register('secondaryPhone')}
                     />
                   </div>
-
                   <div className="space-y-1.5">
-                    <Label
-                      htmlFor="whatsapp"
-                      className="flex items-center gap-1.5 text-emerald-600"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      {isBn ? 'হোয়াটসঅ্যাপ নম্বর' : 'WhatsApp Number'}
+                    <Label htmlFor="whatsapp" className="flex items-center gap-1.5">
+                      <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
+                      {isBn ? 'হোয়াটসঅ্যাপ নম্বর' : 'WhatsApp number'}
                     </Label>
                     <Input id="whatsapp" placeholder="+8801XXXXXXXXX" {...register('whatsapp')} />
                   </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="email" className="flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-primary" />
-                      {isBn ? 'পাবলিক ইমেইল' : 'Public Email'}
+                      <Mail className="text-primary h-3.5 w-3.5" />
+                      {isBn ? 'পাবলিক ইমেইল' : 'Public email'}
                     </Label>
                     <Input
                       id="email"
@@ -488,27 +452,26 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       {...register('email')}
                     />
                     {errors.email && (
-                      <p className="text-xs text-destructive">{errors.email.message}</p>
+                      <p className="text-destructive text-xs">{errors.email.message}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t space-y-4">
+                <div className="space-y-4 border-t pt-4">
                   <h3 className="text-sm font-semibold">
-                    {isBn ? 'অনলাইন ও সোশ্যাল লিংক' : 'Online & Social Links'}
+                    {isBn ? 'অনলাইন ও সোশ্যাল লিংক' : 'Online & social links'}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="website" className="flex items-center gap-1.5">
-                        <Globe className="w-3.5 h-3.5 text-blue-500" />
-                        {isBn ? 'ওয়েবসাইট লিংক' : 'Website'}
+                        <Globe className="h-3.5 w-3.5 text-blue-500" />
+                        {isBn ? 'ওয়েবসাইট' : 'Website'}
                       </Label>
                       <Input id="website" placeholder="https://..." {...register('website')} />
                       {errors.website && (
-                        <p className="text-xs text-destructive">{errors.website.message}</p>
+                        <p className="text-destructive text-xs">{errors.website.message}</p>
                       )}
                     </div>
-
                     <div className="space-y-1.5">
                       <Label htmlFor="facebook">Facebook</Label>
                       <Input
@@ -517,10 +480,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                         {...register('facebook')}
                       />
                       {errors.facebook && (
-                        <p className="text-xs text-destructive">{errors.facebook.message}</p>
+                        <p className="text-destructive text-xs">{errors.facebook.message}</p>
                       )}
                     </div>
-
                     <div className="space-y-1.5">
                       <Label htmlFor="instagram">Instagram</Label>
                       <Input
@@ -529,7 +491,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                         {...register('instagram')}
                       />
                       {errors.instagram && (
-                        <p className="text-xs text-destructive">{errors.instagram.message}</p>
+                        <p className="text-destructive text-xs">{errors.instagram.message}</p>
                       )}
                     </div>
                   </div>
@@ -538,12 +500,12 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
             </Card>
           </TabsContent>
 
-          {/* TAB 3: LOCATION & OPERATIONS */}
+          {/* TAB 3: LOCATION */}
           <TabsContent value="location" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {isBn ? 'ঠিকানা ও এলাকা' : 'Store Address & Location'}
+                  {isBn ? 'ঠিকানা ও এলাকা' : 'Store address & location'}
                 </CardTitle>
                 <CardDescription className="text-xs">
                   {isBn
@@ -552,7 +514,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="district">{isBn ? 'জেলা' : 'District'}</Label>
                     <Input
@@ -561,7 +523,6 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       {...register('district')}
                     />
                   </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="upazila">{isBn ? 'উপজেলা' : 'Upazila'}</Label>
                     <Input
@@ -570,7 +531,6 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       {...register('upazila')}
                     />
                   </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="union">{isBn ? 'ইউনিয়ন' : 'Union'}</Label>
                     <Input
@@ -579,7 +539,6 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       {...register('union')}
                     />
                   </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="village">{isBn ? 'গ্রাম' : 'Village'}</Label>
                     <Input
@@ -592,7 +551,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
 
                 <div className="space-y-1.5">
                   <Label htmlFor="address">
-                    {isBn ? 'বিস্তারিত রাস্তার ঠিকানা' : 'Detailed Street Address'}
+                    {isBn ? 'বিস্তারিত রাস্তার ঠিকানা' : 'Detailed street address'}
                   </Label>
                   <Input
                     id="address"
@@ -603,11 +562,11 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                   />
                 </div>
 
-                <div className="pt-4 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-2">
                   <div className="space-y-1.5">
                     <Label htmlFor="openingHours" className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-primary" />
-                      {isBn ? 'দোকান খোলা থাকার সময়' : 'Business / Opening Hours'}
+                      <Clock className="text-primary h-3.5 w-3.5" />
+                      {isBn ? 'দোকান খোলা থাকার সময়' : 'Opening hours'}
                     </Label>
                     <Input
                       id="openingHours"
@@ -617,11 +576,10 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                       {...register('openingHours')}
                     />
                   </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="deliveryInfo" className="flex items-center gap-1.5">
-                      <Truck className="w-3.5 h-3.5 text-primary" />
-                      {isBn ? 'ডেলিভারি তথ্য' : 'Delivery Information'}
+                      <Truck className="text-primary h-3.5 w-3.5" />
+                      {isBn ? 'ডেলিভারি তথ্য' : 'Delivery information'}
                     </Label>
                     <Input
                       id="deliveryInfo"
@@ -639,13 +597,12 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
           </TabsContent>
         </Tabs>
 
-        {/* Action Save Bar */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t sticky bottom-4 bg-background/90 backdrop-blur-md p-4 rounded-xl border shadow-lg z-20">
+        <div className="bg-background/90 sticky bottom-4 z-20 flex items-center justify-end gap-3 rounded-xl border p-4 shadow-sm">
           <Button type="submit" disabled={isUpdating || !isDirty} className="gap-2 px-6">
             {isUpdating ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Save className="w-4 h-4" />
+              <Save className="h-4 w-4" />
             )}
             {isUpdating
               ? isBn
@@ -653,7 +610,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                 : 'Saving...'
               : isBn
                 ? 'পরিবর্তন সংরক্ষণ করুন'
-                : 'Save Profile Changes'}
+                : 'Save changes'}
           </Button>
         </div>
       </form>

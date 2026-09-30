@@ -66,6 +66,7 @@ export const ROUTES = {
     orders: '/seller/orders',
     orderDetail: (id: string) => `/seller/orders/${id}`,
     coupons: '/seller/coupons',
+    reviews: '/seller/reviews',
     reports: '/seller/reports',
     wallet: '/seller/wallet',
     walletPayout: '/seller/wallet/payout',

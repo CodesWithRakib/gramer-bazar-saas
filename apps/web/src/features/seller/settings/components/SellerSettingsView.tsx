@@ -1,7 +1,7 @@
 'use client';
 
-import React, { use } from 'react';
-import { Store, User, Wallet, Boxes, Ticket, AlertCircle } from 'lucide-react';
+import React from 'react';
+import { Store, User, Wallet, Boxes, Ticket, AlertCircle, Star } from 'lucide-react';
 import DashboardHubOverview, { HubCardItem } from '@/components/dashboard/DashboardHubOverview';
 
 export interface SellerSettingsViewProps {
@@ -55,7 +55,7 @@ export function SellerSettingsView({ lang = 'en' }: SellerSettingsViewProps) {
       descriptionBn:
         'পণ্যের স্টক সংখ্যা পরিবর্তন করুন, স্টক ঘাটতি পর্যবেক্ষণ ও ইনভেন্টরি পরিচালনা করুন।',
       icon: Boxes,
-      href: '/seller/products/inventory',
+      href: '/seller/inventory',
     },
     {
       id: 'coupons',
@@ -75,6 +75,16 @@ export function SellerSettingsView({ lang = 'en' }: SellerSettingsViewProps) {
       descriptionBn: 'পণ্য ফেরত বা অর্ডার সংক্রান্ত গ্রাহক অভিযোগ দেখুন এবং দ্রুত সমাধান করুন।',
       icon: AlertCircle,
       href: '/seller/disputes',
+    },
+    {
+      id: 'reviews',
+      title: 'Product Reviews & Replies',
+      titleBn: 'পণ্য রিভিউ ও উত্তর',
+      description:
+        'Read customer ratings for your products and reply publicly to build trust.',
+      descriptionBn: 'গ্রাহকদের রেটিং দেখুন এবং বিশ্বাস বাড়াতে পাবলিক উত্তর দিন।',
+      icon: Star,
+      href: '/seller/reviews',
     },
   ];
 

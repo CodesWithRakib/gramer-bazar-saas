@@ -44,6 +44,19 @@ export class ShopsService {
     });
   }
 
+  /**
+   * Resolves the shop id owned by a seller account. Returns `null` when the
+   * seller has not been provisioned a shop yet (e.g. application still under
+   * review), so callers can fail closed instead of leaking global records.
+   */
+  async findShopIdBySellerId(sellerId: string): Promise<string | null> {
+    const shop = await this.shopsRepository.findOne({
+      where: { sellerId },
+      select: ['id'],
+    });
+    return shop?.id ?? null;
+  }
+
   async findOne(idOrSlug: string) {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
     const shop = await this.shopsRepository.findOne({
@@ -170,19 +183,18 @@ export class ShopsService {
       .getManyAndCount();
 
     // Ensure pv.images fallback to p.images
-    items.forEach((item: any) => {
-      if (
-        item.productVariant &&
-        (!item.productVariant.images || item.productVariant.images.length === 0)
-      ) {
-        const pImages = item.productVariant.product?.images;
-        if (pImages && pImages.length > 0) {
-          item.productVariant.images = pImages
-            .sort((a: any, b: any) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0))
-            .map((img: any) => img.url);
-        }
+    for (const item of items) {
+      const variant = item.productVariant;
+      if (!variant) continue;
+      if (variant.images && variant.images.length > 0) continue;
+
+      const productImages = variant.product?.images;
+      if (productImages && productImages.length > 0) {
+        variant.images = [...productImages]
+          .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary))
+          .map((img) => img.url);
       }
-    });
+    }
 
     // Query categories with products in this shop
     const categories: Array<{

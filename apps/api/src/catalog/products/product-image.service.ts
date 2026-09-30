@@ -29,9 +29,17 @@ export class ProductImageService {
   }
 
   /**
-   * Upload multiple images for a product
+   * Upload multiple images for a product.
+   *
+   * @param storageNamespace `'seller'` stores the files under the shop-owned
+   * `seller/products/...` prefix; the default keeps them in the platform
+   * `products/...` namespace. Ownership is validated by the caller.
    */
-  async uploadImages(productId: string, files: Express.Multer.File[]): Promise<ProductImage[]> {
+  async uploadImages(
+    productId: string,
+    files: Express.Multer.File[],
+    options?: { storageNamespace?: 'platform' | 'seller'; altText?: string },
+  ): Promise<ProductImage[]> {
     const product = await this.productRepository.findOne({
       where: { id: productId },
       relations: ['images', 'variants'],
@@ -66,11 +74,10 @@ export class ProductImageService {
       }
 
       const imageId = randomUUID();
-      const storagePath = this.storageService.getProductImagePath(
-        productId,
-        imageId,
-        validation.ext,
-      );
+      const storagePath =
+        options?.storageNamespace === 'seller'
+          ? this.storageService.getSellerProductImagePath(productId, imageId, validation.ext)
+          : this.storageService.getProductImagePath(productId, imageId, validation.ext);
       const filename = `${imageId}${validation.ext}`;
 
       const { publicUrl } = await this.storageService.uploadImage(
@@ -92,7 +99,7 @@ export class ProductImageService {
         sizeBytes: file.size,
         isPrimary,
         sortOrder,
-        altText: product.nameEn,
+        altText: options?.altText || product.nameEn,
       });
 
       const saved = await this.imageRepository.save(imageEntity);

@@ -1,12 +1,29 @@
 'use client';
 
-import React, { use, useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-  useGetSellerProductsQuery,
-  useUpdateInventoryMutation,
-} from '@/features/seller-portal/sellerPortalApi';
+  Boxes,
+  Minus,
+  Plus,
+  RotateCcw,
+  Save,
+  Search,
+  X,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AdminPagination } from '@/components/ui/AdminPagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -15,322 +32,546 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { EmptyState } from '@/components/common/EmptyState';
+import { ErrorState } from '@/components/common/ErrorState';
+import { PageHeader } from '@/components/common/PageHeader';
+import { StatusBadge, type StatusTone } from '@/components/common/StatusBadge';
+import { getApiErrorMessage } from '@/lib/apiError';
+import { formatCurrency } from '@/lib/format';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Search, X, Package, Boxes } from 'lucide-react';
-import Link from 'next/link';
-import AdminPagination from '@/components/AdminPagination';
+  useBulkUpdateSellerStockMutation,
+  useGetSellerProductsQuery,
+  type SellerProduct,
+  type StockState,
+} from '@/features/seller';
 
 export interface SellerInventoryViewProps {
   lang?: string;
 }
 
+const STOCK_TONE: Record<StockState, StatusTone> = {
+  OUT_OF_STOCK: 'danger',
+  LOW: 'warning',
+  IN_STOCK: 'success',
+};
+
+interface Draft {
+  quantity: string;
+  threshold: string;
+}
+
+const LIMIT_OPTIONS = [20, 50, 100];
+
 export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
   const isBn = lang === 'bn';
 
-  const { data: products = [], isLoading } = useGetSellerProductsQuery();
-  const [updateInventory] = useUpdateInventoryMutation();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [stockFilter, setStockFilter] = useState<
+    'ALL' | 'LOW_STOCK' | 'IN_STOCK' | 'OUT_OF_STOCK'
+  >('ALL');
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({});
 
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [localQuantities, setLocalQuantities] = useState<Record<string, string>>({});
+  const { input: searchInput, term: search, onInputChange, reset } = useDebouncedSearch();
 
-  // Search & Filter
-  const [search, setSearch] = useState('');
-  const [stockFilter, setStockFilter] = useState('ALL');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const { data, isLoading, isError, refetch } = useGetSellerProductsQuery({
+    page,
+    limit,
+    search: search || undefined,
+    stock: stockFilter,
+    sort: 'newest',
+  });
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((item) => {
-      const name = isBn ? item.productVariant.product.nameBn : item.productVariant.product.nameEn;
-      const sku = item.sellerSku || item.productVariant.sku || '';
+  const [bulkUpdate, { isLoading: isSaving }] = useBulkUpdateSellerStockMutation();
 
-      const matchesSearch =
-        !search.trim() ||
-        name.toLowerCase().includes(search.toLowerCase()) ||
-        sku.toLowerCase().includes(search.toLowerCase());
+  const products = useMemo(() => data?.data ?? [], [data]);
 
-      const qty = item.inventory.quantity;
-      const lowStockThreshold = item.inventory.lowStockThreshold || 5;
+  const dirtyIds = useMemo(
+    () =>
+      products
+        .filter((product) => {
+          const draft = drafts[product.id];
+          if (!draft) return false;
+          return (
+            Number(draft.quantity) !== product.quantity ||
+            Number(draft.threshold) !== product.lowStockThreshold
+          );
+        })
+        .map((product) => product.id),
+    [drafts, products]
+  );
 
-      let matchesStock = true;
-      if (stockFilter === 'LOW_STOCK') {
-        matchesStock = qty <= lowStockThreshold;
-      } else if (stockFilter === 'IN_STOCK') {
-        matchesStock = qty > lowStockThreshold;
-      } else if (stockFilter === 'OUT_OF_STOCK') {
-        matchesStock = qty === 0;
-      }
-
-      return matchesSearch && matchesStock;
-    });
-  }, [products, search, stockFilter, isBn]);
-
-  const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredProducts.slice(start, start + pageSize);
-  }, [filteredProducts, currentPage, pageSize]);
-
-  const handleQuantityChange = (inventoryId: string, value: string) => {
-    setLocalQuantities((prev) => ({ ...prev, [inventoryId]: value }));
+  const setDraft = (product: SellerProduct, patch: Partial<Draft>) => {
+    setDrafts((prev) => ({
+      ...prev,
+      [product.id]: {
+        quantity: prev[product.id]?.quantity ?? String(product.quantity),
+        threshold: prev[product.id]?.threshold ?? String(product.lowStockThreshold),
+        ...patch,
+      },
+    }));
   };
 
-  const handleSave = async (inventoryId: string) => {
-    const val = localQuantities[inventoryId];
-    if (val === undefined || val === '') return;
+  const clearDrafts = () => setDrafts({});
 
-    setUpdatingId(inventoryId);
+  const handleSave = async () => {
+    const invalid = dirtyIds.find((id) => {
+      const draft = drafts[id];
+      return Number.isNaN(Number(draft.quantity)) || Number(draft.quantity) < 0;
+    });
+    if (invalid) {
+      toast.error(
+        isBn ? 'স্টক ঋণাত্মক হতে পারে না' : 'Stock quantity cannot be negative or empty'
+      );
+      return;
+    }
+
     try {
-      await updateInventory({ id: inventoryId, quantity: parseInt(val, 10) }).unwrap();
-      const newQuantities = { ...localQuantities };
-      delete newQuantities[inventoryId];
-      setLocalQuantities(newQuantities);
+      await bulkUpdate({
+        items: dirtyIds.map((id) => ({
+          id,
+          quantity: Number(drafts[id].quantity),
+          lowStockThreshold: Number(drafts[id].threshold),
+        })),
+      }).unwrap();
+      toast.success(
+        isBn
+          ? `${dirtyIds.length}টি পণ্যের স্টক আপডেট হয়েছে`
+          : `Updated stock for ${dirtyIds.length} product${dirtyIds.length > 1 ? 's' : ''}`
+      );
+      clearDrafts();
+      void refetch();
     } catch (error) {
-      console.error('Failed to update inventory', error);
-    } finally {
-      setUpdatingId(null);
+      toast.error(getApiErrorMessage(error, isBn ? 'আপডেট ব্যর্থ' : 'Could not update stock'));
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-          {isBn ? 'ইনভেন্টরি ম্যানেজমেন্ট' : 'Inventory Management'}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {isBn ? 'আপনার স্টকের পরিমাণ দ্রুত আপডেট করুন' : 'Quickly update your stock levels.'}
-        </p>
-      </div>
-
-      {/* Sub-Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 pb-2 border-b">
-        <Link
-          href={`/${lang}/seller/products`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <Package className="w-3.5 h-3.5" />
-          <span>{isBn ? 'সকল প্রোডাক্ট' : 'All Products'}</span>
-        </Link>
-        <Link
-          href={`/${lang}/seller/products/inventory`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground"
-        >
-          <Boxes className="w-3.5 h-3.5" />
-          <span>{isBn ? 'স্টক ইনভেন্টরি' : 'Stock Inventory'}</span>
-        </Link>
-      </div>
-
-      {/* Main Table Card */}
-      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 dark:border-border dark:bg-card">
-        {/* Top Toolbar */}
-        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex w-full flex-1 flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
-            {/* Search Pill */}
-            <div className="relative w-full max-w-md min-w-[200px] flex-1 sm:w-auto">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder={
-                  isBn ? 'প্রোডাক্টের নাম বা SKU দিয়ে খুঁজুন...' : 'Search product name or SKU...'
-                }
-                className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-gray-100 dark:hover:bg-muted"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
+    <div className="space-y-6 pb-24">
+      <PageHeader
+        breadcrumbs={[
+          { label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', href: `/${lang}/seller` },
+          { label: isBn ? 'পণ্য' : 'Products', href: `/${lang}/seller/products` },
+          { label: isBn ? 'ইনভেন্টরি' : 'Inventory' },
+        ]}
+        title={isBn ? 'ইনভেন্টরি' : 'Inventory'}
+        description={
+          isBn
+            ? 'স্টক পরিমাণ একসাথে অনেক পণ্যের জন্য পরিবর্তন করে একবারে সংরক্ষণ করুন।'
+            : 'Adjust stock across many products at once and save the whole batch in one go.'
+        }
+        primaryAction={
+          dirtyIds.length > 0 ? (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={clearDrafts} disabled={isSaving} className="gap-2">
+                <RotateCcw className="h-4 w-4" />
+                {isBn ? 'বাতিল' : 'Discard'}
+              </Button>
+              <Button onClick={() => void handleSave()} disabled={isSaving} className="gap-2">
+                <Save className="h-4 w-4" />
+                {isSaving
+                  ? isBn
+                    ? 'সংরক্ষণ হচ্ছে...'
+                    : 'Saving...'
+                  : isBn
+                    ? `${dirtyIds.length}টি সংরক্ষণ`
+                    : `Save ${dirtyIds.length}`}
+              </Button>
             </div>
+          ) : null
+        }
+      />
 
-            {/* Stock Filter */}
-            <div className="w-full sm:w-44 md:w-48">
-              <Select
-                value={stockFilter}
-                onValueChange={(val) => {
-                  setStockFilter(val);
-                  setCurrentPage(1);
-                }}
-              >
-                <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 dark:border-border dark:bg-background dark:text-foreground">
-                  <SelectValue placeholder="All Stock" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">{isBn ? 'সকল স্টক' : 'All Stock'}</SelectItem>
-                  <SelectItem value="LOW_STOCK">{isBn ? 'কম স্টক (লো)' : 'Low Stock'}</SelectItem>
-                  <SelectItem value="IN_STOCK">{isBn ? 'পর্যাপ্ত স্টক' : 'In Stock'}</SelectItem>
-                  <SelectItem value="OUT_OF_STOCK">{isBn ? 'স্টক শেষ' : 'Out of Stock'}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* Inner Table Container */}
-        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xs dark:border-border dark:bg-card">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
-                <TableRow>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'প্রোডাক্ট' : 'Product'}</TableHead>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'SKU' : 'SKU'}</TableHead>
-                  <TableHead className="py-3.5 px-4">
-                    {isBn ? 'বর্তমান স্টক' : 'Current Stock'}
-                  </TableHead>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'নতুন স্টক' : 'New Stock'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-end">
-                    {isBn ? 'অ্যাকশন' : 'Action'}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="divide-y divide-gray-200 dark:divide-border text-sm">
-                {isLoading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={`skeleton-${i}`} className="animate-pulse">
-                      <TableCell className="py-4 px-4">
-                        <div className="h-4 w-40 rounded bg-muted"></div>
-                      </TableCell>
-                      <TableCell className="py-4 px-4">
-                        <div className="h-4 w-20 rounded bg-muted"></div>
-                      </TableCell>
-                      <TableCell className="py-4 px-4">
-                        <div className="h-6 w-12 rounded-full bg-muted"></div>
-                      </TableCell>
-                      <TableCell className="py-4 px-4">
-                        <div className="h-10 w-24 rounded bg-muted"></div>
-                      </TableCell>
-                      <TableCell className="py-4 px-4 text-end">
-                        <div className="h-9 w-20 ms-auto rounded bg-muted"></div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : paginatedProducts.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted/60">
-                          <Package className="h-6 w-6 text-muted-foreground/60" />
-                        </div>
-                        <h3 className="mb-1 text-base font-semibold text-foreground">
-                          {isBn ? 'কোনো প্রোডাক্ট পাওয়া যায়নি' : 'No products found'}
-                        </h3>
-                        <p className="text-sm text-muted-foreground max-w-sm">
-                          {search || stockFilter !== 'ALL'
-                            ? isBn
-                              ? 'আপনার অনুসন্ধানের সাথে কোনো পণ্য মেলেনি'
-                              : 'No products match your search or filter.'
-                            : isBn
-                              ? 'ইনভেন্টরিতে কোনো পণ্য তালিকাভুক্ত নেই'
-                              : 'No products in inventory.'}
-                        </p>
-                        {(search || stockFilter !== 'ALL') && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSearch('');
-                              setStockFilter('ALL');
-                            }}
-                            className="mt-4 text-sm font-medium text-primary hover:underline"
-                          >
-                            {isBn ? 'ফিল্টার পরিষ্কার করুন' : 'Clear filters'}
-                          </button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  paginatedProducts.map((item) => (
-                    <TableRow
-                      key={item.id}
-                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
-                    >
-                      <TableCell className="font-medium py-3.5 px-4 text-foreground">
-                        {isBn
-                          ? item.productVariant.product.nameBn
-                          : item.productVariant.product.nameEn}
-                      </TableCell>
-                      <TableCell className="py-3.5 px-4 font-mono text-xs text-muted-foreground">
-                        {item.sellerSku || item.productVariant.sku}
-                      </TableCell>
-                      <TableCell className="py-3.5 px-4">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                            item.inventory.quantity <= (item.inventory.lowStockThreshold || 5)
-                              ? 'bg-destructive/10 text-destructive'
-                              : 'bg-primary/10 text-primary'
-                          }`}
-                        >
-                          {item.inventory.quantity}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-3.5 px-4">
-                        <Input
-                          type="number"
-                          min="0"
-                          className="w-24 h-9"
-                          value={localQuantities[item.inventory.id] ?? item.inventory.quantity}
-                          onChange={(e) => handleQuantityChange(item.inventory.id, e.target.value)}
-                        />
-                      </TableCell>
-                      <TableCell className="py-3.5 px-4 text-end">
-                        <Button
-                          size="sm"
-                          className="rounded-full px-4"
-                          disabled={
-                            updatingId === item.inventory.id ||
-                            localQuantities[item.inventory.id] === undefined ||
-                            localQuantities[item.inventory.id] === String(item.inventory.quantity)
-                          }
-                          onClick={() => handleSave(item.inventory.id)}
-                        >
-                          {updatingId === item.inventory.id
-                            ? isBn
-                              ? 'সংরক্ষণ হচ্ছে...'
-                              : 'Saving...'
-                            : isBn
-                              ? 'সংরক্ষণ'
-                              : 'Save'}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-
-        {/* Pagination */}
-        <AdminPagination
-          totalItems={filteredProducts.length}
-          itemsPerPage={pageSize}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          onLimitChange={(newLimit) => {
-            setPageSize(newLimit);
-            setCurrentPage(1);
-          }}
-          lang={isBn ? 'bn' : 'en'}
-          itemLabel={{
-            singular: isBn ? 'আইটেম' : 'item',
-            plural: isBn ? 'আইটেম' : 'items',
-          }}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <MiniStat
+          label={isBn ? 'মোট পণ্য' : 'Listings'}
+          value={data?.meta.total ?? 0}
+          loading={isLoading}
+        />
+        <MiniStat
+          label={isBn ? 'কম স্টক' : 'Low stock'}
+          value={data?.lowStockCount ?? 0}
+          tone="warning"
+          loading={isLoading}
+        />
+        <MiniStat
+          label={isBn ? 'স্টক শেষ' : 'Out of stock'}
+          value={data?.outOfStockCount ?? 0}
+          tone="danger"
+          loading={isLoading}
         />
       </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-md">
+          <Search className="text-muted-foreground pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+          <Input
+            value={searchInput}
+            onChange={(event) => {
+              onInputChange(event.target.value);
+              setPage(1);
+            }}
+            placeholder={isBn ? 'নাম বা SKU...' : 'Search name or SKU...'}
+            className="h-11 rounded-full ps-10 pe-10"
+            aria-label={isBn ? 'ইনভেন্টরি খুঁজুন' : 'Search inventory'}
+          />
+          {searchInput && (
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+                setPage(1);
+              }}
+              aria-label={isBn ? 'মুছুন' : 'Clear'}
+              className="text-muted-foreground hover:bg-muted absolute end-2.5 top-1/2 -translate-y-1/2 rounded-full p-1"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+
+        <div className="w-full sm:w-52">
+          <Select
+            value={stockFilter}
+            onValueChange={(value) => {
+              setStockFilter(value as typeof stockFilter);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-11 w-full rounded-full" aria-label={isBn ? 'স্টক ফিল্টার' : 'Stock filter'}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">{isBn ? 'সব স্টক' : 'All stock'}</SelectItem>
+              <SelectItem value="IN_STOCK">{isBn ? 'পর্যাপ্ত স্টক' : 'In stock'}</SelectItem>
+              <SelectItem value="LOW_STOCK">{isBn ? 'কম স্টক' : 'Low stock'}</SelectItem>
+              <SelectItem value="OUT_OF_STOCK">{isBn ? 'স্টক শেষ' : 'Out of stock'}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {isError ? (
+        <ErrorState
+          isBn={isBn}
+          title={isBn ? 'ইনভেন্টরি লোড করা যায়নি' : 'Could not load inventory'}
+          onRetry={() => refetch()}
+        />
+      ) : isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton key={index} className="h-16 w-full" />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <EmptyState
+          icon={<Boxes className="h-8 w-8" />}
+          title={
+            stockFilter === 'ALL'
+              ? isBn
+                ? 'ইনভেন্টরিতে কোনো পণ্য নেই'
+                : 'No products in inventory'
+              : isBn
+                ? 'এই ফিল্টারে কোনো পণ্য নেই'
+                : 'No products match this filter'
+          }
+          description={
+            isBn
+              ? 'পণ্য যোগ করার পর এখানে স্টক পরিমাণ পরিচালনা করতে পারবেন।'
+              : 'Once you add products, their stock levels can be managed here.'
+          }
+          action={{
+            label: isBn ? 'পণ্য যোগ করুন' : 'Add a product',
+            href: `/${lang}/seller/products/new`,
+          }}
+        />
+      ) : (
+        <>
+          {/* Desktop */}
+          <Card className="hidden overflow-hidden shadow-none lg:block">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="ps-4">{isBn ? 'পণ্য' : 'Product'}</TableHead>
+                  <TableHead>SKU</TableHead>
+                  <TableHead>{isBn ? 'মূল্য' : 'Price'}</TableHead>
+                  <TableHead>{isBn ? 'বর্তমান' : 'Current'}</TableHead>
+                  <TableHead>{isBn ? 'নতুন স্টক' : 'New stock'}</TableHead>
+                  <TableHead>{isBn ? 'সীমা' : 'Threshold'}</TableHead>
+                  <TableHead className="pe-4">{isBn ? 'অবস্থা' : 'Status'}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products.map((product) => {
+                  const draft = drafts[product.id] ?? {
+                    quantity: String(product.quantity),
+                    threshold: String(product.lowStockThreshold),
+                  };
+                  const isDirty = dirtyIds.includes(product.id);
+
+                  return (
+                    <TableRow key={product.id} className={isDirty ? 'bg-primary/5' : undefined}>
+                      <TableCell className="ps-4">
+                        <p className="text-foreground max-w-[260px] truncate font-medium">
+                          {isBn ? product.nameBn : product.nameEn}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          {isBn ? product.categoryNameBn : product.categoryNameEn}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground font-mono text-xs">
+                        {product.sellerSku || product.sku || '—'}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {formatCurrency(product.effectivePrice)}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        <span className="text-foreground font-medium">{product.quantity}</span>
+                        {product.reservedQuantity > 0 && (
+                          <span className="text-muted-foreground ms-1 text-xs">
+                            ({product.reservedQuantity} {isBn ? 'রিজার্ভড' : 'reserved'})
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            aria-label={isBn ? 'এক কমান' : 'Decrease by one'}
+                            onClick={() =>
+                              setDraft(product, {
+                                quantity: String(Math.max(0, Number(draft.quantity) - 1)),
+                              })
+                            }
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </Button>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={draft.quantity}
+                            onChange={(event) =>
+                              setDraft(product, { quantity: event.target.value })
+                            }
+                            className="h-9 w-20 text-center tabular-nums"
+                            aria-label={isBn ? `${product.nameBn} স্টক` : `${product.nameEn} stock`}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            aria-label={isBn ? 'এক বাড়ান' : 'Increase by one'}
+                            onClick={() =>
+                              setDraft(product, { quantity: String(Number(draft.quantity) + 1) })
+                            }
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={draft.threshold}
+                          onChange={(event) =>
+                            setDraft(product, { threshold: event.target.value })
+                          }
+                          className="h-9 w-20 text-center tabular-nums"
+                          aria-label={
+                            isBn
+                              ? `${product.nameBn} কম স্টক সীমা`
+                              : `${product.nameEn} low stock threshold`
+                          }
+                        />
+                      </TableCell>
+                      <TableCell className="pe-4">
+                        <StatusBadge
+                          tone={STOCK_TONE[product.stockState]}
+                          label={stockLabel(product.stockState, isBn)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Card>
+
+          {/* Mobile */}
+          <ul className="space-y-3 lg:hidden">
+            {products.map((product) => {
+              const draft = drafts[product.id] ?? {
+                quantity: String(product.quantity),
+                threshold: String(product.lowStockThreshold),
+              };
+              const isDirty = dirtyIds.includes(product.id);
+
+              return (
+                <li key={product.id}>
+                  <Card className={isDirty ? 'border-primary/40 shadow-none' : 'shadow-none'}>
+                    <CardContent className="space-y-3 p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-foreground line-clamp-2 text-sm font-semibold">
+                            {isBn ? product.nameBn : product.nameEn}
+                          </p>
+                          <p className="text-muted-foreground mt-0.5 font-mono text-xs">
+                            {product.sellerSku || product.sku || '—'}
+                          </p>
+                        </div>
+                        <StatusBadge
+                          tone={STOCK_TONE[product.stockState]}
+                          label={stockLabel(product.stockState, isBn)}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-muted-foreground text-xs">
+                          {isBn ? 'বর্তমান স্টক' : 'Current stock'}
+                        </span>
+                        <span className="text-foreground text-sm font-semibold tabular-nums">
+                          {product.quantity}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <label className="text-muted-foreground text-[11px]">
+                            {isBn ? 'নতুন স্টক' : 'New stock'}
+                          </label>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-9 w-9 shrink-0"
+                              aria-label={isBn ? 'কমান' : 'Decrease'}
+                              onClick={() =>
+                                setDraft(product, {
+                                  quantity: String(Math.max(0, Number(draft.quantity) - 1)),
+                                })
+                              }
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </Button>
+                            <Input
+                              type="number"
+                              min={0}
+                              inputMode="numeric"
+                              value={draft.quantity}
+                              onChange={(event) =>
+                                setDraft(product, { quantity: event.target.value })
+                              }
+                              className="h-9 text-center tabular-nums"
+                              aria-label={isBn ? 'স্টক পরিমাণ' : 'Stock quantity'}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-9 w-9 shrink-0"
+                              aria-label={isBn ? 'বাড়ান' : 'Increase'}
+                              onClick={() =>
+                                setDraft(product, { quantity: String(Number(draft.quantity) + 1) })
+                              }
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-muted-foreground text-[11px]">
+                            {isBn ? 'কম স্টক সীমা' : 'Low-stock limit'}
+                          </label>
+                          <Input
+                            type="number"
+                            min={0}
+                            inputMode="numeric"
+                            value={draft.threshold}
+                            onChange={(event) =>
+                              setDraft(product, { threshold: event.target.value })
+                            }
+                            className="h-9 text-center tabular-nums"
+                            aria-label={isBn ? 'কম স্টক সীমা' : 'Low stock threshold'}
+                          />
+                        </div>
+                      </div>
+
+                      {isDirty && (
+                        <p className="text-primary text-[11px] font-medium">
+                          {isBn ? 'সংরক্ষণ করতে উপরের বোতাম চাপুন' : 'Tap save above to apply'}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </li>
+              );
+            })}
+          </ul>
+
+          <AdminPagination
+            totalItems={data?.meta.total ?? 0}
+            itemsPerPage={limit}
+            currentPage={page}
+            limitOptions={LIMIT_OPTIONS}
+            lang={isBn ? 'bn' : 'en'}
+            itemLabel={{
+              singular: isBn ? 'পণ্য' : 'product',
+              plural: isBn ? 'পণ্য' : 'products',
+            }}
+            onPageChange={setPage}
+            onLimitChange={(newLimit) => {
+              setLimit(newLimit);
+              setPage(1);
+            }}
+          />
+        </>
+      )}
     </div>
+  );
+}
+
+function stockLabel(state: StockState, isBn: boolean): string {
+  if (state === 'OUT_OF_STOCK') return isBn ? 'স্টক শেষ' : 'Out of stock';
+  if (state === 'LOW') return isBn ? 'কম স্টক' : 'Low stock';
+  return isBn ? 'পর্যাপ্ত' : 'In stock';
+}
+
+function MiniStat({
+  label,
+  value,
+  tone = 'neutral',
+  loading,
+}: {
+  label: string;
+  value: number;
+  tone?: 'neutral' | 'warning' | 'danger';
+  loading?: boolean;
+}) {
+  const toneClass =
+    tone === 'warning'
+      ? 'text-amber-600 dark:text-amber-400'
+      : tone === 'danger'
+        ? 'text-destructive'
+        : 'text-foreground';
+
+  return (
+    <Card className="shadow-none">
+      <CardContent className="flex items-center justify-between gap-2 p-4">
+        <span className="text-muted-foreground truncate text-xs">{label}</span>
+        {loading ? (
+          <Skeleton className="h-6 w-10" />
+        ) : (
+          <span className={`text-xl font-bold tabular-nums ${toneClass}`}>{value}</span>
+        )}
+      </CardContent>
+    </Card>
   );
 }

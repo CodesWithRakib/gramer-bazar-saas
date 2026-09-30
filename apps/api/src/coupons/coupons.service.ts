@@ -17,6 +17,42 @@ export class CouponsService {
     private readonly dataSource: DataSource,
   ) {}
 
+  /**
+   * Business rules shared by every coupon writer (admin and seller).
+   * Guards against nonsensical discounts that class-validator alone cannot
+   * express (percentage bounds, date ordering, limits).
+   */
+  private validateDiscountRules(dto: {
+    discountType?: DiscountType;
+    discountValue?: number;
+    startDate?: Date;
+    endDate?: Date;
+    usageLimit?: number;
+    customerUsageLimit?: number;
+  }): void {
+    if (dto.discountValue !== undefined) {
+      if (dto.discountType === DiscountType.PERCENTAGE) {
+        if (dto.discountValue <= 0 || dto.discountValue > 100) {
+          throw new BadRequestException('Percentage discount must be between 1 and 100');
+        }
+      } else if (dto.discountValue <= 0 && dto.discountValue !== 0) {
+        throw new BadRequestException('Discount value must be greater than zero');
+      }
+    }
+
+    if (dto.startDate && dto.endDate && new Date(dto.endDate) <= new Date(dto.startDate)) {
+      throw new BadRequestException('Coupon end date must be after the start date');
+    }
+
+    if (dto.usageLimit !== undefined && dto.customerUsageLimit !== undefined) {
+      if (dto.customerUsageLimit > dto.usageLimit) {
+        throw new BadRequestException(
+          'Per-customer usage limit cannot exceed the total usage limit',
+        );
+      }
+    }
+  }
+
   async create(createDto: CreateCouponDto) {
     const existing = await this.couponRepository.findOne({
       where: { code: createDto.code.toUpperCase() },
@@ -25,9 +61,15 @@ export class CouponsService {
       throw new BadRequestException('Coupon code already exists');
     }
 
+    this.validateDiscountRules(createDto);
+
+    // `usedCount` is server-owned and never accepted from the client.
+    const { shopId, ...rest } = createDto;
     const coupon = this.couponRepository.create({
-      ...createDto,
+      ...rest,
+      shopId: shopId ?? null,
       code: createDto.code.toUpperCase(),
+      usedCount: 0,
     });
 
     return this.couponRepository.save(coupon);
@@ -79,6 +121,19 @@ export class CouponsService {
       }
     }
 
+    this.validateDiscountRules({
+      discountType: updateDto.discountType ?? coupon.discountType,
+      discountValue:
+        updateDto.discountValue !== undefined
+          ? Number(updateDto.discountValue)
+          : Number(coupon.discountValue),
+      startDate: updateDto.startDate ?? coupon.startDate ?? undefined,
+      endDate: updateDto.endDate ?? coupon.endDate ?? undefined,
+      usageLimit: updateDto.usageLimit ?? coupon.usageLimit ?? undefined,
+      customerUsageLimit: updateDto.customerUsageLimit ?? coupon.customerUsageLimit,
+    });
+
+    // `usedCount` and `shopId` are server-owned and not part of the update DTO.
     Object.assign(coupon, updateDto);
     return this.couponRepository.save(coupon);
   }

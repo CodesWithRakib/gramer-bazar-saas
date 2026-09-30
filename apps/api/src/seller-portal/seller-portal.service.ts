@@ -1,226 +1,109 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, In } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Shop } from '../shops/entities/shop.entity.js';
-import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
-import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Order } from '../orders/entities/order.entity.js';
 import { OrderItem } from '../orders/entities/order-item.entity.js';
-import { ProductVariant } from '../catalog/entities/product-variant.entity.js';
-import { UpdateSellerShopDto } from './dto/update-seller-shop.dto.js';
-import { AddSellerProductDto } from './dto/add-seller-product.dto.js';
-import { UpdateSellerProductDto } from './dto/update-seller-product.dto.js';
 import { OrderStatus } from '../orders/enums/order-status.enum.js';
+import { getSellerAllowedNextStatuses } from '../orders/state-machine/order-state-machine.js';
+import { Wallet } from '../wallets/entities/wallet.entity.js';
+import { PayoutRequest, PayoutStatus } from '../payouts/entities/payout-request.entity.js';
+import { Delivery } from '../deliveries/entities/delivery.entity.js';
+import { User } from '../users/entities/user.entity.js';
+import { OrdersService } from '../orders/orders.service.js';
+import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
+import { Role } from '../roles/enums/role.enum.js';
+import { TransitionOrderDto } from '../orders/dto/transition-order.dto.js';
+import { UpdateSellerShopDto } from './dto/update-seller-shop.dto.js';
+import { SellerOrderQueryDto } from './dto/seller-query.dto.js';
+import {
+  SellerDashboardResponseDto,
+  SellerDashboardRecentOrderDto,
+} from './dto/seller-dashboard-response.dto.js';
+import {
+  SellerOrderDetailDto,
+  SellerOrderListDto,
+  SellerOrderSummaryDto,
+} from './dto/seller-order-response.dto.js';
+import { SellerAnalyticsService } from './seller-analytics.service.js';
+
+interface OrderListRow {
+  id: string;
+  status: OrderStatus;
+  payment_method: string;
+  payment_status: string;
+  seller_subtotal: string;
+  item_count: string;
+  created_at: Date;
+  customer_name: string | null;
+  customer_phone: string | null;
+  contact_name: string | null;
+  street_address: string | null;
+  district: string | null;
+  upazila: string | null;
+}
 
 @Injectable()
 export class SellerPortalService {
   constructor(
     @InjectRepository(Shop)
     private readonly shopRepository: Repository<Shop>,
-    @InjectRepository(SellerProduct)
-    private readonly sellerProductRepository: Repository<SellerProduct>,
-    @InjectRepository(Inventory)
-    private readonly inventoryRepository: Repository<Inventory>,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
+    @InjectRepository(Wallet)
+    private readonly walletRepository: Repository<Wallet>,
+    @InjectRepository(PayoutRequest)
+    private readonly payoutRepository: Repository<PayoutRequest>,
+    @InjectRepository(Delivery)
+    private readonly deliveryRepository: Repository<Delivery>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly ordersService: OrdersService,
+    private readonly auditLogsService: AuditLogsService,
+    private readonly analyticsService: SellerAnalyticsService,
     private readonly dataSource: DataSource,
   ) {}
 
-  private async getShopForSeller(sellerId: string): Promise<Shop> {
+  async getShopForSeller(sellerId: string, assertActive = false): Promise<Shop> {
     const shop = await this.shopRepository.findOne({ where: { sellerId } });
     if (!shop) {
       throw new NotFoundException('Shop not found for this seller');
     }
+    if (assertActive && !shop.isActive) {
+      throw new ForbiddenException(
+        'Your shop has been deactivated or suspended by platform administration.',
+      );
+    }
     return shop;
   }
 
-  async getDashboardMetrics(sellerId: string) {
+  async getShopProfile(sellerId: string) {
     const shop = await this.getShopForSeller(sellerId);
-
-    // Low stock count
-    const lowStockCount = await this.inventoryRepository
-      .createQueryBuilder('inv')
-      .innerJoin('inv.sellerProduct', 'sp')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold')
-      .getCount();
-
-    // Pending/Active orders count (orders that have items from this shop and are not delivered/cancelled)
-    const activeOrdersCount = await this.orderItemRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .innerJoin('item.order', 'order')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('order.status NOT IN (:...statuses)', {
-        statuses: [OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.FAILED],
-      })
-      .select('order.id')
-      .distinct(true)
-      .getCount();
-
-    // Total sales (Sum of delivered order items for this shop)
-    const salesData = await this.orderItemRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .innerJoin('item.order', 'order')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('order.status = :status', { status: OrderStatus.DELIVERED })
-      .select('SUM(item.subtotal)', 'totalSales')
-      .getRawOne();
-
-    // Recent Orders (last 5 items, mapped to orders)
-    const recentOrderItems = await this.orderItemRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .innerJoinAndSelect('item.order', 'order')
-      .innerJoinAndSelect('order.user', 'user')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .orderBy('order.createdAt', 'DESC')
-      .limit(5)
-      .getMany();
-
-    const recentOrders = recentOrderItems.map((item) => ({
-      id: item.order.id,
-      customerName: item.order.user
-        ? `${item.order.user.firstName} ${item.order.user.lastName}`
-        : 'Unknown',
-      totalAmount: item.subtotal,
-      status: item.order.status,
-      createdAt: item.order.createdAt,
-    }));
-
-    // Revenue Trend (last 7 days)
-    const revenueTrendRaw = await this.orderItemRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .innerJoin('item.order', 'order')
-      .select("TO_CHAR(order.createdAt, 'Dy')", 'name')
-      .addSelect('SUM(item.subtotal)', 'revenue')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('order.status = :status', { status: OrderStatus.DELIVERED })
-      .andWhere("order.createdAt >= NOW() - INTERVAL '7 days'")
-      .groupBy("TO_CHAR(order.createdAt, 'Dy')")
-      .orderBy('MIN(order.createdAt)', 'ASC')
-      .getRawMany();
-
-    const revenueData = revenueTrendRaw.map((r) => ({
-      name: r.name,
-      revenue: Number(r.revenue),
-    }));
-
-    // Total distinct orders for this shop
-    const totalOrders = await this.orderItemRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .select('item.orderId')
-      .distinct(true)
-      .getCount();
-
-    // Total products in shop
-    const totalProducts = await this.sellerProductRepository.count({
-      where: { shopId: shop.id, isActive: true },
-    });
-
-    // Pending orders count
-    const pendingOrdersCount = await this.orderItemRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .innerJoin('item.order', 'order')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('order.status = :status', { status: OrderStatus.PENDING })
-      .select('order.id')
-      .distinct(true)
-      .getCount();
-
-    // Order status distribution
-    const statusRows = await this.orderItemRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .innerJoin('item.order', 'order')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .select('order.status', 'status')
-      .addSelect('COUNT(DISTINCT order.id)', 'count')
-      .groupBy('order.status')
-      .getRawMany();
-
-    const orderStatusDistribution = statusRows.map((r) => ({
-      status: r.status,
-      count: Number(r.count),
-    }));
-
-    // Top Products
-    const topProductsRaw = await this.orderItemRepository.manager.query(
-      `
-      SELECT sp.id, COALESCE(p.name_en, 'Product') as "nameEn", COALESCE(p.name_bn, 'পণ্য') as "nameBn",
-             SUM(oi.quantity)::int as "quantitySold", SUM(oi.subtotal)::float as "revenue"
-      FROM order_items oi
-      JOIN seller_products sp ON sp.id = oi.seller_product_id
-      JOIN product_variants pv ON pv.id = sp.product_variant_id
-      JOIN products p ON p.id = pv.product_id
-      WHERE sp.shop_id = $1
-      GROUP BY sp.id, p.name_en, p.name_bn
-      ORDER BY "quantitySold" DESC
-      LIMIT 5
-    `,
+    const [stats] = await this.dataSource.query<
+      Array<{ product_count: string; total_orders: string }>
+    >(
+      `SELECT
+         (SELECT COUNT(*)::int FROM seller_products sp
+           WHERE sp.shop_id = $1 AND sp.is_active = true) AS product_count,
+         (SELECT COUNT(DISTINCT o.id)::int
+            FROM order_items oi
+            JOIN seller_products sp ON sp.id = oi.seller_product_id
+            JOIN orders o ON o.id = oi.order_id
+           WHERE sp.shop_id = $1) AS total_orders`,
       [shop.id],
     );
 
-    const topProducts = topProductsRaw.map((r: any) => ({
-      id: r.id,
-      nameEn: r.nameEn,
-      nameBn: r.nameBn,
-      quantitySold: Number(r.quantitySold || 0),
-      revenue: Number(r.revenue || 0),
-    }));
-
-    // Low stock items list (up to 5)
-    const lowStockItemsRaw = await this.inventoryRepository
-      .createQueryBuilder('inv')
-      .innerJoin('inv.sellerProduct', 'sp')
-      .innerJoin('sp.productVariant', 'pv')
-      .innerJoin('pv.product', 'p')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .andWhere('(inv.quantity - inv.reservedQuantity) <= inv.lowStockThreshold')
-      .select('sp.id', 'id')
-      .addSelect('p.nameEn', 'nameEn')
-      .addSelect('p.nameBn', 'nameBn')
-      .addSelect('inv.quantity', 'quantity')
-      .addSelect('inv.lowStockThreshold', 'lowStockThreshold')
-      .limit(5)
-      .getRawMany();
-
-    const lowStockProducts = lowStockItemsRaw.map((r) => ({
-      id: r.id,
-      nameEn: r.nameEn,
-      nameBn: r.nameBn,
-      quantity: Number(r.quantity),
-      lowStockThreshold: Number(r.lowStockThreshold),
-    }));
-
     return {
-      lowStockCount,
-      activeOrdersCount,
-      pendingOrdersCount,
-      totalOrders,
-      totalProducts,
-      totalSales: parseFloat(salesData?.totalSales || '0'),
-      recentOrders,
-      revenueData,
-      orderStatusDistribution,
-      topProducts,
-      lowStockProducts,
+      ...shop,
+      productCount: Number(stats?.product_count ?? 0),
+      totalOrders: Number(stats?.total_orders ?? 0),
     };
   }
 
-  async getShopProfile(sellerId: string) {
-    return this.getShopForSeller(sellerId);
-  }
-
   async updateShopProfile(sellerId: string, dto: UpdateSellerShopDto) {
-    const shop = await this.getShopForSeller(sellerId);
+    const shop = await this.getShopForSeller(sellerId, true);
 
     // Drop undefined keys so a partial payload never clears unrelated columns,
     // and skip the query entirely when nothing was sent.
@@ -231,133 +114,297 @@ export class SellerPortalService {
       await this.shopRepository.update(shop.id, updates);
     }
 
-    return this.getShopForSeller(sellerId);
+    return this.getShopProfile(sellerId);
   }
 
-  // --- Products ---
+  // -------------------------------------------------------------- dashboard
 
-  async getProducts(sellerId: string, search?: string) {
+  async getDashboardMetrics(sellerId: string): Promise<SellerDashboardResponseDto> {
     const shop = await this.getShopForSeller(sellerId);
-    const query = this.sellerProductRepository
-      .createQueryBuilder('sp')
-      .leftJoinAndSelect('sp.inventory', 'inventory')
-      .leftJoinAndSelect('sp.productVariant', 'variant')
-      .leftJoinAndSelect('variant.product', 'product')
-      .where('sp.shopId = :shopId', { shopId: shop.id });
 
-    if (search) {
-      query.andWhere(
-        '(product.nameEn ILIKE :search OR product.nameBn ILIKE :search OR variant.sku ILIKE :search OR sp.sellerSku ILIKE :search)',
-        { search: `%${search}%` },
-      );
+    const [analytics, recentOrders, lowStockProducts, wallet] = await Promise.all([
+      this.analyticsService.getAnalytics(sellerId, 7),
+      this.getRecentOrders(shop.id, 5),
+      this.getLowStockProducts(shop.id, 5),
+      this.getWalletSnapshot(sellerId),
+    ]);
+
+    return {
+      lowStockCount: analytics.inventory.lowStockCount,
+      outOfStockCount: analytics.inventory.outOfStockCount,
+      activeOrdersCount: analytics.orders.awaitingAction,
+      pendingOrdersCount:
+        analytics.orders.statusDistribution.find((row) => row.status === OrderStatus.PENDING)
+          ?.count ?? 0,
+      awaitingActionCount: analytics.orders.awaitingAction,
+      completedOrdersCount: analytics.orders.completed,
+      totalOrders: analytics.orders.lifetime,
+      totalProducts: analytics.inventory.activeListings,
+      totalSales: analytics.sales.lifetime,
+      todaySales: analytics.sales.today,
+      todayOrders: analytics.orders.today,
+      monthSales: analytics.sales.thisMonth,
+      monthOrders: analytics.orders.thisMonth,
+      stockValue: analytics.inventory.stockValue,
+      activeCouponsCount: analytics.promotions.activeCoupons,
+      wallet,
+      recentOrders,
+      revenueData: analytics.revenueTrend.map((point) => ({
+        name: point.date.slice(5),
+        date: point.date,
+        revenue: point.revenue,
+        orders: point.orders,
+      })),
+      orderStatusDistribution: analytics.orders.statusDistribution,
+      topProducts: analytics.bestSellers,
+      lowStockProducts,
+    };
+  }
+
+  private async getRecentOrders(
+    shopId: string,
+    limit: number,
+  ): Promise<SellerDashboardRecentOrderDto[]> {
+    const rows = await this.dataSource.query<
+      Array<{
+        id: string;
+        customer_name: string | null;
+        customer_phone: string | null;
+        seller_subtotal: string;
+        item_count: string;
+        status: OrderStatus;
+        created_at: Date;
+      }>
+    >(
+      `SELECT o.id,
+              NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), '')
+                AS customer_name,
+              u.phone AS customer_phone,
+              COALESCE(SUM(oi.subtotal), 0)::float AS seller_subtotal,
+              COUNT(oi.id)::int AS item_count,
+              o.status,
+              o.created_at
+         FROM orders o
+         JOIN order_items oi ON oi.order_id = o.id
+         JOIN seller_products sp ON sp.id = oi.seller_product_id
+         LEFT JOIN users u ON u.id = o.user_id
+        WHERE sp.shop_id = $1
+        GROUP BY o.id, u.first_name, u.last_name, u.phone, o.status, o.created_at
+        ORDER BY o.created_at DESC
+        LIMIT $2`,
+      [shopId, limit],
+    );
+
+    return rows.map((row) => ({
+      id: row.id,
+      customerName: row.customer_name ?? 'Customer',
+      customerPhone: row.customer_phone ?? null,
+      totalAmount: Number(row.seller_subtotal),
+      itemCount: Number(row.item_count),
+      status: row.status,
+      allowedNextStatuses: getSellerAllowedNextStatuses(row.status),
+      createdAt: this.toIso(row.created_at),
+    }));
+  }
+
+  private async getLowStockProducts(shopId: string, limit: number) {
+    const rows = await this.dataSource.query<
+      Array<{
+        id: string;
+        name_en: string;
+        name_bn: string;
+        sku: string | null;
+        quantity: string;
+        reserved_quantity: string;
+        low_stock_threshold: string;
+      }>
+    >(
+      `SELECT sp.id,
+              p.name_en,
+              p.name_bn,
+              COALESCE(sp.seller_sku, pv.sku) AS sku,
+              inv.quantity,
+              inv.reserved_quantity,
+              inv.low_stock_threshold
+         FROM seller_products sp
+         JOIN inventory inv ON inv.seller_product_id = sp.id
+         JOIN product_variants pv ON pv.id = sp.product_variant_id
+         JOIN products p ON p.id = pv.product_id
+        WHERE sp.shop_id = $1
+          AND sp.is_active = true
+          AND (inv.quantity - inv.reserved_quantity) <= inv.low_stock_threshold
+        ORDER BY (inv.quantity - inv.reserved_quantity) ASC
+        LIMIT $2`,
+      [shopId, limit],
+    );
+
+    return rows.map((row) => ({
+      id: row.id,
+      nameEn: row.name_en,
+      nameBn: row.name_bn,
+      sku: row.sku,
+      quantity: Number(row.quantity),
+      availableQuantity: Math.max(0, Number(row.quantity) - Number(row.reserved_quantity)),
+      lowStockThreshold: Number(row.low_stock_threshold),
+    }));
+  }
+
+  async getWalletSnapshot(sellerId: string) {
+    const wallet = await this.walletRepository.findOne({ where: { userId: sellerId } });
+
+    const pendingRow = await this.payoutRepository
+      .createQueryBuilder('payout')
+      .select('COALESCE(SUM(payout.amount), 0)', 'total')
+      .where('payout.sellerId = :sellerId', { sellerId })
+      .andWhere('payout.status = :status', { status: PayoutStatus.PENDING })
+      .getRawOne<{ total: string }>();
+
+    return {
+      balance: Number(wallet?.balance ?? 0),
+      pendingClearance: Number(wallet?.pendingClearance ?? 0),
+      totalEarned: Number(wallet?.totalEarned ?? 0),
+      totalWithdrawn: Number(wallet?.totalWithdrawn ?? 0),
+      pendingPayoutAmount: Number(pendingRow?.total ?? 0),
+      hasWallet: !!wallet,
+    };
+  }
+
+  // ----------------------------------------------------------------- orders
+
+  private readonly needsActionStatuses = [
+    OrderStatus.PENDING,
+    OrderStatus.CONFIRMED,
+    OrderStatus.PROCESSING,
+  ];
+
+  /**
+   * Builds the shared WHERE fragment plus positional parameters so the summary
+   * and count queries always stay in sync.
+   */
+  private buildOrderFilters(
+    shopId: string,
+    query: SellerOrderQueryDto,
+  ): { where: string; params: unknown[] } {
+    const params: unknown[] = [shopId];
+    let where = '';
+
+    if (query.status) {
+      params.push(query.status);
+      where += ` AND o.status = $${params.length}`;
     }
 
-    return query.getMany();
+    if (query.needsAction === 'true') {
+      params.push(this.needsActionStatuses);
+      where += ` AND o.status = ANY($${params.length})`;
+    }
+
+    const search = query.search?.trim();
+    if (search) {
+      params.push(`%${search}%`);
+      const idx = params.length;
+      where += ` AND (
+        o.id::text ILIKE $${idx}
+        OR COALESCE(u.phone, '') ILIKE $${idx}
+        OR COALESCE(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')), '') ILIKE $${idx}
+      )`;
+    }
+
+    return { where, params };
   }
 
-  async addProduct(sellerId: string, dto: AddSellerProductDto) {
+  async getOrders(sellerId: string, query: SellerOrderQueryDto): Promise<SellerOrderListDto> {
     const shop = await this.getShopForSeller(sellerId);
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(query.limit) || 20));
 
-    return this.dataSource.transaction(async (manager) => {
-      // Check if variant exists
-      const variant = await manager.findOne(ProductVariant, {
-        where: { id: dto.productVariantId },
-      });
-      if (!variant) throw new NotFoundException('Product variant not found');
+    const { where, params } = this.buildOrderFilters(shop.id, query);
 
-      // Check if seller already has this product
-      const existing = await manager.findOne(SellerProduct, {
-        where: { shopId: shop.id, productVariantId: dto.productVariantId },
-      });
-      if (existing) throw new BadRequestException('Product already exists in your shop');
+    const rows = await this.dataSource.query<OrderListRow[]>(
+      `SELECT o.id,
+              o.status,
+              o.payment_method,
+              o.payment_status,
+              COALESCE(SUM(oi.subtotal), 0)::float AS seller_subtotal,
+              COUNT(oi.id)::int AS item_count,
+              o.created_at,
+              NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), '')
+                AS customer_name,
+              u.phone AS customer_phone,
+              a.contact_name,
+              a.street_address,
+              d.name_en AS district,
+              uz.name_en AS upazila
+         FROM orders o
+         JOIN order_items oi ON oi.order_id = o.id
+         JOIN seller_products sp ON sp.id = oi.seller_product_id
+         LEFT JOIN users u ON u.id = o.user_id
+         LEFT JOIN addresses a ON a.id = o.address_id
+         LEFT JOIN districts d ON d.id = a.district_id
+         LEFT JOIN upazilas uz ON uz.id = a.upazila_id
+        WHERE sp.shop_id = $1${where}
+        GROUP BY o.id, u.first_name, u.last_name, u.phone,
+                 a.contact_name, a.street_address, d.name_en, uz.name_en
+        ORDER BY o.created_at DESC
+        LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, limit, (page - 1) * limit],
+    );
 
-      const sellerProduct = new SellerProduct();
-      sellerProduct.shopId = shop.id;
-      sellerProduct.productVariantId = dto.productVariantId;
-      sellerProduct.price = dto.price;
-      sellerProduct.discountPrice = dto.discountPrice || null;
-      sellerProduct.sellerSku = dto.sellerSku || null;
+    const [countRow] = await this.dataSource.query<Array<{ total: string; awaiting: string }>>(
+      `SELECT COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE o.status IN ('PENDING','CONFIRMED','PROCESSING'))::int
+                AS awaiting
+         FROM (
+           SELECT DISTINCT o.id, o.status
+             FROM orders o
+             JOIN order_items oi ON oi.order_id = o.id
+             JOIN seller_products sp ON sp.id = oi.seller_product_id
+             LEFT JOIN users u ON u.id = o.user_id
+            WHERE sp.shop_id = $1${where}
+         ) o`,
+      params,
+    );
 
-      const savedSp = await manager.save(SellerProduct, sellerProduct);
+    const total = Number(countRow?.total ?? 0);
 
-      const inventory = new Inventory();
-      inventory.sellerProductId = savedSp.id;
-      inventory.quantity = dto.quantity;
-      if (dto.lowStockThreshold !== undefined) {
-        inventory.lowStockThreshold = dto.lowStockThreshold;
-      }
-
-      await manager.save(Inventory, inventory);
-
-      return manager.findOne(SellerProduct, {
-        where: { id: savedSp.id },
-        relations: ['inventory', 'productVariant', 'productVariant.product'],
-      });
-    });
+    return {
+      data: rows.map((row) => this.toOrderSummary(row)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
+      awaitingActionCount: Number(countRow?.awaiting ?? 0),
+    };
   }
 
-  async updateProduct(sellerId: string, id: string, dto: UpdateSellerProductDto) {
-    const shop = await this.getShopForSeller(sellerId);
-
-    return this.dataSource.transaction(async (manager) => {
-      const sellerProduct = await manager.findOne(SellerProduct, {
-        where: { id, shopId: shop.id },
-        relations: ['inventory'],
-      });
-
-      if (!sellerProduct) throw new NotFoundException('Seller product not found');
-
-      if (dto.price !== undefined) sellerProduct.price = dto.price;
-      if (dto.discountPrice !== undefined) sellerProduct.discountPrice = dto.discountPrice;
-      if (dto.isActive !== undefined) sellerProduct.isActive = dto.isActive;
-
-      await manager.save(SellerProduct, sellerProduct);
-
-      if (dto.quantity !== undefined || dto.lowStockThreshold !== undefined) {
-        if (dto.quantity !== undefined) {
-          // Validate quantity doesn't drop below reserved
-          if (dto.quantity < sellerProduct.inventory.reservedQuantity) {
-            throw new BadRequestException(
-              `Cannot set quantity below reserved quantity (${sellerProduct.inventory.reservedQuantity})`,
-            );
-          }
-          sellerProduct.inventory.quantity = dto.quantity;
-        }
-        if (dto.lowStockThreshold !== undefined) {
-          sellerProduct.inventory.lowStockThreshold = dto.lowStockThreshold;
-        }
-        await manager.save(Inventory, sellerProduct.inventory);
-      }
-
-      return manager.findOne(SellerProduct, {
-        where: { id: sellerProduct.id },
-        relations: ['inventory', 'productVariant', 'productVariant.product'],
-      });
-    });
+  private toIso(value: Date | string): string {
+    return value instanceof Date ? value.toISOString() : String(value);
   }
 
-  // --- Orders ---
-
-  async getOrders(sellerId: string) {
-    const shop = await this.getShopForSeller(sellerId);
-
-    // Get distinct orders that contain items from this seller's shop
-    const orders = await this.orderRepository
-      .createQueryBuilder('order')
-      .innerJoinAndSelect('order.items', 'item')
-      .innerJoin('item.sellerProduct', 'sp')
-      .innerJoinAndSelect('order.user', 'user')
-      .where('sp.shopId = :shopId', { shopId: shop.id })
-      .orderBy('order.createdAt', 'DESC')
-      .getMany();
-
-    // Since the join filters the items in the result to ONLY those of this shop,
-    // the returned order.items array will only contain the seller's items.
-    // This correctly isolates data so seller A doesn't see seller B's items in the same order.
-    return orders;
+  private toOrderSummary(row: OrderListRow): SellerOrderSummaryDto {
+    return {
+      id: row.id,
+      reference: `#${row.id.replace(/-/g, '').slice(-8).toUpperCase()}`,
+      status: row.status,
+      sellerSubtotal: Number(row.seller_subtotal),
+      itemCount: Number(row.item_count),
+      paymentMethod: row.payment_method,
+      paymentStatus: row.payment_status,
+      createdAt: this.toIso(row.created_at),
+      customer: {
+        name: row.customer_name?.trim() || 'Customer',
+        phone: row.customer_phone ?? null,
+        contactName: row.contact_name ?? null,
+        streetAddress: row.street_address ?? null,
+        district: row.district ?? null,
+        upazila: row.upazila ?? null,
+      },
+      allowedNextStatuses: getSellerAllowedNextStatuses(row.status),
+    };
   }
 
-  async getOrderDetails(sellerId: string, orderId: string) {
+  async getOrderDetails(sellerId: string, orderId: string): Promise<SellerOrderDetailDto> {
     const shop = await this.getShopForSeller(sellerId);
 
     const order = await this.orderRepository
@@ -366,8 +413,11 @@ export class SellerPortalService {
       .innerJoinAndSelect('item.sellerProduct', 'sp')
       .leftJoinAndSelect('sp.productVariant', 'variant')
       .leftJoinAndSelect('variant.product', 'product')
+      .leftJoinAndSelect('product.images', 'productImage')
       .innerJoinAndSelect('order.user', 'user')
-      .innerJoinAndSelect('order.address', 'address')
+      .leftJoinAndSelect('order.address', 'address')
+      .leftJoinAndSelect('address.district', 'addressDistrict')
+      .leftJoinAndSelect('address.upazila', 'addressUpazila')
       .leftJoinAndSelect('order.statusHistory', 'history')
       .where('order.id = :orderId', { orderId })
       .andWhere('sp.shopId = :shopId', { shopId: shop.id })
@@ -378,14 +428,130 @@ export class SellerPortalService {
       throw new NotFoundException('Order not found or contains no items from your shop');
     }
 
-    // Adjust the order total to reflect only this seller's items
     const sellerSubtotal = order.items.reduce((sum, item) => sum + Number(item.subtotal), 0);
-    // (Note: delivery fee and discounts are complex to split. For a multi-vendor cart, it should be handled explicitly.
-    // Here we'll just expose the items and subtotal to the seller)
+
+    const items = order.items.map((item) => {
+      const product = item.sellerProduct?.productVariant?.product;
+      const images = product?.images ?? [];
+      const primary = images.find((image) => image.isPrimary) ?? images[0];
+      return {
+        id: item.id,
+        sellerProductId: item.sellerProductId,
+        nameEn: product?.nameEn ?? '',
+        nameBn: product?.nameBn ?? '',
+        image: primary?.url ?? null,
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice),
+        subtotal: Number(item.subtotal),
+      };
+    });
+
+    const summary = this.toOrderSummary({
+      id: order.id,
+      status: order.status,
+      payment_method: order.paymentMethod,
+      payment_status: order.paymentStatus,
+      seller_subtotal: String(sellerSubtotal),
+      item_count: String(order.items.length),
+      created_at: order.createdAt,
+      customer_name: order.user
+        ? [order.user.firstName, order.user.lastName].filter(Boolean).join(' ')
+        : null,
+      customer_phone: order.user?.phone ?? null,
+      contact_name: order.address?.contactName ?? null,
+      street_address: order.address?.streetAddress ?? null,
+      district: order.address?.district?.nameEn ?? null,
+      upazila: order.address?.upazila?.nameEn ?? null,
+    });
+
+    const delivery = await this.deliveryRepository.findOne({
+      where: { orderId: order.id },
+      relations: ['rider'],
+    });
+
+    const riderName = delivery?.rider
+      ? [delivery.rider.firstName, delivery.rider.lastName].filter(Boolean).join(' ') || 'Assigned Rider'
+      : null;
+    const riderPhone = delivery?.rider?.phone ?? null;
+    const deliveryStatus = delivery?.status ?? null;
+    const deliveryNote = delivery?.notes ?? null;
 
     return {
-      ...order,
-      sellerSubtotal,
+      ...summary,
+      customerUserId: order.user?.id ?? null,
+      items,
+      statusHistory: [...(order.statusHistory ?? [])]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .map((history) => ({
+          status: history.status,
+          note: history.reason ?? history.remark ?? null,
+          createdAt: this.toIso(history.createdAt),
+        })),
+      riderName,
+      riderPhone,
+      deliveryStatus,
+      note: deliveryNote,
     };
+  }
+
+  async transitionOrderStatus(
+    sellerId: string,
+    orderId: string,
+    dto: TransitionOrderDto,
+    context?: { ip?: string; userAgent?: string },
+  ): Promise<SellerOrderDetailDto> {
+    const shop = await this.getShopForSeller(sellerId, true);
+
+    // Verify order exists and contains items from this shop
+    const order = await this.orderRepository
+      .createQueryBuilder('order')
+      .innerJoin('order.items', 'item')
+      .innerJoin('item.sellerProduct', 'sp')
+      .where('order.id = :orderId', { orderId })
+      .andWhere('sp.shopId = :shopId', { shopId: shop.id })
+      .getOne();
+
+    if (!order) {
+      throw new NotFoundException('Order not found or contains no items from your shop');
+    }
+
+    await this.ordersService.transitionOrder(orderId, dto, {
+      id: sellerId,
+      roles: [Role.SELLER],
+      ip: context?.ip,
+      userAgent: context?.userAgent,
+    });
+
+    await this.auditLogsService.record({
+      actorId: sellerId,
+      actorName: shop.nameEn,
+      action: 'SELLER_ORDER_STATUS_UPDATED',
+      targetType: 'Order',
+      targetId: orderId,
+      details: `Transitioned order to ${dto.targetStatus}. Reason: ${dto.reason || 'None provided'}`,
+    });
+
+    return this.getOrderDetails(sellerId, orderId);
+  }
+
+  async updateSellerAvatar(sellerId: string, avatarUrl: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: sellerId } });
+    if (!user) {
+      throw new NotFoundException('Seller user not found');
+    }
+
+    user.avatar = avatarUrl;
+    await this.userRepository.save(user);
+
+    await this.auditLogsService.record({
+      actorId: sellerId,
+      actorName: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || null,
+      action: 'SELLER_AVATAR_UPDATED',
+      targetType: 'User',
+      targetId: sellerId,
+      details: `Avatar updated to ${avatarUrl}`,
+    });
+
+    return user;
   }
 }

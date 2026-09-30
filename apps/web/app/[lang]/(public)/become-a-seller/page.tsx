@@ -56,6 +56,24 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
   });
 
   const [errorMsg, setErrorMsg] = useState('');
+  const [isReapplying, setIsReapplying] = useState(false);
+
+  const handleStartReapply = () => {
+    if (myApp) {
+      setFormData({
+        shopNameEn: myApp.shopNameEn || '',
+        shopNameBn: myApp.shopNameBn || '',
+        shopSlug: myApp.shopSlug || '',
+        phone: myApp.phone || user?.phone || '',
+        email: myApp.email || user?.email || '',
+        description: myApp.description || '',
+        address: myApp.address || '',
+        tradeLicenseNumber: myApp.tradeLicenseNumber || '',
+        nidNumber: myApp.nidNumber || '',
+      });
+    }
+    setIsReapplying(true);
+  };
 
   const handleSlugify = (name: string) => {
     return name
@@ -96,6 +114,7 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
           ? 'আবেদনটি সফলভাবে জমা দেওয়া হয়েছে!'
           : 'Application submitted successfully! Our team will review it shortly.'
       );
+      setIsReapplying(false);
       refetch();
     } catch (err) {
       const msg =
@@ -219,7 +238,7 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
               </Button>
             </div>
           </div>
-        ) : myApp ? (
+        ) : myApp && !isReapplying ? (
           <div className="p-8 rounded-3xl bg-card border shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b pb-4">
               <div>
@@ -307,11 +326,16 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
                         : 'Submitted details could not be verified.')}
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground text-center">
-                  {isBn
-                    ? 'প্রয়োজনে সংশোধন করে পুনরায় আবেদন করতে অনুগ্রহ করে সাপোর্টে যোগাযোগ করুন।'
-                    : 'If you wish to update your details, please reach out to customer support.'}
-                </p>
+                <div className="pt-2 flex justify-center">
+                  <Button
+                    type="button"
+                    onClick={handleStartReapply}
+                    variant="outline"
+                    className="rounded-2xl px-6 gap-2"
+                  >
+                    {isBn ? 'সংশোধন করে পুনরায় আবেদন করুন' : 'Edit & Resubmit Application'}
+                  </Button>
+                </div>
               </div>
             )}
 
@@ -352,15 +376,33 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
         ) : (
           /* Application Form */
           <div className="p-8 rounded-3xl bg-card border shadow-sm space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">
-                {isBn ? 'সেলার পার্টনারশিপ আবেদন ফরম' : 'Seller Partner Application Form'}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {isBn
-                  ? 'আপনার দোকানের সঠিক তথ্য প্রদান করুন। অ্যাডমিন পর্যালোচনার পর আপনার স্টোর সক্রিয় হবে।'
-                  : 'Please provide authentic business details for verification and onboarding.'}
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">
+                  {isReapplying
+                    ? isBn
+                      ? 'সংশোধিত সেলার আবেদন'
+                      : 'Resubmit Updated Seller Application'
+                    : isBn
+                      ? 'সেলার পার্টনারশিপ আবেদন ফরম'
+                      : 'Seller Partner Application Form'}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {isBn
+                    ? 'আপনার দোকানের সঠিক তথ্য প্রদান করুন। অ্যাডমিন পর্যালোচনার পর আপনার স্টোর সক্রিয় হবে।'
+                    : 'Please provide authentic business details for verification and onboarding.'}
+                </p>
+              </div>
+              {isReapplying && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsReapplying(false)}
+                  className="self-start sm:self-center"
+                >
+                  {isBn ? 'বাতিল করুন' : 'Cancel'}
+                </Button>
+              )}
             </div>
 
             {errorMsg && (

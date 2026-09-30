@@ -1,3 +1,4 @@
+export * from './api';
 export * from './dashboard';
 export * from './products';
 export * from './orders';
@@ -9,3 +10,4 @@ export * from './profile';
 export * from './reports';
 export * from './settings';
 export * from './messages';
+export * from './reviews';

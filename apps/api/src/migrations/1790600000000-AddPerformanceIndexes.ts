@@ -76,8 +76,10 @@ export class AddPerformanceIndexes1790600000000 implements MigrationInterface {
 
     // Users indexes
     await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_users_status" ON "users" ("status");`);
+    // `users` uses camelCase columns (no @Column name mapping), unlike the
+    // snake_case tables above — index "createdAt", not "created_at".
     await queryRunner.query(
-      `CREATE INDEX IF NOT EXISTS "idx_users_created_at" ON "users" ("created_at");`,
+      `CREATE INDEX IF NOT EXISTS "idx_users_created_at" ON "users" ("createdAt");`,
     );
 
     // Applications indexes
@@ -101,6 +103,7 @@ export class AddPerformanceIndexes1790600000000 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_seller_applications_created_at";`);
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_seller_applications_status";`);
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_users_created_at";`);
+    // note: index is on the camelCase "createdAt" column
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_users_status";`);
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_deliveries_created_at";`);
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_deliveries_status";`);

@@ -194,6 +194,9 @@ export class ApplicationsService {
           nameBn: app.shopNameBn,
           slug: app.shopSlug,
           description: app.description,
+          phone: app.phone,
+          email: app.email,
+          address: app.address,
           isVerified: true,
           isActive: true,
         });
@@ -201,6 +204,9 @@ export class ApplicationsService {
       } else {
         shop.isActive = true;
         shop.isVerified = true;
+        if (!shop.phone && app.phone) shop.phone = app.phone;
+        if (!shop.email && app.email) shop.email = app.email;
+        if (!shop.address && app.address) shop.address = app.address;
         await queryRunner.manager.save(shop);
       }
 

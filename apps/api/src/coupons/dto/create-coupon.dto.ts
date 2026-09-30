@@ -6,13 +6,15 @@ import {
   IsOptional,
   IsBoolean,
   IsDateString,
+  MaxLength,
   Min,
 } from 'class-validator';
 import { DiscountType } from '../enums/discount-type.enum.js';
 
 export class CreateCouponDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'SHOP20', description: 'Uppercase alphanumeric coupon code' })
   @IsString()
+  @MaxLength(40)
   code: string;
 
   @ApiProperty({ enum: DiscountType })
@@ -45,11 +47,6 @@ export class CreateCouponDto {
   @IsOptional()
   @IsDateString()
   endDate?: Date;
-
-  @ApiProperty({ description: 'Number of times the coupon has been used', default: 0 })
-  @IsNumber()
-  @IsOptional()
-  usedCount?: number;
 
   @ApiProperty({ description: 'Optional Shop ID for seller-specific coupons', required: false })
   @IsString()

@@ -64,6 +64,17 @@ export function getPaymentStatusMeta(status?: string | null) {
   return lookup(PAYMENT_STATUS_META, status);
 }
 
+/** Localised label for a payment method (`COD` / `ONLINE`). */
+export function getPaymentMethodMeta(method?: string | null): { en: string; bn: string } {
+  if (!method) return PAYMENT_METHOD_META.COD;
+  return (
+    PAYMENT_METHOD_META[method.toUpperCase()] ?? {
+      en: method.replace(/_/g, ' '),
+      bn: method.replace(/_/g, ' '),
+    }
+  );
+}
+
 /** Localised label helper for the very common "just give me the text" case. */
 export function statusLabel(meta: StatusMeta, isBn: boolean): string {
   return isBn ? meta.bn : meta.en;

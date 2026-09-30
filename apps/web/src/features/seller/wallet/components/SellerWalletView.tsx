@@ -1,7 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { useGetMyWalletQuery, useGetMyTransactionsQuery } from '@/features/wallets/walletsApi';
+import React, { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { ArrowUpRight, CheckCircle2, Clock, Search, Wallet, X } from 'lucide-react';
+
+import { useGetMyTransactionsQuery, useGetMyWalletQuery } from '@/features/wallets/walletsApi';
+import type { WalletTransaction } from '@/features/wallets/walletsApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,10 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Wallet, ArrowUpRight, Clock, CheckCircle2, Search, X } from 'lucide-react';
-import Link from 'next/link';
-import { format } from 'date-fns';
+import { PageHeader } from '@/components/common/PageHeader';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
 import AdminPagination from '@/components/AdminPagination';
+import { formatCurrency, formatDateTime } from '@/lib/format';
 
 export interface SellerWalletViewProps {
   lang?: string;
@@ -31,23 +36,32 @@ export interface SellerWalletViewProps {
 
 export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
   const isBn = lang === 'bn';
-  const { data: wallet, isLoading: isWalletLoading } = useGetMyWalletQuery();
-  const { data: transactions = [], isLoading: isTxLoading } = useGetMyTransactionsQuery();
+  const {
+    data: wallet,
+    isLoading: isWalletLoading,
+    isError: isWalletError,
+    refetch: refetchWallet,
+  } = useGetMyWalletQuery();
+  const {
+    data: transactions = [],
+    isLoading: isTxLoading,
+    isError: isTxError,
+    refetch: refetchTx,
+  } = useGetMyTransactionsQuery();
 
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('ALL');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'CREDIT' | 'DEBIT'>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const filteredTransactions = useMemo(() => {
-    return transactions.filter((tx: any) => {
+    const term = search.trim().toLowerCase();
+    return transactions.filter((tx: WalletTransaction) => {
       const matchesSearch =
-        !search.trim() ||
-        tx.description.toLowerCase().includes(search.toLowerCase()) ||
-        tx.amount.toString().includes(search.trim());
-
+        !term ||
+        tx.description.toLowerCase().includes(term) ||
+        String(tx.amount).includes(term);
       const matchesType = typeFilter === 'ALL' || tx.type === typeFilter;
-
       return matchesSearch && matchesType;
     });
   }, [transactions, search, typeFilter]);
@@ -58,91 +72,111 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
   }, [filteredTransactions, currentPage, pageSize]);
 
   if (isWalletLoading) {
+    return <LoadingState message={isBn ? 'ওয়ালেট লোড হচ্ছে...' : 'Loading wallet...'} />;
+  }
+
+  if (isWalletError) {
     return (
-      <div className="p-8 text-center text-muted-foreground">
-        {isBn ? 'লোড হচ্ছে...' : 'Loading...'}
-      </div>
+      <ErrorState
+        title={isBn ? 'ওয়ালেট লোড করা যায়নি' : 'Could not load wallet'}
+        message={
+          isBn
+            ? 'আপনার ওয়ালেট তথ্য আনতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+            : 'There was a problem loading your wallet. Please try again.'
+        }
+        onRetry={() => {
+          void refetchWallet();
+          void refetchTx();
+        }}
+        isBn={isBn}
+      />
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {isBn ? 'আমার ওয়ালেট' : 'My Wallet'}
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {isBn ? 'আপনার আয় এবং লেনদেন পরিচালনা করুন' : 'Manage your earnings and transactions'}
-          </p>
-        </div>
-        <Button asChild className="gap-2 rounded-full px-5">
-          <Link href={`/${lang}/seller/wallet/payout`}>
-            <Wallet className="h-4 w-4" />
-            {isBn ? 'পেআউট অনুরোধ করুন' : 'Request Payout'}
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        breadcrumbs={[
+          { label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', href: `/${lang}/seller` },
+          { label: isBn ? 'ওয়ালেট' : 'Wallet' },
+        ]}
+        title={isBn ? 'আমার ওয়ালেট' : 'My wallet'}
+        description={
+          isBn ? 'আপনার আয় এবং লেনদেন পরিচালনা করুন' : 'Manage your earnings and transactions'
+        }
+        primaryAction={
+          <Button asChild className="gap-2">
+            <Link href={`/${lang}/seller/wallet/payout`}>
+              <Wallet className="h-4 w-4" />
+              {isBn ? 'পেআউট অনুরোধ করুন' : 'Request payout'}
+            </Link>
+          </Button>
+        }
+      />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-primary/5 border-primary/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {isBn ? 'বর্তমান ব্যালেন্স' : 'Available Balance'}
-            </CardTitle>
-            <Wallet className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">৳ {wallet?.balance || 0}</div>
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {isBn ? 'পেন্ডিং ক্লিয়ারেন্স' : 'Pending Clearance'}
+            <CardTitle className="text-muted-foreground text-xs font-medium">
+              {isBn ? 'বর্তমান ব্যালেন্স' : 'Available balance'}
             </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <Wallet className="text-primary h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-500">
-              ৳ {wallet?.pendingClearance || 0}
+            <div className="text-primary text-xl font-bold sm:text-2xl">
+              {formatCurrency(wallet?.balance)}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {isBn ? 'মোট আয়' : 'Total Earned'}
+            <CardTitle className="text-muted-foreground text-xs font-medium">
+              {isBn ? 'পেন্ডিং ক্লিয়ারেন্স' : 'Pending clearance'}
             </CardTitle>
-            <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+            <Clock className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">৳ {wallet?.totalEarned || 0}</div>
+            <div className="text-xl font-bold text-amber-600 sm:text-2xl">
+              {formatCurrency(wallet?.pendingClearance)}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {isBn ? 'মোট উত্তোলন' : 'Total Withdrawn'}
+            <CardTitle className="text-muted-foreground text-xs font-medium">
+              {isBn ? 'মোট আয়' : 'Total earned'}
             </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+            <ArrowUpRight className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">৳ {wallet?.totalWithdrawn || 0}</div>
+            <div className="text-xl font-bold text-emerald-600 sm:text-2xl">
+              {formatCurrency(wallet?.totalEarned)}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-muted-foreground text-xs font-medium">
+              {isBn ? 'মোট উত্তোলন' : 'Total withdrawn'}
+            </CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-bold text-blue-600 sm:text-2xl">
+              {formatCurrency(wallet?.totalWithdrawn)}
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Table Card */}
-      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 dark:border-border dark:bg-card">
-        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex w-full flex-1 flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-            {/* Search Pill */}
-            <div className="relative w-full max-w-md min-w-[200px] flex-1 sm:w-auto">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <Card>
+        <CardContent className="pt-6">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative w-full sm:max-w-sm">
+              <Search className="start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={search}
@@ -151,99 +185,94 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                   setCurrentPage(1);
                 }}
                 placeholder={
-                  isBn
-                    ? 'বিবরণ বা পরিমাণ দিয়ে লেনদেন খুঁজুন...'
-                    : 'Search transactions by description...'
+                  isBn ? 'বিবরণ বা পরিমাণ দিয়ে খুঁজুন...' : 'Search by description or amount...'
                 }
-                className="h-11 w-full rounded-full border border-gray-200 bg-white px-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none dark:border-border dark:bg-background"
+                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary h-10 w-full rounded-lg border ps-10 pe-10 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-gray-100 dark:hover:bg-muted"
+                  aria-label={isBn ? 'মুছুন' : 'Clear'}
+                  className="text-muted-foreground hover:text-foreground absolute end-3 top-1/2 -translate-y-1/2 rounded p-1"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
 
-            {/* Type Filter */}
             <div className="w-full sm:w-44">
               <Select
                 value={typeFilter}
                 onValueChange={(val) => {
-                  setTypeFilter(val);
+                  setTypeFilter(val as 'ALL' | 'CREDIT' | 'DEBIT');
                   setCurrentPage(1);
                 }}
               >
-                <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 dark:border-border dark:bg-background dark:text-foreground">
-                  <SelectValue placeholder="All Types" />
+                <SelectTrigger className="h-10 w-full">
+                  <SelectValue placeholder={isBn ? 'সকল ধরন' : 'All types'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ALL">{isBn ? 'সকল ধরন' : 'All Types'}</SelectItem>
+                  <SelectItem value="ALL">{isBn ? 'সকল ধরন' : 'All types'}</SelectItem>
                   <SelectItem value="CREDIT">
-                    {isBn ? 'ক্রেডিট (আয়)' : 'Credit (Income)'}
+                    {isBn ? 'ক্রেডিট (আয়)' : 'Credit (income)'}
                   </SelectItem>
-                  <SelectItem value="DEBIT">
-                    {isBn ? 'ডেবিট (ব্যয়)' : 'Debit (Expense)'}
-                  </SelectItem>
+                  <SelectItem value="DEBIT">{isBn ? 'ডেবিট (ব্যয়)' : 'Debit (expense)'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-        </div>
 
-        {/* Inner Table Container */}
-        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xs dark:border-border dark:bg-card">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border">
             <Table>
-              <TableHeader className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
+              <TableHeader>
                 <TableRow>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'তারিখ' : 'Date'}</TableHead>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'বিবরণ' : 'Description'}</TableHead>
-                  <TableHead className="py-3.5 px-4">{isBn ? 'ধরন' : 'Type'}</TableHead>
-                  <TableHead className="py-3.5 px-4 text-end">
-                    {isBn ? 'পরিমাণ' : 'Amount'}
-                  </TableHead>
+                  <TableHead>{isBn ? 'তারিখ' : 'Date'}</TableHead>
+                  <TableHead>{isBn ? 'বিবরণ' : 'Description'}</TableHead>
+                  <TableHead>{isBn ? 'ধরন' : 'Type'}</TableHead>
+                  <TableHead className="text-end">{isBn ? 'পরিমাণ' : 'Amount'}</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody className="divide-y divide-gray-200 dark:divide-border">
+              <TableBody>
                 {isTxLoading ? (
                   Array.from({ length: 5 }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`} className="animate-pulse">
-                      <TableCell className="py-4 px-4">
-                        <div className="h-4 w-32 rounded bg-muted"></div>
-                      </TableCell>
-                      <TableCell className="py-4 px-4">
-                        <div className="h-4 w-48 rounded bg-muted"></div>
-                      </TableCell>
-                      <TableCell className="py-4 px-4">
-                        <div className="h-6 w-16 rounded-full bg-muted"></div>
-                      </TableCell>
-                      <TableCell className="py-4 px-4 text-end">
-                        <div className="ms-auto h-4 w-20 rounded bg-muted"></div>
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell colSpan={4}>
+                        <div className="bg-muted h-4 w-full animate-pulse rounded" />
                       </TableCell>
                     </TableRow>
                   ))
+                ) : isTxError ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-10 text-center">
+                      <p className="text-muted-foreground mb-3 text-sm">
+                        {isBn
+                          ? 'লেনদেন তথ্য আনা যায়নি।'
+                          : 'Could not load transactions.'}
+                      </p>
+                      <Button variant="outline" size="sm" onClick={() => void refetchTx()}>
+                        {isBn ? 'আবার চেষ্টা করুন' : 'Retry'}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 ) : paginatedTransactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted/60">
-                          <Search className="h-6 w-6 text-muted-foreground/60" />
+                    <TableCell colSpan={4} className="py-12 text-center">
+                      <div className="flex flex-col items-center">
+                        <div className="bg-muted/60 mb-4 flex h-14 w-14 items-center justify-center rounded-full">
+                          <Search className="text-muted-foreground/60 h-6 w-6" />
                         </div>
-                        <h3 className="mb-1 text-base font-semibold text-foreground">
+                        <h3 className="text-foreground mb-1 text-base font-semibold">
                           {isBn ? 'কোন লেনদেন পাওয়া যায়নি' : 'No transactions found'}
                         </h3>
-                        <p className="text-sm text-muted-foreground max-w-sm">
+                        <p className="text-muted-foreground max-w-sm text-sm">
                           {search || typeFilter !== 'ALL'
                             ? isBn
                               ? 'আপনার ফিল্টারের সাথে কোনো লেনদেন মেলেনি'
-                              : 'No transactions match your search criteria.'
+                              : 'No transactions match your filters.'
                             : isBn
-                              ? 'বর্তমানে কোনো লেনদেনের রেকর্ড নেই'
-                              : 'No transaction records available.'}
+                              ? 'বর্তমানে কোনো লেনদেনের রেকর্ড নেই। পণ্য বিক্রি হলে এখানে আয় দেখা যাবে।'
+                              : 'No transactions yet. Earnings appear here once your sales are settled.'}
                         </p>
                         {(search || typeFilter !== 'ALL') && (
                           <button
@@ -252,7 +281,7 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                               setSearch('');
                               setTypeFilter('ALL');
                             }}
-                            className="mt-4 text-sm font-medium text-primary hover:underline"
+                            className="text-primary hover:text-primary/80 mt-4 text-sm font-medium"
                           >
                             {isBn ? 'ফিল্টার পরিষ্কার করুন' : 'Clear filters'}
                           </button>
@@ -261,18 +290,15 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedTransactions.map((tx: any) => (
-                    <TableRow
-                      key={tx.id}
-                      className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
-                    >
-                      <TableCell className="whitespace-nowrap py-3.5 px-4 font-mono text-xs">
-                        {format(new Date(tx.createdAt), 'MMM dd, yyyy HH:mm')}
+                  paginatedTransactions.map((tx) => (
+                    <TableRow key={tx.id}>
+                      <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
+                        {formatDateTime(tx.createdAt, lang)}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4 font-medium text-foreground">
+                      <TableCell className="font-medium text-foreground">
                         {tx.description}
                       </TableCell>
-                      <TableCell className="py-3.5 px-4">
+                      <TableCell>
                         <Badge
                           variant="secondary"
                           className={
@@ -281,15 +307,18 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                               : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
                           }
                         >
-                          {tx.type}
+                          {tx.type === 'CREDIT'
+                            ? isBn ? 'আয়' : 'Credit'
+                            : isBn ? 'ব্যয়' : 'Debit'}
                         </Badge>
                       </TableCell>
                       <TableCell
-                        className={`text-end py-3.5 px-4 font-semibold tabular-nums ${
+                        className={`text-end font-semibold tabular-nums ${
                           tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-rose-600'
                         }`}
                       >
-                        {tx.type === 'CREDIT' ? '+' : '-'} ৳ {tx.amount}
+                        {tx.type === 'CREDIT' ? '+' : '-'}
+                        {formatCurrency(tx.amount)}
                       </TableCell>
                     </TableRow>
                   ))
@@ -297,25 +326,24 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
               </TableBody>
             </Table>
           </div>
-        </div>
 
-        {/* Pagination inside Main Card */}
-        <AdminPagination
-          totalItems={filteredTransactions.length}
-          itemsPerPage={pageSize}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          onLimitChange={(newLimit) => {
-            setPageSize(newLimit);
-            setCurrentPage(1);
-          }}
-          lang={lang}
-          itemLabel={{
-            singular: isBn ? 'লেনদেন' : 'transaction',
-            plural: isBn ? 'লেনদেন' : 'transactions',
-          }}
-        />
-      </div>
+          <AdminPagination
+            totalItems={filteredTransactions.length}
+            itemsPerPage={pageSize}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            onLimitChange={(newLimit) => {
+              setPageSize(newLimit);
+              setCurrentPage(1);
+            }}
+            lang={lang}
+            itemLabel={{
+              singular: isBn ? 'লেনদেন' : 'transaction',
+              plural: isBn ? 'লেনদেন' : 'transactions',
+            }}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

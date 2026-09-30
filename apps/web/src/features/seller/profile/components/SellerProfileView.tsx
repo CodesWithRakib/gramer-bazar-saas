@@ -1,5 +1,4 @@
 'use client';
-import { use } from 'react';
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,7 +7,8 @@ import * as z from 'zod';
 import {
   useGetSellerShopQuery,
   useUpdateSellerShopMutation,
-} from '@/features/seller-portal/sellerPortalApi';
+  useUploadSellerAvatarMutation,
+} from '@/features/seller';
 import { useGetProfileQuery, useUpdateProfileMutation } from '@/features/auth/authApi';
 import { useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store/store';
@@ -23,6 +23,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { PageHeader } from '@/components/common/PageHeader';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ImageUploader } from '@/components/upload/ImageUploader';
+import { CustomImage } from '@/components/ui/CustomImage';
 import { toast } from 'sonner';
 
 const shopSchema = z.object({
@@ -48,6 +52,20 @@ export function SellerProfileView({ lang = 'en' }: SellerProfileViewProps) {
   const [updateShop, { isLoading: isUpdating }] = useUpdateSellerShopMutation();
   const { data: profile } = useGetProfileQuery(undefined, { skip: !isAuthenticated });
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
+  const [uploadAvatar] = useUploadSellerAvatarMutation();
+
+  const handleAvatarUpload = async (files: File[]) => {
+    if (!files[0]) return;
+    const body = new FormData();
+    body.append('file', files[0]);
+    try {
+      await uploadAvatar(body).unwrap();
+      toast.success(isBn ? 'প্রোফাইল ছবি আপডেট হয়েছে' : 'Profile avatar updated');
+    } catch {
+      toast.error(isBn ? 'ছবি আপলোড ব্যর্থ হয়েছে' : 'Failed to upload avatar');
+      throw new Error('Avatar upload failed');
+    }
+  };
 
   const shopForm = useForm<z.infer<typeof shopSchema>>({
     resolver: zodResolver(shopSchema),
@@ -87,15 +105,60 @@ export function SellerProfileView({ lang = 'en' }: SellerProfileViewProps) {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingState message={isBn ? 'প্রোফাইল লোড হচ্ছে...' : 'Loading profile...'} />;
 
   return (
-    <div className="w-full space-y-6">
-      <h1 className="text-2xl font-bold">{isBn ? 'প্রোফাইল' : 'Profile'}</h1>
+    <div className="w-full max-w-3xl space-y-6 pb-16">
+      <PageHeader
+        breadcrumbs={[
+          { label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', href: `/${lang}/seller` },
+          { label: isBn ? 'প্রোফাইল' : 'Profile' },
+        ]}
+        title={isBn ? 'সেলার প্রোফাইল' : 'Seller profile'}
+        description={
+          isBn
+            ? 'ব্যক্তিগত যোগাযোগ এবং দোকানের তথ্য আপডেট করুন'
+            : 'Update your personal contact details and shop information'
+        }
+      />
+
+      {/* Profile avatar section */}
+      <section className="border-border space-y-4 rounded-lg border p-4 sm:p-6">
+        <div>
+          <h2 className="text-lg font-semibold">{isBn ? 'প্রোফাইল ছবি' : 'Profile Picture'}</h2>
+          <p className="text-muted-foreground text-xs">
+            {isBn
+              ? 'আপনার অ্যাকাউন্টের ছবি আপলোড করুন। ফাইলটি স্বয়ংক্রিয়ভাবে অপটিমাইজ করা হবে।'
+              : 'Upload your personal account avatar. Image will be automatically compressed for optimal loading.'}
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-6">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-border bg-muted">
+            <CustomImage
+              src={profile?.avatar}
+              alt={profile?.firstName || 'Seller avatar'}
+              fill
+              className="object-cover"
+              fallbackSrc="/placeholder-avatar.png"
+            />
+          </div>
+
+          <div className="w-full max-w-sm">
+            <ImageUploader
+              profile="avatar"
+              isBn={isBn}
+              maxFiles={1}
+              upload={handleAvatarUpload}
+              description={isBn ? 'সর্বোচ্চ ৫ মেগাবাইট (JPEG, PNG, WebP)' : 'Max 5MB (JPEG, PNG, WebP)'}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Account contact info — PATCH /auth/me */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">{isBn ? 'অ্যাকাউন্ট তথ্য' : 'Account Info'}</h2>
+      <section className="border-border space-y-4 rounded-lg border p-4 sm:p-6">
+        <h2 className="text-lg font-semibold">{isBn ? 'অ্যাকাউন্ট তথ্য' : 'Account info'}</h2>
         <Form {...accountForm}>
           <form onSubmit={accountForm.handleSubmit(onAccountSubmit)} className="space-y-4">
             <FormField
@@ -155,11 +218,11 @@ export function SellerProfileView({ lang = 'en' }: SellerProfileViewProps) {
         </Form>
       </section>
 
-      <hr />
+      <hr className="border-border" />
 
       {/* Shop profile — PATCH /seller-portal/shop */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">{isBn ? 'শপ প্রোফাইল' : 'Shop Profile'}</h2>
+      <section className="border-border space-y-4 rounded-lg border p-4 sm:p-6">
+        <h2 className="text-lg font-semibold">{isBn ? 'শপ প্রোফাইল' : 'Shop profile'}</h2>
         <Form {...shopForm}>
           <form onSubmit={shopForm.handleSubmit(onShopSubmit)} className="space-y-4">
             <FormField

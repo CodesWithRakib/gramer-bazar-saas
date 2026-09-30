@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
   UseGuards,
   ParseUUIDPipe,
   HttpStatus,
@@ -25,6 +26,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
+import type { AuthenticatedRequest } from '../../common/types/authenticated-request.js';
+import { toActor } from '../../common/utils/actor.js';
 
 @ApiTags('Inventory - Stock')
 @Controller('inventory')
@@ -46,8 +49,8 @@ export class InventoryController {
     description: 'Inventory initialized successfully',
   })
   @ApiCommonErrors([400, 401, 403, 500])
-  create(@Body() createInventoryDto: CreateInventoryDto) {
-    return this.inventoryService.create(createInventoryDto);
+  create(@Request() req: AuthenticatedRequest, @Body() createInventoryDto: CreateInventoryDto) {
+    return this.inventoryService.create(createInventoryDto, toActor(req));
   }
 
   @Get()
@@ -62,8 +65,8 @@ export class InventoryController {
     description: 'List of inventory records',
   })
   @ApiCommonErrors([500])
-  findAll() {
-    return this.inventoryService.findAll();
+  findAll(@Request() req: AuthenticatedRequest) {
+    return this.inventoryService.findAll(toActor(req));
   }
 
   @Get(':id')
@@ -98,8 +101,12 @@ export class InventoryController {
     description: 'Inventory updated successfully',
   })
   @ApiCommonErrors([400, 401, 403, 404, 500])
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateInventoryDto: UpdateInventoryDto) {
-    return this.inventoryService.update(id, updateInventoryDto);
+  update(
+    @Request() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateInventoryDto: UpdateInventoryDto,
+  ) {
+    return this.inventoryService.update(id, updateInventoryDto, toActor(req));
   }
 
   @Delete(':id')

@@ -29,6 +29,25 @@ export const VALID_ORDER_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 };
 
 /**
+ * Order statuses a shop owner may move an order into. Mirrors the seller
+ * branch of `validateRoleTransition` so the UI can render exactly the actions
+ * the API will accept.
+ */
+export const SELLER_ALLOWED_TRANSITIONS: { from: OrderStatus; to: OrderStatus }[] = [
+  { from: OrderStatus.PENDING, to: OrderStatus.CONFIRMED },
+  { from: OrderStatus.CONFIRMED, to: OrderStatus.PROCESSING },
+  { from: OrderStatus.PROCESSING, to: OrderStatus.READY_FOR_PICKUP },
+  { from: OrderStatus.PENDING, to: OrderStatus.CANCELLED },
+  { from: OrderStatus.CONFIRMED, to: OrderStatus.CANCELLED },
+  { from: OrderStatus.PROCESSING, to: OrderStatus.CANCELLED },
+];
+
+/** Statuses the seller of an order may transition into from `fromStatus`. */
+export function getSellerAllowedNextStatuses(fromStatus: OrderStatus): OrderStatus[] {
+  return SELLER_ALLOWED_TRANSITIONS.filter((t) => t.from === fromStatus).map((t) => t.to);
+}
+
+/**
  * Checks if a direct transition between two statuses is structurally permitted by the state machine.
  */
 export function isValidTransition(fromStatus: OrderStatus, toStatus: OrderStatus): boolean {
@@ -95,16 +114,7 @@ export function validateRoleTransition(
 
   // 5. Seller: Can confirm, process, mark ready for pickup, or cancel
   if (context.isSellerOwner && userRoles.includes(Role.SELLER)) {
-    const allowedSellerTransitions: { from: OrderStatus; to: OrderStatus }[] = [
-      { from: OrderStatus.PENDING, to: OrderStatus.CONFIRMED },
-      { from: OrderStatus.CONFIRMED, to: OrderStatus.PROCESSING },
-      { from: OrderStatus.PROCESSING, to: OrderStatus.READY_FOR_PICKUP },
-      { from: OrderStatus.PENDING, to: OrderStatus.CANCELLED },
-      { from: OrderStatus.CONFIRMED, to: OrderStatus.CANCELLED },
-      { from: OrderStatus.PROCESSING, to: OrderStatus.CANCELLED },
-    ];
-
-    const isPermitted = allowedSellerTransitions.some(
+    const isPermitted = SELLER_ALLOWED_TRANSITIONS.some(
       (t) => t.from === fromStatus && t.to === toStatus,
     );
 

@@ -204,6 +204,8 @@ export const api = createApi({
     'AuditLog',
     'Settings',
     'SellerApplication',
+    'SellerProduct',
+    'SellerAnalytics',
     'RiderApplication',
     'RiderProfile',
     'RiderEarning',

@@ -1,5 +1,6 @@
 import {
   Controller,
+  ForbiddenException,
   Get,
   Post,
   Body,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CouponsService } from './coupons.service.js';
+import { ShopsService } from '../shops/shops/shops.service.js';
 import { CreateCouponDto } from './dto/create-coupon.dto.js';
 import { UpdateCouponDto } from './dto/update-coupon.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
@@ -34,7 +36,25 @@ import {
 @Controller()
 @ApiCommonErrors()
 export class CouponsController {
-  constructor(private readonly couponsService: CouponsService) {}
+  constructor(
+    private readonly couponsService: CouponsService,
+    private readonly shopsService: ShopsService,
+  ) {}
+
+  /**
+   * Coupons are scoped by shop, and the authenticated seller object does not
+   * carry a shop id. Resolve it from the database and fail closed so a seller
+   * can never read or write platform-wide coupons by accident.
+   */
+  private async requireSellerShopId(sellerId: string): Promise<string> {
+    const shopId = await this.shopsService.findShopIdBySellerId(sellerId);
+    if (!shopId) {
+      throw new ForbiddenException(
+        'Your shop is not active yet. Coupons become available once your shop is provisioned.',
+      );
+    }
+    return shopId;
+  }
 
   @Post('admin/coupons')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -131,8 +151,9 @@ export class CouponsController {
     status: 201,
     description: 'Seller coupon created successfully',
   })
-  createSellerCoupon(@Request() req: any, @Body() createDto: CreateCouponDto) {
-    return this.couponsService.create({ ...createDto, shopId: req.user.shopId });
+  async createSellerCoupon(@Request() req: any, @Body() createDto: CreateCouponDto) {
+    const shopId = await this.requireSellerShopId(req.user.id);
+    return this.couponsService.create({ ...createDto, shopId });
   }
 
   @Get('seller/coupons')
@@ -147,13 +168,14 @@ export class CouponsController {
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiStandardPaginatedResponse(CouponResponseDto, { description: 'Paginated seller coupons' })
-  findAllSellerCoupons(
+  async findAllSellerCoupons(
     @Request() req: any,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string,
   ) {
-    return this.couponsService.findAll(page, limit, search, req.user.shopId);
+    const shopId = await this.requireSellerShopId(req.user.id);
+    return this.couponsService.findAll(page, limit, search, shopId);
   }
 
   @Patch('seller/coupons/:id')
@@ -169,12 +191,13 @@ export class CouponsController {
     type: CouponResponseDto,
     description: 'Seller coupon updated successfully',
   })
-  updateSellerCoupon(
+  async updateSellerCoupon(
     @Request() req: any,
     @Param('id') id: string,
     @Body() updateDto: UpdateCouponDto,
   ) {
-    return this.couponsService.updateSellerCoupon(id, req.user.shopId, updateDto);
+    const shopId = await this.requireSellerShopId(req.user.id);
+    return this.couponsService.updateSellerCoupon(id, shopId, updateDto);
   }
 
   @Delete('seller/coupons/:id')
@@ -187,8 +210,9 @@ export class CouponsController {
   })
   @ApiParam({ name: 'id', description: 'Coupon UUID' })
   @ApiStandardMessageResponse({ description: 'Seller coupon removed successfully' })
-  removeSellerCoupon(@Request() req: any, @Param('id') id: string) {
-    return this.couponsService.removeSellerCoupon(id, req.user.shopId);
+  async removeSellerCoupon(@Request() req: any, @Param('id') id: string) {
+    const shopId = await this.requireSellerShopId(req.user.id);
+    return this.couponsService.removeSellerCoupon(id, shopId);
   }
 
   @Post('coupons/validate')

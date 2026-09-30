@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { Category } from './category.entity.js';
 import { Brand } from './brand.entity.js';
+import { Shop } from '../../shops/entities/shop.entity.js';
 import { ProductStatus } from '../enums/product-status.enum.js';
 import { ProductVariant } from './product-variant.entity.js';
 import { ProductImage } from './product-image.entity.js';
@@ -24,9 +25,22 @@ import { ProductImage } from './product-image.entity.js';
 @Index('idx_products_is_active', ['isActive'])
 @Index('idx_products_status', ['status'])
 @Index('idx_products_created_at', ['createdAt'])
+@Index('idx_products_owner_shop_id', ['ownerShopId'])
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  /**
+   * Set when the catalog record was created by a seller through the seller
+   * portal. Admin-imported / master-catalog products keep this null and are
+   * owned by the platform. Sellers may only mutate products they own.
+   */
+  @Column({ name: 'owner_shop_id', type: 'uuid', nullable: true })
+  ownerShopId: string | null;
+
+  @ManyToOne(() => Shop, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'owner_shop_id' })
+  ownerShop: Relation<Shop> | null;
 
   @Column({ name: 'category_id' })
   categoryId: string;

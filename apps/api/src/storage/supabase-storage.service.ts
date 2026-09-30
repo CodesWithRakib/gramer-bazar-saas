@@ -21,7 +21,18 @@ export class SupabaseStorageService {
   private readonly supabaseClient: SupabaseClient | null = null;
   private readonly bucketName: string;
   private readonly maxFileSizeBytes = 5 * 1024 * 1024; // 5 MB max per requirement
-  private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+  /** Image MIME types the platform will ever persist. */
+  static readonly ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+
+  /** Maximum accepted (already client-optimized) upload size in bytes. */
+  static get MAX_FILE_SIZE_BYTES(): number {
+    return 5 * 1024 * 1024;
+  }
+
+  private readonly allowedMimeTypes: string[] = [
+    ...SupabaseStorageService.ALLOWED_IMAGE_MIME_TYPES,
+  ];
 
   constructor(private readonly configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('supabase.url');
@@ -102,11 +113,13 @@ export class SupabaseStorageService {
       );
     }
 
-    if (declaredMime && declaredMime !== detectedMime) {
-      // Disallow MIME spoofing
-      if (declaredMime.toLowerCase() !== detectedMime) {
-        this.logger.warn(`MIME mismatch: declared=${declaredMime}, detected=${detectedMime}`);
-      }
+    // Never trust the client-declared MIME type: if it disagrees with the magic
+    // bytes we reject the upload outright (MIME spoofing attempt).
+    if (declaredMime && declaredMime.toLowerCase() !== detectedMime) {
+      this.logger.warn(`Rejected MIME mismatch: declared=${declaredMime}, detected=${detectedMime}`);
+      throw new BadRequestException(
+        `Declared file type (${declaredMime}) does not match the actual image content (${detectedMime})`,
+      );
     }
 
     return { isValid: true, mimeType: detectedMime, ext };
@@ -277,6 +290,23 @@ export class SupabaseStorageService {
 
   getProductImagePath(productId: string, imageId: string, ext = '.webp'): string {
     return `products/${productId}/${imageId}${ext}`;
+  }
+
+  /**
+   * Seller-owned namespaces. Keeping seller uploads under their own shop
+   * prefix makes ownership auditable and allows a whole shop's media to be
+   * purged without touching other tenants.
+   */
+  getSellerShopImagePath(shopId: string, type: 'logo' | 'cover', ext = '.webp'): string {
+    return `seller/shop/${shopId}/${type}${ext}`;
+  }
+
+  getSellerProductImagePath(productId: string, imageId: string, ext = '.webp'): string {
+    return `seller/products/${productId}/${imageId}${ext}`;
+  }
+
+  getSellerProfileImagePath(userId: string, ext = '.webp'): string {
+    return `seller/profile/${userId}/avatar${ext}`;
   }
 
   getCategoryImagePath(categoryId: string, imageId: string, ext = '.webp'): string {
