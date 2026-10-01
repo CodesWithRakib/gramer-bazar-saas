@@ -12,7 +12,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { OrdersService } from './orders.service.js';
@@ -63,8 +65,9 @@ export class OrdersController {
 
   @Get('admin/all')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('orders.read')
   @ApiOperation({
     summary: 'List all platform orders with search (Admin only)',
     description:
@@ -87,8 +90,9 @@ export class OrdersController {
 
   @Patch('admin/:id/status')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('orders.update')
   @ApiOperation({
     summary: 'Manually override order status (Admin only)',
     description: 'Requires ADMIN or SUPER_ADMIN role. Updates order status and logs audit event.',

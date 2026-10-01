@@ -3,7 +3,9 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger'
 import { AuditLogsService } from './audit-logs.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import {
   ApiStandardPaginatedResponse,
@@ -13,7 +15,7 @@ import { AuditLogResponseDto } from './dto/audit-log-response.dto.js';
 
 @ApiTags('Audit Logs (Admin)')
 @Controller('admin/audit-logs')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
 @ApiBearerAuth()
 @ApiCommonErrors()
@@ -21,6 +23,7 @@ export class AuditLogsController {
   constructor(private readonly auditLogsService: AuditLogsService) {}
 
   @Get()
+  @Permissions('audit_logs.read')
   @ApiOperation({
     summary: 'List audit logs (Admin)',
     description:

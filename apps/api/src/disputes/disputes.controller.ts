@@ -6,7 +6,9 @@ import { AddDisputeMessageDto } from './dto/add-dispute-message.dto.js';
 import { ResolveDisputeDto } from './dto/resolve-dispute.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import {
   ApiStandardResponse,
@@ -16,7 +18,7 @@ import { DisputeResponseDto, DisputeMessageResponseDto } from './dto/dispute-res
 
 @ApiTags('Disputes')
 @Controller('disputes')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @ApiBearerAuth()
 @ApiCommonErrors()
 export class DisputesController {
@@ -128,6 +130,7 @@ export class DisputesController {
   // Admin Routes
   @Get('admin')
   @Roles(Role.ADMIN)
+  @Permissions('disputes.read')
   @ApiOperation({
     summary: 'Admin: List all marketplace disputes',
     description: 'Lists all open and resolved dispute tickets across the entire platform.',
@@ -143,6 +146,7 @@ export class DisputesController {
 
   @Get('admin/:id')
   @Roles(Role.ADMIN)
+  @Permissions('disputes.read')
   @ApiOperation({
     summary: 'Admin: Get full dispute details',
     description: 'Returns dispute evidence, audit trail, and full conversation history.',
@@ -155,6 +159,7 @@ export class DisputesController {
 
   @Post('admin/:id/messages')
   @Roles(Role.ADMIN)
+  @Permissions('disputes.resolve')
   @ApiOperation({
     summary: 'Admin: Post official mediation message',
     description: 'Appends official admin message into dispute resolution thread.',
@@ -171,6 +176,7 @@ export class DisputesController {
 
   @Patch('admin/:id/resolve')
   @Roles(Role.ADMIN)
+  @Permissions('disputes.resolve')
   @ApiOperation({
     summary: 'Admin: Adjudicate and resolve dispute',
     description: 'Applies final administrative verdict (RESOLVED, REJECTED) with refund notes.',

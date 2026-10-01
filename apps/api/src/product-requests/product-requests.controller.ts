@@ -23,7 +23,9 @@ import {
 } from '../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { ProductRequestStatus } from './enums/product-request-status.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
@@ -95,8 +97,9 @@ export class ProductRequestsController {
 
   @Get('admin/product-requests')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('product_requests.read')
   @ApiOperation({
     summary: 'List all product requests for fulfillment (Admin only)',
     description:
@@ -121,8 +124,9 @@ export class ProductRequestsController {
 
   @Get('admin/product-requests/:id')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('product_requests.read')
   @ApiOperation({
     summary: 'Get product request details (Admin only)',
     description: 'Returns complete request audit trail and fulfillment options.',
@@ -140,8 +144,9 @@ export class ProductRequestsController {
 
   @Patch('admin/product-requests/:id/status')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('product_requests.manage')
   @ApiOperation({
     summary: 'Update product request fulfillment status (Admin only)',
     description:

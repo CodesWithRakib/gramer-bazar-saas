@@ -38,7 +38,9 @@ import {
 } from '../../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../../common/guards/permissions.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 import { ProductStatus } from '../enums/product-status.enum.js';
 
@@ -51,9 +53,10 @@ export class ProductsController {
   ) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.create')
   @ApiOperation({
     summary: 'Create a new global product in master catalog (Admin only)',
     description: 'Requires ADMIN or SUPER_ADMIN role. Adds a master marketplace product item.',
@@ -132,9 +135,10 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.update')
   @ApiOperation({
     summary: 'Update a global product (Admin only)',
     description:
@@ -152,9 +156,10 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.delete')
   @ApiOperation({
     summary: 'Delete a global product (Admin only)',
     description: 'Requires ADMIN or SUPER_ADMIN role. Removes product from master catalog.',
@@ -172,10 +177,11 @@ export class ProductsController {
   // --- Product Images Management ---
 
   @Post(':id/images')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiConsumes('multipart/form-data')
+  @Permissions('products.update')
   @ApiOperation({
     summary: 'Upload images for product (Admin only)',
     description:
@@ -218,9 +224,10 @@ export class ProductsController {
   }
 
   @Patch(':id/images/:imageId/primary')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.update')
   @ApiOperation({
     summary: 'Set primary image for a product (Admin only)',
     description: 'Marks the selected image as the main catalog thumbnail.',
@@ -241,9 +248,10 @@ export class ProductsController {
   }
 
   @Patch(':id/images/reorder')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.update')
   @ApiOperation({
     summary: 'Reorder product images sequence (Admin only)',
     description: 'Updates display ordering indices for product gallery images.',
@@ -261,9 +269,10 @@ export class ProductsController {
   }
 
   @Delete(':id/images/:imageId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.update')
   @ApiOperation({
     summary: 'Delete product image (Admin only)',
     description: 'Removes image record and deletes file from storage.',

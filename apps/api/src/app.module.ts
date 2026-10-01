@@ -43,6 +43,7 @@ import { DisputesModule } from './disputes/disputes.module.js';
 import { FlashSalesModule } from './flash-sales/flash-sales.module.js';
 import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
+import { AdminsModule } from './admins/admins.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
@@ -50,6 +51,7 @@ import { StorageModule } from './storage/storage.module.js';
 import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSchema.js';
 import { RiderSystem1790700000000 } from './migrations/1790700000000-RiderSystem.js';
 import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSystem.js';
+import { AdminRbac1790900000000 } from './migrations/1790900000000-AdminRbac.js';
 
 @Module({
   imports: [
@@ -84,6 +86,7 @@ import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSyst
             InitialSchema1790406745498,
             RiderSystem1790700000000,
             SellerSystem1790800000000,
+            AdminRbac1790900000000,
           ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,
@@ -173,6 +176,7 @@ import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSyst
     AuditLogsModule,
     SettingsModule,
     ApplicationsModule,
+    AdminsModule,
   ],
   controllers: [AppController],
   providers: [

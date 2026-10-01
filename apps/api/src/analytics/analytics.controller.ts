@@ -3,7 +3,9 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { BulkCreateDemandEventDto } from './dto/create-demand-event.dto.js';
 import {
@@ -23,8 +25,9 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('admin/analytics/dashboard')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reports.read')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Admin: Get dashboard metrics',
@@ -51,8 +54,9 @@ export class AnalyticsController {
   }
 
   @Get('admin/analytics/demand')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reports.read')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Admin: Get demand analytics reports',

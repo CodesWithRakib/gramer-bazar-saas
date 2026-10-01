@@ -17,7 +17,9 @@ import { ReviewApplicationDto } from './dto/review-application.dto.js';
 import { ApplicationStatus } from './enums/application-status.enum.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import {
   ApiStandardResponse,
@@ -40,6 +42,8 @@ export class ApplicationsController {
   // ==================== USER: SELLER ====================
 
   @Post('seller')
+  @UseGuards(PermissionsGuard)
+  @Permissions('seller_applications.submit')
   @ApiOperation({
     summary: 'Submit a new seller application',
     description: 'User submits shop application to become an onboarded vendor on Gramer Bazar.',
@@ -69,6 +73,8 @@ export class ApplicationsController {
   // ==================== USER: RIDER ====================
 
   @Post('rider')
+  @UseGuards(PermissionsGuard)
+  @Permissions('rider_applications.submit')
   @ApiOperation({
     summary: 'Submit a new rider application',
     description: 'User submits rider onboarding application to provide local courier services.',
@@ -98,8 +104,9 @@ export class ApplicationsController {
   // ==================== ADMIN: SELLER APPLICATIONS ====================
 
   @Get('admin/sellers')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('seller_applications.read', 'sellers.read')
   @ApiOperation({
     summary: 'Admin: Get all seller applications',
     description: 'Returns paginated seller applications with status filtering.',
@@ -119,8 +126,9 @@ export class ApplicationsController {
   }
 
   @Get('admin/sellers/:id')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('seller_applications.read', 'sellers.read')
   @ApiOperation({
     summary: 'Admin: Get seller application by ID',
     description: 'Returns complete seller application info for review.',
@@ -135,8 +143,9 @@ export class ApplicationsController {
   }
 
   @Patch('admin/sellers/:id/approve')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('sellers.approve', 'seller_applications.review')
   @ApiOperation({
     summary: 'Admin: Approve a seller application and activate role + shop',
     description:
@@ -156,8 +165,9 @@ export class ApplicationsController {
   }
 
   @Patch('admin/sellers/:id/reject')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('sellers.reject', 'seller_applications.review')
   @ApiOperation({
     summary: 'Admin: Reject a seller application with reason',
     description: 'Marks seller application REJECTED with rejection feedback notes.',
@@ -178,8 +188,9 @@ export class ApplicationsController {
   // ==================== ADMIN: RIDER APPLICATIONS ====================
 
   @Get('admin/riders')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('rider_applications.read', 'riders.read')
   @ApiOperation({
     summary: 'Admin: Get all rider applications',
     description: 'Returns paginated rider applications with status filtering.',
@@ -199,8 +210,9 @@ export class ApplicationsController {
   }
 
   @Get('admin/riders/:id')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('rider_applications.read', 'riders.read')
   @ApiOperation({
     summary: 'Admin: Get rider application by ID',
     description: 'Returns full rider application dossier.',
@@ -215,8 +227,9 @@ export class ApplicationsController {
   }
 
   @Patch('admin/riders/:id/approve')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('riders.approve', 'rider_applications.review')
   @ApiOperation({
     summary: 'Admin: Approve a rider application and activate role',
     description: 'Grants RIDER role and marks application APPROVED.',
@@ -235,8 +248,9 @@ export class ApplicationsController {
   }
 
   @Patch('admin/riders/:id/reject')
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('riders.reject', 'rider_applications.review')
   @ApiOperation({
     summary: 'Admin: Reject a rider application with reason',
     description: 'Marks rider application REJECTED with rejection feedback notes.',

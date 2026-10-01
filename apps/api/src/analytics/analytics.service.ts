@@ -7,6 +7,13 @@ import { Product } from '../catalog/entities/product.entity.js';
 import { OrderStatus } from '../orders/enums/order-status.enum.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { DemandEvent } from './entities/demand-event.entity.js';
+import { Shop } from '../shops/entities/shop.entity.js';
+import { SellerApplication } from '../applications/entities/seller-application.entity.js';
+import { RiderApplication } from '../applications/entities/rider-application.entity.js';
+import { ApplicationStatus } from '../applications/enums/application-status.enum.js';
+import { PayoutRequest, PayoutStatus } from '../payouts/entities/payout-request.entity.js';
+import { Dispute } from '../disputes/entities/dispute.entity.js';
+import { DisputeStatus } from '../disputes/enums/dispute-status.enum.js';
 
 @Injectable()
 export class AnalyticsService {
@@ -19,6 +26,16 @@ export class AnalyticsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(DemandEvent)
     private readonly demandEventRepository: Repository<DemandEvent>,
+    @InjectRepository(Shop)
+    private readonly shopRepository: Repository<Shop>,
+    @InjectRepository(SellerApplication)
+    private readonly sellerApplicationRepository: Repository<SellerApplication>,
+    @InjectRepository(RiderApplication)
+    private readonly riderApplicationRepository: Repository<RiderApplication>,
+    @InjectRepository(PayoutRequest)
+    private readonly payoutRequestRepository: Repository<PayoutRequest>,
+    @InjectRepository(Dispute)
+    private readonly disputeRepository: Repository<Dispute>,
   ) {}
 
   async getDashboardMetrics() {
@@ -58,6 +75,22 @@ export class AnalyticsService {
 
     const totalProducts = await this.productRepository.count();
 
+    // Operational backlog metrics — real counts straight from the database.
+    const [activeShops, pendingSellerApplications, pendingRiderApplications, pendingPayouts, openDisputes] =
+      await Promise.all([
+        this.shopRepository.count({ where: { isActive: true } }),
+        this.sellerApplicationRepository.count({
+          where: { status: ApplicationStatus.PENDING },
+        }),
+        this.riderApplicationRepository.count({
+          where: { status: ApplicationStatus.PENDING },
+        }),
+        this.payoutRequestRepository.count({ where: { status: PayoutStatus.PENDING } }),
+        this.disputeRepository.count({
+          where: [{ status: DisputeStatus.OPEN }, { status: DisputeStatus.UNDER_REVIEW }],
+        }),
+      ]);
+
     // Recent orders (last 5)
     const recentOrders = await this.orderRepository.find({
       order: { createdAt: 'DESC' },
@@ -90,6 +123,11 @@ export class AnalyticsService {
         totalSellers,
         totalRiders,
         totalProducts,
+        activeShops,
+        pendingSellerApplications,
+        pendingRiderApplications,
+        pendingPayouts,
+        openDisputes,
       },
       recentOrders: recentOrders.map((o) => ({
         id: o.id,

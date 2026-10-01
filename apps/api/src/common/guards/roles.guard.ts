@@ -2,39 +2,37 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 import { Reflector } from '@nestjs/core';
 import { Role } from '../../roles/enums/role.enum.js';
 import { ROLES_KEY } from '../decorators/roles.decorator.js';
+import { getRoleNames, isSuperAdmin, type PermissionBearingUser } from '../utils/permission.js';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!requiredRoles) {
+
+    if (!requiredRoles || requiredRoles.length === 0) {
       return true;
     }
-    const { user } = context.switchToHttp().getRequest();
 
-    if (!user || !user.roles) {
+    const request = context.switchToHttp().getRequest<{ user?: PermissionBearingUser }>();
+    const { user } = request;
+
+    if (!user) {
       throw new ForbiddenException('Insufficient permissions');
     }
 
-    const hasRole = requiredRoles.some((role) =>
-      user.roles.some(
-        (userRole: { name: Role } | Role) =>
-          (typeof userRole === 'string' ? userRole : userRole.name) === role,
-      ),
-    );
-    const isSuperAdmin = user.roles.some(
-      (userRole: { name: Role } | Role) =>
-        (typeof userRole === 'string' ? userRole : userRole.name) === Role.SUPER_ADMIN,
-    );
+    const roleNames = getRoleNames(user);
+    const hasRole = requiredRoles.some((role) => roleNames.includes(role));
 
-    if (!hasRole && !isSuperAdmin) {
+    // Super Admins hold system-level authority across every protected surface.
+    if (!hasRole && !isSuperAdmin(user)) {
       throw new ForbiddenException('Insufficient permissions');
     }
+
     return true;
   }
 }

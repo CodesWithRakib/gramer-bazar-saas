@@ -25,7 +25,9 @@ import {
 } from '../../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../../common/guards/permissions.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 
 @ApiTags('Catalog - Brands')
@@ -34,9 +36,10 @@ export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('brands.create')
   @ApiOperation({
     summary: 'Register a new brand in the catalog (Admin only)',
     description:
@@ -127,9 +130,10 @@ export class BrandsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('brands.update')
   @ApiOperation({
     summary: 'Update brand details (Admin only)',
     description:
@@ -152,9 +156,10 @@ export class BrandsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('brands.delete')
   @ApiOperation({
     summary: 'Delete a brand (Admin only)',
     description: 'Requires ADMIN or SUPER_ADMIN role. Removes brand from directory.',

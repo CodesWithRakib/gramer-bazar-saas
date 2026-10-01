@@ -4,7 +4,9 @@ import { SettingsService } from './settings.service.js';
 import { UpdateSettingsDto } from './dto/update-settings.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 import {
@@ -15,7 +17,7 @@ import { PlatformSettingsResponseDto } from './dto/settings-response.dto.js';
 
 @ApiTags('Settings (Admin)')
 @Controller('admin/settings')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
 @ApiBearerAuth()
 @ApiCommonErrors()
@@ -26,6 +28,7 @@ export class SettingsController {
   ) {}
 
   @Get()
+  @Permissions('settings.read')
   @ApiOperation({
     summary: 'Get marketplace settings (Admin)',
     description: 'Returns system-wide operational configurations and payment gateway credentials.',
@@ -39,6 +42,7 @@ export class SettingsController {
   }
 
   @Patch()
+  @Permissions('settings.update')
   @ApiOperation({
     summary: 'Update marketplace settings (Admin)',
     description: 'Persists marketplace settings updates and logs an administrative audit entry.',

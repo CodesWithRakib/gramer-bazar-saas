@@ -5,7 +5,9 @@ import { CreateBannerDto } from './dto/create-banner.dto.js';
 import { UpdateBannerDto } from './dto/update-banner.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import {
   ApiStandardResponse,
@@ -21,9 +23,10 @@ export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.create')
   @ApiOperation({
     summary: 'Create a new banner (Admin)',
     description: 'Creates a homepage or promotional hero banner.',
@@ -38,9 +41,10 @@ export class BannersController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.read')
   @ApiOperation({
     summary: 'Get all banners (Admin)',
     description: 'Lists all banners including inactive ones for CMS administration.',
@@ -69,9 +73,10 @@ export class BannersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.read')
   @ApiOperation({
     summary: 'Get a banner by ID (Admin)',
     description: 'Retrieves single banner CMS details.',
@@ -83,9 +88,10 @@ export class BannersController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.update')
   @ApiOperation({
     summary: 'Update a banner (Admin)',
     description: 'Updates banner images, link targets, order, or active state.',
@@ -97,9 +103,10 @@ export class BannersController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.delete')
   @ApiOperation({
     summary: 'Delete a banner (Admin)',
     description: 'Permanently removes a banner from CMS.',

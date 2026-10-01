@@ -26,7 +26,9 @@ import {
 } from '../../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../../common/guards/permissions.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 
 @ApiTags('Shops')
@@ -35,9 +37,10 @@ export class ShopsController {
   constructor(private readonly shopsService: ShopsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('shops.update')
   @ApiOperation({
     summary: 'Register a new vendor store / shop profile',
     description:
@@ -142,9 +145,10 @@ export class ShopsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('shops.update')
   @ApiOperation({
     summary: 'Update shop profile details',
     description:
@@ -170,8 +174,9 @@ export class ShopsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('shops.delete')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Delete a shop profile (Admin only)',

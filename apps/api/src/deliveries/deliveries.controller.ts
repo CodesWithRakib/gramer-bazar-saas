@@ -14,7 +14,9 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } fro
 import { DeliveriesService } from './deliveries.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto.js';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto.js';
@@ -32,7 +34,7 @@ import {
 
 @ApiTags('Deliveries')
 @Controller('deliveries')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @ApiBearerAuth()
 @ApiCommonErrors()
 export class DeliveriesController {
@@ -42,6 +44,7 @@ export class DeliveriesController {
 
   @Get('admin')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('deliveries.read')
   @ApiOperation({
     summary: 'Admin: Get all deliveries',
     description: 'Lists all system deliveries with pagination, search, and rider details.',
@@ -67,6 +70,7 @@ export class DeliveriesController {
 
   @Post('admin/assign')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('deliveries.update')
   @ApiOperation({
     summary: 'Admin: Assign an order to a rider',
     description: 'Assigns or re-assigns an order delivery to a specific registered rider.',
@@ -82,6 +86,7 @@ export class DeliveriesController {
 
   @Get('admin/riders')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('deliveries.read', 'riders.read')
   @ApiOperation({
     summary: 'Admin: Get list of riders',
     description: 'Returns a summary list of all available active riders for dispatch assignment.',

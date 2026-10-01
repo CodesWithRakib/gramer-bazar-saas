@@ -15,7 +15,9 @@ import { CreateFlashSaleDto } from './dto/create-flash-sale.dto.js';
 import { UpdateFlashSaleDto } from './dto/update-flash-sale.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import {
   ApiStandardResponse,
@@ -46,9 +48,10 @@ export class FlashSalesController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.create')
   @ApiOperation({
     summary: 'Admin: Create a flash sale',
     description: 'Creates a scheduled flash sale campaign with discounted inventory allocations.',
@@ -63,9 +66,10 @@ export class FlashSalesController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.read')
   @ApiOperation({
     summary: 'Admin: Get all flash sales',
     description: 'Paginated historical and upcoming flash promotions for management.',
@@ -89,9 +93,10 @@ export class FlashSalesController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.update')
   @ApiOperation({
     summary: 'Admin: Update a flash sale',
     description: 'Modifies duration, active flag, banner, or items of a flash sale.',
@@ -106,9 +111,10 @@ export class FlashSalesController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('offers.delete')
   @ApiOperation({
     summary: 'Admin: Delete a flash sale',
     description: 'Removes a flash sale promotion.',

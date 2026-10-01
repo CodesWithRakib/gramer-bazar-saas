@@ -15,7 +15,9 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiParam } from '@nestj
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
@@ -29,7 +31,7 @@ import {
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
 @ApiBearerAuth('JWT-auth')
 export class UsersController {
@@ -39,6 +41,7 @@ export class UsersController {
   ) {}
 
   @Get()
+  @Permissions('users.read')
   @ApiOperation({
     summary: 'List users with pagination, role filter, and keyword search',
     description:
@@ -85,6 +88,7 @@ export class UsersController {
   }
 
   @Post()
+  @Permissions('users.create')
   @ApiOperation({
     summary: 'Create a new staff or user account directly',
     description:
@@ -110,6 +114,7 @@ export class UsersController {
   }
 
   @Patch(':id/status')
+  @Permissions('users.update')
   @ApiOperation({
     summary: 'Update account lifecycle status',
     description:
@@ -127,7 +132,7 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateUserStatusDto,
   ) {
-    const updated = await this.usersService.update(id, { status: dto.status });
+    const updated = await this.usersService.updateStatusByAdmin(req.user, id, dto.status);
     await this.auditLogsService.record({
       actorId: req.user?.id,
       actorName: this.actorName(req.user),
@@ -140,6 +145,7 @@ export class UsersController {
   }
 
   @Patch(':id/roles')
+  @Permissions('users.update')
   @ApiOperation({
     summary: 'Update user assigned roles',
     description:

@@ -24,7 +24,9 @@ import {
 } from '../../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../../common/guards/permissions.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 import type { AuthenticatedRequest } from '../../common/types/authenticated-request.js';
 import { toActor } from '../../common/utils/actor.js';
@@ -35,9 +37,10 @@ export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('inventory.update')
   @ApiOperation({
     summary: 'Initialize inventory stock record',
     description:
@@ -86,9 +89,10 @@ export class InventoryController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('inventory.update')
   @ApiOperation({
     summary: 'Adjust inventory stock quantities and thresholds',
     description:
@@ -110,8 +114,9 @@ export class InventoryController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('inventory.update')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Delete inventory record (Admin only)',

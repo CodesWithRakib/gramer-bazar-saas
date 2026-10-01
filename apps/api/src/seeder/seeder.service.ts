@@ -69,6 +69,7 @@ import { RiderEarning } from '../riders/entities/rider-earning.entity.js';
 import { RiderAvailability } from '../riders/enums/rider-availability.enum.js';
 import { RiderEarningStatus } from '../riders/enums/rider-earning-status.enum.js';
 import { Otp } from '../otp/entities/otp.entity.js';
+import { AuditLog } from '../audit-logs/entities/audit-log.entity.js';
 
 import {
   SEED_ADMINS,
@@ -153,6 +154,7 @@ export class SeederService {
     await this.seedPermissionsAndRolePermissions();
     await this.seedLocations();
     const users = await this.seedUsers();
+    await this.seedAdminPermissions();
     await this.seedAddresses(users.customers);
     const shops = await this.seedShops(users.sellers);
     const catalog = await this.seedCatalog();
@@ -1430,6 +1432,7 @@ export class SeederService {
   async seedPermissionsAndRolePermissions() {
     this.logger.log('Seeding fine-grained RBAC permissions and role_permissions...');
     const permMap = new Map<string, PermissionEntity>();
+    const catalogNames = new Set(SEED_PERMISSIONS.map((p) => p.name));
 
     for (const p of SEED_PERMISSIONS) {
       let perm = await this.permissionRepo.findOne({ where: { name: p.name } });
@@ -1440,11 +1443,22 @@ export class SeederService {
             description: p.description,
           }),
         );
+      } else if (perm.description !== p.description) {
+        perm.description = p.description;
+        perm = await this.permissionRepo.save(perm);
       }
       permMap.set(p.name, perm);
     }
 
-    // Attach to roles
+    // Retire permissions that are no longer part of the canonical catalog so the
+    // platform keeps a single permission system. Join rows cascade away.
+    const stale = (await this.permissionRepo.find()).filter((p) => !catalogNames.has(p.name));
+    if (stale.length > 0) {
+      await this.permissionRepo.remove(stale);
+      this.logger.log(`Retired ${stale.length} stale permission definitions.`);
+    }
+
+    // Attach the canonical permission set to each role.
     for (const roleEnum of Object.values(Role)) {
       const role = await this.roleRepo.findOne({
         where: { name: roleEnum },
@@ -1464,6 +1478,73 @@ export class SeederService {
     this.logger.log(
       `Permissions & Role_Permissions ready (${permMap.size} permissions assigned across roles).`,
     );
+  }
+
+  /**
+   * Grant explicit per-account permissions to the sample admin accounts.
+   *
+   * Demonstrates the Super-Admin-managed direct grant model: the "broad" admin
+   * receives approval powers, while the "limited" admin keeps only the default
+   * ADMIN role baseline.
+   */
+  async seedAdminPermissions() {
+    this.logger.log('Seeding explicit admin account permission grants...');
+    const grants: Record<string, string[]> = {
+      'admin@gramerbazar.com': [
+        'sellers.approve',
+        'riders.approve',
+        'payouts.approve',
+        'payouts.reject',
+        'settings.update',
+        'audit_logs.read',
+      ],
+      'admin@gramerbazar.example': ['payouts.read', 'reports.read'],
+    };
+
+    const allPermissions = await this.permissionRepo.find();
+    const byName = new Map(allPermissions.map((p) => [p.name, p]));
+
+    for (const [email, names] of Object.entries(grants)) {
+      const user = await this.userRepo.findOne({
+        where: { email },
+        relations: ['directPermissions'],
+      });
+      if (!user) continue;
+
+      const perms = names.map((n) => byName.get(n)).filter((p): p is PermissionEntity => !!p);
+      user.directPermissions = perms;
+      await this.userRepo.save(user);
+    }
+
+    // Sample administrative audit trail for the audit-log viewer.
+    const auditRepo = this.dataSource.getRepository(AuditLog);
+    const existingLogs = await auditRepo.count();
+    if (existingLogs === 0) {
+      const superAdmin = await this.userRepo.findOne({
+        where: { email: 'codeswithrakib@gmail.com' },
+      });
+      const actorName = superAdmin
+        ? `${superAdmin.firstName ?? ''} ${superAdmin.lastName ?? ''}`.trim()
+        : 'Super Admin';
+      await auditRepo.save([
+        auditRepo.create({
+          actorId: superAdmin?.id ?? null,
+          actorName,
+          action: 'SEED_INITIALIZED',
+          targetType: 'Platform',
+          targetId: null,
+          details: 'Platform seed data initialized',
+        }),
+        auditRepo.create({
+          actorId: superAdmin?.id ?? null,
+          actorName,
+          action: 'PERMISSIONS_UPDATED',
+          targetType: 'Role',
+          targetId: 'ADMIN',
+          details: 'Synchronised canonical permission catalog with ADMIN role',
+        }),
+      ]);
+    }
   }
 
   async seedCategoryBrands(categories: Category[]) {

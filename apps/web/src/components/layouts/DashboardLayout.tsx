@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/ui/NotificationBell';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { BrandLogo } from '@/components/common/BrandLogo';
-import { getUserRoles } from '@/lib/roles';
+import { getUserRoles, userHasAnyPermission, userIsSuperAdmin } from '@/lib/roles';
 import { getDirection } from '@/config/i18n';
 import {
   DropdownMenu,
@@ -172,7 +172,6 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
     rider: riderRoutes,
     customer: customerRoutes,
   };
-  const routes = routesMap[routeType] || adminRoutes;
   const isBn = lang === 'bn';
   const dir = getDirection(lang);
   const pathname = usePathname();
@@ -183,6 +182,24 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Only surface modules the account can actually operate. Permission checks
+  // here are a navigation convenience — the backend re-checks every request.
+  const routes = React.useMemo(() => {
+    const base = routesMap[routeType] || adminRoutes;
+    return base.filter((route) => {
+      if (route.superAdminOnly && !userIsSuperAdmin(user)) return false;
+      if (
+        route.permissions &&
+        route.permissions.length > 0 &&
+        !userHasAnyPermission(user, route.permissions)
+      ) {
+        return false;
+      }
+      return true;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeType, user]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);

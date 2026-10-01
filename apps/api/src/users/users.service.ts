@@ -14,6 +14,7 @@ import { RoleEntity } from '../roles/entities/role.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { UserStatus } from './enums/user-status.enum.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
+import { isSuperAdmin, type PermissionBearingUser } from '../common/utils/permission.js';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -319,6 +320,60 @@ export class UsersService implements OnModuleInit {
     return this.userRepository.save(user);
   }
 
+  /**
+   * Update an account status through the administrative users API with
+   * server-side protection of privileged accounts. A normal Admin may never
+   * deactivate another Admin or any Super Admin.
+   */
+  async updateStatusByAdmin(
+    caller: PermissionBearingUser & { id: string },
+    id: string,
+    status: UserStatus,
+  ): Promise<User> {
+    const target = await this.findById(id);
+    this.assertCanManagePrivilegedTarget(caller, target);
+
+    if (
+      status !== UserStatus.ACTIVE &&
+      target.roles?.some((r) => r.name === Role.SUPER_ADMIN)
+    ) {
+      await this.assertNotLastSuperAdmin(target.id);
+    }
+
+    target.status = status;
+    return this.userRepository.save(target);
+  }
+
+  /**
+   * Guard administrative mutations of privileged accounts. Non Super Admins can
+   * manage customers, sellers and riders but not other staff accounts.
+   */
+  private assertCanManagePrivilegedTarget(
+    caller: PermissionBearingUser,
+    target: User,
+  ): void {
+    if (isSuperAdmin(caller)) return;
+    const targetIsPrivileged = target.roles?.some(
+      (r) => r.name === Role.ADMIN || r.name === Role.SUPER_ADMIN,
+    );
+    if (targetIsPrivileged) {
+      throw new ForbiddenException('Only Super Admins can manage Admin or Super Admin accounts');
+    }
+  }
+
+  private async assertNotLastSuperAdmin(excludedUserId: string): Promise<void> {
+    const remaining = await this.userRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.roles', 'role')
+      .where('role.name = :role', { role: Role.SUPER_ADMIN })
+      .andWhere('user.status = :status', { status: UserStatus.ACTIVE })
+      .andWhere('user.id != :id', { id: excludedUserId })
+      .getCount();
+    if (remaining === 0) {
+      throw new ForbiddenException('At least one active Super Admin must remain');
+    }
+  }
+
   async findAll(page = 1, limit = 10, search?: string, roleName?: string) {
     const query = this.userRepository
       .createQueryBuilder('user')
@@ -357,8 +412,8 @@ export class UsersService implements OnModuleInit {
     id: string,
     roleNames: string[],
   ): Promise<User> {
-    const isSuperAdmin = caller.roles?.some(
-      (r) => (typeof r === 'string' ? r : r.name) === Role.SUPER_ADMIN,
+    const callerIsSuperAdmin = isSuperAdmin(
+      caller as { roles?: Array<{ name: string } | string> },
     );
 
     const targetUser = await this.findById(id);
@@ -367,19 +422,28 @@ export class UsersService implements OnModuleInit {
     );
     const attemptingPrivilege = roleNames.some((r) => r === Role.ADMIN || r === Role.SUPER_ADMIN);
 
-    if (!isSuperAdmin && (targetHasPrivilege || attemptingPrivilege)) {
+    // A normal Admin can never promote to (or demote from) a privileged role,
+    // nor modify another staff account. This blocks privilege escalation even
+    // through direct API calls.
+    if (!callerIsSuperAdmin && (targetHasPrivilege || attemptingPrivilege)) {
       throw new ForbiddenException('Only Super Admins can manage Admin or Super Admin roles');
     }
 
-    if (!roleNames || roleNames.length === 0) {
-      targetUser.roles = [];
-    } else {
-      const roles = await this.roleRepository
-        .createQueryBuilder('role')
-        .where('role.name IN (:...roleNames)', { roleNames })
-        .getMany();
-      targetUser.roles = roles;
+    const validRoleNames = new Set(Object.values(Role) as string[]);
+    const invalid = roleNames.filter((name) => !validRoleNames.has(name));
+    if (invalid.length > 0) {
+      throw new BadRequestException(`Unknown roles: ${invalid.join(', ')}`);
     }
+
+    if (!roleNames || roleNames.length === 0) {
+      throw new BadRequestException('At least one role must be assigned');
+    }
+
+    const roles = await this.roleRepository
+      .createQueryBuilder('role')
+      .where('role.name IN (:...roleNames)', { roleNames })
+      .getMany();
+    targetUser.roles = roles;
     return this.userRepository.save(targetUser);
   }
 }

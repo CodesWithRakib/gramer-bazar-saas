@@ -22,7 +22,9 @@ import {
 } from '../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 
 @ApiTags('Reviews')
@@ -100,8 +102,9 @@ export class ReviewsController {
   }
 
   @Get('admin')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reviews.read')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'List all reviews for moderation (Admin only)',
@@ -124,8 +127,9 @@ export class ReviewsController {
   }
 
   @Patch('admin/:id/moderate')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reviews.moderate')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Moderate review approval status (Admin only)',

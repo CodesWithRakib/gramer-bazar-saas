@@ -23,7 +23,9 @@ import {
 } from '../../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../../common/guards/permissions.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 
 @ApiTags('Catalog - Variants')
@@ -32,9 +34,10 @@ export class ProductVariantsController {
   constructor(private readonly productVariantsService: ProductVariantsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.create')
   @ApiOperation({
     summary: 'Create a new global product variant (Admin only)',
     description: 'Requires ADMIN or SUPER_ADMIN role. Adds SKU variation under master product.',
@@ -82,9 +85,10 @@ export class ProductVariantsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.update')
   @ApiOperation({
     summary: 'Update a global product variant (Admin only)',
     description: 'Requires ADMIN or SUPER_ADMIN role. Updates variant pricing, stock, or title.',
@@ -104,9 +108,10 @@ export class ProductVariantsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.delete')
   @ApiOperation({
     summary: 'Delete a global product variant (Admin only)',
     description: 'Requires ADMIN or SUPER_ADMIN role. Removes SKU variation.',

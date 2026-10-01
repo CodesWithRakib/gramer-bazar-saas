@@ -16,7 +16,9 @@ import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import {
   ApiTags,
@@ -261,8 +263,9 @@ export class PaymentsController {
 
   @Get('admin/all')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('payments.read')
   @ApiOperation({
     summary: 'List all payment transactions with filters (Admin only)',
     description:
@@ -277,8 +280,9 @@ export class PaymentsController {
 
   @Get('admin/:id')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('payments.read')
   @ApiOperation({
     summary: 'Get payment transaction details by ID (Admin only)',
     description: 'Fetches raw transaction details, bank transaction IDs, and gateway responses.',

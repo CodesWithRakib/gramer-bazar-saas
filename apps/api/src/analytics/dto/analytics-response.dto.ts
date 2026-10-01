@@ -35,17 +35,20 @@ export class DashboardMetricsSummaryDto {
   })
   activeShops: number;
 
-  @ApiProperty({
-    example: 5,
-    description: 'Pending seller and rider applications',
-  })
-  pendingApplications: number;
+  @ApiProperty({ example: 3, description: 'Seller applications awaiting review' })
+  pendingSellerApplications: number;
+
+  @ApiProperty({ example: 2, description: 'Rider applications awaiting review' })
+  pendingRiderApplications: number;
+
+  @ApiProperty({ example: 6, description: 'Payout requests awaiting approval' })
+  pendingPayouts: number;
 
   @ApiProperty({
     example: 2,
-    description: 'Active open disputes requiring attention',
+    description: 'Active open or under-review disputes requiring attention',
   })
-  pendingDisputes: number;
+  openDisputes: number;
 }
 
 export class RecentOrderSummaryDto {

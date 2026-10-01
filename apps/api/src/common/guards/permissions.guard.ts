@@ -1,39 +1,42 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator.js';
+import { hasAnyPermission, type PermissionBearingUser } from '../utils/permission.js';
 
+/**
+ * Enforces the `@Permissions()` decorator on admin/super-admin endpoints.
+ *
+ * Authorisation is evaluated on the server from the authenticated principal's
+ * *effective* permissions (role permissions + direct account grants). Hiding a
+ * button in the frontend is never sufficient.
+ */
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!requiredPermissions) {
+
+    if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
     }
-    const { user } = context.switchToHttp().getRequest();
 
-    if (!user || !user.roles) {
+    const request = context.switchToHttp().getRequest<{ user?: PermissionBearingUser }>();
+    const { user } = request;
+
+    if (!user) {
       throw new ForbiddenException('Insufficient permissions');
     }
 
-    // Flatten all permissions from all roles the user has
-    const userPermissions = new Set<string>();
-    for (const role of user.roles) {
-      if (role.permissions) {
-        for (const perm of role.permissions) {
-          userPermissions.add(perm.name);
-        }
-      }
+    if (!hasAnyPermission(user, requiredPermissions)) {
+      throw new ForbiddenException(
+        `Missing required permission: ${requiredPermissions.join(' or ')}`,
+      );
     }
 
-    const hasPermission = requiredPermissions.some((permission) => userPermissions.has(permission));
-    if (!hasPermission) {
-      throw new ForbiddenException('Insufficient permissions');
-    }
     return true;
   }
 }

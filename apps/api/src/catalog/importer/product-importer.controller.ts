@@ -14,7 +14,9 @@ import { ProductImporterService } from './product-importer.service.js';
 import { ImportMode } from './entities/import-log.entity.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../../common/guards/permissions.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 import {
   IsString,
@@ -67,13 +69,14 @@ export class RunImportDto {
 
 @ApiTags('Catalog - Importer')
 @Controller('admin/importer')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
 @ApiBearerAuth('JWT-auth')
 export class ProductImporterController {
   constructor(private readonly importerService: ProductImporterService) {}
 
   @Post('run')
+  @Permissions('products.create')
   @ApiOperation({
     summary: 'Trigger bulk product import or dry-run (Admin only)',
     description:
@@ -96,6 +99,7 @@ export class ProductImporterController {
   }
 
   @Get('logs')
+  @Permissions('products.read')
   @ApiOperation({
     summary: 'List history of product import runs (Admin only)',
     description: 'Returns historical execution records of automated catalog imports.',
@@ -114,6 +118,7 @@ export class ProductImporterController {
   }
 
   @Get('logs/:id')
+  @Permissions('products.read')
   @ApiOperation({
     summary: 'Retrieve specific import log details (Admin only)',
     description:

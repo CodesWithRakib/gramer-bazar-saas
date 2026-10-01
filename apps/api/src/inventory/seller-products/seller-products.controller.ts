@@ -26,7 +26,9 @@ import {
 } from '../../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../../common/guards/permissions.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
+import { Permissions } from '../../common/decorators/permissions.decorator.js';
 import { Role } from '../../roles/enums/role.enum.js';
 import type { AuthenticatedRequest } from '../../common/types/authenticated-request.js';
 import { toActor } from '../../common/utils/actor.js';
@@ -37,9 +39,10 @@ export class SellerProductsController {
   constructor(private readonly sellerProductsService: SellerProductsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.create')
   @ApiOperation({
     summary: 'Create a new seller product listing offer',
     description:
@@ -96,9 +99,10 @@ export class SellerProductsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.update')
   @ApiOperation({
     summary: 'Update a seller product offer',
     description: 'Requires owner SELLER or ADMIN role. Updates price, discount, or SKU.',
@@ -119,9 +123,10 @@ export class SellerProductsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
   @ApiBearerAuth('JWT-auth')
+  @Permissions('products.delete', 'products.update')
   @ApiOperation({
     summary: 'Delete a seller product offer',
     description:

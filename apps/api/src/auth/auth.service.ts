@@ -9,6 +9,7 @@ import { UserStatus } from '../users/enums/user-status.enum.js';
 import { User } from '../users/entities/user.entity.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { Role } from '../roles/enums/role.enum.js';
+import { getEffectivePermissions, isSuperAdmin } from '../common/utils/permission.js';
 
 @Injectable()
 export class AuthService {
@@ -156,14 +157,27 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
-      user: {
-        id: updatedUser.id,
-        phone: updatedUser.phone,
-        email: updatedUser.email,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        roles: updatedUser.roles?.map((r) => r.name) || [],
-      },
+      user: this.toSessionUser(updatedUser),
+    };
+  }
+
+  /**
+   * Shape the user returned to the client. `permissions` carries the effective
+   * permission set so the frontend can gate navigation — the backend still
+   * enforces every permission independently on each request.
+   */
+  private toSessionUser(user: User) {
+    const roles = user.roles?.map((r) => r.name) || [];
+    return {
+      id: user.id,
+      phone: user.phone,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+      roles,
+      permissions: Array.from(getEffectivePermissions(user)).sort(),
+      isSuperAdmin: isSuperAdmin(user),
     };
   }
 
@@ -201,15 +215,7 @@ export class AuthService {
     const updatedUser = await this.usersService.update(userId, updateProfileDto);
     return {
       message: 'Profile updated successfully',
-      user: {
-        id: updatedUser.id,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        phone: updatedUser.phone,
-        email: updatedUser.email,
-        avatar: updatedUser.avatar,
-        roles: updatedUser.roles?.map((r: any) => (typeof r === 'string' ? r : r.name)) || [],
-      },
+      user: this.toSessionUser(updatedUser),
     };
   }
 

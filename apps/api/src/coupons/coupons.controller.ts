@@ -18,7 +18,9 @@ import { CreateCouponDto } from './dto/create-coupon.dto.js';
 import { UpdateCouponDto } from './dto/update-coupon.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import {
   ApiStandardResponse,
@@ -57,9 +59,10 @@ export class CouponsController {
   }
 
   @Post('admin/coupons')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('coupons.create')
   @ApiOperation({
     summary: 'Admin: Create a new coupon',
     description:
@@ -75,9 +78,10 @@ export class CouponsController {
   }
 
   @Get('admin/coupons')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('coupons.read')
   @ApiOperation({
     summary: 'Admin: Get all coupons',
     description: 'Returns a paginated list of all coupons configured in the platform.',
@@ -100,9 +104,10 @@ export class CouponsController {
   }
 
   @Get('admin/coupons/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('coupons.read')
   @ApiOperation({
     summary: 'Admin: Get a single coupon',
     description: 'Retrieves complete details for a coupon by ID.',
@@ -114,9 +119,10 @@ export class CouponsController {
   }
 
   @Patch('admin/coupons/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('coupons.update')
   @ApiOperation({
     summary: 'Admin: Update a coupon',
     description: 'Updates coupon rules, discount values, or status.',
@@ -128,9 +134,10 @@ export class CouponsController {
   }
 
   @Delete('admin/coupons/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiBearerAuth()
+  @Permissions('coupons.delete')
   @ApiOperation({ summary: 'Admin: Delete a coupon', description: 'Permanently deletes a coupon.' })
   @ApiParam({ name: 'id', description: 'Coupon UUID' })
   @ApiStandardMessageResponse({ description: 'Coupon removed successfully' })

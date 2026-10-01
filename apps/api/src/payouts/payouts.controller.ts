@@ -16,7 +16,9 @@ import { CreateRiderPayoutDto } from './dto/create-rider-payout.dto.js';
 import { ReviewPayoutDto } from './dto/review-payout.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { PayoutStatus } from './entities/payout-request.entity.js';
 import {
@@ -27,7 +29,7 @@ import { PayoutResponseDto } from './dto/payout-response.dto.js';
 
 @ApiTags('Payouts')
 @Controller('payouts')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @ApiBearerAuth()
 @ApiCommonErrors()
 export class PayoutsController {
@@ -96,6 +98,7 @@ export class PayoutsController {
 
   @Get()
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('payouts.read')
   @ApiOperation({
     summary: 'Get all payout requests (Admin)',
     description: 'Lists all vendor withdrawal requests with optional status filter.',
@@ -112,6 +115,7 @@ export class PayoutsController {
 
   @Patch(':id/review')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('payouts.approve', 'payouts.reject')
   @ApiOperation({
     summary: 'Approve or reject a payout request (Admin)',
     description: 'Updates status of payout to APPROVED (disbursing funds) or REJECTED.',

@@ -210,6 +210,8 @@ export const api = createApi({
     'RiderProfile',
     'RiderEarning',
     'Payment',
+    'Admin',
+    'Role',
   ],
   endpoints: () => ({}),
 });

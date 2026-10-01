@@ -26,6 +26,16 @@ export class AuthUserDto {
 
   @ApiProperty({ example: ['CUSTOMER'], description: 'Assigned system roles', type: [String] })
   roles: string[];
+
+  @ApiProperty({
+    example: ['orders.read', 'orders.cancel'],
+    description: 'Effective permission set (role permissions ∪ direct grants)',
+    type: [String],
+  })
+  permissions: string[];
+
+  @ApiProperty({ example: false, description: 'True when the account is a Super Admin' })
+  isSuperAdmin: boolean;
 }
 
 export class AuthResponseDto {
@@ -95,6 +105,13 @@ export class UserProfileResponseDto {
 
   @ApiProperty({ example: ['CUSTOMER'], description: 'List of role names', type: [String] })
   roles: string[];
+
+  @ApiProperty({
+    example: ['orders.read', 'orders.cancel'],
+    description: 'Effective permission set (role permissions ∪ direct grants)',
+    type: [String],
+  })
+  permissions: string[];
 }
 
 export class SendOtpResponseDto {

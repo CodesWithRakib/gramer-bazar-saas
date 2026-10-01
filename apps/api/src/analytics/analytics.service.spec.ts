@@ -5,6 +5,11 @@ import { DemandEvent } from './entities/demand-event.entity.js';
 import { Order } from '../orders/entities/order.entity.js';
 import { Product } from '../catalog/entities/product.entity.js';
 import { User } from '../users/entities/user.entity.js';
+import { Shop } from '../shops/entities/shop.entity.js';
+import { SellerApplication } from '../applications/entities/seller-application.entity.js';
+import { RiderApplication } from '../applications/entities/rider-application.entity.js';
+import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
+import { Dispute } from '../disputes/entities/dispute.entity.js';
 
 describe('AnalyticsService', () => {
   let service: AnalyticsService;
@@ -17,6 +22,11 @@ describe('AnalyticsService', () => {
         { provide: getRepositoryToken(User), useValue: {} },
         { provide: getRepositoryToken(Product), useValue: {} },
         { provide: getRepositoryToken(DemandEvent), useValue: {} },
+        { provide: getRepositoryToken(Shop), useValue: {} },
+        { provide: getRepositoryToken(SellerApplication), useValue: {} },
+        { provide: getRepositoryToken(RiderApplication), useValue: {} },
+        { provide: getRepositoryToken(PayoutRequest), useValue: {} },
+        { provide: getRepositoryToken(Dispute), useValue: {} },
       ],
     }).compile();
 

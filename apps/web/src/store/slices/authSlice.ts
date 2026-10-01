@@ -13,6 +13,10 @@ export interface UserProfile {
   lastName?: string;
   avatar?: string | null;
   roles?: string[];
+  /** Effective permissions granted by the backend (role permissions ∪ direct grants). */
+  permissions?: string[];
+  /** True when the account holds the SUPER_ADMIN role. */
+  isSuperAdmin?: boolean;
   [key: string]: unknown;
 }
 
@@ -29,9 +33,14 @@ const normalizeUser = (user: unknown): UserProfile | null => {
   if (!user || typeof user !== 'object') return null;
   const u = user as Record<string, unknown>;
   const roles = Array.isArray(u.roles) ? u.roles.map(normalizeRole).filter(Boolean) : [];
+  const permissions = Array.isArray(u.permissions)
+    ? u.permissions.filter((p): p is string => typeof p === 'string')
+    : [];
   return {
     ...(u as UserProfile),
     roles,
+    permissions,
+    isSuperAdmin: roles.includes('SUPER_ADMIN'),
   };
 };
 

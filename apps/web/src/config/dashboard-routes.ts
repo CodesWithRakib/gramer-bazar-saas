@@ -32,6 +32,14 @@ export interface DashboardRoute {
   sectionBn?: string;
   matchPrefixes?: string[];
   children?: DashboardRoute[];
+  /**
+   * Effective permission required to see this module. The nav entry is hidden
+   * when none of these are held. Backend authorization is always authoritative;
+   * this only prevents dead-end navigation.
+   */
+  permissions?: string[];
+  /** Restrict this entry to genuine Super Admin accounts. */
+  superAdminOnly?: boolean;
 }
 
 /**
@@ -45,6 +53,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'ড্যাশবোর্ড',
     href: '/admin',
     icon: LayoutDashboard,
+    permissions: ['reports.read'],
     section: 'Overview',
     sectionBn: 'ওভারভিউ',
   },
@@ -53,6 +62,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'অর্ডার ব্যবস্থাপনা',
     href: '/admin/orders',
     icon: ShoppingCart,
+    permissions: ['orders.read'],
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/orders'],
@@ -62,6 +72,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'পণ্য ক্যাটালগ',
     href: '/admin/products',
     icon: Package,
+    permissions: ['products.read', 'categories.read', 'brands.read'],
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/products', '/admin/categories', '/admin/brands'],
@@ -73,6 +84,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'প্রমোশন ও অফার',
     href: '/admin/promotions',
     icon: Tag,
+    permissions: ['coupons.read', 'offers.read'],
     section: 'Management',
     sectionBn: 'ব্যবস্থাপনা',
     matchPrefixes: ['/admin/promotions', '/admin/coupons', '/admin/flash-sales', '/admin/banners'],
@@ -82,6 +94,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'ব্যবহারকারী ও অংশীদার',
     href: '/admin/users-management',
     icon: Users,
+    permissions: ['users.read', 'sellers.read', 'riders.read'],
     section: 'Management',
     sectionBn: 'ব্যবস্থাপনা',
     matchPrefixes: ['/admin/users-management', '/admin/users', '/admin/sellers', '/admin/riders'],
@@ -91,6 +104,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'অর্থ ও পেমেন্ট',
     href: '/admin/finance',
     icon: CreditCard,
+    permissions: ['payouts.read', 'payments.read'],
     section: 'Management',
     sectionBn: 'ব্যবস্থাপনা',
     matchPrefixes: ['/admin/finance'],
@@ -111,6 +125,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'বিরোধ ও অভিযোগ',
     href: '/admin/disputes',
     icon: AlertCircle,
+    permissions: ['disputes.read'],
     section: 'System',
     sectionBn: 'সিস্টেম',
     matchPrefixes: ['/admin/disputes'],
@@ -120,6 +135,7 @@ export const adminRoutes: DashboardRoute[] = [
     titleBn: 'সিস্টেম সেটিংস',
     href: '/admin/settings',
     icon: Settings,
+    permissions: ['settings.read'],
     section: 'System',
     sectionBn: 'সিস্টেম',
     matchPrefixes: ['/admin/settings'],
@@ -136,6 +152,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'মাস্টার কনসোল',
     href: '/super-admin',
     icon: LayoutDashboard,
+    permissions: ['reports.read'],
     section: 'Overview',
     sectionBn: 'ওভারভিউ',
   },
@@ -144,6 +161,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'সকল অর্ডার',
     href: '/super-admin/orders',
     icon: ShoppingCart,
+    permissions: ['orders.read'],
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/orders'],
@@ -153,6 +171,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'মাস্টার ক্যাটালগ',
     href: '/super-admin/products',
     icon: Package,
+    permissions: ['products.read', 'categories.read', 'brands.read'],
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/products', '/super-admin/categories', '/super-admin/brands'],
@@ -164,6 +183,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'প্রমোশন হাব',
     href: '/super-admin/promotions',
     icon: Tag,
+    permissions: ['coupons.read', 'offers.read'],
     section: 'Governance',
     sectionBn: 'প্রশাসন',
     matchPrefixes: [
@@ -178,6 +198,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'ব্যবহারকারী ও স্টাফ',
     href: '/super-admin/users-management',
     icon: Users,
+    permissions: ['users.read', 'sellers.read', 'riders.read', 'admins.read'],
     section: 'Governance',
     sectionBn: 'প্রশাসন',
     matchPrefixes: [
@@ -193,6 +214,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'অর্থ ও পে-আউট',
     href: '/super-admin/finance',
     icon: CreditCard,
+    permissions: ['payouts.read', 'payments.read'],
     section: 'Governance',
     sectionBn: 'প্রশাসন',
     matchPrefixes: ['/super-admin/finance'],
@@ -213,6 +235,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'বিরোধ ও পর্যালোচনা',
     href: '/super-admin/disputes',
     icon: AlertCircle,
+    permissions: ['disputes.read'],
     section: 'System',
     sectionBn: 'সিস্টেম',
     matchPrefixes: ['/super-admin/disputes'],
@@ -222,6 +245,7 @@ export const superAdminRoutes: DashboardRoute[] = [
     titleBn: 'প্ল্যাটফর্ম সেটিংস',
     href: '/super-admin/settings',
     icon: Settings,
+    permissions: ['settings.read'],
     section: 'System',
     sectionBn: 'সিস্টেম',
     matchPrefixes: ['/super-admin/settings'],

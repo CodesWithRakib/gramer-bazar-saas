@@ -12,6 +12,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { UserStatus } from '../enums/user-status.enum.js';
 import { RoleEntity } from '../../roles/entities/role.entity.js';
+import { PermissionEntity } from '../../permissions/entities/permission.entity.js';
 
 @Entity('users')
 @Index('idx_users_status', ['status'])
@@ -71,4 +72,19 @@ export class User {
     inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
   })
   roles: RoleEntity[];
+
+  /**
+   * Explicit per-account permission grants.
+   *
+   * Effective permissions are the union of role permissions and these direct
+   * grants. This is how a Super Admin gives one Admin extra capabilities
+   * without changing the shared ADMIN role.
+   */
+  @ManyToMany(() => PermissionEntity, { eager: true })
+  @JoinTable({
+    name: 'user_permissions',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' },
+  })
+  directPermissions: PermissionEntity[];
 }
