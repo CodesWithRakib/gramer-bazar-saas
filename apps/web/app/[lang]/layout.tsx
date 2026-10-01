@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Hind_Siliguri, Noto_Sans_Bengali } from 'next/font/google';
 import '../globals.css';
 import { getDirection } from '@/config/i18n';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toast';
 import { ReduxProvider } from '@/store/provider';
 import { SocketProvider } from '@/providers/SocketProvider';
 import { ClientLayoutWrapper } from '@/components/layout/ClientLayoutWrapper';
@@ -73,6 +73,9 @@ import { CSPostHogProvider } from '@/providers/PostHogProvider';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 import { AuthProvider } from '@/providers/AuthProvider';
 
+import { ThemePaletteProvider } from '@/providers/ThemePaletteProvider';
+import { ThemeDevToolbar } from '@/components/theme/ThemeDevToolbar';
+
 export default async function RootLayout({
   children,
   params,
@@ -95,19 +98,22 @@ export default async function RootLayout({
         className={`min-h-full flex flex-col ${isBn ? 'font-bengali' : 'font-sans'} w-full max-w-full`}
         suppressHydrationWarning
       >
-        <CSPostHogProvider>
-          <ReduxProvider>
-            <AuthProvider>
-              <SocketProvider>
-                <ClientLayoutWrapper lang={lang}>{children}</ClientLayoutWrapper>
-                <LoginModal lang={lang} />
-                <CartDrawer lang={lang} />
-                <InstallPrompt lang={lang} />
-              </SocketProvider>
-            </AuthProvider>
-          </ReduxProvider>
-        </CSPostHogProvider>
-        <Toaster />
+        <ThemePaletteProvider>
+          <CSPostHogProvider>
+            <ReduxProvider>
+              <AuthProvider>
+                <SocketProvider>
+                  <ClientLayoutWrapper lang={lang}>{children}</ClientLayoutWrapper>
+                  <LoginModal lang={lang} />
+                  <CartDrawer lang={lang} />
+                  <InstallPrompt lang={lang} />
+                  <ThemeDevToolbar lang={lang} />
+                </SocketProvider>
+              </AuthProvider>
+            </ReduxProvider>
+          </CSPostHogProvider>
+          <Toaster />
+        </ThemePaletteProvider>
       </body>
     </html>
   );

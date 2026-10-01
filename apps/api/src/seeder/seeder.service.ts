@@ -1909,7 +1909,8 @@ export class SeederService {
       const profile = await this.riderProfileRepo.findOne({ where: { userId: riders[i].id } });
       if (!profile) continue;
       profile.availability = availabilityPlan[i % availabilityPlan.length];
-      if (profile.availability === RiderAvailability.AVAILABLE) profile.lastAvailableAt = new Date();
+      if (profile.availability === RiderAvailability.AVAILABLE)
+        profile.lastAvailableAt = new Date();
       await this.riderProfileRepo.save(profile);
     }
 

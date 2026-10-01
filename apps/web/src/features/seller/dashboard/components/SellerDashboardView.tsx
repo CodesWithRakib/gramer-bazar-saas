@@ -76,7 +76,10 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
   return (
     <div className="space-y-6">
       <PageHeader
-        breadcrumbs={[{ label: isBn ? 'সেলার' : 'Seller' }, { label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard' }]}
+        breadcrumbs={[
+          { label: isBn ? 'সেলার' : 'Seller' },
+          { label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard' },
+        ]}
         title={isBn ? 'সেলার ড্যাশবোর্ড' : 'Seller dashboard'}
         description={
           isBn
@@ -186,9 +189,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
               {isBn ? 'নিষ্পত্তিকৃত বিক্রয় (৭ দিন)' : 'Settled sales (last 7 days)'}
             </CardTitle>
             <CardDescription className="text-xs">
-              {isBn
-                ? 'শুধু ডেলিভারি সম্পন্ন অর্ডারের আয়'
-                : 'Revenue from delivered orders only'}
+              {isBn ? 'শুধু ডেলিভারি সম্পন্ন অর্ডারের আয়' : 'Revenue from delivered orders only'}
             </CardDescription>
           </CardHeader>
           <CardContent className="ps-0 pe-4">
@@ -196,7 +197,11 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
               <div className="h-[240px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={trend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="hsl(var(--border))"
+                    />
                     <XAxis
                       dataKey="name"
                       stroke="hsl(var(--muted-foreground))"
@@ -335,10 +340,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                       </span>
                     </div>
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                      <StatusBadge
-                        tone={meta.tone}
-                        label={isBn ? meta.bn : meta.en}
-                      />
+                      <StatusBadge tone={meta.tone} label={isBn ? meta.bn : meta.en} />
                       {order.allowedNextStatuses.length > 0 && (
                         <SellerOrderActions
                           orderId={order.id}
@@ -433,9 +435,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
               {isBn ? 'সর্বাধিক বিক্রিত পণ্য' : 'Best-selling products'}
             </CardTitle>
             <CardDescription className="text-xs">
-              {isBn
-                ? 'নিষ্পত্তিকৃত বিক্রয় অনুযায়ী ক্রম'
-                : 'Ranked by settled sales revenue'}
+              {isBn ? 'নিষ্পত্তিকৃত বিক্রয় অনুযায়ী ক্রম' : 'Ranked by settled sales revenue'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -469,9 +469,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                       {isBn ? product.nameBn : product.nameEn}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      {isBn
-                        ? `${product.quantitySold}টি বিক্রি`
-                        : `${product.quantitySold} sold`}
+                      {isBn ? `${product.quantitySold}টি বিক্রি` : `${product.quantitySold} sold`}
                     </p>
                   </div>
                   <span className="text-foreground shrink-0 text-sm font-semibold tabular-nums">
@@ -499,9 +497,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
           <CardContent className="space-y-3">
             {metrics.lowStockProducts.length === 0 ? (
               <p className="text-muted-foreground py-6 text-center text-xs">
-                {isBn
-                  ? 'সব পণ্যের স্টক পর্যাপ্ত।'
-                  : 'Every product is comfortably in stock.'}
+                {isBn ? 'সব পণ্যের স্টক পর্যাপ্ত।' : 'Every product is comfortably in stock.'}
               </p>
             ) : (
               metrics.lowStockProducts.map((product) => (
@@ -510,9 +506,7 @@ export function SellerDashboardView({ lang = 'en' }: SellerDashboardViewProps) {
                     <p className="text-foreground truncate text-sm font-medium">
                       {isBn ? product.nameBn : product.nameEn}
                     </p>
-                    <p className="text-muted-foreground text-xs font-mono">
-                      {product.sku || '—'}
-                    </p>
+                    <p className="text-muted-foreground text-xs font-mono">{product.sku || '—'}</p>
                   </div>
                   <StatusBadge
                     tone={product.availableQuantity <= 0 ? 'danger' : 'warning'}

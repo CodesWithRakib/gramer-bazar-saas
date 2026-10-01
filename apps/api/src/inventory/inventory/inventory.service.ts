@@ -31,10 +31,7 @@ export class InventoryService {
    * A SELLER may only touch stock records that belong to one of their own
    * listings. Admin / Super Admin keep full platform access.
    */
-  private async assertCanMutate(
-    inventory: Inventory,
-    actor?: InventoryActor,
-  ): Promise<Inventory> {
+  private async assertCanMutate(inventory: Inventory, actor?: InventoryActor): Promise<Inventory> {
     const loaded = await this.inventoryRepository.findOne({
       where: { id: inventory.id },
       relations: ['sellerProduct', 'sellerProduct.shop'],
@@ -45,7 +42,8 @@ export class InventoryService {
 
     if (!actor) return loaded;
 
-    const isPrivileged = actor.roles?.includes(Role.ADMIN) || actor.roles?.includes(Role.SUPER_ADMIN);
+    const isPrivileged =
+      actor.roles?.includes(Role.ADMIN) || actor.roles?.includes(Role.SUPER_ADMIN);
     if (isPrivileged) return loaded;
 
     const ownerId = loaded.sellerProduct?.shop?.sellerId;

@@ -9,9 +9,7 @@ import { Delivery } from '../deliveries/entities/delivery.entity.js';
 import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([RiderProfile, RiderEarning, User, Delivery, PayoutRequest]),
-  ],
+  imports: [TypeOrmModule.forFeature([RiderProfile, RiderEarning, User, Delivery, PayoutRequest])],
   controllers: [RidersController],
   providers: [RidersService],
   exports: [RidersService],

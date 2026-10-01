@@ -105,7 +105,8 @@ export function SellerProfileView({ lang = 'en' }: SellerProfileViewProps) {
     }
   };
 
-  if (isLoading) return <LoadingState message={isBn ? 'প্রোফাইল লোড হচ্ছে...' : 'Loading profile...'} />;
+  if (isLoading)
+    return <LoadingState message={isBn ? 'প্রোফাইল লোড হচ্ছে...' : 'Loading profile...'} />;
 
   return (
     <div className="w-full max-w-3xl space-y-6 pb-16">
@@ -150,7 +151,9 @@ export function SellerProfileView({ lang = 'en' }: SellerProfileViewProps) {
               isBn={isBn}
               maxFiles={1}
               upload={handleAvatarUpload}
-              description={isBn ? 'সর্বোচ্চ ৫ মেগাবাইট (JPEG, PNG, WebP)' : 'Max 5MB (JPEG, PNG, WebP)'}
+              description={
+                isBn ? 'সর্বোচ্চ ৫ মেগাবাইট (JPEG, PNG, WebP)' : 'Max 5MB (JPEG, PNG, WebP)'
+              }
             />
           </div>
         </div>

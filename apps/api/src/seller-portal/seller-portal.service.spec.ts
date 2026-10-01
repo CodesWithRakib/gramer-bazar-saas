@@ -74,7 +74,11 @@ describe('SellerPortalService', () => {
   });
 
   it('never clears unrelated shop columns on a partial update', async () => {
-    shopRepository.findOne.mockResolvedValue({ id: 'shop-1', sellerId: 'seller-1', isActive: true });
+    shopRepository.findOne.mockResolvedValue({
+      id: 'shop-1',
+      sellerId: 'seller-1',
+      isActive: true,
+    });
     shopRepository.update.mockResolvedValue({ affected: 1 });
     dataSource.query.mockResolvedValue([{ product_count: 0, total_orders: 0 }]);
 
@@ -84,7 +88,11 @@ describe('SellerPortalService', () => {
   });
 
   it('skips the write entirely when nothing was provided', async () => {
-    shopRepository.findOne.mockResolvedValue({ id: 'shop-1', sellerId: 'seller-1', isActive: true });
+    shopRepository.findOne.mockResolvedValue({
+      id: 'shop-1',
+      sellerId: 'seller-1',
+      isActive: true,
+    });
 
     await service.updateShopProfile('seller-1', {} as never);
 
@@ -92,7 +100,11 @@ describe('SellerPortalService', () => {
   });
 
   it('rejects access when shop is suspended and assertActive is true', async () => {
-    shopRepository.findOne.mockResolvedValue({ id: 'shop-1', sellerId: 'seller-1', isActive: false });
+    shopRepository.findOne.mockResolvedValue({
+      id: 'shop-1',
+      sellerId: 'seller-1',
+      isActive: false,
+    });
 
     await expect(service.getShopForSeller('seller-1', true)).rejects.toThrow(
       'Your shop has been deactivated or suspended by platform administration.',

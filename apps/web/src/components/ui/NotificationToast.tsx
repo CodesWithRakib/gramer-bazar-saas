@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import {
   Package,
   Truck,
@@ -152,7 +152,7 @@ export function NotificationToast({
 }
 
 /**
- * Convenience helper to show the custom toast via Sonner
+ * Convenience helper to show the notification toast via custom toast system
  */
 export function showNotificationToast(
   notification: AppNotification,
@@ -171,7 +171,7 @@ export function showNotificationToast(
         : 4500;
 
   toast.custom(
-    (t) => (
+    (t: string | number) => (
       <NotificationToast
         t={t}
         notification={notification}

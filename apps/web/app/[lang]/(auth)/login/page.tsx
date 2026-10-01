@@ -525,7 +525,9 @@ export default function LoginPage({ params }: { params: Promise<{ lang: string }
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
               </span>
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{isBn ? 'হাইপার-লোকাল গ্রামীণ মার্কেটপ্লেস' : 'Hyperlocal Rural Commerce'}</span>
+              <span>
+                {isBn ? 'হাইপার-লোকাল গ্রামীণ মার্কেটপ্লেস' : 'Hyperlocal Rural Commerce'}
+              </span>
             </span>
           </div>
 
@@ -548,22 +550,34 @@ export default function LoginPage({ params }: { params: Promise<{ lang: string }
             <div className="grid grid-cols-3 gap-3">
               <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
                 <p className="text-base sm:text-lg font-black text-white">১০০% খাঁটি</p>
-                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'খামার উৎপাদিত' : 'Farm Fresh'}</p>
+                <p className="text-[11px] text-white/80 font-medium">
+                  {isBn ? 'খামার উৎপাদিত' : 'Farm Fresh'}
+                </p>
               </div>
               <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
-                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'নিরাপদ' : 'Safe'}</p>
-                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery'}</p>
+                <p className="text-base sm:text-lg font-black text-white">
+                  {isBn ? 'নিরাপদ' : 'Safe'}
+                </p>
+                <p className="text-[11px] text-white/80 font-medium">
+                  {isBn ? 'ক্যাশ অন ডেলিভারি' : 'Cash on Delivery'}
+                </p>
               </div>
               <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
-                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'দ্রুত' : 'Speedy'}</p>
-                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'লোকাল রাইডার' : 'Local Riders'}</p>
+                <p className="text-base sm:text-lg font-black text-white">
+                  {isBn ? 'দ্রুত' : 'Speedy'}
+                </p>
+                <p className="text-[11px] text-white/80 font-medium">
+                  {isBn ? 'লোকাল রাইডার' : 'Local Riders'}
+                </p>
               </div>
             </div>
 
             {/* Testimonial Banner */}
             <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-between text-xs text-white/90">
               <span className="font-semibold">
-                {isBn ? 'খানসামা ও দিনাজপুরের বিশ্বস্ত মার্কেটপ্লেস' : 'Serving Dinajpur & rural markets'}
+                {isBn
+                  ? 'খানসামা ও দিনাজপুরের বিশ্বস্ত মার্কেটপ্লেস'
+                  : 'Serving Dinajpur & rural markets'}
               </span>
               <span className="text-amber-300 font-bold tracking-wider">★★★★★</span>
             </div>

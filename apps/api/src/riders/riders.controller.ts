@@ -52,10 +52,7 @@ export class RidersController {
     type: RiderProfileResponseDto,
     description: 'Rider profile updated successfully',
   })
-  updateMyProfile(
-    @Request() req: { user: { id: string } },
-    @Body() dto: UpdateRiderProfileDto,
-  ) {
+  updateMyProfile(@Request() req: { user: { id: string } }, @Body() dto: UpdateRiderProfileDto) {
     return this.ridersService.updateProfile(req.user.id, dto);
   }
 
@@ -103,10 +100,7 @@ export class RidersController {
     type: RiderEarningsResponseDto,
     description: 'Rider earnings retrieved successfully',
   })
-  getMyEarnings(
-    @Request() req: { user: { id: string } },
-    @Query() query: QueryRiderEarningsDto,
-  ) {
+  getMyEarnings(@Request() req: { user: { id: string } }, @Query() query: QueryRiderEarningsDto) {
     return this.ridersService.getEarnings(req.user.id, query);
   }
 
@@ -114,7 +108,8 @@ export class RidersController {
   @Roles(Role.RIDER)
   @ApiOperation({
     summary: 'Rider: Get my earnings summary',
-    description: 'Today / week / month / lifetime earnings, pending payout and withdrawable balance.',
+    description:
+      'Today / week / month / lifetime earnings, pending payout and withdrawable balance.',
   })
   @ApiStandardResponse({
     description: 'Rider earnings summary retrieved successfully',

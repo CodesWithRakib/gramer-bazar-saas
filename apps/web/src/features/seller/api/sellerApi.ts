@@ -530,10 +530,7 @@ export const sellerApi = api.injectEndpoints({
         'SellerProduct',
       ],
     }),
-    setSellerProductPrimaryImage: builder.mutation<
-      SellerProduct,
-      { id: string; imageId: string }
-    >({
+    setSellerProductPrimaryImage: builder.mutation<SellerProduct, { id: string; imageId: string }>({
       query: ({ id, imageId }) => ({
         url: `/seller-portal/products/${id}/images/${imageId}/primary`,
         method: 'PATCH',
@@ -543,20 +540,19 @@ export const sellerApi = api.injectEndpoints({
         'SellerProduct',
       ],
     }),
-    reorderSellerProductImages: builder.mutation<
-      SellerProduct,
-      { id: string; imageIds: string[] }
-    >({
-      query: ({ id, imageIds }) => ({
-        url: `/seller-portal/products/${id}/images/reorder`,
-        method: 'PATCH',
-        body: { imageIds },
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'SellerProduct' as const, id },
-        'SellerProduct',
-      ],
-    }),
+    reorderSellerProductImages: builder.mutation<SellerProduct, { id: string; imageIds: string[] }>(
+      {
+        query: ({ id, imageIds }) => ({
+          url: `/seller-portal/products/${id}/images/reorder`,
+          method: 'PATCH',
+          body: { imageIds },
+        }),
+        invalidatesTags: (result, error, { id }) => [
+          { type: 'SellerProduct' as const, id },
+          'SellerProduct',
+        ],
+      }
+    ),
     deleteSellerProductImage: builder.mutation<SellerProduct, { id: string; imageId: string }>({
       query: ({ id, imageId }) => ({
         url: `/seller-portal/products/${id}/images/${imageId}`,
@@ -596,10 +592,7 @@ export const sellerApi = api.injectEndpoints({
         'SellerAnalytics',
       ],
     }),
-    uploadSellerAvatar: builder.mutation<
-      { avatarUrl: string; user: unknown },
-      FormData
-    >({
+    uploadSellerAvatar: builder.mutation<{ avatarUrl: string; user: unknown }, FormData>({
       query: (body) => ({
         url: '/seller-portal/profile/avatar',
         method: 'POST',

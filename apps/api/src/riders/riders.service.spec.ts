@@ -63,7 +63,7 @@ describe('RidersService', () => {
     vi.clearAllMocks();
     userRepo.findOne.mockResolvedValue({ id: 'rider-1', phone: '01712345678' });
     payoutRepo.createQueryBuilder.mockReturnValue(
-      makeQueryBuilder({ pendingPayout: '0', paidOut: '0' })
+      makeQueryBuilder({ pendingPayout: '0', paidOut: '0' }),
     );
 
     const module: TestingModule = await Test.createTestingModule({
@@ -87,7 +87,7 @@ describe('RidersService', () => {
   describe('updateAvailability', () => {
     it('rejects the system-managed BUSY state', async () => {
       await expect(service.updateAvailability('rider-1', RiderAvailability.BUSY)).rejects.toThrow(
-        BadRequestException
+        BadRequestException,
       );
     });
 
@@ -107,14 +107,16 @@ describe('RidersService', () => {
   describe('applySystemAvailability', () => {
     it('does not force an offline rider back online after a delivery', async () => {
       const manager = {
-        findOne: vi.fn().mockResolvedValue(makeProfile({ availability: RiderAvailability.OFFLINE })),
+        findOne: vi
+          .fn()
+          .mockResolvedValue(makeProfile({ availability: RiderAvailability.OFFLINE })),
         save: vi.fn(),
       };
 
       await service.applySystemAvailability(
         manager as never,
         'rider-1',
-        RiderAvailability.AVAILABLE
+        RiderAvailability.AVAILABLE,
       );
 
       expect(manager.save).not.toHaveBeenCalled();
@@ -127,7 +129,7 @@ describe('RidersService', () => {
       await service.applySystemAvailability(
         manager as never,
         'rider-1',
-        RiderAvailability.AVAILABLE
+        RiderAvailability.AVAILABLE,
       );
 
       expect(profile.availability).toBe(RiderAvailability.AVAILABLE);
@@ -138,7 +140,11 @@ describe('RidersService', () => {
   describe('recordDeliveryEarning', () => {
     it('is idempotent per delivery', async () => {
       const existing = { id: 'earning-1' };
-      const manager = { findOne: vi.fn().mockResolvedValue(existing), create: vi.fn(), save: vi.fn() };
+      const manager = {
+        findOne: vi.fn().mockResolvedValue(existing),
+        create: vi.fn(),
+        save: vi.fn(),
+      };
 
       const result = await service.recordDeliveryEarning(manager as never, {
         riderId: 'rider-1',
@@ -182,10 +188,10 @@ describe('RidersService', () => {
           todayEarnings: '60',
           weekEarnings: '180',
           monthEarnings: '300',
-        })
+        }),
       );
       payoutRepo.createQueryBuilder.mockReturnValue(
-        makeQueryBuilder({ pendingPayout: '60', paidOut: '100' })
+        makeQueryBuilder({ pendingPayout: '60', paidOut: '100' }),
       );
 
       const summary = await service.getEarningsSummary('rider-1');
@@ -205,10 +211,10 @@ describe('RidersService', () => {
           todayEarnings: '0',
           weekEarnings: '0',
           monthEarnings: '0',
-        })
+        }),
       );
       payoutRepo.createQueryBuilder.mockReturnValue(
-        makeQueryBuilder({ pendingPayout: '200', paidOut: '100' })
+        makeQueryBuilder({ pendingPayout: '200', paidOut: '100' }),
       );
 
       const summary = await service.getEarningsSummary('rider-1');

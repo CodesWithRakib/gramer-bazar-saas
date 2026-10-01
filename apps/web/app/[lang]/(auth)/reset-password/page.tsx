@@ -44,8 +44,7 @@ function ResetPasswordForm({ lang }: { lang: string }) {
   const [sendOtp, { isLoading: isResending }] = useSendOtpMutation();
 
   const isPasswordMatch = newPassword.length >= 6 && newPassword === confirmPassword;
-  const isPasswordMismatch =
-    confirmPassword.length > 0 && newPassword !== confirmPassword;
+  const isPasswordMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
 
   const handleResend = async () => {
     if (!phone) return;
@@ -90,7 +89,9 @@ function ResetPasswordForm({ lang }: { lang: string }) {
     } catch (err) {
       setErrorMsg(
         getApiErrorMessage(err) ||
-          (isBn ? 'পাসওয়ার্ড পরিবর্তন ব্যর্থ হয়েছে। ওটিপি যাচাই করুন।' : 'Failed to reset password. Check your OTP.')
+          (isBn
+            ? 'পাসওয়ার্ড পরিবর্তন ব্যর্থ হয়েছে। ওটিপি যাচাই করুন।'
+            : 'Failed to reset password. Check your OTP.')
       );
     }
   };
@@ -230,7 +231,9 @@ function ResetPasswordForm({ lang }: { lang: string }) {
             </button>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            {isBn ? 'কমপক্ষে ৬ অক্ষরের একটি শক্তিশালী পাসওয়ার্ড বেছে নিন' : 'Choose a strong password with at least 6 characters'}
+            {isBn
+              ? 'কমপক্ষে ৬ অক্ষরের একটি শক্তিশালী পাসওয়ার্ড বেছে নিন'
+              : 'Choose a strong password with at least 6 characters'}
           </p>
         </div>
 

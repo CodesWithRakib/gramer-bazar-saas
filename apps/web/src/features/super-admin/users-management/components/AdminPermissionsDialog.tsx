@@ -59,7 +59,9 @@ export function AdminPermissionsDialog({
     const term = search.trim().toLowerCase();
     const filtered = term
       ? permissions.filter(
-          (p) => p.name.toLowerCase().includes(term) || (p.description ?? '').toLowerCase().includes(term)
+          (p) =>
+            p.name.toLowerCase().includes(term) ||
+            (p.description ?? '').toLowerCase().includes(term)
         )
       : permissions;
 
@@ -85,10 +87,9 @@ export function AdminPermissionsDialog({
     if (!admin) return;
     try {
       await setPermissions({ id: admin.id, permissions: Array.from(selected) }).unwrap();
-      customToast.success(
-        isBn ? 'পারমিশন সংরক্ষণ হয়েছে' : 'Permissions updated',
-        { description: admin.email || admin.phone }
-      );
+      customToast.success(isBn ? 'পারমিশন সংরক্ষণ হয়েছে' : 'Permissions updated', {
+        description: admin.email || admin.phone,
+      });
       onOpenChange(false);
     } catch {
       customToast.error(isBn ? 'পারমিশন সংরক্ষণ ব্যর্থ' : 'Could not update permissions');

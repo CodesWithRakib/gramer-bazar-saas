@@ -218,13 +218,17 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
             : 'This product does not belong to your shop or no longer exists.'
         }
         onRetry={() => refetchProduct()}
-        secondaryAction={{ label: isBn ? 'প্রোডাক্ট তালিকায় ফিরুন' : 'Back to products', href: `/${lang}/seller/products` }}
+        secondaryAction={{
+          label: isBn ? 'প্রোডাক্ট তালিকায় ফিরুন' : 'Back to products',
+          href: `/${lang}/seller/products`,
+        }}
       />
     );
   }
 
   const isSaving = isCreating || isUpdating;
-  const effectivePrice = watchedDiscount > 0 && watchedDiscount < watchedPrice ? watchedDiscount : watchedPrice;
+  const effectivePrice =
+    watchedDiscount > 0 && watchedDiscount < watchedPrice ? watchedDiscount : watchedPrice;
 
   return (
     <div className="space-y-6 pb-24">
@@ -232,7 +236,7 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
         breadcrumbs={[
           { label: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', href: `/${lang}/seller` },
           { label: isBn ? 'পণ্য' : 'Products', href: `/${lang}/seller/products` },
-          { label: isEdit ? isBn ? 'সম্পাদনা' : 'Edit' : isBn ? 'নতুন' : 'New' },
+          { label: isEdit ? (isBn ? 'সম্পাদনা' : 'Edit') : isBn ? 'নতুন' : 'New' },
         ]}
         title={
           isEdit
@@ -288,9 +292,7 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
         {/* ---------------------------------------------------- basic info */}
         <Card className="shadow-none">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base">
-              {isBn ? 'মৌলিক তথ্য' : 'Basic information'}
-            </CardTitle>
+            <CardTitle className="text-base">{isBn ? 'মৌলিক তথ্য' : 'Basic information'}</CardTitle>
             <CardDescription className="text-xs">
               {isBn
                 ? 'গ্রাহক যে নাম ও শ্রেণিতে প্রোডাক্টটি খুঁজে পাবেন'
@@ -371,13 +373,14 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
                   form.setValue('subCategoryId', value === NO_SUBCATEGORY ? '' : value)
                 }
               >
-                <SelectTrigger className="w-full" aria-label={isBn ? 'সাব-ক্যাটাগরি' : 'Sub-category'}>
+                <SelectTrigger
+                  className="w-full"
+                  aria-label={isBn ? 'সাব-ক্যাটাগরি' : 'Sub-category'}
+                >
                   <SelectValue placeholder={isBn ? 'নির্বাচন করুন' : 'Select'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NO_SUBCATEGORY}>
-                    {isBn ? 'প্রযোজ্য নয়' : 'None'}
-                  </SelectItem>
+                  <SelectItem value={NO_SUBCATEGORY}>{isBn ? 'প্রযোজ্য নয়' : 'None'}</SelectItem>
                   {subCategories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {isBn ? category.nameBn : category.nameEn}
@@ -543,11 +546,7 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
               />
             </Field>
             <Field label="SKU" hint={isBn ? 'ঐচ্ছিক' : 'Optional'}>
-              <Input
-                disabled={catalogLocked}
-                placeholder="POT-RED-001"
-                {...form.register('sku')}
-              />
+              <Input disabled={catalogLocked} placeholder="POT-RED-001" {...form.register('sku')} />
             </Field>
             <Field
               label={isBn ? 'একক' : 'Unit'}

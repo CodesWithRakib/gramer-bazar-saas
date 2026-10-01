@@ -174,9 +174,7 @@ export function RiderDashboardView({ lang = 'en' }: RiderDashboardViewProps) {
             <CardContent className="flex items-center gap-3 p-4">
               <div
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                  stat.emphasize
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-muted text-muted-foreground'
+                  stat.emphasize ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
                 }`}
               >
                 <stat.icon className="h-5 w-5" />
@@ -210,18 +208,14 @@ export function RiderDashboardView({ lang = 'en' }: RiderDashboardViewProps) {
             <p className="text-3xl font-bold tracking-tight text-foreground">
               {currency(earnings.todayEarnings)}
             </p>
-            <span className="pb-1 text-xs text-muted-foreground">
-              {isBn ? 'আজ' : 'today'}
-            </span>
+            <span className="pb-1 text-xs text-muted-foreground">{isBn ? 'আজ' : 'today'}</span>
           </div>
           <div className="grid grid-cols-2 gap-3 border-t border-border pt-3 text-sm">
             <div>
               <p className="text-xs text-muted-foreground">
                 {isBn ? 'উত্তোলনযোগ্য ব্যালেন্স' : 'Available Balance'}
               </p>
-              <p className="font-semibold text-foreground">
-                {currency(earnings.availableBalance)}
-              </p>
+              <p className="font-semibold text-foreground">{currency(earnings.availableBalance)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">
@@ -291,9 +285,7 @@ export function RiderDashboardView({ lang = 'en' }: RiderDashboardViewProps) {
             {isBn ? 'নতুন অ্যাসাইনমেন্ট' : 'New Assignments'}
           </h2>
           <Button asChild variant="ghost" size="sm" className="text-primary">
-            <Link href={`/${lang}/rider/deliveries`}>
-              {isBn ? 'সব দেখুন' : 'View all'}
-            </Link>
+            <Link href={`/${lang}/rider/deliveries`}>{isBn ? 'সব দেখুন' : 'View all'}</Link>
           </Button>
         </div>
 

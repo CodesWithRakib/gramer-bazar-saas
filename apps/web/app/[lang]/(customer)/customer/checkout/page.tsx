@@ -364,7 +364,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
               <div className="space-y-3 border-t border-border/60 pt-4 text-sm">
                 <div className="flex justify-between gap-3 text-muted-foreground">
                   <span>{isBn ? 'সাবটোটাল' : 'Subtotal'}</span>
-                  <span className="font-medium text-foreground tabular-nums">{formatCurrency(sub, lang)}</span>
+                  <span className="font-medium text-foreground tabular-nums">
+                    {formatCurrency(sub, lang)}
+                  </span>
                 </div>
                 {appliedCoupon && (
                   <div className="flex justify-between gap-3 font-medium text-primary">
@@ -376,7 +378,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                 )}
                 <div className="flex justify-between gap-3 text-muted-foreground">
                   <span>{isBn ? 'ডেলিভারি চার্জ' : 'Delivery fee'}</span>
-                  <span className="font-medium text-foreground tabular-nums">{formatCurrency(deliveryFee, lang)}</span>
+                  <span className="font-medium text-foreground tabular-nums">
+                    {formatCurrency(deliveryFee, lang)}
+                  </span>
                 </div>
                 <div className="flex justify-between gap-3 border-t border-border/60 pt-4 text-lg font-bold">
                   <span>{isBn ? 'সর্বমোট' : 'Total'}</span>
@@ -411,7 +415,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
           <span className="text-[10px] font-semibold text-muted-foreground">
             {isBn ? 'মোট প্রদেয়' : 'Total payable'}
           </span>
-          <span className="text-lg font-black text-primary tabular-nums">{formatCurrency(total, lang)}</span>
+          <span className="text-lg font-black text-primary tabular-nums">
+            {formatCurrency(total, lang)}
+          </span>
         </div>
         <Button
           size="sm"

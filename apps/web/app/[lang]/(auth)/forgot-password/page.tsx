@@ -8,7 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { Phone, ArrowLeft, KeyRound, AlertCircle, ShieldCheck, HelpCircle, CheckCircle2 } from 'lucide-react';
+import {
+  Phone,
+  ArrowLeft,
+  KeyRound,
+  AlertCircle,
+  ShieldCheck,
+  HelpCircle,
+  CheckCircle2,
+} from 'lucide-react';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { BrandLogo } from '@/components/common/BrandLogo';
 

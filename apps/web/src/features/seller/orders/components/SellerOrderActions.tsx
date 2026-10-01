@@ -95,13 +95,10 @@ export function SellerOrderActions({
 
   return (
     <>
-      <div className={fullWidth ? 'flex w-full items-center gap-2' : 'inline-flex items-center gap-1'}>
-        <Button
-          size={size}
-          onClick={handlePrimary}
-          disabled={isLoading}
-          className={triggerClass}
-        >
+      <div
+        className={fullWidth ? 'flex w-full items-center gap-2' : 'inline-flex items-center gap-1'}
+      >
+        <Button size={size} onClick={handlePrimary} disabled={isLoading} className={triggerClass}>
           {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
           {isBn ? 'মার্ক করুন: ' : 'Mark as '}
           {statusLabel(getOrderStatusMeta(primary), isBn)}
@@ -151,9 +148,7 @@ export function SellerOrderActions({
           </DialogHeader>
 
           <div className="space-y-1.5">
-            <Label htmlFor="cancel-reason">
-              {isBn ? 'কারণ (ঐচ্ছিক)' : 'Reason (optional)'}
-            </Label>
+            <Label htmlFor="cancel-reason">{isBn ? 'কারণ (ঐচ্ছিক)' : 'Reason (optional)'}</Label>
             <Input
               id="cancel-reason"
               value={cancelReason}

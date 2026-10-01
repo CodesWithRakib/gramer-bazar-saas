@@ -8,10 +8,7 @@ import { RiderEarningStatus } from './enums/rider-earning-status.enum.js';
 import { User } from '../users/entities/user.entity.js';
 import { Delivery } from '../deliveries/entities/delivery.entity.js';
 import { DeliveryStatus } from '../deliveries/enums/delivery-status.enum.js';
-import {
-  PayoutRequest,
-  PayoutStatus,
-} from '../payouts/entities/payout-request.entity.js';
+import { PayoutRequest, PayoutStatus } from '../payouts/entities/payout-request.entity.js';
 import { UpdateRiderProfileDto } from './dto/update-rider-profile.dto.js';
 import { QueryRiderEarningsDto } from './dto/query-rider-earnings.dto.js';
 import {
@@ -161,9 +158,7 @@ export class RidersService {
       id: profile.id,
       userId: profile.userId,
       fullName:
-        profile.fullName ||
-        `${user?.firstName || ''} ${user?.lastName || ''}`.trim() ||
-        'Rider',
+        profile.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Rider',
       phone: user?.phone || '',
       email: user?.email ?? null,
       avatar: user?.avatar ?? null,
@@ -241,10 +236,7 @@ export class RidersService {
 
     const payouts = await this.getPayoutTotals(riderId);
     const totalEarned = Number(raw?.totalEarned || 0);
-    const availableBalance = Math.max(
-      0,
-      totalEarned - payouts.pendingPayout - payouts.paidOut,
-    );
+    const availableBalance = Math.max(0, totalEarned - payouts.pendingPayout - payouts.paidOut);
 
     return {
       todayEarnings: Number(raw?.todayEarnings || 0),
@@ -262,11 +254,11 @@ export class RidersService {
     const raw = await this.payoutRepo
       .createQueryBuilder('p')
       .select(
-        "COALESCE(SUM(CASE WHEN p.status = :pending THEN p.amount ELSE 0 END), 0)",
+        'COALESCE(SUM(CASE WHEN p.status = :pending THEN p.amount ELSE 0 END), 0)',
         'pendingPayout',
       )
       .addSelect(
-        "COALESCE(SUM(CASE WHEN p.status = :approved THEN p.amount ELSE 0 END), 0)",
+        'COALESCE(SUM(CASE WHEN p.status = :approved THEN p.amount ELSE 0 END), 0)',
         'paidOut',
       )
       .where('p.riderId = :riderId', { riderId })
@@ -454,9 +446,7 @@ export class RidersService {
   }
 
   /** Availability lookup for a batch of rider user ids (used by dispatch lists). */
-  async getAvailabilityMap(
-    userIds: string[],
-  ): Promise<Record<string, RiderAvailability>> {
+  async getAvailabilityMap(userIds: string[]): Promise<Record<string, RiderAvailability>> {
     if (userIds.length === 0) return {};
 
     const profiles = await this.profileRepo.find({

@@ -89,7 +89,9 @@ export function SellerReviewsView({ lang = 'en' }: SellerReviewsViewProps) {
       setReplyText('');
       void refetch();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, isBn ? 'উত্তর সংরক্ষণ ব্যর্থ' : 'Could not save reply'));
+      toast.error(
+        getApiErrorMessage(error, isBn ? 'উত্তর সংরক্ষণ ব্যর্থ' : 'Could not save reply')
+      );
     }
   };
 
@@ -210,7 +212,10 @@ export function SellerReviewsView({ lang = 'en' }: SellerReviewsViewProps) {
               setPage(1);
             }}
           >
-            <SelectTrigger className="h-11 w-full rounded-full" aria-label={isBn ? 'রেটিং' : 'Rating'}>
+            <SelectTrigger
+              className="h-11 w-full rounded-full"
+              aria-label={isBn ? 'রেটিং' : 'Rating'}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -230,7 +235,10 @@ export function SellerReviewsView({ lang = 'en' }: SellerReviewsViewProps) {
               setPage(1);
             }}
           >
-            <SelectTrigger className="h-11 w-full rounded-full" aria-label={isBn ? 'উত্তর' : 'Reply state'}>
+            <SelectTrigger
+              className="h-11 w-full rounded-full"
+              aria-label={isBn ? 'উত্তর' : 'Reply state'}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -316,16 +324,15 @@ export function SellerReviewsView({ lang = 'en' }: SellerReviewsViewProps) {
                           <div className="flex shrink-0 flex-col items-end gap-1">
                             <StarRow rating={review.rating} />
                             {!review.isApproved && (
-                              <StatusBadge
-                                tone="neutral"
-                                label={isBn ? 'অননুমোদিত' : 'Hidden'}
-                              />
+                              <StatusBadge tone="neutral" label={isBn ? 'অননুমোদিত' : 'Hidden'} />
                             )}
                           </div>
                         </div>
 
                         {review.comment && (
-                          <p className="text-foreground mt-2 text-sm break-words">{review.comment}</p>
+                          <p className="text-foreground mt-2 text-sm break-words">
+                            {review.comment}
+                          </p>
                         )}
 
                         {review.images.length > 0 && (
@@ -436,9 +443,7 @@ export function SellerReviewsView({ lang = 'en' }: SellerReviewsViewProps) {
             value={replyText}
             maxLength={2000}
             onChange={(event) => setReplyText(event.target.value)}
-            placeholder={
-              isBn ? 'যেমন: মতামতের জন্য ধন্যবাদ!' : 'e.g. Thank you for the feedback!'
-            }
+            placeholder={isBn ? 'যেমন: মতামতের জন্য ধন্যবাদ!' : 'e.g. Thank you for the feedback!'}
             aria-label={isBn ? 'উত্তর' : 'Reply'}
           />
 

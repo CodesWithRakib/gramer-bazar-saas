@@ -76,20 +76,25 @@ export class AnalyticsService {
     const totalProducts = await this.productRepository.count();
 
     // Operational backlog metrics — real counts straight from the database.
-    const [activeShops, pendingSellerApplications, pendingRiderApplications, pendingPayouts, openDisputes] =
-      await Promise.all([
-        this.shopRepository.count({ where: { isActive: true } }),
-        this.sellerApplicationRepository.count({
-          where: { status: ApplicationStatus.PENDING },
-        }),
-        this.riderApplicationRepository.count({
-          where: { status: ApplicationStatus.PENDING },
-        }),
-        this.payoutRequestRepository.count({ where: { status: PayoutStatus.PENDING } }),
-        this.disputeRepository.count({
-          where: [{ status: DisputeStatus.OPEN }, { status: DisputeStatus.UNDER_REVIEW }],
-        }),
-      ]);
+    const [
+      activeShops,
+      pendingSellerApplications,
+      pendingRiderApplications,
+      pendingPayouts,
+      openDisputes,
+    ] = await Promise.all([
+      this.shopRepository.count({ where: { isActive: true } }),
+      this.sellerApplicationRepository.count({
+        where: { status: ApplicationStatus.PENDING },
+      }),
+      this.riderApplicationRepository.count({
+        where: { status: ApplicationStatus.PENDING },
+      }),
+      this.payoutRequestRepository.count({ where: { status: PayoutStatus.PENDING } }),
+      this.disputeRepository.count({
+        where: [{ status: DisputeStatus.OPEN }, { status: DisputeStatus.UNDER_REVIEW }],
+      }),
+    ]);
 
     // Recent orders (last 5)
     const recentOrders = await this.orderRepository.find({

@@ -111,7 +111,7 @@ export function useImageUpload({
         setError(
           isBn
             ? `একসাথে সর্বোচ্চ ${maxFiles}টি ফাইল নির্বাচন করা যাবে।`
-            : `You can select up to ${maxFiles} file${maxFiles > 1 ? 's' : ''} at once.`,
+            : `You can select up to ${maxFiles} file${maxFiles > 1 ? 's' : ''} at once.`
         );
         return;
       }
@@ -146,14 +146,14 @@ export function useImageUpload({
             throw new ImageValidationError(
               isBn
                 ? `ছবিটি খুব ছোট। সর্বনিম্ন প্রস্থ ${minWidth}px প্রয়োজন।`
-                : `Image is too small. A minimum width of ${minWidth}px is required.`,
+                : `Image is too small. A minimum width of ${minWidth}px is required.`
             );
           }
           if (minHeight && result.height > 0 && result.height < minHeight) {
             throw new ImageValidationError(
               isBn
                 ? `ছবিটি খুব ছোট। সর্বনিম্ন উচ্চতা ${minHeight}px প্রয়োজন।`
-                : `Image is too small. A minimum height of ${minHeight}px is required.`,
+                : `Image is too small. A minimum height of ${minHeight}px is required.`
             );
           }
 
@@ -172,19 +172,22 @@ export function useImageUpload({
                     height: result.height,
                     mimeType: result.mimeType,
                   }
-                : item,
-            ),
+                : item
+            )
           );
         } catch (err) {
           const message =
             err instanceof ImageValidationError
               ? err.message
-              : getApiErrorMessage(err, isBn ? 'ছবি প্রক্রিয়া করা যায়নি।' : 'Could not process this image.');
+              : getApiErrorMessage(
+                  err,
+                  isBn ? 'ছবি প্রক্রিয়া করা যায়নি।' : 'Could not process this image.'
+                );
           failures.push({ id: queuedItem.id, message });
           setItems((prev) =>
             prev.map((item) =>
-              item.id === queuedItem.id ? { ...item, status: 'error', error: message } : item,
-            ),
+              item.id === queuedItem.id ? { ...item, status: 'error', error: message } : item
+            )
           );
         }
       }
@@ -195,21 +198,19 @@ export function useImageUpload({
         try {
           await upload(optimized.map((item) => item.file));
           setItems((prev) =>
-            prev.map((item) =>
-              optimizedByItem.has(item.id) ? { ...item, status: 'done' } : item,
-            ),
+            prev.map((item) => (optimizedByItem.has(item.id) ? { ...item, status: 'done' } : item))
           );
           setLastBatch(optimized);
           onUploaded?.(optimized);
         } catch (err) {
           const message = getApiErrorMessage(
             err,
-            isBn ? 'আপলোড ব্যর্থ হয়েছে।' : 'Upload failed. Please try again.',
+            isBn ? 'আপলোড ব্যর্থ হয়েছে।' : 'Upload failed. Please try again.'
           );
           setItems((prev) =>
             prev.map((item) =>
-              optimizedByItem.has(item.id) ? { ...item, status: 'error', error: message } : item,
-            ),
+              optimizedByItem.has(item.id) ? { ...item, status: 'error', error: message } : item
+            )
           );
           setError(message);
         }
@@ -222,12 +223,15 @@ export function useImageUpload({
       setIsProcessing(false);
       busyRef.current = false;
     },
-    [isBn, maxFiles, minHeight, minWidth, onUploaded, profile, trackUrl, upload],
+    [isBn, maxFiles, minHeight, minWidth, onUploaded, profile, trackUrl, upload]
   );
 
   const savings = useMemo(() => {
     const original = items.reduce((sum, item) => sum + item.originalSize, 0);
-    const optimized = items.reduce((sum, item) => sum + (item.optimizedSize || item.originalSize), 0);
+    const optimized = items.reduce(
+      (sum, item) => sum + (item.optimizedSize || item.originalSize),
+      0
+    );
     return {
       original,
       optimized,

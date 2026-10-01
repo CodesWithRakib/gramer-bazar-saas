@@ -86,7 +86,7 @@ export class RiderEarningResponseDto {
 }
 
 export class RiderEarningsSummaryDto {
-  @ApiProperty({ example: 180, description: "Earnings credited today" })
+  @ApiProperty({ example: 180, description: 'Earnings credited today' })
   todayEarnings: number;
 
   @ApiProperty({ example: 600, description: 'Earnings in the last 7 days' })

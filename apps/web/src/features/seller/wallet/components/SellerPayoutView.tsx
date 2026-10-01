@@ -62,7 +62,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>(
-    'ALL',
+    'ALL'
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -99,7 +99,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
       toast.error(
         isBn
           ? `সর্বনিম্ন ${MIN_PAYOUT} টাকা উত্তোলন করা যাবে`
-          : `Minimum payout amount is ${MIN_PAYOUT}`,
+          : `Minimum payout amount is ${MIN_PAYOUT}`
       );
       return;
     }
@@ -122,7 +122,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
       setAccountDetails('');
     } catch (error) {
       toast.error(
-        getApiErrorMessage(error, isBn ? 'পেআউট অনুরোধ ব্যর্থ হয়েছে' : 'Failed to request payout'),
+        getApiErrorMessage(error, isBn ? 'পেআউট অনুরোধ ব্যর্থ হয়েছে' : 'Failed to request payout')
       );
     }
   };
@@ -130,12 +130,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
   const statusBadge = (status: 'PENDING' | 'APPROVED' | 'REJECTED') => {
     switch (status) {
       case 'APPROVED':
-        return (
-          <StatusBadge
-            tone="success"
-            label={isBn ? 'অনুমোদিত' : 'Approved'}
-          />
-        );
+        return <StatusBadge tone="success" label={isBn ? 'অনুমোদিত' : 'Approved'} />;
       case 'REJECTED':
         return <StatusBadge tone="danger" label={isBn ? 'বাতিল' : 'Rejected'} />;
       default:
@@ -176,7 +171,9 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
             <CardDescription>
               {isBn
                 ? `প্রকৃত ব্যালেন্স: ${formatCurrency(balance)}${
-                    wallet?.pendingClearance ? ` · পেন্ডিং: ${formatCurrency(wallet.pendingClearance)}` : ''
+                    wallet?.pendingClearance
+                      ? ` · পেন্ডিং: ${formatCurrency(wallet.pendingClearance)}`
+                      : ''
                   }`
                 : `Available ${formatCurrency(balance)}${
                     wallet?.pendingClearance
@@ -210,9 +207,7 @@ export function SellerPayoutView({ lang = 'en' }: SellerPayoutViewProps) {
                 <Label>{isBn ? 'উত্তোলনের মাধ্যম' : 'Payout method'}</Label>
                 <Select value={method} onValueChange={setMethod}>
                   <SelectTrigger className="w-full">
-                    <SelectValue
-                      placeholder={isBn ? 'মাধ্যম নির্বাচন করুন' : 'Select method'}
-                    />
+                    <SelectValue placeholder={isBn ? 'মাধ্যম নির্বাচন করুন' : 'Select method'} />
                   </SelectTrigger>
                   <SelectContent>
                     {METHOD_OPTIONS.map((option) => (

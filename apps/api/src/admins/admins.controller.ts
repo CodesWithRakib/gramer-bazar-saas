@@ -99,12 +99,14 @@ export class AdminsController {
     @Param('role', new ParseEnumPipe(Role)) role: Role,
     @Body() dto: UpdateRolePermissionsDto,
   ) {
-    const result = await this.adminsService.updateRolePermissions(
-      req.user,
+    const result = await this.adminsService.updateRolePermissions(req.user, role, dto.permissions);
+    await this.audit(
+      req,
+      'ROLE_PERMISSIONS_UPDATED',
+      'Role',
       role,
-      dto.permissions,
+      `Permissions: ${result.permissions.join(', ')}`,
     );
-    await this.audit(req, 'ROLE_PERMISSIONS_UPDATED', 'Role', role, `Permissions: ${result.permissions.join(', ')}`);
     return result;
   }
 
@@ -149,10 +151,7 @@ export class AdminsController {
     status: 201,
     description: 'Administrative account created',
   })
-  async createAdmin(
-    @Request() req: { user: AuthenticatedAdmin },
-    @Body() dto: CreateAdminDto,
-  ) {
+  async createAdmin(@Request() req: { user: AuthenticatedAdmin }, @Body() dto: CreateAdminDto) {
     const admin = await this.adminsService.createAdmin(req.user, dto);
     await this.audit(req, 'ADMIN_CREATED', 'User', admin.id, `Role ${dto.role}`);
     return admin;
@@ -228,7 +227,6 @@ export class AdminsController {
     await this.audit(req, 'ADMIN_DEACTIVATED', 'User', id, null);
     return result;
   }
-
 
   private async audit(
     req: { user: AuthenticatedAdmin },

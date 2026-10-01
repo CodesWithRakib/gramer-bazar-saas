@@ -75,9 +75,7 @@ export function MarketplaceHero({ lang }: MarketplaceHeroProps) {
         <SearchBar
           lang={lang}
           placeholder={
-            isBn
-              ? 'চাল, ডাল, তেল, মাছ, শাকসবজি খুঁজুন...'
-              : 'Search rice, oil, fish, vegetables...'
+            isBn ? 'চাল, ডাল, তেল, মাছ, শাকসবজি খুঁজুন...' : 'Search rice, oil, fish, vegetables...'
           }
           className="shadow-xs"
         />
@@ -120,7 +118,9 @@ export function MarketplaceHero({ lang }: MarketplaceHeroProps) {
                   {isBn ? 'আজকের সেরা ফ্ল্যাশ ডিল' : "Today's Hot Flash Sale"}
                 </h3>
                 <p className="text-xs text-white/85 line-clamp-1 mt-0.5">
-                  {isBn ? 'নির্বাচিত পণ্যে সর্বোচ্চ ৫০% পর্যন্ত ছাড়!' : 'Up to 50% discount on daily essentials!'}
+                  {isBn
+                    ? 'নির্বাচিত পণ্যে সর্বোচ্চ ৫০% পর্যন্ত ছাড়!'
+                    : 'Up to 50% discount on daily essentials!'}
                 </p>
               </div>
 
@@ -159,7 +159,9 @@ export function MarketplaceHero({ lang }: MarketplaceHeroProps) {
                   {isBn ? 'সরাসরি খামারের তাজা শস্য ও মুদি' : 'Direct From Local Farmers'}
                 </h3>
                 <p className="text-xs text-white/85 line-clamp-1 mt-0.5">
-                  {isBn ? 'খাঁটি ঘি, সরিষার তেল, পদ্মার মাছ ও শাকসবজি' : 'Pure honey, mustard oil & fresh vegetables'}
+                  {isBn
+                    ? 'খাঁটি ঘি, সরিষার তেল, পদ্মার মাছ ও শাকসবজি'
+                    : 'Pure honey, mustard oil & fresh vegetables'}
                 </p>
               </div>
 

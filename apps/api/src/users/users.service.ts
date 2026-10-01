@@ -333,10 +333,7 @@ export class UsersService implements OnModuleInit {
     const target = await this.findById(id);
     this.assertCanManagePrivilegedTarget(caller, target);
 
-    if (
-      status !== UserStatus.ACTIVE &&
-      target.roles?.some((r) => r.name === Role.SUPER_ADMIN)
-    ) {
+    if (status !== UserStatus.ACTIVE && target.roles?.some((r) => r.name === Role.SUPER_ADMIN)) {
       await this.assertNotLastSuperAdmin(target.id);
     }
 
@@ -348,10 +345,7 @@ export class UsersService implements OnModuleInit {
    * Guard administrative mutations of privileged accounts. Non Super Admins can
    * manage customers, sellers and riders but not other staff accounts.
    */
-  private assertCanManagePrivilegedTarget(
-    caller: PermissionBearingUser,
-    target: User,
-  ): void {
+  private assertCanManagePrivilegedTarget(caller: PermissionBearingUser, target: User): void {
     if (isSuperAdmin(caller)) return;
     const targetIsPrivileged = target.roles?.some(
       (r) => r.name === Role.ADMIN || r.name === Role.SUPER_ADMIN,
@@ -412,9 +406,7 @@ export class UsersService implements OnModuleInit {
     id: string,
     roleNames: string[],
   ): Promise<User> {
-    const callerIsSuperAdmin = isSuperAdmin(
-      caller as { roles?: Array<{ name: string } | string> },
-    );
+    const callerIsSuperAdmin = isSuperAdmin(caller as { roles?: Array<{ name: string } | string> });
 
     const targetUser = await this.findById(id);
     const targetHasPrivilege = targetUser.roles?.some(

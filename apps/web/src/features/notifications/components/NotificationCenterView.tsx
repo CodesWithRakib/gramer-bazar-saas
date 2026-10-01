@@ -97,9 +97,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
     }
     if (activeTab === 'applications') {
       return (
-        typeStr.includes('APPLICATION') ||
-        typeStr.includes('PAYOUT') ||
-        typeStr.includes('PAYMENT')
+        typeStr.includes('APPLICATION') || typeStr.includes('PAYOUT') || typeStr.includes('PAYMENT')
       );
     }
     return true;
@@ -277,12 +275,7 @@ export function NotificationCenterView({ lang = 'bn' }: NotificationCenterViewPr
                 ? 'সার্ভার থেকে নোটিফিকেশন তথ্য সংগ্রহ করা যায়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
                 : 'Could not load notifications from the server. Please try again.'}
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              className="mt-4 text-xs"
-            >
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-4 text-xs">
               {isBn ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
             </Button>
           </div>

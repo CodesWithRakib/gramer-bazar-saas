@@ -116,7 +116,9 @@ export class SupabaseStorageService {
     // Never trust the client-declared MIME type: if it disagrees with the magic
     // bytes we reject the upload outright (MIME spoofing attempt).
     if (declaredMime && declaredMime.toLowerCase() !== detectedMime) {
-      this.logger.warn(`Rejected MIME mismatch: declared=${declaredMime}, detected=${detectedMime}`);
+      this.logger.warn(
+        `Rejected MIME mismatch: declared=${declaredMime}, detected=${detectedMime}`,
+      );
       throw new BadRequestException(
         `Declared file type (${declaredMime}) does not match the actual image content (${detectedMime})`,
       );

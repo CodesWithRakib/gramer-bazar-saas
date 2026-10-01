@@ -19,9 +19,7 @@ export class SellerProductsService {
   ) {}
 
   private isPrivileged(actor?: Actor): boolean {
-    return (
-      !!actor && (actor.roles.includes(Role.ADMIN) || actor.roles.includes(Role.SUPER_ADMIN))
-    );
+    return !!actor && (actor.roles.includes(Role.ADMIN) || actor.roles.includes(Role.SUPER_ADMIN));
   }
 
   /**
@@ -36,7 +34,10 @@ export class SellerProductsService {
     }
   }
 
-  async create(createSellerProductDto: CreateSellerProductDto, actor?: Actor): Promise<SellerProduct> {
+  async create(
+    createSellerProductDto: CreateSellerProductDto,
+    actor?: Actor,
+  ): Promise<SellerProduct> {
     if (!this.isPrivileged(actor)) {
       const shopId = createSellerProductDto.shopId;
       if (!shopId) {

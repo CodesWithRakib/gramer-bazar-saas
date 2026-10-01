@@ -25,7 +25,7 @@ import {
   Ticket,
   Copy,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/custom-toast';
 import { motion } from 'framer-motion';
 import { MarketplaceHero } from '@/components/home/MarketplaceHero';
 import { FlashSalesSection } from '@/components/home/FlashSalesSection';
@@ -238,7 +238,10 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
           </div>
         </section>
       ) : featuredProducts.length > 0 ? (
-        <motion.section {...motionProps} className="container mx-auto px-4 max-w-7xl overflow-hidden">
+        <motion.section
+          {...motionProps}
+          className="container mx-auto px-4 max-w-7xl overflow-hidden"
+        >
           <SectionHeader
             icon={<Sparkles className="h-5 w-5" />}
             title={isBn ? 'নির্বাচিত পণ্যসমূহ' : 'Featured products'}
@@ -289,7 +292,9 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
                           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
                             <Ticket className="h-3.5 w-3.5" />
                           </span>
-                          <span className="text-xs sm:text-sm font-bold text-foreground">{value}</span>
+                          <span className="text-xs sm:text-sm font-bold text-foreground">
+                            {value}
+                          </span>
                         </div>
                         <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground line-clamp-1">
                           {isBn ? 'সর্বনিম্ন অর্ডার' : 'Min. order'}{' '}
@@ -299,8 +304,7 @@ export default function HomePage({ params }: { params: Promise<{ lang: string }>
                               <span aria-hidden className="mx-1">
                                 •
                               </span>
-                              {isBn ? 'মেয়াদ' : 'ends'}{' '}
-                              {formatDate(coupon.endDate, lang, 'short')}
+                              {isBn ? 'মেয়াদ' : 'ends'} {formatDate(coupon.endDate, lang, 'short')}
                             </>
                           ) : null}
                         </p>

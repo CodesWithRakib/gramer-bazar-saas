@@ -177,13 +177,18 @@ export function SellerOrdersView({ lang = 'en' }: SellerOrdersViewProps) {
 
         <div className="w-full sm:w-52">
           <Select
-            value={typeof quickFilter === 'string' && quickFilter !== 'ACTION' ? quickFilter : 'ALL'}
+            value={
+              typeof quickFilter === 'string' && quickFilter !== 'ACTION' ? quickFilter : 'ALL'
+            }
             onValueChange={(value) => {
               setQuickFilter(value as QuickFilter);
               setPage(1);
             }}
           >
-            <SelectTrigger className="h-11 w-full rounded-full" aria-label={isBn ? 'অবস্থা' : 'Status'}>
+            <SelectTrigger
+              className="h-11 w-full rounded-full"
+              aria-label={isBn ? 'অবস্থা' : 'Status'}
+            >
               <SelectValue placeholder={isBn ? 'সব অবস্থা' : 'All statuses'} />
             </SelectTrigger>
             <SelectContent>
@@ -257,7 +262,13 @@ export function SellerOrdersView({ lang = 'en' }: SellerOrdersViewProps) {
               </TableHeader>
               <TableBody>
                 {orders.map((order) => (
-                  <OrderRow key={order.id} order={order} lang={lang} isBn={isBn} onChanged={refetch} />
+                  <OrderRow
+                    key={order.id}
+                    order={order}
+                    lang={lang}
+                    isBn={isBn}
+                    onChanged={refetch}
+                  />
                 ))}
               </TableBody>
             </Table>

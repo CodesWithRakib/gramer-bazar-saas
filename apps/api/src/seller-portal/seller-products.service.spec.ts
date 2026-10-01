@@ -54,7 +54,11 @@ describe('SellerProductsService', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    shopRepository.findOne.mockResolvedValue({ id: 'shop-1', sellerId: 'seller-1', isActive: true });
+    shopRepository.findOne.mockResolvedValue({
+      id: 'shop-1',
+      sellerId: 'seller-1',
+      isActive: true,
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

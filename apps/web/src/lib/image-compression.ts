@@ -150,7 +150,7 @@ async function detectImageMime(file: File): Promise<string | null> {
  */
 export async function validateUploadFile(
   file: File,
-  profileName: ImageProfileName,
+  profileName: ImageProfileName
 ): Promise<{ detectedMime: string | null }> {
   const profile = IMAGE_PROFILES[profileName];
 
@@ -168,7 +168,7 @@ export async function validateUploadFile(
 
   if (file.size > profile.maxSourceBytes) {
     throw new ImageValidationError(
-      `${profile.label} is too large (${formatBytes(file.size)}). Maximum is ${formatBytes(profile.maxSourceBytes)}.`,
+      `${profile.label} is too large (${formatBytes(file.size)}). Maximum is ${formatBytes(profile.maxSourceBytes)}.`
     );
   }
 
@@ -187,9 +187,7 @@ export async function validateUploadFile(
 
   // The declared type must agree with the actual bytes we detected.
   if (file.type && file.type !== detectedMime) {
-    throw new ImageValidationError(
-      'This file looks mislabelled. Please re-save it and try again.',
-    );
+    throw new ImageValidationError('This file looks mislabelled. Please re-save it and try again.');
   }
 
   return { detectedMime };
@@ -269,15 +267,14 @@ function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string, quality: numb
         else reject(new ImageValidationError('Image optimization failed. Please try again.'));
       },
       mimeType,
-      quality,
+      quality
     );
   });
 }
 
 function renameForMime(originalName: string, mimeType: string): string {
   const base = originalName.replace(/\.[^./\\]+$/, '') || 'image';
-  const extension =
-    mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
+  const extension = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
   return `${base}.${extension}`;
 }
 
@@ -291,7 +288,7 @@ function renameForMime(originalName: string, mimeType: string): string {
  */
 export async function optimizeImage(
   file: File,
-  profileName: ImageProfileName,
+  profileName: ImageProfileName
 ): Promise<OptimizedImage> {
   const profile = IMAGE_PROFILES[profileName];
   const { detectedMime } = await validateUploadFile(file, profileName);

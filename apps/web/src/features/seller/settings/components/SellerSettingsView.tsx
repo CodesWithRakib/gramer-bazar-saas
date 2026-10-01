@@ -80,8 +80,7 @@ export function SellerSettingsView({ lang = 'en' }: SellerSettingsViewProps) {
       id: 'reviews',
       title: 'Product Reviews & Replies',
       titleBn: 'পণ্য রিভিউ ও উত্তর',
-      description:
-        'Read customer ratings for your products and reply publicly to build trust.',
+      description: 'Read customer ratings for your products and reply publicly to build trust.',
       descriptionBn: 'গ্রাহকদের রেটিং দেখুন এবং বিশ্বাস বাড়াতে পাবলিক উত্তর দিন।',
       icon: Star,
       href: '/seller/reviews',

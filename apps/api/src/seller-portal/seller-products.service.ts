@@ -19,10 +19,7 @@ import { ProductImageService } from '../catalog/products/product-image.service.j
 import { CreateSellerProductDto } from './dto/create-seller-product.dto.js';
 import { UpdateSellerProductDto } from './dto/update-seller-product.dto.js';
 import { SellerProductQueryDto } from './dto/seller-query.dto.js';
-import {
-  SellerProductDetailDto,
-  SellerProductListDto,
-} from './dto/seller-product-response.dto.js';
+import { SellerProductDetailDto, SellerProductListDto } from './dto/seller-product-response.dto.js';
 import { slugify, slugifyUnique } from '../common/utils/slug.js';
 
 /** Internal projection of a listing joined with everything the API returns. */
@@ -106,7 +103,10 @@ export class SellerProductsService {
   }
 
   /** Catalog/media writes are only allowed on products the shop itself created. */
-  private assertOwnsCatalogProduct(product: Product | null, shopId: string): asserts product is Product {
+  private assertOwnsCatalogProduct(
+    product: Product | null,
+    shopId: string,
+  ): asserts product is Product {
     if (!product || product.ownerShopId !== shopId) {
       throw new ForbiddenException(
         'This product belongs to the platform catalog. You can update your price and stock, but not its catalog details or images.',
@@ -250,7 +250,10 @@ export class SellerProductsService {
 
   // ------------------------------------------------------------------ reads
 
-  async listProducts(sellerId: string, query: SellerProductQueryDto): Promise<SellerProductListDto> {
+  async listProducts(
+    sellerId: string,
+    query: SellerProductQueryDto,
+  ): Promise<SellerProductListDto> {
     const shop = await this.getShopForSeller(sellerId);
     const page = Math.max(1, Number(query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(query.limit) || 20));
@@ -291,9 +294,13 @@ export class SellerProductsService {
     if (stock === 'OUT_OF_STOCK') {
       qb.andWhere('(inventory.quantity - inventory.reservedQuantity) <= 0');
     } else if (stock === 'LOW_STOCK') {
-      qb.andWhere('(inventory.quantity - inventory.reservedQuantity) <= inventory.lowStockThreshold');
+      qb.andWhere(
+        '(inventory.quantity - inventory.reservedQuantity) <= inventory.lowStockThreshold',
+      );
     } else if (stock === 'IN_STOCK') {
-      qb.andWhere('(inventory.quantity - inventory.reservedQuantity) > inventory.lowStockThreshold');
+      qb.andWhere(
+        '(inventory.quantity - inventory.reservedQuantity) > inventory.lowStockThreshold',
+      );
     }
 
     switch (query.sort) {
@@ -407,7 +414,10 @@ export class SellerProductsService {
 
   // ----------------------------------------------------------------- writes
 
-  async createProduct(sellerId: string, dto: CreateSellerProductDto): Promise<SellerProductDetailDto> {
+  async createProduct(
+    sellerId: string,
+    dto: CreateSellerProductDto,
+  ): Promise<SellerProductDetailDto> {
     const shop = await this.getShopForSeller(sellerId, true);
     this.validatePricing(dto.price, dto.discountPrice ?? null);
 
@@ -619,11 +629,7 @@ export class SellerProductsService {
           { id: product.id },
           { isActive: false, status: ProductStatus.ARCHIVED },
         );
-        await manager.update(
-          ProductVariant,
-          { id: listing.productVariantId },
-          { isActive: false },
-        );
+        await manager.update(ProductVariant, { id: listing.productVariantId }, { isActive: false });
       }
     });
 

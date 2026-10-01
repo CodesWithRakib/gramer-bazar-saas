@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/custom-toast';
 
 export default function BecomeARiderPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);

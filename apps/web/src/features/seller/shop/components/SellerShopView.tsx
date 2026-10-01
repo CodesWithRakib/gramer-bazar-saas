@@ -113,7 +113,7 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
 
   const uploadShopImage = async (
     files: File[],
-    mutation: (body: FormData) => { unwrap: () => Promise<unknown> },
+    mutation: (body: FormData) => { unwrap: () => Promise<unknown> }
   ) => {
     const formData = new FormData();
     formData.append('file', files[0]);
@@ -124,14 +124,14 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
     try {
       await updateShop(data).unwrap();
       toast.success(
-        isBn ? 'শপ প্রোফাইল সফলভাবে আপডেট করা হয়েছে' : 'Shop profile updated successfully',
+        isBn ? 'শপ প্রোফাইল সফলভাবে আপডেট করা হয়েছে' : 'Shop profile updated successfully'
       );
     } catch (error) {
       toast.error(
         getApiErrorMessage(
           error,
-          isBn ? 'শপ প্রোফাইল আপডেট করা যায়নি' : 'Failed to update shop profile',
-        ),
+          isBn ? 'শপ প্রোফাইল আপডেট করা যায়নি' : 'Failed to update shop profile'
+        )
       );
     }
   };
@@ -210,17 +210,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
         </Card>
         <Card className="col-span-2 sm:col-span-1">
           <CardContent className="pt-5">
-            <p className="text-muted-foreground text-xs">
-              {isBn ? 'শপ স্ট্যাটাস' : 'Shop status'}
-            </p>
+            <p className="text-muted-foreground text-xs">{isBn ? 'শপ স্ট্যাটাস' : 'Shop status'}</p>
             <p className="text-foreground mt-1 text-sm font-semibold">
-              {shop.isActive
-                ? isBn
-                  ? 'সক্রিয়'
-                  : 'Active'
-                : isBn
-                  ? 'নিষ্ক্রিয়'
-                  : 'Inactive'}
+              {shop.isActive ? (isBn ? 'সক্রিয়' : 'Active') : isBn ? 'নিষ্ক্রিয়' : 'Inactive'}
             </p>
           </CardContent>
         </Card>
@@ -314,7 +306,9 @@ export function SellerShopView({ lang = 'en' }: SellerShopViewProps) {
                     ) : (
                       <div className="text-muted-foreground/40 flex flex-col items-center gap-1">
                         <ImageIcon className="h-8 w-8" />
-                        <span className="text-xs">{isBn ? 'কোন ব্যানার নেই' : 'No banner set'}</span>
+                        <span className="text-xs">
+                          {isBn ? 'কোন ব্যানার নেই' : 'No banner set'}
+                        </span>
                       </div>
                     )}
                     {isUploadingBanner && (

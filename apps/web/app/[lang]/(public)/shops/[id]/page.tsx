@@ -40,7 +40,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/custom-toast';
 
 export default function ShopProfilePage({
   params,

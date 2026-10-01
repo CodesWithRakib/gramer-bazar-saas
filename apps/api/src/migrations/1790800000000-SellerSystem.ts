@@ -38,9 +38,7 @@ export class SellerSystem1790800000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "reviews" DROP COLUMN IF EXISTS "seller_replied_at"`,
-    );
+    await queryRunner.query(`ALTER TABLE "reviews" DROP COLUMN IF EXISTS "seller_replied_at"`);
     await queryRunner.query(`ALTER TABLE "reviews" DROP COLUMN IF EXISTS "seller_reply"`);
     await queryRunner.query(
       `ALTER TABLE "products" DROP CONSTRAINT IF EXISTS "FK_products_owner_shop_id"`,

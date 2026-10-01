@@ -137,7 +137,11 @@ export class SellerOrderDetailDto extends SellerOrderSummaryDto {
   @ApiPropertyOptional({ type: String, nullable: true, description: 'Assigned rider name' })
   riderName?: string | null;
 
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Assigned rider contact phone' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Assigned rider contact phone',
+  })
   riderPhone?: string | null;
 
   @ApiPropertyOptional({ type: String, nullable: true, description: 'Delivery status' })

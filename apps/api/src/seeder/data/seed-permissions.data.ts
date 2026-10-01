@@ -21,10 +21,19 @@ export const SEED_PERMISSIONS: SeedPermissionItem[] = [
   { name: 'users.read', description: 'View user accounts', group: 'Users' },
   { name: 'users.create', description: 'Create user accounts', group: 'Users' },
   { name: 'users.update', description: 'Update user profiles', group: 'Users' },
-  { name: 'users.delete', description: 'Deactivate or remove user accounts', group: 'Users', sensitive: true },
+  {
+    name: 'users.delete',
+    description: 'Deactivate or remove user accounts',
+    group: 'Users',
+    sensitive: true,
+  },
   { name: 'customers.read', description: 'View customer profiles and orders', group: 'Customers' },
   { name: 'customers.update', description: 'Update customer account details', group: 'Customers' },
-  { name: 'customers.suspend', description: 'Suspend or reactivate customer accounts', group: 'Customers' },
+  {
+    name: 'customers.suspend',
+    description: 'Suspend or reactivate customer accounts',
+    group: 'Customers',
+  },
 
   // Sellers & Shops
   { name: 'sellers.read', description: 'View sellers and their shops', group: 'Sellers' },
@@ -33,7 +42,11 @@ export const SEED_PERMISSIONS: SeedPermissionItem[] = [
   { name: 'sellers.reject', description: 'Reject seller applications', group: 'Sellers' },
   { name: 'sellers.suspend', description: 'Suspend or reactivate sellers', group: 'Sellers' },
   { name: 'shops.read', description: 'View merchant shops', group: 'Shops' },
-  { name: 'shops.update', description: 'Edit shop settings and operational status', group: 'Shops' },
+  {
+    name: 'shops.update',
+    description: 'Edit shop settings and operational status',
+    group: 'Shops',
+  },
   { name: 'shops.delete', description: 'Remove merchant shops', group: 'Shops', sensitive: true },
 
   // Riders
@@ -50,7 +63,11 @@ export const SEED_PERMISSIONS: SeedPermissionItem[] = [
   { name: 'products.delete', description: 'Delete or archive catalog products', group: 'Products' },
   { name: 'categories.read', description: 'View catalog categories', group: 'Categories' },
   { name: 'categories.create', description: 'Create new categories', group: 'Categories' },
-  { name: 'categories.update', description: 'Modify category details and tree', group: 'Categories' },
+  {
+    name: 'categories.update',
+    description: 'Modify category details and tree',
+    group: 'Categories',
+  },
   { name: 'categories.delete', description: 'Remove catalog categories', group: 'Categories' },
   { name: 'brands.read', description: 'View product brands', group: 'Brands' },
   { name: 'brands.create', description: 'Create new product brands', group: 'Brands' },
@@ -64,31 +81,91 @@ export const SEED_PERMISSIONS: SeedPermissionItem[] = [
   { name: 'orders.update', description: 'Update order status and fulfillment', group: 'Orders' },
   { name: 'orders.cancel', description: 'Cancel pending or disputed orders', group: 'Orders' },
   { name: 'deliveries.read', description: 'View delivery fleet assignments', group: 'Deliveries' },
-  { name: 'deliveries.update', description: 'Update delivery status and assignments', group: 'Deliveries' },
-  { name: 'payments.read', description: 'View payment transactions and gateways', group: 'Payments' },
-  { name: 'payments.refund', description: 'Initiate order refund transactions', group: 'Payments', sensitive: true },
+  {
+    name: 'deliveries.update',
+    description: 'Update delivery status and assignments',
+    group: 'Deliveries',
+  },
+  {
+    name: 'payments.read',
+    description: 'View payment transactions and gateways',
+    group: 'Payments',
+  },
+  {
+    name: 'payments.refund',
+    description: 'Initiate order refund transactions',
+    group: 'Payments',
+    sensitive: true,
+  },
 
   // Finance
   { name: 'payouts.read', description: 'View seller and rider payout requests', group: 'Payouts' },
   { name: 'payouts.request', description: 'Request an earnings payout', group: 'Payouts' },
-  { name: 'payouts.approve', description: 'Approve payout requests', group: 'Payouts', sensitive: true },
-  { name: 'payouts.reject', description: 'Reject payout requests', group: 'Payouts', sensitive: true },
+  {
+    name: 'payouts.approve',
+    description: 'Approve payout requests',
+    group: 'Payouts',
+    sensitive: true,
+  },
+  {
+    name: 'payouts.reject',
+    description: 'Reject payout requests',
+    group: 'Payouts',
+    sensitive: true,
+  },
   { name: 'wallets.read', description: 'View balance and transaction ledger', group: 'Wallets' },
-  { name: 'wallets.manage', description: 'Adjust or audit wallet balances', group: 'Wallets', sensitive: true },
+  {
+    name: 'wallets.manage',
+    description: 'Adjust or audit wallet balances',
+    group: 'Wallets',
+    sensitive: true,
+  },
 
   // Applications
-  { name: 'seller_applications.submit', description: 'Submit a merchant partnership application', group: 'Applications' },
-  { name: 'seller_applications.read', description: 'View seller applications', group: 'Applications' },
-  { name: 'seller_applications.review', description: 'Approve or reject seller applications', group: 'Applications' },
-  { name: 'rider_applications.submit', description: 'Submit a delivery fleet application', group: 'Applications' },
-  { name: 'rider_applications.read', description: 'View rider applications', group: 'Applications' },
-  { name: 'rider_applications.review', description: 'Approve or reject rider applications', group: 'Applications' },
+  {
+    name: 'seller_applications.submit',
+    description: 'Submit a merchant partnership application',
+    group: 'Applications',
+  },
+  {
+    name: 'seller_applications.read',
+    description: 'View seller applications',
+    group: 'Applications',
+  },
+  {
+    name: 'seller_applications.review',
+    description: 'Approve or reject seller applications',
+    group: 'Applications',
+  },
+  {
+    name: 'rider_applications.submit',
+    description: 'Submit a delivery fleet application',
+    group: 'Applications',
+  },
+  {
+    name: 'rider_applications.read',
+    description: 'View rider applications',
+    group: 'Applications',
+  },
+  {
+    name: 'rider_applications.review',
+    description: 'Approve or reject rider applications',
+    group: 'Applications',
+  },
 
   // Disputes & Reviews
   { name: 'disputes.read', description: 'View dispute tickets and messages', group: 'Disputes' },
-  { name: 'disputes.resolve', description: 'Adjudicate disputes with refund or rejection', group: 'Disputes' },
+  {
+    name: 'disputes.resolve',
+    description: 'Adjudicate disputes with refund or rejection',
+    group: 'Disputes',
+  },
   { name: 'reviews.read', description: 'Read customer reviews', group: 'Reviews' },
-  { name: 'reviews.moderate', description: 'Moderate or remove inappropriate reviews', group: 'Reviews' },
+  {
+    name: 'reviews.moderate',
+    description: 'Moderate or remove inappropriate reviews',
+    group: 'Reviews',
+  },
 
   // Promotions
   { name: 'coupons.read', description: 'View promotional coupons', group: 'Coupons' },
@@ -101,21 +178,68 @@ export const SEED_PERMISSIONS: SeedPermissionItem[] = [
   { name: 'offers.delete', description: 'Remove banners and flash-sale offers', group: 'Offers' },
 
   // Product sourcing requests
-  { name: 'product_requests.read', description: 'View product sourcing requests', group: 'Product Requests' },
-  { name: 'product_requests.manage', description: 'Review and source requested products', group: 'Product Requests' },
+  {
+    name: 'product_requests.read',
+    description: 'View product sourcing requests',
+    group: 'Product Requests',
+  },
+  {
+    name: 'product_requests.manage',
+    description: 'Review and source requested products',
+    group: 'Product Requests',
+  },
 
   // Platform governance (Super Admin)
-  { name: 'admins.read', description: 'View administrative accounts and their permissions', group: 'Admin Management', sensitive: true },
-  { name: 'admins.create', description: 'Create administrative accounts', group: 'Admin Management', sensitive: true },
-  { name: 'admins.update', description: 'Edit administrative accounts', group: 'Admin Management', sensitive: true },
-  { name: 'admins.delete', description: 'Deactivate or remove administrative accounts', group: 'Admin Management', sensitive: true },
-  { name: 'roles.manage', description: 'Manage roles and role permissions', group: 'Admin Management', sensitive: true },
+  {
+    name: 'admins.read',
+    description: 'View administrative accounts and their permissions',
+    group: 'Admin Management',
+    sensitive: true,
+  },
+  {
+    name: 'admins.create',
+    description: 'Create administrative accounts',
+    group: 'Admin Management',
+    sensitive: true,
+  },
+  {
+    name: 'admins.update',
+    description: 'Edit administrative accounts',
+    group: 'Admin Management',
+    sensitive: true,
+  },
+  {
+    name: 'admins.delete',
+    description: 'Deactivate or remove administrative accounts',
+    group: 'Admin Management',
+    sensitive: true,
+  },
+  {
+    name: 'roles.manage',
+    description: 'Manage roles and role permissions',
+    group: 'Admin Management',
+    sensitive: true,
+  },
   { name: 'audit_logs.read', description: 'Read administrative audit logs', group: 'Audit Logs' },
   { name: 'reports.read', description: 'View platform operational reports', group: 'Reports' },
-  { name: 'notifications.read', description: 'View platform notifications', group: 'Notifications' },
-  { name: 'notifications.manage', description: 'Send platform notifications', group: 'Notifications', sensitive: true },
+  {
+    name: 'notifications.read',
+    description: 'View platform notifications',
+    group: 'Notifications',
+  },
+  {
+    name: 'notifications.manage',
+    description: 'Send platform notifications',
+    group: 'Notifications',
+    sensitive: true,
+  },
   { name: 'settings.read', description: 'View platform settings', group: 'Settings' },
-  { name: 'settings.update', description: 'Update platform settings', group: 'Settings', sensitive: true },
+  {
+    name: 'settings.update',
+    description: 'Update platform settings',
+    group: 'Settings',
+    sensitive: true,
+  },
 ];
 
 /**
@@ -235,6 +359,6 @@ export const ROLE_PERMISSION_NAMES: Record<Role, string[]> = {
 };
 
 /** Permissions that a Super Admin should treat as system-critical. */
-export const SENSITIVE_PERMISSION_NAMES: string[] = SEED_PERMISSIONS.filter(
-  (p) => p.sensitive,
-).map((p) => p.name);
+export const SENSITIVE_PERMISSION_NAMES: string[] = SEED_PERMISSIONS.filter((p) => p.sensitive).map(
+  (p) => p.name,
+);

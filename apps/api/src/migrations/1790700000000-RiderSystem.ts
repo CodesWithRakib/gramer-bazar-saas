@@ -73,10 +73,10 @@ export class RiderSystem1790700000000 implements MigrationInterface {
     );
 
     // Payout requests become multi-actor: seller OR rider.
+    await queryRunner.query(`ALTER TABLE "payout_requests" ALTER COLUMN "seller_id" DROP NOT NULL`);
     await queryRunner.query(
-      `ALTER TABLE "payout_requests" ALTER COLUMN "seller_id" DROP NOT NULL`,
+      `ALTER TABLE "payout_requests" ADD COLUMN IF NOT EXISTS "rider_id" uuid`,
     );
-    await queryRunner.query(`ALTER TABLE "payout_requests" ADD COLUMN IF NOT EXISTS "rider_id" uuid`);
     await queryRunner.query(
       `CREATE INDEX IF NOT EXISTS "idx_payout_requests_rider_id" ON "payout_requests" ("rider_id")`,
     );
@@ -89,9 +89,7 @@ export class RiderSystem1790700000000 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_payout_requests_seller_id"`);
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_payout_requests_rider_id"`);
     await queryRunner.query(`ALTER TABLE "payout_requests" DROP COLUMN IF EXISTS "rider_id"`);
-    await queryRunner.query(
-      `DROP INDEX IF EXISTS "idx_rider_earnings_created_at"`,
-    );
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_rider_earnings_created_at"`);
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_rider_earnings_status"`);
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_rider_earnings_rider_id"`);
     await queryRunner.query(`DROP TABLE IF EXISTS "rider_earnings"`);

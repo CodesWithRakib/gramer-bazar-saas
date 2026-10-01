@@ -83,7 +83,9 @@ export function RiderPayoutsView({ lang = 'en' }: RiderPayoutsViewProps) {
     }
     if (parsed < MIN_PAYOUT) {
       setFormError(
-        isBn ? `সর্বনিম্ন পে-আউট ${currency(MIN_PAYOUT)}` : `Minimum payout is ${currency(MIN_PAYOUT)}`
+        isBn
+          ? `সর্বনিম্ন পে-আউট ${currency(MIN_PAYOUT)}`
+          : `Minimum payout is ${currency(MIN_PAYOUT)}`
       );
       return;
     }
@@ -102,7 +104,11 @@ export function RiderPayoutsView({ lang = 'en' }: RiderPayoutsViewProps) {
 
     setFormError(null);
     try {
-      await requestPayout({ amount: parsed, method, accountDetails: accountDetails.trim() }).unwrap();
+      await requestPayout({
+        amount: parsed,
+        method,
+        accountDetails: accountDetails.trim(),
+      }).unwrap();
       toast.success(isBn ? 'পে-আউট অনুরোধ পাঠানো হয়েছে' : 'Payout request submitted');
       setDialogOpen(false);
       setAmount('');
@@ -163,9 +169,7 @@ export function RiderPayoutsView({ lang = 'en' }: RiderPayoutsViewProps) {
           <p className="text-3xl font-bold tracking-tight text-foreground">{currency(available)}</p>
           <div className="grid grid-cols-2 gap-3 border-t border-border pt-3 text-sm">
             <div>
-              <p className="text-xs text-muted-foreground">
-                {isBn ? 'পেন্ডিং' : 'Pending'}
-              </p>
+              <p className="text-xs text-muted-foreground">{isBn ? 'পেন্ডিং' : 'Pending'}</p>
               <p className="font-semibold text-foreground">
                 {currency(summary?.pendingPayout ?? 0)}
               </p>
@@ -216,9 +220,7 @@ export function RiderPayoutsView({ lang = 'en' }: RiderPayoutsViewProps) {
               {payouts.map((payout) => (
                 <li key={payout.id} className="space-y-1.5 px-4 py-3.5">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold text-foreground">
-                      {currency(payout.amount)}
-                    </span>
+                    <span className="font-semibold text-foreground">{currency(payout.amount)}</span>
                     <Badge className={`text-[10px] uppercase ${statusStyles[payout.status]}`}>
                       {payout.status}
                     </Badge>
@@ -293,7 +295,9 @@ export function RiderPayoutsView({ lang = 'en' }: RiderPayoutsViewProps) {
                 id="payout-account"
                 value={accountDetails}
                 onChange={(event) => setAccountDetails(event.target.value)}
-                placeholder={method === 'BANK_TRANSFER' ? 'Bank, A/C number' : 'bKash Personal: 017...'}
+                placeholder={
+                  method === 'BANK_TRANSFER' ? 'Bank, A/C number' : 'bKash Personal: 017...'
+                }
                 className="h-11"
               />
             </div>
@@ -305,7 +309,13 @@ export function RiderPayoutsView({ lang = 'en' }: RiderPayoutsViewProps) {
               {isBn ? 'বাতিল' : 'Cancel'}
             </Button>
             <Button onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? (isBn ? 'পাঠানো হচ্ছে...' : 'Submitting...') : isBn ? 'জমা দিন' : 'Submit'}
+              {isSubmitting
+                ? isBn
+                  ? 'পাঠানো হচ্ছে...'
+                  : 'Submitting...'
+                : isBn
+                  ? 'জমা দিন'
+                  : 'Submit'}
             </Button>
           </DialogFooter>
         </DialogContent>

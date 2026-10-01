@@ -133,7 +133,9 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
               </span>
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{isBn ? 'নতুন সদস্য অফার • স্বাগতম বোনাস' : 'New Member Perks • Welcome Bonus'}</span>
+              <span>
+                {isBn ? 'নতুন সদস্য অফার • স্বাগতম বোনাস' : 'New Member Perks • Welcome Bonus'}
+              </span>
             </span>
           </div>
 
@@ -157,7 +159,9 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                   {isBn ? 'প্রথম অর্ডারে বিশেষ ছাড়' : 'First Order Special'}
                 </span>
                 <p className="text-sm font-bold text-white">
-                  {isBn ? 'নিশ্চিত ৫০ টাকা ছাড় পেতে ব্যবহার করুন' : 'Get ৳50 Instant Discount with code'}
+                  {isBn
+                    ? 'নিশ্চিত ৫০ টাকা ছাড় পেতে ব্যবহার করুন'
+                    : 'Get ৳50 Instant Discount with code'}
                 </p>
               </div>
               <div className="px-3 py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs tracking-wider border border-emerald-300 shrink-0">
@@ -171,22 +175,34 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
             <div className="grid grid-cols-3 gap-3">
               <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
                 <p className="text-base sm:text-lg font-black text-emerald-300">১০০% খাঁটি</p>
-                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'রাসায়নিকমুক্ত' : 'Chemical-Free'}</p>
+                <p className="text-[11px] text-white/80 font-medium">
+                  {isBn ? 'রাসায়নিকমুক্ত' : 'Chemical-Free'}
+                </p>
               </div>
               <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
-                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'ন্যায্য মূল্য' : 'Fair Price'}</p>
-                <p className="text-[11px] text-white/80 font-medium">{isBn ? 'মধ্যস্বত্বভোগীহীন' : 'Zero Middlemen'}</p>
+                <p className="text-base sm:text-lg font-black text-white">
+                  {isBn ? 'ন্যায্য মূল্য' : 'Fair Price'}
+                </p>
+                <p className="text-[11px] text-white/80 font-medium">
+                  {isBn ? 'মধ্যস্বত্বভোগীহীন' : 'Zero Middlemen'}
+                </p>
               </div>
               <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center space-y-0.5">
-                <p className="text-base sm:text-lg font-black text-white">{isBn ? 'সহজ রিটার্ন' : 'Easy Return'}</p>
-                <p className="text-[11px] text-white/80 font-medium">{isBn ? '১০০% সন্তুষ্টি' : '100% Satisfaction'}</p>
+                <p className="text-base sm:text-lg font-black text-white">
+                  {isBn ? 'সহজ রিটার্ন' : 'Easy Return'}
+                </p>
+                <p className="text-[11px] text-white/80 font-medium">
+                  {isBn ? '১০০% সন্তুষ্টি' : '100% Satisfaction'}
+                </p>
               </div>
             </div>
 
             {/* Testimonial Banner */}
             <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-between text-xs text-white/90">
               <span className="font-semibold">
-                {isBn ? 'দিনাজপুর ও উত্তরাঞ্চলের শীর্ষ প্রশংসিত মার্কেটপ্লেস' : 'Top rated rural marketplace in Dinajpur'}
+                {isBn
+                  ? 'দিনাজপুর ও উত্তরাঞ্চলের শীর্ষ প্রশংসিত মার্কেটপ্লেস'
+                  : 'Top rated rural marketplace in Dinajpur'}
               </span>
               <span className="text-amber-300 font-bold tracking-wider">৪.৯ ★★★★★</span>
             </div>
@@ -308,7 +324,8 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                   </Label>
                   {formData.password && (
                     <span className="text-[11px] font-semibold text-muted-foreground">
-                      {isBn ? 'শক্তি:' : 'Strength:'} <span className="text-foreground">{passwordStrength.label}</span>
+                      {isBn ? 'শক্তি:' : 'Strength:'}{' '}
+                      <span className="text-foreground">{passwordStrength.label}</span>
                     </span>
                   )}
                 </div>
@@ -341,9 +358,7 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                       <div
                         key={step}
                         className={`h-1.5 rounded-full transition-all duration-300 ${
-                          passwordStrength.score >= step
-                            ? passwordStrength.color
-                            : 'bg-muted'
+                          passwordStrength.score >= step ? passwordStrength.color : 'bg-muted'
                         }`}
                       />
                     ))}
@@ -351,7 +366,9 @@ export default function RegisterPage({ params }: { params: Promise<{ lang: strin
                 )}
 
                 <p className="text-[11px] text-muted-foreground">
-                  {isBn ? 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন (সংখ্যা বা অক্ষরের মিশ্রণ)' : 'Must be at least 6 characters (mix letters & numbers)'}
+                  {isBn
+                    ? 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন (সংখ্যা বা অক্ষরের মিশ্রণ)'
+                    : 'Must be at least 6 characters (mix letters & numbers)'}
                 </p>
               </div>
 

@@ -58,9 +58,7 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
     const term = search.trim().toLowerCase();
     return transactions.filter((tx: WalletTransaction) => {
       const matchesSearch =
-        !term ||
-        tx.description.toLowerCase().includes(term) ||
-        String(tx.amount).includes(term);
+        !term || tx.description.toLowerCase().includes(term) || String(tx.amount).includes(term);
       const matchesType = typeFilter === 'ALL' || tx.type === typeFilter;
       return matchesSearch && matchesType;
     });
@@ -217,7 +215,9 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                   <SelectItem value="CREDIT">
                     {isBn ? 'ক্রেডিট (আয়)' : 'Credit (income)'}
                   </SelectItem>
-                  <SelectItem value="DEBIT">{isBn ? 'ডেবিট (ব্যয়)' : 'Debit (expense)'}</SelectItem>
+                  <SelectItem value="DEBIT">
+                    {isBn ? 'ডেবিট (ব্যয়)' : 'Debit (expense)'}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -246,9 +246,7 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                   <TableRow>
                     <TableCell colSpan={4} className="py-10 text-center">
                       <p className="text-muted-foreground mb-3 text-sm">
-                        {isBn
-                          ? 'লেনদেন তথ্য আনা যায়নি।'
-                          : 'Could not load transactions.'}
+                        {isBn ? 'লেনদেন তথ্য আনা যায়নি।' : 'Could not load transactions.'}
                       </p>
                       <Button variant="outline" size="sm" onClick={() => void refetchTx()}>
                         {isBn ? 'আবার চেষ্টা করুন' : 'Retry'}
@@ -308,8 +306,12 @@ export function SellerWalletView({ lang = 'en' }: SellerWalletViewProps) {
                           }
                         >
                           {tx.type === 'CREDIT'
-                            ? isBn ? 'আয়' : 'Credit'
-                            : isBn ? 'ব্যয়' : 'Debit'}
+                            ? isBn
+                              ? 'আয়'
+                              : 'Credit'
+                            : isBn
+                              ? 'ব্যয়'
+                              : 'Debit'}
                         </Badge>
                       </TableCell>
                       <TableCell

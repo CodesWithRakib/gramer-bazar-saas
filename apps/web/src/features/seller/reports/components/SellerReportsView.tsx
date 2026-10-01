@@ -57,11 +57,7 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
     package: <Package className="h-4 w-4" />,
   });
 
-  const metric = (
-    label: string,
-    value: string,
-    key: keyof ReturnType<typeof icons>,
-  ) => (
+  const metric = (label: string, value: string, key: keyof ReturnType<typeof icons>) => (
     <Card key={label}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-muted-foreground text-xs font-medium">{label}</CardTitle>
@@ -161,17 +157,18 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
           ) : (
             <div className="h-[260px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={revenueTrend}
-                  margin={{ top: 8, right: 8, left: -8, bottom: 0 }}
-                >
+                <AreaChart data={revenueTrend} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
                   <defs>
                     <linearGradient id="sellerReportFill" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
                       <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                    vertical={false}
+                  />
                   <XAxis
                     dataKey="date"
                     stroke="hsl(var(--muted-foreground))"
@@ -224,8 +221,14 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <StatRow label={isBn ? 'আজ' : 'Today'} value={formatNumber(orders.today)} />
-              <StatRow label={isBn ? 'এই মাসে' : 'This month'} value={formatNumber(orders.thisMonth)} />
-              <StatRow label={isBn ? 'সর্বমোট' : 'Lifetime'} value={formatNumber(orders.lifetime)} />
+              <StatRow
+                label={isBn ? 'এই মাসে' : 'This month'}
+                value={formatNumber(orders.thisMonth)}
+              />
+              <StatRow
+                label={isBn ? 'সর্বমোট' : 'Lifetime'}
+                value={formatNumber(orders.lifetime)}
+              />
               <StatRow
                 label={isBn ? 'কার্যক্রম প্রয়োজন' : 'Awaiting action'}
                 value={formatNumber(orders.awaitingAction)}
@@ -234,7 +237,10 @@ export function SellerReportsView({ lang = 'en' }: SellerReportsViewProps) {
                 label={isBn ? 'সম্পন্ন' : 'Completed'}
                 value={formatNumber(orders.completed)}
               />
-              <StatRow label={isBn ? 'বাতিল' : 'Cancelled'} value={formatNumber(orders.cancelled)} />
+              <StatRow
+                label={isBn ? 'বাতিল' : 'Cancelled'}
+                value={formatNumber(orders.cancelled)}
+              />
             </div>
 
             {orders.statusDistribution.length > 0 && (

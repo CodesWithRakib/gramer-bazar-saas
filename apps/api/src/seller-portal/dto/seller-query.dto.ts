@@ -68,7 +68,9 @@ export class SellerOrderQueryDto extends SellerPaginationQueryDto {
   @IsIn(Object.values(OrderStatus))
   status?: OrderStatus;
 
-  @ApiPropertyOptional({ description: 'Only orders awaiting action (PENDING/CONFIRMED/PROCESSING)' })
+  @ApiPropertyOptional({
+    description: 'Only orders awaiting action (PENDING/CONFIRMED/PROCESSING)',
+  })
   @IsOptional()
   @IsBooleanString()
   needsAction?: string;

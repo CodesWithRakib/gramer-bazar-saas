@@ -29,7 +29,12 @@ export function RiderDeliveriesView({ lang = 'en' }: RiderDeliveriesViewProps) {
   const isBn = lang === 'bn';
   const [tab, setTab] = useState<TabKey>('new');
 
-  const { data: deliveries, isLoading, isError, refetch } = useGetRiderDeliveriesQuery(undefined, {
+  const {
+    data: deliveries,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetRiderDeliveriesQuery(undefined, {
     pollingInterval: 30000,
   });
 

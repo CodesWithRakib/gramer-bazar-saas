@@ -5,11 +5,7 @@ import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSocket } from '@/lib/socket';
 import { notificationsApi, useMarkAsReadMutation } from '@/features/notifications/notificationsApi';
-import {
-  AppNotification,
-  NotificationPriority,
-  RealtimeNotificationPayload,
-} from '@/types/notifications';
+import { NotificationPriority, RealtimeNotificationPayload } from '@/types/notifications';
 import { showNotificationToast } from '@/components/ui/NotificationToast';
 import { playNotificationSound } from '@/lib/notification-sound';
 

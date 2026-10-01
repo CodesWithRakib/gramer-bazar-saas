@@ -18,10 +18,7 @@ import {
   useAddSellerDisputeMessageMutation,
   useGetSellerDisputeDetailsQuery,
 } from '@/features/disputes/disputesApi';
-import {
-  getDisputeReasonLabel,
-  getDisputeStatusMeta,
-} from '@/features/disputes/dispute-display';
+import { getDisputeReasonLabel, getDisputeStatusMeta } from '@/features/disputes/dispute-display';
 import { RootState } from '@/store/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,13 +37,7 @@ export interface SellerDisputeDetailsViewProps {
 
 export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetailsViewProps) {
   const isBn = lang === 'bn';
-  const {
-    data: dispute,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetSellerDisputeDetailsQuery(id);
+  const { data: dispute, isLoading, isError, error, refetch } = useGetSellerDisputeDetailsQuery(id);
   const [addMessage, { isLoading: isSending }] = useAddSellerDisputeMessageMutation();
   const [message, setMessage] = useState('');
 
@@ -63,8 +54,8 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
       toast.error(
         getApiErrorMessage(
           err,
-          isBn ? 'বার্তা পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Failed to send message.',
-        ),
+          isBn ? 'বার্তা পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Failed to send message.'
+        )
       );
     }
   };
@@ -184,17 +175,13 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-muted-foreground">{isBn ? 'কারণ' : 'Reason'}</span>
-              <span className="font-medium">
-                {getDisputeReasonLabel(dispute.reason, isBn)}
-              </span>
+              <span className="font-medium">{getDisputeReasonLabel(dispute.reason, isBn)}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-muted-foreground">
                 {isBn ? 'অভিযোগের তারিখ' : 'Claim opened'}
               </span>
-              <span className="text-xs font-medium">
-                {formatDateTime(dispute.createdAt, lang)}
-              </span>
+              <span className="text-xs font-medium">{formatDateTime(dispute.createdAt, lang)}</span>
             </div>
             <Button asChild variant="outline" size="sm" className="mt-1 w-full">
               <Link href={`/${lang}/seller/orders/${dispute.orderId}`}>

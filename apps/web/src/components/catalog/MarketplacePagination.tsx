@@ -2,7 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  MoreHorizontal,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatNumber } from '@/lib/format';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -118,7 +124,9 @@ export function MarketplacePagination({
           <span>
             {isBn ? (
               <>
-                মোট <strong className="text-foreground">{formatNumber(safeTotalItems, lang)}</strong> টি পণ্যের মধ্যে{' '}
+                মোট{' '}
+                <strong className="text-foreground">{formatNumber(safeTotalItems, lang)}</strong> টি
+                পণ্যের মধ্যে{' '}
                 <strong className="text-foreground">
                   {formatNumber(from, lang)}–{formatNumber(to, lang)}
                 </strong>{' '}
@@ -126,8 +134,11 @@ export function MarketplacePagination({
               </>
             ) : (
               <>
-                Showing <strong className="text-foreground">{from}–{to}</strong> of{' '}
-                <strong className="text-foreground">{safeTotalItems}</strong> products
+                Showing{' '}
+                <strong className="text-foreground">
+                  {from}–{to}
+                </strong>{' '}
+                of <strong className="text-foreground">{safeTotalItems}</strong> products
               </>
             )}
           </span>

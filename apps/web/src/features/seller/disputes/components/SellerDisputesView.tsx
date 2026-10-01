@@ -14,10 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/common/PageHeader';
-import {
-  getDisputeReasonLabel,
-  getDisputeStatusMeta,
-} from '@/features/disputes/dispute-display';
+import { getDisputeReasonLabel, getDisputeStatusMeta } from '@/features/disputes/dispute-display';
 import { formatDate } from '@/lib/format';
 import AdminPagination from '@/components/AdminPagination';
 
@@ -236,10 +233,7 @@ export function SellerDisputesView({ lang = 'en' }: SellerDisputesViewProps) {
                   </tr>
                 ) : (
                   paginatedDisputes.map((dispute) => (
-                    <tr
-                      key={dispute.id}
-                      className="hover:bg-muted/30 transition-colors"
-                    >
+                    <tr key={dispute.id} className="hover:bg-muted/30 transition-colors">
                       <td className="py-3.5 px-4 font-mono text-xs font-semibold text-foreground">
                         {dispute.orderId.slice(0, 8)}...
                       </td>

@@ -221,7 +221,9 @@ export class AdminsService {
     this.assertCanManageTarget(caller, target);
 
     if (isSuperAdmin(target)) {
-      throw new ForbiddenException('Super Admin permissions are system-defined and cannot be edited');
+      throw new ForbiddenException(
+        'Super Admin permissions are system-defined and cannot be edited',
+      );
     }
 
     this.assertCanGrantPermissions(caller, dto.permissions);
@@ -351,11 +353,7 @@ export class AdminsService {
     }
   }
 
-  private assertNotSelf(
-    caller: { id: string },
-    target: User,
-    message: string,
-  ): void {
+  private assertNotSelf(caller: { id: string }, target: User, message: string): void {
     if (caller.id === target.id) {
       throw new ForbiddenException(message);
     }

@@ -2,16 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { customToast as toast } from '@/components/ui/custom-toast';
-import {
-  Calendar,
-  Edit,
-  Plus,
-  Search,
-  Ticket,
-  Trash2,
-  Users,
-  X,
-} from 'lucide-react';
+import { Calendar, Edit, Plus, Search, Ticket, Trash2, Users, X } from 'lucide-react';
 
 import { getApiErrorMessage } from '@/lib/apiError';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
@@ -83,7 +74,7 @@ function toLocalInput(iso: string | null | undefined): string {
   if (Number.isNaN(date.getTime())) return '';
   const pad = (value: number) => String(value).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
-    date.getHours(),
+    date.getHours()
   )}:${pad(date.getMinutes())}`;
 }
 
@@ -96,12 +87,7 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
   const { input: searchInput, term: search, onInputChange } = useDebouncedSearch();
 
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetSellerCouponsQuery({
+  const { data, isLoading, isError, refetch } = useGetSellerCouponsQuery({
     page,
     limit,
     search: search.trim() || undefined,
@@ -154,7 +140,7 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
       toast.success(isBn ? 'স্ট্যাটাস আপডেট হয়েছে' : 'Status updated');
     } catch (error) {
       toast.error(
-        getApiErrorMessage(error, isBn ? 'আপডেট ব্যর্থ হয়েছে' : 'Could not update the status'),
+        getApiErrorMessage(error, isBn ? 'আপডেট ব্যর্থ হয়েছে' : 'Could not update the status')
       );
     }
   };
@@ -166,7 +152,7 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
       toast.success(isBn ? 'কুপন মুছে ফেলা হয়েছে' : 'Coupon deleted');
     } catch (error) {
       toast.error(
-        getApiErrorMessage(error, isBn ? 'মুছতে ব্যর্থ হয়েছে' : 'Could not delete the coupon'),
+        getApiErrorMessage(error, isBn ? 'মুছতে ব্যর্থ হয়েছে' : 'Could not delete the coupon')
       );
     } finally {
       setCouponToDelete(null);
@@ -282,7 +268,9 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="coupon-value">{isBn ? 'ডিসকাউন্ট মূল্য' : 'Discount value'}</Label>
+                    <Label htmlFor="coupon-value">
+                      {isBn ? 'ডিসকাউন্ট মূল্য' : 'Discount value'}
+                    </Label>
                     <Input
                       id="coupon-value"
                       type="number"
@@ -490,7 +478,11 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
               ) : coupons.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center">
-                    <EmptyCouponCell hasFilters={hasFilters} isBn={isBn} onClear={handleOpenCreateModal} />
+                    <EmptyCouponCell
+                      hasFilters={hasFilters}
+                      isBn={isBn}
+                      onClear={handleOpenCreateModal}
+                    />
                   </td>
                 </tr>
               ) : (
@@ -547,7 +539,15 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
                         />
                         <StatusBadge
                           tone={coupon.isActive ? 'success' : 'neutral'}
-                          label={coupon.isActive ? (isBn ? 'সক্রিয়' : 'Active') : isBn ? 'নিষ্ক্রিয়' : 'Inactive'}
+                          label={
+                            coupon.isActive
+                              ? isBn
+                                ? 'সক্রিয়'
+                                : 'Active'
+                              : isBn
+                                ? 'নিষ্ক্রিয়'
+                                : 'Inactive'
+                          }
                         />
                       </div>
                     </td>
@@ -600,11 +600,18 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
             </div>
           ) : coupons.length === 0 ? (
             <div className="border-border rounded-lg border p-6 text-center">
-              <EmptyCouponCell hasFilters={hasFilters} isBn={isBn} onClear={handleOpenCreateModal} />
+              <EmptyCouponCell
+                hasFilters={hasFilters}
+                isBn={isBn}
+                onClear={handleOpenCreateModal}
+              />
             </div>
           ) : (
             coupons.map((coupon) => (
-              <div key={coupon.id} className="border-border bg-card space-y-3 rounded-lg border p-4">
+              <div
+                key={coupon.id}
+                className="border-border bg-card space-y-3 rounded-lg border p-4"
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-primary truncate font-mono font-bold">{coupon.code}</p>
@@ -619,7 +626,15 @@ export function SellerCouponsView({ lang = 'en' }: SellerCouponsViewProps) {
                   </div>
                   <StatusBadge
                     tone={coupon.isActive ? 'success' : 'neutral'}
-                    label={coupon.isActive ? (isBn ? 'সক্রিয়' : 'Active') : isBn ? 'নিষ্ক্রিয়' : 'Inactive'}
+                    label={
+                      coupon.isActive
+                        ? isBn
+                          ? 'সক্রিয়'
+                          : 'Active'
+                        : isBn
+                          ? 'নিষ্ক্রিয়'
+                          : 'Inactive'
+                    }
                   />
                 </div>
 

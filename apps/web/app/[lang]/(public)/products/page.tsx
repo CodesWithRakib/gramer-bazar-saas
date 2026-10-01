@@ -87,7 +87,10 @@ function ProductsPageContent({ lang }: { lang: string }) {
   const activePage = meta?.page !== undefined ? Number(meta.page) : page;
   const activeLimit = meta?.limit !== undefined ? Number(meta.limit) : limit;
   const activeTotal = meta?.total !== undefined ? Number(meta.total) : 0;
-  const activeTotalPages = meta?.totalPages !== undefined ? Number(meta.totalPages) : Math.ceil(activeTotal / activeLimit) || 1;
+  const activeTotalPages =
+    meta?.totalPages !== undefined
+      ? Number(meta.totalPages)
+      : Math.ceil(activeTotal / activeLimit) || 1;
 
   // Build clean page URL for native Next.js link navigation
   const createPageUrl = (targetPage: number) => {
@@ -192,16 +195,26 @@ function ProductsPageContent({ lang }: { lang: string }) {
                 <div className="text-xs text-muted-foreground hidden sm:block font-medium">
                   {isBn ? (
                     <>
-                      মোট <strong className="text-foreground">{formatNumber(activeTotal, lang)}</strong> টি পণ্যের মধ্যে{' '}
+                      মোট{' '}
+                      <strong className="text-foreground">{formatNumber(activeTotal, lang)}</strong>{' '}
+                      টি পণ্যের মধ্যে{' '}
                       <strong className="text-foreground">
-                        {formatNumber(Math.min((activePage - 1) * activeLimit + 1, activeTotal), lang)}–{formatNumber(Math.min(activePage * activeLimit, activeTotal), lang)}
+                        {formatNumber(
+                          Math.min((activePage - 1) * activeLimit + 1, activeTotal),
+                          lang
+                        )}
+                        –{formatNumber(Math.min(activePage * activeLimit, activeTotal), lang)}
                       </strong>{' '}
                       দেখানো হচ্ছে
                     </>
                   ) : (
                     <>
-                      Showing <strong className="text-foreground">{Math.min((activePage - 1) * activeLimit + 1, activeTotal)}–{Math.min(activePage * activeLimit, activeTotal)}</strong> of{' '}
-                      <strong className="text-foreground">{activeTotal}</strong> products
+                      Showing{' '}
+                      <strong className="text-foreground">
+                        {Math.min((activePage - 1) * activeLimit + 1, activeTotal)}–
+                        {Math.min(activePage * activeLimit, activeTotal)}
+                      </strong>{' '}
+                      of <strong className="text-foreground">{activeTotal}</strong> products
                     </>
                   )}
                 </div>

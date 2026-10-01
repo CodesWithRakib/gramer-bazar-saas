@@ -173,7 +173,9 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
 
             <div className="border-border mt-2 space-y-1.5 border-t pt-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{isBn ? 'আপনার সাবটোটাল' : 'Your subtotal'}</span>
+                <span className="text-muted-foreground">
+                  {isBn ? 'আপনার সাবটোটাল' : 'Your subtotal'}
+                </span>
                 <span className="text-foreground font-bold tabular-nums">
                   {formatCurrency(order.sellerSubtotal)}
                 </span>
@@ -212,13 +214,9 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
                   }
                 />
               )}
-              {order.customer.contactName &&
-                order.customer.contactName !== order.customer.name && (
-                  <InfoRow
-                    label={isBn ? 'প্রাপক' : 'Recipient'}
-                    value={order.customer.contactName}
-                  />
-                )}
+              {order.customer.contactName && order.customer.contactName !== order.customer.name && (
+                <InfoRow label={isBn ? 'প্রাপক' : 'Recipient'} value={order.customer.contactName} />
+              )}
               {order.customer.streetAddress && (
                 <div className="text-muted-foreground flex items-start gap-1.5 text-xs">
                   <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
@@ -334,10 +332,7 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
             />
           ) : (
             <ol className="relative space-y-4 ps-6">
-              <span
-                className="bg-border absolute start-2 top-1 bottom-1 w-px"
-                aria-hidden
-              />
+              <span className="bg-border absolute start-2 top-1 bottom-1 w-px" aria-hidden />
               {timeline.map((entry, index) => {
                 const meta = getOrderStatusMeta(entry.status);
                 const isCurrent = index === timeline.length - 1;

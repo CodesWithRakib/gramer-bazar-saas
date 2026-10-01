@@ -54,7 +54,10 @@ export function getEffectivePermissions(user?: PermissionBearingUser | null): Se
 }
 
 /** Super Admins implicitly satisfy every permission check. */
-export function hasPermission(user: PermissionBearingUser | null | undefined, permission: string): boolean {
+export function hasPermission(
+  user: PermissionBearingUser | null | undefined,
+  permission: string,
+): boolean {
   if (isSuperAdmin(user)) return true;
   return getEffectivePermissions(user).has(permission);
 }

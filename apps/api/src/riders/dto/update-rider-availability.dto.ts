@@ -6,7 +6,8 @@ export class UpdateRiderAvailabilityDto {
   @ApiProperty({
     enum: [RiderAvailability.OFFLINE, RiderAvailability.AVAILABLE],
     example: RiderAvailability.AVAILABLE,
-    description: 'Rider-controlled availability. System-managed BUSY is rejected for manual updates.',
+    description:
+      'Rider-controlled availability. System-managed BUSY is rejected for manual updates.',
   })
   @IsNotEmpty()
   @IsEnum(RiderAvailability)

@@ -16,8 +16,7 @@ export function RiderSettingsView({ lang = 'en' }: RiderSettingsViewProps) {
       titleBn: 'রাইডার প্রোফাইল ও যানবাহন',
       description:
         'Manage your contact details, service zone, emergency contact and vehicle information.',
-      descriptionBn:
-        'যোগাযোগের তথ্য, কাজের এলাকা, জরুরি যোগাযোগ এবং যানবাহনের তথ্য পরিচালনা করুন।',
+      descriptionBn: 'যোগাযোগের তথ্য, কাজের এলাকা, জরুরি যোগাযোগ এবং যানবাহনের তথ্য পরিচালনা করুন।',
       icon: Bike,
       href: '/rider/profile',
       badge: 'Account',

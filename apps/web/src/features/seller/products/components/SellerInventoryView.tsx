@@ -1,15 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import {
-  Boxes,
-  Minus,
-  Plus,
-  RotateCcw,
-  Save,
-  Search,
-  X,
-} from 'lucide-react';
+import { Boxes, Minus, Plus, RotateCcw, Save, Search, X } from 'lucide-react';
 import { customToast as toast } from '@/components/ui/custom-toast';
 
 import { Button } from '@/components/ui/button';
@@ -68,9 +60,9 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
-  const [stockFilter, setStockFilter] = useState<
-    'ALL' | 'LOW_STOCK' | 'IN_STOCK' | 'OUT_OF_STOCK'
-  >('ALL');
+  const [stockFilter, setStockFilter] = useState<'ALL' | 'LOW_STOCK' | 'IN_STOCK' | 'OUT_OF_STOCK'>(
+    'ALL'
+  );
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
 
   const { input: searchInput, term: search, onInputChange, reset } = useDebouncedSearch();
@@ -121,9 +113,7 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
       return Number.isNaN(Number(draft.quantity)) || Number(draft.quantity) < 0;
     });
     if (invalid) {
-      toast.error(
-        isBn ? 'স্টক ঋণাত্মক হতে পারে না' : 'Stock quantity cannot be negative or empty'
-      );
+      toast.error(isBn ? 'স্টক ঋণাত্মক হতে পারে না' : 'Stock quantity cannot be negative or empty');
       return;
     }
 
@@ -239,7 +229,10 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
               setPage(1);
             }}
           >
-            <SelectTrigger className="h-11 w-full rounded-full" aria-label={isBn ? 'স্টক ফিল্টার' : 'Stock filter'}>
+            <SelectTrigger
+              className="h-11 w-full rounded-full"
+              aria-label={isBn ? 'স্টক ফিল্টার' : 'Stock filter'}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -379,9 +372,7 @@ export function SellerInventoryView({ lang = 'en' }: SellerInventoryViewProps) {
                           type="number"
                           min={0}
                           value={draft.threshold}
-                          onChange={(event) =>
-                            setDraft(product, { threshold: event.target.value })
-                          }
+                          onChange={(event) => setDraft(product, { threshold: event.target.value })}
                           className="h-9 w-20 text-center tabular-nums"
                           aria-label={
                             isBn

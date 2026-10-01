@@ -98,10 +98,12 @@ export function RiderHistoryView({ lang = 'en' }: RiderHistoryViewProps) {
 
   const { data, isLoading, isFetching, isError, refetch } = useGetRiderHistoryQuery(params);
 
-  const resetToFirstPage = <T,>(setter: (value: T) => void) => (value: T) => {
-    setter(value);
-    setPage(1);
-  };
+  const resetToFirstPage =
+    <T,>(setter: (value: T) => void) =>
+    (value: T) => {
+      setter(value);
+      setPage(1);
+    };
 
   const statusOptions: { value: DeliveryStatus | 'ALL'; label: string }[] = [
     { value: 'ALL', label: isBn ? 'সব স্ট্যাটাস' : 'All statuses' },
@@ -141,7 +143,11 @@ export function RiderHistoryView({ lang = 'en' }: RiderHistoryViewProps) {
           <Input
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
-            placeholder={isBn ? 'অর্ডার নম্বর বা গ্রাহকের নাম দিয়ে খুঁজুন' : 'Search by order ID or customer name'}
+            placeholder={
+              isBn
+                ? 'অর্ডার নম্বর বা গ্রাহকের নাম দিয়ে খুঁজুন'
+                : 'Search by order ID or customer name'
+            }
             className="h-10 ps-9"
           />
         </div>

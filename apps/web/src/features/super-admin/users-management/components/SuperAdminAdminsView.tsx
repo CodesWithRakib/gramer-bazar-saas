@@ -115,7 +115,10 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
       accessorKey: 'roles',
       header: isBn ? 'রোল' : 'Role',
       cell: ({ row }) => (
-        <Badge variant={row.original.isSuperAdmin ? 'default' : 'secondary'} className="font-medium">
+        <Badge
+          variant={row.original.isSuperAdmin ? 'default' : 'secondary'}
+          className="font-medium"
+        >
           {row.original.isSuperAdmin ? 'SUPER_ADMIN' : 'ADMIN'}
         </Badge>
       ),
@@ -232,7 +235,10 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
         isBn={isBn}
         pagination={{ pageIndex: page - 1, pageSize: limit }}
         onPaginationChange={(updater) => {
-          const state = typeof updater === 'function' ? updater({ pageIndex: page - 1, pageSize: limit }) : updater;
+          const state =
+            typeof updater === 'function'
+              ? updater({ pageIndex: page - 1, pageSize: limit })
+              : updater;
           setPage(state.pageIndex + 1);
           setLimit(state.pageSize);
         }}
@@ -241,7 +247,9 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
           setSearch(val);
           setPage(1);
         }}
-        searchPlaceholder={isBn ? 'নাম, ইমেইল বা ফোন দিয়ে খুঁজুন...' : 'Search by name, email or phone...'}
+        searchPlaceholder={
+          isBn ? 'নাম, ইমেইল বা ফোন দিয়ে খুঁজুন...' : 'Search by name, email or phone...'
+        }
         actionSlot={
           <Button onClick={() => setCreateOpen(true)} className="!h-11 rounded-full px-6 shadow-xs">
             <UserPlus className="w-4 h-4 me-2" />

@@ -58,7 +58,11 @@ export function RiderEarningsView({ lang = 'en' }: RiderEarningsViewProps) {
     { label: isBn ? 'এই সপ্তাহ' : 'This Week', value: summary.weekEarnings },
     { label: isBn ? 'এই মাস' : 'This Month', value: summary.monthEarnings },
     { label: isBn ? 'সর্বমোট' : 'Lifetime', value: summary.totalEarned },
-    { label: isBn ? 'উত্তোলনযোগ্য' : 'Withdrawable', value: summary.availableBalance, primary: true },
+    {
+      label: isBn ? 'উত্তোলনযোগ্য' : 'Withdrawable',
+      value: summary.availableBalance,
+      primary: true,
+    },
     { label: isBn ? 'পরিশোধিত' : 'Paid Out', value: summary.paidOut },
   ];
 
@@ -107,9 +111,7 @@ export function RiderEarningsView({ lang = 'en' }: RiderEarningsViewProps) {
           <span className="font-semibold text-foreground">{currency(summary.pendingPayout)}</span>
         </div>
         <Button asChild size="sm" className="ms-auto h-9">
-          <Link href={`/${lang}/rider/payouts`}>
-            {isBn ? 'পে-আউট অনুরোধ' : 'Request payout'}
-          </Link>
+          <Link href={`/${lang}/rider/payouts`}>{isBn ? 'পে-আউট অনুরোধ' : 'Request payout'}</Link>
         </Button>
       </div>
 

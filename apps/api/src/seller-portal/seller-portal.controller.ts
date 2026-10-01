@@ -53,14 +53,8 @@ import {
 import { SellerDashboardResponseDto } from './dto/seller-dashboard-response.dto.js';
 import { SellerAnalyticsResponseDto } from './dto/seller-analytics.dto.js';
 import { ShopResponseDto } from '../shops/dto/shop-response.dto.js';
-import {
-  SellerProductDetailDto,
-  SellerProductListDto,
-} from './dto/seller-product-response.dto.js';
-import {
-  SellerOrderDetailDto,
-  SellerOrderListDto,
-} from './dto/seller-order-response.dto.js';
+import { SellerProductDetailDto, SellerProductListDto } from './dto/seller-product-response.dto.js';
+import { SellerOrderDetailDto, SellerOrderListDto } from './dto/seller-order-response.dto.js';
 import {
   ReplyToReviewDto,
   SellerReviewItemDto,
@@ -135,7 +129,8 @@ export class SellerPortalController {
   @Get('shop')
   @ApiOperation({
     summary: 'Get current seller shop profile',
-    description: 'Returns the shop owned by the authenticated seller along with product and order counts.',
+    description:
+      'Returns the shop owned by the authenticated seller along with product and order counts.',
   })
   @ApiStandardResponse({ type: ShopResponseDto, description: 'Seller shop profile retrieved' })
   getShopProfile(@Request() req: AuthenticatedRequest) {
@@ -219,7 +214,11 @@ export class SellerPortalController {
     if (!file) throw new BadRequestException('File is required');
     const shop = await this.sellerPortalService.getShopForSeller(req.user.id);
     const validation = this.storageService.validateImage(file.buffer, file.mimetype);
-    const storagePath = this.storageService.getSellerShopImagePath(shop.id, 'cover', validation.ext);
+    const storagePath = this.storageService.getSellerShopImagePath(
+      shop.id,
+      'cover',
+      validation.ext,
+    );
     const result = await this.storageService.replaceImage(
       shop.banner,
       storagePath,
@@ -271,8 +270,16 @@ export class SellerPortalController {
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, enum: ['ALL', 'ACTIVE', 'INACTIVE'] })
-  @ApiQuery({ name: 'stock', required: false, enum: ['ALL', 'LOW_STOCK', 'IN_STOCK', 'OUT_OF_STOCK'] })
-  @ApiQuery({ name: 'sort', required: false, enum: ['newest', 'oldest', 'price_asc', 'price_desc'] })
+  @ApiQuery({
+    name: 'stock',
+    required: false,
+    enum: ['ALL', 'LOW_STOCK', 'IN_STOCK', 'OUT_OF_STOCK'],
+  })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    enum: ['newest', 'oldest', 'price_asc', 'price_desc'],
+  })
   @ApiStandardResponse({ type: SellerProductListDto, description: 'Seller product listings' })
   listProducts(@Request() req: AuthenticatedRequest, @Query() query: SellerProductQueryDto) {
     return this.sellerProductsService.listProducts(req.user.id, query);
@@ -539,7 +546,10 @@ export class SellerPortalController {
       file.buffer,
       validation.mimeType,
     );
-    const updatedUser = await this.sellerPortalService.updateSellerAvatar(req.user.id, result.publicUrl);
+    const updatedUser = await this.sellerPortalService.updateSellerAvatar(
+      req.user.id,
+      result.publicUrl,
+    );
     return {
       avatarUrl: result.publicUrl,
       user: {

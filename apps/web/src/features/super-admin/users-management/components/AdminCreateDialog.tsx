@@ -70,8 +70,7 @@ export function AdminCreateDialog({
       next.phone = isBn ? 'সঠিক ফোন নম্বর দিন' : 'Enter a valid 11-digit phone number';
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email.trim()))
       next.email = isBn ? 'সঠিক ইমেইল দিন' : 'Enter a valid email address';
-    if (form.password.length < 8)
-      next.password = isBn ? 'কমপক্ষে ৮ অক্ষর' : 'Minimum 8 characters';
+    if (form.password.length < 8) next.password = isBn ? 'কমপক্ষে ৮ অক্ষর' : 'Minimum 8 characters';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -120,7 +119,9 @@ export function AdminCreateDialog({
             <div className="space-y-1.5">
               <Label className="text-xs">{isBn ? 'নাম' : 'First name'}</Label>
               <Input value={form.firstName} onChange={(e) => update('firstName', e.target.value)} />
-              {errors.firstName && <p className="text-[11px] text-destructive">{errors.firstName}</p>}
+              {errors.firstName && (
+                <p className="text-[11px] text-destructive">{errors.firstName}</p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">{isBn ? 'পদবি' : 'Last name'}</Label>

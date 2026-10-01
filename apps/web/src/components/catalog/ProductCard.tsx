@@ -435,7 +435,7 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         {/* Top Badges */}
         <div className="absolute top-2 start-2 flex flex-col gap-1 z-10">
           {discountPercent !== null && discountPercent > 0 && !isOutOfStock && (
-            <div className="bg-destructive text-destructive-foreground text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-md shadow-xs tracking-tight">
+            <div className="bg-discount text-discount-foreground text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs tracking-tight">
               -{discountPercent}%
             </div>
           )}
@@ -494,15 +494,17 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
 
             {/* Rating OR New Pill */}
             {avgRating > 0 ? (
-              <div className="flex items-center text-amber-500 text-[9px] sm:text-[10px] font-semibold gap-0.5 shrink-0">
+              <div className="flex items-center text-rating text-[9px] sm:text-[10px] font-semibold gap-0.5 shrink-0">
                 <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-current" />
                 <span>{avgRating.toFixed(1)}</span>
                 {totalReviews > 0 && (
-                  <span className="text-muted-foreground text-[8px] sm:text-[9px]">({totalReviews})</span>
+                  <span className="text-muted-foreground text-[8px] sm:text-[9px]">
+                    ({totalReviews})
+                  </span>
                 )}
               </div>
             ) : (
-              <span className="text-[9px] sm:text-[10px] font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-1.5 py-0.2 rounded-full shrink-0">
+              <span className="text-[9px] sm:text-[10px] font-medium text-success bg-success/10 border border-success/20 px-1.5 py-0.2 rounded-full shrink-0">
                 {isBn ? 'নতুন' : 'New'}
               </span>
             )}
@@ -521,7 +523,7 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         {/* Row 3: Price & Shop Section */}
         <div className="pt-1.5 border-t border-border/40 mt-1.5 min-w-0">
           <div className="h-5 sm:h-5.5 flex items-baseline flex-wrap gap-1 min-w-0">
-            <span className="text-xs sm:text-sm font-bold text-primary tabular-nums tracking-tight">
+            <span className="text-xs sm:text-sm font-bold text-price tabular-nums tracking-tight">
               {formatCurrency(currentPrice, lang)}
             </span>
             {originalPrice && originalPrice > currentPrice && (

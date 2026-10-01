@@ -62,7 +62,9 @@ describe('PermissionsGuard', () => {
 
   it('rejects an admin trying to delete users without users.delete', () => {
     expect(() =>
-      guardWith(['users.delete']).canActivate(contextFor(adminUser(['users.read', 'users.update']))),
+      guardWith(['users.delete']).canActivate(
+        contextFor(adminUser(['users.read', 'users.update'])),
+      ),
     ).toThrow(ForbiddenException);
   });
 

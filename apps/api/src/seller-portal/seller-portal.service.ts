@@ -470,7 +470,8 @@ export class SellerPortalService {
     });
 
     const riderName = delivery?.rider
-      ? [delivery.rider.firstName, delivery.rider.lastName].filter(Boolean).join(' ') || 'Assigned Rider'
+      ? [delivery.rider.firstName, delivery.rider.lastName].filter(Boolean).join(' ') ||
+        'Assigned Rider'
       : null;
     const riderPhone = delivery?.rider?.phone ?? null;
     const deliveryStatus = delivery?.status ?? null;

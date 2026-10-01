@@ -80,13 +80,7 @@ export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
 
   const { data: categories = [] } = useGetSellerCategoriesQuery();
 
-  const {
-    data,
-    isLoading,
-    isFetching,
-    isError,
-    refetch,
-  } = useGetSellerProductsQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useGetSellerProductsQuery({
     page,
     limit,
     search: search || undefined,
@@ -268,7 +262,9 @@ export function SellerProductsView({ lang = 'en' }: SellerProductsViewProps) {
             <SelectItem value="newest">{isBn ? 'নতুন আগে' : 'Newest first'}</SelectItem>
             <SelectItem value="oldest">{isBn ? 'পুরোনো আগে' : 'Oldest first'}</SelectItem>
             <SelectItem value="price_asc">{isBn ? 'কম দাম আগে' : 'Price: low to high'}</SelectItem>
-            <SelectItem value="price_desc">{isBn ? 'বেশি দাম আগে' : 'Price: high to low'}</SelectItem>
+            <SelectItem value="price_desc">
+              {isBn ? 'বেশি দাম আগে' : 'Price: high to low'}
+            </SelectItem>
           </FilterSelect>
         </div>
       </div>

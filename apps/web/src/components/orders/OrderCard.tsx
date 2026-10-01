@@ -103,7 +103,9 @@ export function OrderCard({ order, lang }: OrderCardProps) {
                     {isBn ? 'পণ্য বিবরণ প্রস্তুত হচ্ছে' : 'Order details available'}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    {isBn ? 'বিস্তারিত দেখতে ডানপাশের বাটনে ক্লিক করুন' : 'Click view details to see the full breakdown'}
+                    {isBn
+                      ? 'বিস্তারিত দেখতে ডানপাশের বাটনে ক্লিক করুন'
+                      : 'Click view details to see the full breakdown'}
                   </p>
                 </div>
               </div>

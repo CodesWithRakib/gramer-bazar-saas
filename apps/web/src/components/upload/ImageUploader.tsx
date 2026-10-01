@@ -120,11 +120,7 @@ export function ImageUploader({
           ) : (
             <UploadCloud className="h-3.5 w-3.5" />
           )}
-          {isBusy
-            ? isBn
-              ? 'আপলোড হচ্ছে...'
-              : 'Uploading...'
-            : resolvedTitle}
+          {isBusy ? (isBn ? 'আপলোড হচ্ছে...' : 'Uploading...') : resolvedTitle}
         </Button>
       ) : (
         <div
@@ -148,7 +144,9 @@ export function ImageUploader({
           className={cn(
             'flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 text-center transition-colors',
             'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-            isDragging ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50',
+            isDragging
+              ? 'border-primary bg-primary/5'
+              : 'border-border bg-muted/30 hover:bg-muted/50',
             (disabled || isBusy) && 'cursor-not-allowed opacity-70'
           )}
         >
@@ -213,8 +211,10 @@ export function ImageUploader({
                       {formatBytes(item.optimizedSize || item.originalSize)} ·{' '}
                       {isBn ? 'আপলোড হচ্ছে' : 'Uploading'}
                     </>
+                  ) : isBn ? (
+                    'অপটিমাইজ হচ্ছে'
                   ) : (
-                    isBn ? 'অপটিমাইজ হচ্ছে' : 'Optimizing'
+                    'Optimizing'
                   )}
                 </p>
               </div>
@@ -240,11 +240,13 @@ export function ImageUploader({
 
       {savings.label && !error && (
         <p className="text-muted-foreground text-xs">
-          {isBn ? 'ফাইল সাইজ:' : 'File size:'} <span className="text-foreground">{savings.label}</span>
+          {isBn ? 'ফাইল সাইজ:' : 'File size:'}{' '}
+          <span className="text-foreground">{savings.label}</span>
           {savings.saved > 0 && (
             <>
               {' '}
-              · <span className="text-success">
+              ·{' '}
+              <span className="text-success">
                 {formatBytes(savings.saved)} {isBn ? 'সাশ্রয়' : 'saved'}
               </span>
             </>

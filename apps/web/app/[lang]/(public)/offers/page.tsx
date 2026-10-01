@@ -19,7 +19,7 @@ import {
   ShoppingBag,
   Sparkles,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/custom-toast';
 
 export default function OffersPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
