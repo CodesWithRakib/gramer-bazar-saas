@@ -105,19 +105,19 @@ export class AnnouncementsService {
 
   private async resolveRecipients(announcement: Announcement): Promise<string[]> {
     const userIds = new Set<string>();
-    const activeUsersQuery = this.userRepo.createQueryBuilder('user')
-      .where('user.status = :status', { status: 'ACTIVE' });
+    const activeUsersQuery = this.userRepo.createQueryBuilder('u')
+      .where('u.status = :status', { status: 'ACTIVE' });
 
     if (announcement.audienceType === AudienceType.EVERYONE) {
-      const users = await activeUsersQuery.select('user.id').getMany();
+      const users = await activeUsersQuery.select(['u.id']).getMany();
       users.forEach(u => userIds.add(u.id));
     } 
     else if (announcement.audienceType === AudienceType.ROLE || announcement.audienceType === AudienceType.MULTIPLE_ROLES) {
       if (announcement.targetRoles && announcement.targetRoles.length > 0) {
         const users = await activeUsersQuery
-          .innerJoin('user.roles', 'role')
+          .innerJoin('u.roles', 'role')
           .andWhere('role.name IN (:...roles)', { roles: announcement.targetRoles })
-          .select('user.id')
+          .select(['u.id'])
           .getMany();
         users.forEach(u => userIds.add(u.id));
       }
