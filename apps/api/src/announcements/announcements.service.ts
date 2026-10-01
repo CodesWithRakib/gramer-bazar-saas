@@ -68,20 +68,42 @@ export class AnnouncementsService {
         if (announcement.priority === AnnouncementPriority.URGENT) notifPriority = NotificationPriority.CRITICAL;
 
         try {
-          await this.notificationsService.notifyUsers(chunk, {
-            type: NotificationType.ADMIN_ANNOUNCEMENT,
-            title: announcement.title,
-            message: announcement.message,
-            priority: notifPriority,
-            data: {
-              announcementId: announcement.id,
-              titleBn: announcement.titleBn,
-              messageBn: announcement.messageBn,
-              image: announcement.image,
-              ctaText: announcement.ctaText,
-              ctaLink: announcement.ctaLink,
-            },
+          // Fetch users for this chunk to do variable replacement
+          const users = await this.userRepo.find({ 
+            where: { id: In(chunk) },
+            select: ['id', 'firstName', 'lastName'] 
           });
+
+          // Optional: Fetch shop names for sellers
+          // For simplicity, we fallback to just user names if shop relations aren't loaded
+
+          const dtos = users.map(user => {
+            const userName = [user.firstName, user.lastName].filter(Boolean).join(' ') || 'User';
+            
+            // Replace templates
+            const title = announcement.title.replace(/\{\{userName\}\}/g, userName);
+            const message = announcement.message.replace(/\{\{userName\}\}/g, userName);
+            const titleBn = announcement.titleBn ? announcement.titleBn.replace(/\{\{userName\}\}/g, userName) : null;
+            const messageBn = announcement.messageBn ? announcement.messageBn.replace(/\{\{userName\}\}/g, userName) : null;
+
+            return {
+              userId: user.id,
+              type: NotificationType.ADMIN_ANNOUNCEMENT,
+              title,
+              message,
+              priority: notifPriority,
+              data: {
+                announcementId: announcement.id,
+                titleBn,
+                messageBn,
+                image: announcement.image,
+                ctaText: announcement.ctaText,
+                ctaLink: announcement.ctaLink,
+              },
+            };
+          });
+
+          await this.notificationsService.createMany(dtos);
           delivered += chunk.length;
         } catch (error) {
           this.logger.error(`Failed to send chunk for announcement ${id}`, error);

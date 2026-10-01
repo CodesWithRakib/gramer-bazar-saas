@@ -25,6 +25,7 @@ import { Role, useGetUsersQuery, User } from '../../users/usersApi';
 import { Loader2, Send, Clock, Save, Megaphone, X, Search } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Label } from '@/components/ui/label';
+import { useGetAnnouncementTemplatesQuery } from '../announcementsApi';
 
 export function AnnouncementsView() {
   const router = useRouter();
@@ -43,6 +44,11 @@ export function AnnouncementsView() {
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [priority, setPriority] = useState<AnnouncementPriority>(AnnouncementPriority.NORMAL);
+
+  const [useTemplateMode, setUseTemplateMode] = useState<boolean>(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('none');
+
+  const { data: templates } = useGetAnnouncementTemplatesQuery();
 
   const { data: usersData, isFetching: isSearchingUsers } = useGetUsersQuery(
     { search: userSearchQuery, limit: 10 },
@@ -134,10 +140,67 @@ export function AnnouncementsView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+          {useTemplateMode && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{isBn ? 'টেমপ্লেট নির্বাচন করুন' : 'Select Template'}</CardTitle>
+                <CardDescription>
+                  {isBn ? 'একটি পূর্বনির্ধারিত টেমপ্লেট বেছে নিন।' : 'Choose a predefined template.'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Select
+                  value={selectedTemplateId}
+                  onValueChange={(val) => {
+                    setSelectedTemplateId(val);
+                    if (val !== 'none' && templates) {
+                      const tmpl = templates.find(t => t.id === val);
+                      if (tmpl) {
+                        setTitle(tmpl.title);
+                        setTitleBn(tmpl.titleBn || '');
+                        setMessage(tmpl.message);
+                        setMessageBn(tmpl.messageBn || '');
+                        setAudienceType(tmpl.audienceType);
+                        if (tmpl.targetRoles) setTargetRoles(tmpl.targetRoles);
+                        setPriority(tmpl.priority);
+                      }
+                    } else {
+                      setTitle(''); setTitleBn(''); setMessage(''); setMessageBn('');
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={isBn ? 'টেমপ্লেট নির্বাচন করুন' : 'Select template'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{isBn ? 'কোনটি না' : 'None'}</SelectItem>
+                    {templates?.map(t => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {isBn && t.titleBn ? t.titleBn : t.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
-            <CardHeader>
-              <CardTitle>{isBn ? 'বিষয়বস্তু' : 'Content'}</CardTitle>
-              <CardDescription>{isBn ? 'ঘোষণার মূল বিষয়বস্তু।' : 'The main content of the announcement.'}</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>{isBn ? 'বিষয়বস্তু' : 'Content'}</CardTitle>
+                <CardDescription>{isBn ? 'ঘোষণার মূল বিষয়বস্তু।' : 'The main content of the announcement.'}</CardDescription>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="use-template" 
+                  checked={useTemplateMode}
+                  onCheckedChange={(checked) => setUseTemplateMode(!!checked)}
+                />
+                <Label htmlFor="use-template" className="cursor-pointer">
+                  {isBn ? 'টেমপ্লেট ব্যবহার করুন' : 'Use Template'}
+                </Label>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <Tabs defaultValue="en" className="w-full">
@@ -184,6 +247,24 @@ export function AnnouncementsView() {
                   </div>
                 </TabsContent>
               </Tabs>
+              
+              <div className="pt-4 border-t mt-4">
+                <div className="bg-muted p-4 rounded-md">
+                  <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                    <Megaphone className="h-4 w-4" />
+                    {isBn ? 'প্রিভিউ (উদাহরণ)' : 'Preview (Example)'}
+                  </h4>
+                  <div className="text-sm space-y-2">
+                    <p><strong>{isBn ? 'শিরোনাম' : 'Title'}:</strong> {title.replace(/\{\{userName\}\}/g, 'Rakib Hasan') || (isBn ? 'শিরোনাম নেই' : 'No title')}</p>
+                    <p className="whitespace-pre-wrap"><strong>{isBn ? 'বার্তা' : 'Message'}:</strong> {message.replace(/\{\{userName\}\}/g, 'Rakib Hasan') || (isBn ? 'বার্তা নেই' : 'No message')}</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {isBn 
+                        ? '* {{userName}} ডাইনামিক ভেরিয়েবলগুলো ব্যবহারকারীর নাম দিয়ে প্রতিস্থাপিত হবে।' 
+                        : '* Dynamic variables like {{userName}} will be replaced with the actual user\'s name.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

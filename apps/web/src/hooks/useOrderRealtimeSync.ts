@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/store';
 import { getSocket } from '@/lib/socket';
+import { useSocket } from '@/providers/SocketProvider';
 import { ordersApi, OrderStatusHistoryItem } from '@/features/orders/ordersApi';
 
 export interface OrderStatusUpdatedPayload {
@@ -27,11 +28,10 @@ export const useOrderRealtimeSync = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const lastProcessedRef = useRef<Map<string, number>>(new Map());
+  const { socket } = useSocket();
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    const socket = getSocket();
-    if (!socket) return;
+    if (!isAuthenticated || !socket) return;
 
     const handleOrderStatusUpdated = (payload: OrderStatusUpdatedPayload) => {
       if (!payload || !payload.orderId || !payload.currentStatus) return;
@@ -86,5 +86,5 @@ export const useOrderRealtimeSync = () => {
     return () => {
       socket.off('order.status.updated', handleOrderStatusUpdated);
     };
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, dispatch, socket]);
 };

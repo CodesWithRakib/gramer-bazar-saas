@@ -31,20 +31,16 @@ export const useSocket = () => useContext(SocketContext);
  * Auth state comes from the Redux slice (populated from localStorage on boot
  * and refreshed by `AuthInitializer`) — no eager `/auth/me` request here.
  */
+const SocketListeners = () => {
+  useOrderRealtimeSync();
+  useNotificationListener();
+  return null;
+};
+
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, accessToken } = useSelector((state: RootState) => state.auth);
   const socket = getSocket();
 
-  // Active realtime synchronization for order status updates on canonical socket
-  useOrderRealtimeSync();
-
-  // Active realtime notifications (deduplication, audio synthesis, toast, cache updates)
-  useNotificationListener();
-
-  // Connectivity mirrors the live socket. Event handlers keep it fresh, and the
-  // render-time adjustment below self-heals any missed transition (React's
-  // "adjust state when external state changes during render" pattern) — e.g. a
-  // socket created between renders.
   const [isConnected, setIsConnected] = useState<boolean>(() => socket?.connected ?? false);
   if ((socket?.connected ?? false) !== isConnected) {
     setIsConnected(socket?.connected ?? false);
@@ -52,8 +48,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      // Logout: tear the connection down. The resulting disconnect clears
-      // `isConnected` via the render adjustment on the next pass.
       disconnectSocket();
       return;
     }
@@ -63,7 +57,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       socketInstance.auth = { token: `Bearer ${accessToken}` };
     }
 
-    // Disconnect and reconnect to apply new auth payload
     if (socketInstance.connected) {
       socketInstance.disconnect();
       socketInstance.connect();
@@ -90,6 +83,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <SocketContext.Provider value={{ socket: getSocket(), isConnected }}>
+      <SocketListeners />
       {children}
     </SocketContext.Provider>
   );

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSocket } from '@/lib/socket';
+import { useSocket } from '@/providers/SocketProvider';
 import { notificationsApi, useMarkAsReadMutation } from '@/features/notifications/notificationsApi';
 import { NotificationPriority, RealtimeNotificationPayload } from '@/types/notifications';
 import { showNotificationToast } from '@/components/ui/NotificationToast';
@@ -26,14 +27,12 @@ export function useNotificationListener() {
   const params = useParams();
   const lang = (typeof params?.lang === 'string' ? params.lang : 'bn') as string;
   const [markAsRead] = useMarkAsReadMutation();
+  const { socket } = useSocket();
 
   const processedIdsRef = useRef<Map<string, number>>(new Map());
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) return;
-
-    const socket = getSocket();
-    if (!socket) return;
+    if (!isAuthenticated || !user?.id || !socket) return;
 
     const handleNewNotification = (notification: RealtimeNotificationPayload) => {
       if (!notification || !notification.id) return;
@@ -148,5 +147,5 @@ export function useNotificationListener() {
       socket.off('notification:read', handleNotificationRead);
       socket.off('notification:all_read', handleAllRead);
     };
-  }, [isAuthenticated, user?.id, user?.roles, dispatch, lang, markAsRead]);
+  }, [isAuthenticated, user?.id, user?.roles, dispatch, lang, markAsRead, socket]);
 }
