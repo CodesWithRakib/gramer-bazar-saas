@@ -62,6 +62,7 @@ export interface DemandReport {
   }>;
   categoryDemand: Array<{
     categoryId: string;
+    categoryName: string;
     count: number;
   }>;
   frequentlyUnavailable: Array<{
@@ -71,22 +72,70 @@ export interface DemandReport {
   }>;
   requestedProducts: Array<{
     productRequestId: string;
+    productName?: string;
     requests: number;
     purchases: number;
     conversionRate: number;
   }>;
 }
 
+export interface SalesReport {
+  revenueByDay: Array<{ date: string; revenue: number; orders: number }>;
+  salesFunnel: Array<{ step: string; count: number }>;
+  paymentMethods: Array<{ method: string; revenue: number; count: number }>;
+}
+
+export interface ProductsReport {
+  topProducts: Array<{ productId: string; name: string; revenue: number; sales: number }>;
+}
+
+export interface CustomersReport {
+  newCustomersCount: number;
+  topCustomers: Array<{ userId: string; name: string; email: string; revenue: number; orders: number }>;
+}
+
+export interface DateQuery {
+  from?: string;
+  to?: string;
+}
+
 export const analyticsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getDashboardMetrics: builder.query<DashboardMetrics, void>({
       query: () => '/admin/analytics/dashboard',
-      providesTags: ['Order', 'User', 'Catalog'], // Invalidate if any of these change
+      providesTags: ['Order', 'User', 'Catalog'],
     }),
-    getDemandAnalytics: builder.query<DemandReport, void>({
-      query: () => '/admin/analytics/demand',
+    getDemandAnalytics: builder.query<DemandReport, DateQuery | void>({
+      query: (params) => ({
+        url: '/admin/analytics/demand',
+        params: params || undefined,
+      }),
+    }),
+    getSalesAnalytics: builder.query<SalesReport, DateQuery | void>({
+      query: (params) => ({
+        url: '/admin/analytics/sales',
+        params: params || undefined,
+      }),
+    }),
+    getProductsAnalytics: builder.query<ProductsReport, DateQuery | void>({
+      query: (params) => ({
+        url: '/admin/analytics/products',
+        params: params || undefined,
+      }),
+    }),
+    getCustomersAnalytics: builder.query<CustomersReport, DateQuery | void>({
+      query: (params) => ({
+        url: '/admin/analytics/customers',
+        params: params || undefined,
+      }),
     }),
   }),
 });
 
-export const { useGetDashboardMetricsQuery, useGetDemandAnalyticsQuery } = analyticsApi;
+export const {
+  useGetDashboardMetricsQuery,
+  useGetDemandAnalyticsQuery,
+  useGetSalesAnalyticsQuery,
+  useGetProductsAnalyticsQuery,
+  useGetCustomersAnalyticsQuery,
+} = analyticsApi;

@@ -24,7 +24,7 @@ export const SEED_DISPUTES: SeedDisputeItem[] = [
     evidenceImages: [
       'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80',
     ],
-    status: DisputeStatus.RESOLVED_REFUNDED,
+    status: DisputeStatus.RESOLVED,
     adminDecision: 'Refund of 380 BDT approved and credited directly to customer wallet balance.',
     messages: [
       {
@@ -100,7 +100,7 @@ export const SEED_DISPUTES: SeedDisputeItem[] = [
     evidenceImages: [
       'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80',
     ],
-    status: DisputeStatus.RESOLVED_REJECTED,
+    status: DisputeStatus.REJECTED,
     adminDecision:
       'Product batch tested. Conforms to authentic 100% natural sun-dried chili standards without synthetic color dyes. Dispute dismissed.',
     messages: [

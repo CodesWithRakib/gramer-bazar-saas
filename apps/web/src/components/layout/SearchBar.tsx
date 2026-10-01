@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Loader2, ArrowRight, Tag, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGetSearchSuggestionsQuery } from '@/features/catalog/catalogApi';
+import { analyticsTracker } from '@/lib/analyticsTracker';
 import { formatCurrency } from '@/lib/format';
 
 interface SearchBarProps {
@@ -71,6 +72,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
     e.preventDefault();
     setIsOpen(false);
     if (searchTerm.trim()) {
+      analyticsTracker.track('SEARCH', { searchQuery: searchTerm.trim() });
       router.push(`/${lang}/search?q=${encodeURIComponent(searchTerm.trim())}`);
     } else {
       router.push(`/${lang}/search`);

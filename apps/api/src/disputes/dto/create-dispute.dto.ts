@@ -23,4 +23,9 @@ export class CreateDisputeDto {
   @IsString({ each: true })
   @IsOptional()
   evidenceImages?: string[];
+
+  @ApiPropertyOptional({ example: 'FULL_REFUND' })
+  @IsString()
+  @IsOptional()
+  requestedResolution?: string;
 }

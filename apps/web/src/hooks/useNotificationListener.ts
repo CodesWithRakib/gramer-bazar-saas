@@ -56,16 +56,20 @@ export function useNotificationListener() {
 
       // 1. Optimistically update notifications list cache
       dispatch(
-        notificationsApi.util.updateQueryData('getUserNotifications', undefined, (draft) => {
-          const exists = draft.items.some((item) => item.id === notification.id);
-          if (!exists) {
-            draft.items.unshift(notification);
-            draft.total += 1;
-            if (!notification.isRead) {
-              draft.unreadCount += 1;
+        notificationsApi.util.updateQueryData(
+          'getUserNotifications',
+          { page: 1, limit: 15 },
+          (draft) => {
+            const exists = draft.items.some((item) => item.id === notification.id);
+            if (!exists) {
+              draft.items.unshift(notification);
+              draft.total += 1;
+              if (!notification.isRead) {
+                draft.unreadCount += 1;
+              }
             }
           }
-        })
+        )
       );
 
       // 2. Optimistically update unread count cache
@@ -103,13 +107,17 @@ export function useNotificationListener() {
 
       // Update notifications list cache
       dispatch(
-        notificationsApi.util.updateQueryData('getUserNotifications', undefined, (draft) => {
-          const item = draft.items.find((n) => n.id === payload.id);
-          if (item && !item.isRead) {
-            item.isRead = true;
-            draft.unreadCount = Math.max(0, draft.unreadCount - 1);
+        notificationsApi.util.updateQueryData(
+          'getUserNotifications',
+          { page: 1, limit: 15 },
+          (draft) => {
+            const item = draft.items.find((n) => n.id === payload.id);
+            if (item && !item.isRead) {
+              item.isRead = true;
+              draft.unreadCount = Math.max(0, draft.unreadCount - 1);
+            }
           }
-        })
+        )
       );
 
       // Update unread count cache
@@ -123,12 +131,16 @@ export function useNotificationListener() {
     const handleAllRead = () => {
       // Mark all in cache as read
       dispatch(
-        notificationsApi.util.updateQueryData('getUserNotifications', undefined, (draft) => {
-          draft.items.forEach((item) => {
-            item.isRead = true;
-          });
-          draft.unreadCount = 0;
-        })
+        notificationsApi.util.updateQueryData(
+          'getUserNotifications',
+          { page: 1, limit: 15 },
+          (draft) => {
+            draft.items.forEach((item) => {
+              item.isRead = true;
+            });
+            draft.unreadCount = 0;
+          }
+        )
       );
 
       dispatch(

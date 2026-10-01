@@ -2,3 +2,8 @@ export * from './SettingsHubView';
 export * from './GeneralSettingsView';
 export * from './AuditLogsView';
 export * from './DemandAnalyticsView';
+export * from './AnalyticsReportsLayout';
+export * from './AnalyticsOverviewView';
+export * from './SalesAnalyticsView';
+export * from './ProductsAnalyticsView';
+export * from './CustomersAnalyticsView';

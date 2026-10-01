@@ -4,6 +4,8 @@ import { DisputesService } from './disputes.service.js';
 import { CreateDisputeDto } from './dto/create-dispute.dto.js';
 import { AddDisputeMessageDto } from './dto/add-dispute-message.dto.js';
 import { ResolveDisputeDto } from './dto/resolve-dispute.dto.js';
+import { RejectDisputeDto } from './dto/reject-dispute.dto.js';
+import { AddInternalNoteDto } from './dto/add-internal-note.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { PermissionsGuard } from '../common/guards/permissions.guard.js';
@@ -174,19 +176,50 @@ export class DisputesController {
     return this.disputesService.addMessage(id, req.user.id, 'admin', dto);
   }
 
-  @Patch('admin/:id/resolve')
+  @Post('admin/:id/resolve')
   @Roles(Role.ADMIN)
   @Permissions('disputes.resolve')
   @ApiOperation({
     summary: 'Admin: Adjudicate and resolve dispute',
-    description: 'Applies final administrative verdict (RESOLVED, REJECTED) with refund notes.',
+    description: 'Applies final administrative verdict with refund logic.',
   })
   @ApiParam({ name: 'id', description: 'Dispute UUID' })
   @ApiStandardResponse({
     type: DisputeResponseDto,
     description: 'Dispute resolution verdict saved',
   })
-  resolveDispute(@Param('id') id: string, @Body() dto: ResolveDisputeDto) {
-    return this.disputesService.resolveDispute(id, dto);
+  resolveDispute(@Param('id') id: string, @Req() req: any, @Body() dto: ResolveDisputeDto) {
+    return this.disputesService.resolveDispute(id, req.user.id, dto);
+  }
+
+  @Post('admin/:id/reject')
+  @Roles(Role.ADMIN)
+  @Permissions('disputes.resolve')
+  @ApiOperation({
+    summary: 'Admin: Reject dispute',
+    description: 'Rejects a dispute.',
+  })
+  @ApiParam({ name: 'id', description: 'Dispute UUID' })
+  @ApiStandardResponse({
+    type: DisputeResponseDto,
+    description: 'Dispute rejected',
+  })
+  rejectDispute(@Param('id') id: string, @Req() req: any, @Body() dto: RejectDisputeDto) {
+    return this.disputesService.rejectDispute(id, req.user.id, dto);
+  }
+
+  @Post('admin/:id/note')
+  @Roles(Role.ADMIN)
+  @Permissions('disputes.resolve')
+  @ApiOperation({
+    summary: 'Admin: Add internal note',
+    description: 'Adds an internal note to a dispute.',
+  })
+  @ApiParam({ name: 'id', description: 'Dispute UUID' })
+  @ApiStandardResponse({
+    description: 'Internal note added',
+  })
+  addInternalNote(@Param('id') id: string, @Req() req: any, @Body() dto: AddInternalNoteDto) {
+    return this.disputesService.addInternalNote(id, req.user.id, dto);
   }
 }

@@ -26,14 +26,6 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isBn ? 'চাহিদা বিশ্লেষণ' : 'Demand Analytics'}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            {isBn ? 'চাহিদা বিশ্লেষণ লোড হচ্ছে...' : 'Loading demand analytics...'}
-          </p>
-        </div>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="h-64 rounded-xl border border-gray-100 bg-white p-6 shadow-sm animate-pulse dark:border-border dark:bg-card"></div>
           <div className="h-64 rounded-xl border border-gray-100 bg-white p-6 shadow-sm animate-pulse dark:border-border dark:bg-card"></div>
@@ -48,17 +40,6 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          {isBn ? 'চাহিদা বিশ্লেষণ' : 'Demand Analytics'}
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {isBn
-            ? 'কীওয়ার্ড অনুসন্ধান এবং অনুপলব্ধ পণ্যগুলোর উপর ভিত্তি করে গ্রাহকের চাহিদা বিশ্লেষণ করুন।'
-            : 'Analyze customer demand based on search keywords and unavailable products.'}
-        </p>
-      </div>
-
       <div className="grid gap-6 md:grid-cols-2">
         {/* Top Searches Card */}
         <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 dark:border-border dark:bg-card">
@@ -189,7 +170,7 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
               <TableHeader className="border-b border-gray-200 bg-gray-50 uppercase text-xs font-semibold text-gray-900 tracking-wider dark:border-border dark:bg-muted/40 dark:text-foreground">
                 <TableRow>
                   <TableHead className="py-3.5 px-4">
-                    {isBn ? 'অনুরোধ আইডি' : 'Request ID'}
+                    {isBn ? 'অনুরোধ আইডি / নাম' : 'Request / Product'}
                   </TableHead>
                   <TableHead className="py-3.5 px-4 text-end">
                     {isBn ? 'অনুরোধের সংখ্যা' : 'Total Requests'}
@@ -209,8 +190,9 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
                       key={idx}
                       className="hover:bg-gray-50/70 transition-colors dark:hover:bg-muted/30"
                     >
-                      <TableCell className="py-3.5 px-4 font-mono font-medium text-foreground">
-                        #{req.productRequestId.substring(0, 8)}
+                      <TableCell className="py-3.5 px-4 text-foreground">
+                        <div className="font-medium">{req.productName || 'Unknown'}</div>
+                        <div className="text-xs text-muted-foreground font-mono">#{req.productRequestId.substring(0, 8)}</div>
                       </TableCell>
                       <TableCell className="py-3.5 px-4 text-end text-muted-foreground">
                         {req.requests}

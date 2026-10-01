@@ -14,6 +14,8 @@ import { ApplicationStatus } from '../applications/enums/application-status.enum
 import { PayoutRequest, PayoutStatus } from '../payouts/entities/payout-request.entity.js';
 import { Dispute } from '../disputes/entities/dispute.entity.js';
 import { DisputeStatus } from '../disputes/enums/dispute-status.enum.js';
+import { ProductRequest } from '../product-requests/entities/product-request.entity.js';
+import { Category } from '../catalog/entities/category.entity.js';
 
 @Injectable()
 export class AnalyticsService {
@@ -36,6 +38,10 @@ export class AnalyticsService {
     private readonly payoutRequestRepository: Repository<PayoutRequest>,
     @InjectRepository(Dispute)
     private readonly disputeRepository: Repository<Dispute>,
+    @InjectRepository(ProductRequest)
+    private readonly productRequestRepository: Repository<ProductRequest>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
   ) {}
 
   async getDashboardMetrics() {
@@ -159,7 +165,14 @@ export class AnalyticsService {
     return { success: true };
   }
 
-  async getDemandAnalytics() {
+  async getDemandAnalytics(from?: string, to?: string) {
+    let dateFilter = '';
+    let params: any = {};
+    if (from && to) {
+      dateFilter = 'event.created_at >= :from AND event.created_at <= :to';
+      params = { from, to };
+    }
+
     // 1. Popular Products (by VIEW, ADD_TO_CART, PURCHASE)
     const popularProductsRaw = await this.demandEventRepository
       .createQueryBuilder('event')
@@ -171,6 +184,7 @@ export class AnalyticsService {
       .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
       .leftJoin(Product, 'product', 'product.id = event.productId')
       .where('event.productId IS NOT NULL')
+      .andWhere(dateFilter || '1=1', params)
       .groupBy('event.productId')
       .addGroupBy('product.nameEn')
       .addGroupBy('product.nameBn')
@@ -193,6 +207,7 @@ export class AnalyticsService {
       .addSelect('COUNT(*)', 'count')
       .where("event.eventType = 'SEARCH'")
       .andWhere('event.searchQuery IS NOT NULL')
+      .andWhere(dateFilter || '1=1', params)
       .groupBy('event.searchQuery')
       .orderBy('count', 'DESC')
       .limit(10)
@@ -210,7 +225,12 @@ export class AnalyticsService {
       .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
       .addSelect("COUNT(CASE WHEN event.eventType = 'ADD_TO_CART' THEN 1 END)", 'carts')
       .where("event.eventType IN ('PURCHASE', 'ADD_TO_CART')")
-      .andWhere("event.created_at >= NOW() - INTERVAL '7 days'")
+      .andWhere(
+        dateFilter
+          ? dateFilter
+          : "event.created_at >= NOW() - INTERVAL '7 days'",
+        params,
+      )
       .groupBy("TO_CHAR(event.created_at, 'YYYY-MM-DD')")
       .orderBy('date', 'ASC')
       .getRawMany();
@@ -225,15 +245,22 @@ export class AnalyticsService {
     const categoryDemandRaw = await this.demandEventRepository
       .createQueryBuilder('event')
       .select('event.categoryId', 'categoryId')
+      .addSelect('category.nameEn', 'categoryName')
+      .addSelect('category.nameBn', 'categoryNameBn')
       .addSelect('COUNT(*)', 'count')
+      .leftJoin(Category, 'category', 'category.id = event.categoryId')
       .where('event.categoryId IS NOT NULL')
+      .andWhere(dateFilter || '1=1', params)
       .groupBy('event.categoryId')
+      .addGroupBy('category.nameEn')
+      .addGroupBy('category.nameBn')
       .orderBy('count', 'DESC')
       .limit(5)
       .getRawMany();
 
     const categoryDemand = categoryDemandRaw.map((c: any) => ({
       categoryId: c.categoryId,
+      categoryName: c.categoryName || c.categoryNameBn || 'Unknown Category',
       count: Number(c.count),
     }));
 
@@ -257,6 +284,7 @@ export class AnalyticsService {
           AND (inv.quantity - inv.reserved_quantity) > 0
       )`,
       )
+      .andWhere(dateFilter || '1=1', params)
       .groupBy('event.productId')
       .addGroupBy('product.nameEn')
       .addGroupBy('product.nameBn')
@@ -271,22 +299,28 @@ export class AnalyticsService {
     }));
 
     // 6. Requested Products
-    const requestedProductsRaw = await this.demandEventRepository
-      .createQueryBuilder('event')
-      .select('event.productRequestId', 'productRequestId')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'REQUEST' THEN 1 END)", 'requests')
-      .addSelect("COUNT(CASE WHEN event.eventType = 'PURCHASE' THEN 1 END)", 'purchases')
-      .where('event.productRequestId IS NOT NULL')
-      .groupBy('event.productRequestId')
+    // Query directly from ProductRequest table instead of DemandEvent
+    const requestedProductsRaw = await this.productRequestRepository
+      .createQueryBuilder('request')
+      .select('request.id', 'productRequestId')
+      .addSelect('request.productName', 'productName')
+      .addSelect('request.status', 'status')
+      .addSelect("COUNT(request.id)", 'requests')
+      .addSelect("SUM(CASE WHEN request.status = 'PRODUCT_ADDED' THEN 1 ELSE 0 END)", 'converted')
+      .where(dateFilter ? dateFilter.replace(/event\.created_at/g, 'request.createdAt') : '1=1', params)
+      .groupBy('request.id')
+      .addGroupBy('request.productName')
+      .addGroupBy('request.status')
       .orderBy('requests', 'DESC')
       .limit(10)
       .getRawMany();
 
     const requestedProducts = requestedProductsRaw.map((r: any) => ({
       productRequestId: r.productRequestId,
+      productName: r.productName,
       requests: Number(r.requests),
-      purchases: Number(r.purchases),
-      conversionRate: r.requests > 0 ? (Number(r.purchases) / Number(r.requests)) * 100 : 0,
+      purchases: Number(r.converted), // Assuming PRODUCT_ADDED is closest to purchase for now
+      conversionRate: Number(r.requests) > 0 ? (Number(r.converted) / Number(r.requests)) * 100 : 0,
     }));
 
     return {
@@ -296,6 +330,176 @@ export class AnalyticsService {
       categoryDemand,
       frequentlyUnavailable,
       requestedProducts,
+    };
+  }
+
+  async getSalesAnalytics(from?: string, to?: string) {
+    let orderDateFilter = '';
+    let eventDateFilter = '';
+    let params: any = {};
+    if (from && to) {
+      orderDateFilter = 'order.created_at >= :from AND order.created_at <= :to';
+      eventDateFilter = 'event.created_at >= :from AND event.created_at <= :to';
+      params = { from, to };
+    }
+
+    // Revenue by Day
+    const revenueByDayRaw = await this.orderRepository
+      .createQueryBuilder('order')
+      .select("TO_CHAR(order.created_at, 'YYYY-MM-DD')", 'date')
+      .addSelect('SUM(order.total)', 'revenue')
+      .addSelect('COUNT(order.id)', 'orders')
+      .where('order.status = :status', { status: OrderStatus.DELIVERED })
+      .andWhere(orderDateFilter || '1=1', params)
+      .groupBy("TO_CHAR(order.created_at, 'YYYY-MM-DD')")
+      .orderBy('date', 'ASC')
+      .getRawMany();
+
+    const revenueByDay = revenueByDayRaw.map((r: any) => ({
+      date: r.date,
+      revenue: Number(r.revenue),
+      orders: Number(r.orders),
+    }));
+
+    // Sales Funnel
+    const funnelRaw = await this.demandEventRepository
+      .createQueryBuilder('event')
+      .select('event.eventType', 'type')
+      .addSelect('COUNT(*)', 'count')
+      .where("event.eventType IN ('VIEW', 'ADD_TO_CART', 'PURCHASE')")
+      .andWhere(eventDateFilter || '1=1', params)
+      .groupBy('event.eventType')
+      .getRawMany();
+
+    let views = 0;
+    let carts = 0;
+    let purchases = 0;
+
+    funnelRaw.forEach((f: any) => {
+      if (f.type === 'VIEW') views = Number(f.count);
+      if (f.type === 'ADD_TO_CART') carts = Number(f.count);
+      if (f.type === 'PURCHASE') purchases = Number(f.count);
+    });
+
+    const salesFunnel = [
+      { step: 'Views', count: views },
+      { step: 'Added to Cart', count: carts },
+      { step: 'Purchased', count: purchases },
+    ];
+
+    // Payment Methods
+    const paymentMethodsRaw = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('order.paymentMethod', 'method')
+      .addSelect('SUM(order.total)', 'revenue')
+      .addSelect('COUNT(order.id)', 'count')
+      .where('order.status = :status', { status: OrderStatus.DELIVERED })
+      .andWhere(orderDateFilter || '1=1', params)
+      .groupBy('order.paymentMethod')
+      .getRawMany();
+
+    const paymentMethods = paymentMethodsRaw.map((p: any) => ({
+      method: p.method,
+      revenue: Number(p.revenue),
+      count: Number(p.count),
+    }));
+
+    return {
+      revenueByDay,
+      salesFunnel,
+      paymentMethods,
+    };
+  }
+
+  async getProductsAnalytics(from?: string, to?: string) {
+    let orderDateFilter = '';
+    let params: any = {};
+    if (from && to) {
+      orderDateFilter = 'order.created_at >= :from AND order.created_at <= :to';
+      params = { from, to };
+    }
+
+    // Top Products by Revenue (using orders/order_items)
+    const topProductsRaw = await this.orderRepository
+      .createQueryBuilder('order')
+      .innerJoin('order.items', 'item')
+      .select('item.productId', 'productId')
+      .addSelect('item.productNameEn', 'productName')
+      .addSelect('item.productNameBn', 'productNameBn')
+      .addSelect('SUM(item.price * item.quantity)', 'revenue')
+      .addSelect('SUM(item.quantity)', 'sales')
+      .where('order.status = :status', { status: OrderStatus.DELIVERED })
+      .andWhere(orderDateFilter || '1=1', params)
+      .groupBy('item.productId')
+      .addGroupBy('item.productNameEn')
+      .addGroupBy('item.productNameBn')
+      .orderBy('revenue', 'DESC')
+      .limit(10)
+      .getRawMany();
+
+    const topProducts = topProductsRaw.map((p: any) => ({
+      productId: p.productId,
+      name: p.productName || p.productNameBn || 'Unknown',
+      revenue: Number(p.revenue),
+      sales: Number(p.sales),
+    }));
+
+    return {
+      topProducts,
+    };
+  }
+
+  async getCustomersAnalytics(from?: string, to?: string) {
+    let orderDateFilter = '';
+    let userDateFilter = '';
+    let params: any = {};
+    if (from && to) {
+      orderDateFilter = 'order.created_at >= :from AND order.created_at <= :to';
+      userDateFilter = 'user.created_at >= :from AND user.created_at <= :to';
+      params = { from, to };
+    }
+
+    // New vs Returning logic approximation:
+    // "New" = Customers whose first order was in the period.
+    // Actually, just returning basic counts for now to keep it performant
+    const customersCountRaw = await this.userRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.roles', 'role')
+      .where('role.name = :role', { role: Role.CUSTOMER })
+      .andWhere(userDateFilter || '1=1', params)
+      .getCount();
+
+    // Top Customers by Revenue
+    const topCustomersRaw = await this.orderRepository
+      .createQueryBuilder('order')
+      .innerJoin('order.user', 'user')
+      .select('user.id', 'userId')
+      .addSelect('user.firstName', 'firstName')
+      .addSelect('user.lastName', 'lastName')
+      .addSelect('user.email', 'email')
+      .addSelect('SUM(order.total)', 'revenue')
+      .addSelect('COUNT(order.id)', 'orders')
+      .where('order.status = :status', { status: OrderStatus.DELIVERED })
+      .andWhere(orderDateFilter || '1=1', params)
+      .groupBy('user.id')
+      .addGroupBy('user.firstName')
+      .addGroupBy('user.lastName')
+      .addGroupBy('user.email')
+      .orderBy('revenue', 'DESC')
+      .limit(10)
+      .getRawMany();
+
+    const topCustomers = topCustomersRaw.map((c: any) => ({
+      userId: c.userId,
+      name: `${c.firstName} ${c.lastName}`.trim() || 'Guest',
+      email: c.email,
+      revenue: Number(c.revenue),
+      orders: Number(c.orders),
+    }));
+
+    return {
+      newCustomersCount: customersCountRaw,
+      topCustomers,
     };
   }
 }

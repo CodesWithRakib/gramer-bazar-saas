@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -24,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { ProductGrid } from '@/components/catalog/ProductGrid';
+import { analyticsTracker } from '@/lib/analyticsTracker';
 import { SellerProduct, useGetRelatedProductsQuery } from '@/features/catalog/catalogApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -84,6 +85,15 @@ export function ProductDetailsClient({
   const [addToWishlist, { isLoading: isAddingWishlist }] = useAddProductToWishlistMutation();
   const [removeFromWishlist, { isLoading: isRemovingWishlist }] =
     useRemoveProductFromWishlistMutation();
+
+  useEffect(() => {
+    if (product) {
+      analyticsTracker.track('VIEW', {
+        productId: product.productVariant.product.id,
+        categoryId: product.productVariant.product.category?.id,
+      });
+    }
+  }, [product?.productVariant?.product?.id, product?.productVariant?.product?.category?.id]);
 
   if (!products || products.length === 0 || !product) {
     return (
@@ -202,6 +212,10 @@ export function ProductDetailsClient({
         slug: masterProduct.slug,
       })
     );
+    analyticsTracker.track('ADD_TO_CART', {
+      productId: masterProduct.id,
+      categoryId: masterProduct.category?.id,
+    });
     toast.success(isBn ? 'কার্টে যোগ করা হয়েছে' : 'Added to cart');
     return true;
   };

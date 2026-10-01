@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Post, Body, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, Body, Request, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
@@ -67,7 +67,43 @@ export class AnalyticsController {
     type: DemandAnalyticsResponseDto,
     description: 'Demand analytics reports retrieved successfully',
   })
-  getDemandAnalytics() {
-    return this.analyticsService.getDemandAnalytics();
+  getDemandAnalytics(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.analyticsService.getDemandAnalytics(from, to);
+  }
+
+  @Get('admin/analytics/sales')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reports.read')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin: Get sales analytics',
+  })
+  getSalesAnalytics(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.analyticsService.getSalesAnalytics(from, to);
+  }
+
+  @Get('admin/analytics/products')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reports.read')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin: Get products analytics',
+  })
+  getProductsAnalytics(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.analyticsService.getProductsAnalytics(from, to);
+  }
+
+  @Get('admin/analytics/customers')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reports.read')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin: Get customers analytics',
+  })
+  getCustomersAnalytics(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.analyticsService.getCustomersAnalytics(from, to);
   }
 }

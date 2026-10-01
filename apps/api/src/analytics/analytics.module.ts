@@ -11,6 +11,8 @@ import { SellerApplication } from '../applications/entities/seller-application.e
 import { RiderApplication } from '../applications/entities/rider-application.entity.js';
 import { PayoutRequest } from '../payouts/entities/payout-request.entity.js';
 import { Dispute } from '../disputes/entities/dispute.entity.js';
+import { ProductRequest } from '../product-requests/entities/product-request.entity.js';
+import { Category } from '../catalog/entities/category.entity.js';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { Dispute } from '../disputes/entities/dispute.entity.js';
       RiderApplication,
       PayoutRequest,
       Dispute,
+      ProductRequest,
+      Category,
     ]),
   ],
   controllers: [AnalyticsController],

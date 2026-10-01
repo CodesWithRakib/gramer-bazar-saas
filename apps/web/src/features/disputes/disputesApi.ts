@@ -7,14 +7,21 @@ export enum DisputeReason {
   MISSING_ITEM = 'MISSING_ITEM',
   NOT_AS_DESCRIBED = 'NOT_AS_DESCRIBED',
   WRONG_ITEM = 'WRONG_ITEM',
+  QUALITY_ISSUE = 'QUALITY_ISSUE',
+  ITEM_NOT_RECEIVED = 'ITEM_NOT_RECEIVED',
+  QUANTITY_ISSUE = 'QUANTITY_ISSUE',
+  PAYMENT_ISSUE = 'PAYMENT_ISSUE',
   OTHER = 'OTHER',
 }
 
 export enum DisputeStatus {
   OPEN = 'OPEN',
   UNDER_REVIEW = 'UNDER_REVIEW',
-  RESOLVED_REFUNDED = 'RESOLVED_REFUNDED',
-  RESOLVED_REJECTED = 'RESOLVED_REJECTED',
+  WAITING_FOR_SELLER = 'WAITING_FOR_SELLER',
+  WAITING_FOR_CUSTOMER = 'WAITING_FOR_CUSTOMER',
+  RESOLVED = 'RESOLVED',
+  REJECTED = 'REJECTED',
+  CANCELLED = 'CANCELLED',
 }
 
 export interface DisputeMessage {
@@ -38,6 +45,9 @@ export interface Dispute {
   evidenceImages?: string[] | null;
   status: DisputeStatus;
   adminDecision?: string | null;
+  requestedResolution?: string | null;
+  resolutionType?: string | null;
+  refundAmount?: number | null;
   createdAt: string;
   updatedAt: string;
 
@@ -45,6 +55,7 @@ export interface Dispute {
   customer?: User;
   seller?: User;
   messages?: DisputeMessage[];
+  internalNotes?: any[];
 }
 
 export const disputesApi = api.injectEndpoints({
@@ -124,14 +135,36 @@ export const disputesApi = api.injectEndpoints({
     }),
     resolveDispute: builder.mutation<
       Dispute,
-      { id: string; status: DisputeStatus; adminDecision?: string }
+      { id: string; resolutionType: string; adminDecision?: string; internalNote?: string; refundAmount?: number }
     >({
       query: ({ id, ...body }) => ({
         url: `/disputes/admin/${id}/resolve`,
-        method: 'PATCH',
+        method: 'POST',
         body,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Dispute', id }, 'Dispute'],
+    }),
+    rejectDispute: builder.mutation<
+      Dispute,
+      { id: string; reason: string; internalNote?: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/disputes/admin/${id}/reject`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Dispute', id }, 'Dispute'],
+    }),
+    addInternalNote: builder.mutation<
+      any,
+      { id: string; note: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/disputes/admin/${id}/note`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Dispute', id }],
     }),
   }),
 });
@@ -148,4 +181,6 @@ export const {
   useGetAdminDisputeDetailsQuery,
   useAddAdminDisputeMessageMutation,
   useResolveDisputeMutation,
+  useRejectDisputeMutation,
+  useAddInternalNoteMutation,
 } = disputesApi;

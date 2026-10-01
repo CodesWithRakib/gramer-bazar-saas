@@ -13,6 +13,7 @@ import { User } from '../../users/entities/user.entity.js';
 import { DisputeReason } from '../enums/dispute-reason.enum.js';
 import { DisputeStatus } from '../enums/dispute-status.enum.js';
 import type { DisputeMessage } from './dispute-message.entity.js';
+import type { DisputeInternalNote } from './dispute-internal-note.entity.js';
 
 @Entity('disputes')
 export class Dispute {
@@ -57,6 +58,18 @@ export class Dispute {
 
   @OneToMany('DisputeMessage', (message: DisputeMessage) => message.dispute)
   messages: DisputeMessage[];
+
+  @OneToMany('DisputeInternalNote', (note: DisputeInternalNote) => note.dispute)
+  internalNotes: DisputeInternalNote[];
+
+  @Column({ name: 'refund_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  refundAmount: number | null;
+
+  @Column({ name: 'requested_resolution', type: 'varchar', nullable: true })
+  requestedResolution: string | null;
+
+  @Column({ name: 'resolution_type', type: 'varchar', nullable: true })
+  resolutionType: string | null; // e.g., 'FULL_REFUND', 'PARTIAL_REFUND', 'REPLACEMENT', 'REJECTED'
 
   @CreateDateColumn()
   createdAt: Date;

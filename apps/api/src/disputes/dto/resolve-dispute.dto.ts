@@ -1,15 +1,25 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsNumber, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { DisputeStatus } from '../enums/dispute-status.enum.js';
 
 export class ResolveDisputeDto {
-  @ApiProperty({ enum: DisputeStatus, example: DisputeStatus.RESOLVED_REFUNDED })
-  @IsEnum(DisputeStatus)
+  @ApiProperty({ enum: ['FULL_REFUND', 'PARTIAL_REFUND', 'REPLACEMENT', 'NO_REFUND'], example: 'FULL_REFUND' })
+  @IsEnum(['FULL_REFUND', 'PARTIAL_REFUND', 'REPLACEMENT', 'NO_REFUND'])
   @IsNotEmpty()
-  status: DisputeStatus;
+  resolutionType: string;
+
+  @ApiPropertyOptional({ example: 450.00 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  refundAmount?: number;
 
   @ApiPropertyOptional({ example: 'Partial refund approved for customer' })
   @IsString()
   @IsOptional()
   adminDecision?: string;
+
+  @ApiPropertyOptional({ example: 'Customer showed clear evidence' })
+  @IsString()
+  @IsOptional()
+  internalNote?: string;
 }

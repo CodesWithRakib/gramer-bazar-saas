@@ -90,15 +90,15 @@ export function SettingsHubView({ lang = 'en', namespace = 'admin' }: SettingsHu
       badgeBn: 'নিরাপত্তা',
     },
     {
-      id: 'demand-reports',
-      title: 'Market Demand & Analytics',
-      titleBn: 'বাজার চাহিদা ও পণ্য বিশ্লেষণ',
+      id: 'analytics-reports',
+      title: 'Analytics & Reports',
+      titleBn: 'অ্যানালিটিক্স ও রিপোর্ট',
       description:
-        'Examine out-of-stock product inquiries, regional consumer demand metrics, and category trend forecasts.',
+        'Comprehensive overview of sales, product performance, customer metrics, and market demand forecasts.',
       descriptionBn:
-        'পণ্যের চাহিদা বিশ্লেষণ, স্টক শেষের পর গ্রাহক অনুসন্ধান এবং আঞ্চলিক ক্রয় প্রবণতা রিপোর্ট দেখুন।',
+        'বিক্রয়, পণ্য বিশ্লেষণ, গ্রাহক মেট্রিক্স এবং বাজারের চাহিদা রিপোর্টের বিস্তারিত চিত্র।',
       icon: BarChart3,
-      href: `/${basePath}/settings/reports/demand`,
+      href: `/${basePath}/settings/reports/overview`,
     },
   ];
 

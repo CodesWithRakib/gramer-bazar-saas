@@ -7,8 +7,14 @@ import { Order } from '../orders/entities/order.entity.js';
 import { CreateDisputeDto } from './dto/create-dispute.dto.js';
 import { AddDisputeMessageDto } from './dto/add-dispute-message.dto.js';
 import { ResolveDisputeDto } from './dto/resolve-dispute.dto.js';
+import { RejectDisputeDto } from './dto/reject-dispute.dto.js';
+import { AddInternalNoteDto } from './dto/add-internal-note.dto.js';
 import { DisputeStatus } from './enums/dispute-status.enum.js';
 import { OrderStatus } from '../orders/enums/order-status.enum.js';
+import { WalletsService } from '../wallets/wallets.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
+import { NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
+import { DisputeInternalNote } from './entities/dispute-internal-note.entity.js';
 
 @Injectable()
 export class DisputesService {
@@ -17,8 +23,12 @@ export class DisputesService {
     private readonly disputeRepository: Repository<Dispute>,
     @InjectRepository(DisputeMessage)
     private readonly disputeMessageRepository: Repository<DisputeMessage>,
+    @InjectRepository(DisputeInternalNote)
+    private readonly disputeInternalNoteRepository: Repository<DisputeInternalNote>,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    private readonly walletsService: WalletsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async createDispute(customerId: string, createDisputeDto: CreateDisputeDto) {
@@ -60,7 +70,20 @@ export class DisputesService {
       status: DisputeStatus.OPEN,
     });
 
-    return this.disputeRepository.save(dispute);
+    const savedDispute = await this.disputeRepository.save(dispute);
+    
+    // Notify Seller
+    void this.notificationsService?.notifyUser?.(sellerId, {
+      type: NotificationType.DISPUTE_OPENED,
+      title: 'New Dispute Opened',
+      message: `A new dispute has been opened for order #${order.id.slice(0, 8).toUpperCase()}.`,
+      titleKey: 'notifications.dispute_opened.title',
+      messageKey: 'notifications.dispute_opened.message',
+      priority: NotificationPriority.HIGH,
+      data: { disputeId: savedDispute.id, orderId: order.id },
+    });
+
+    return savedDispute;
   }
 
   async getCustomerDisputes(customerId: string) {
@@ -82,14 +105,19 @@ export class DisputesService {
   async getAdminDisputes() {
     return this.disputeRepository.find({
       order: { createdAt: 'DESC' },
-      relations: ['order', 'customer', 'seller'],
+      relations: ['order', 'customer', 'seller', 'internalNotes'],
     });
   }
 
   async getDisputeDetails(id: string, userId: string, role: string) {
+    const relations = ['order', 'customer', 'seller', 'messages', 'messages.sender'];
+    if (role === 'admin') {
+      relations.push('internalNotes', 'internalNotes.createdBy');
+    }
+
     const dispute = await this.disputeRepository.findOne({
       where: { id },
-      relations: ['order', 'customer', 'seller', 'messages', 'messages.sender'],
+      relations,
     });
 
     if (!dispute) {
@@ -138,23 +166,117 @@ export class DisputesService {
       await this.disputeRepository.save(dispute);
     }
 
+    // Notify the other party
+    const targetUserId = role === 'customer' ? dispute.sellerId : (role === 'seller' ? dispute.customerId : null);
+    if (targetUserId) {
+      void this.notificationsService?.notifyUser?.(targetUserId, {
+        type: NotificationType.DISPUTE_MESSAGE,
+        title: 'New Dispute Message',
+        message: `You have a new message regarding dispute #${dispute.id.slice(0, 8).toUpperCase()}.`,
+        titleKey: 'notifications.dispute_message.title',
+        messageKey: 'notifications.dispute_message.message',
+        priority: NotificationPriority.NORMAL,
+        data: { disputeId: dispute.id },
+      });
+    } else if (role === 'admin') {
+      // Notify both customer and seller
+      void this.notificationsService?.notifyUsers?.([dispute.customerId, dispute.sellerId], {
+        type: NotificationType.DISPUTE_MESSAGE,
+        title: 'New Dispute Message from Admin',
+        message: `Admin has replied to dispute #${dispute.id.slice(0, 8).toUpperCase()}.`,
+        titleKey: 'notifications.dispute_admin_message.title',
+        messageKey: 'notifications.dispute_admin_message.message',
+        priority: NotificationPriority.HIGH,
+        data: { disputeId: dispute.id },
+      });
+    }
+
     return message;
   }
 
-  async resolveDispute(disputeId: string, dto: ResolveDisputeDto) {
+  async addInternalNote(disputeId: string, adminId: string, dto: AddInternalNoteDto) {
     const dispute = await this.disputeRepository.findOne({ where: { id: disputeId } });
-    if (!dispute) {
-      throw new NotFoundException('Dispute not found');
+    if (!dispute) throw new NotFoundException('Dispute not found');
+
+    const note = this.disputeInternalNoteRepository.create({
+      disputeId,
+      createdById: adminId,
+      note: dto.note,
+    });
+
+    return this.disputeInternalNoteRepository.save(note);
+  }
+
+  async resolveDispute(disputeId: string, adminId: string, dto: ResolveDisputeDto) {
+    const dispute = await this.disputeRepository.findOne({ where: { id: disputeId }, relations: ['order'] });
+    if (!dispute) throw new NotFoundException('Dispute not found');
+
+    dispute.status = DisputeStatus.RESOLVED;
+    dispute.resolutionType = dto.resolutionType;
+    if (dto.adminDecision) dispute.adminDecision = dto.adminDecision;
+    if (dto.refundAmount) dispute.refundAmount = dto.refundAmount;
+
+    // Refund Logic
+    if (dto.resolutionType === 'FULL_REFUND' || dto.resolutionType === 'PARTIAL_REFUND') {
+      const amount = dto.refundAmount || Number(dispute.order.total);
+      
+      // Debit seller, credit customer
+      await this.walletsService.requestPayoutDebit(dispute.sellerId, amount);
+      await this.walletsService.approvePayout(dispute.sellerId, amount, `Dispute Refund: ${dispute.id}`);
+      
+      await this.walletsService.creditEarnings(
+        dispute.customerId, 
+        amount, 
+        `Dispute Refund: ${dispute.id}`, 
+        dispute.id
+      );
     }
 
-    dispute.status = dto.status;
-    if (dto.adminDecision) {
-      dispute.adminDecision = dto.adminDecision;
+    if (dto.internalNote) {
+      await this.addInternalNote(disputeId, adminId, { note: dto.internalNote });
     }
 
-    // If RESOLVED_REFUNDED, the actual refund logic (wallet transfer) would happen here
-    // For now, we update the status. Real implementation would update the Order status to REFUNDED as well.
+    const savedDispute = await this.disputeRepository.save(dispute);
 
-    return this.disputeRepository.save(dispute);
+    // Notify users
+    void this.notificationsService?.notifyUsers?.([dispute.customerId, dispute.sellerId], {
+      type: NotificationType.DISPUTE_RESOLVED,
+      title: 'Dispute Resolved',
+      message: `Dispute #${dispute.id.slice(0, 8).toUpperCase()} has been resolved.`,
+      titleKey: 'notifications.dispute_resolved.title',
+      messageKey: 'notifications.dispute_resolved.message',
+      priority: NotificationPriority.HIGH,
+      data: { disputeId: dispute.id, resolutionType: dto.resolutionType },
+    });
+
+    return savedDispute;
+  }
+
+  async rejectDispute(disputeId: string, adminId: string, dto: RejectDisputeDto) {
+    const dispute = await this.disputeRepository.findOne({ where: { id: disputeId } });
+    if (!dispute) throw new NotFoundException('Dispute not found');
+
+    dispute.status = DisputeStatus.REJECTED;
+    dispute.adminDecision = dto.reason;
+    dispute.resolutionType = 'REJECTED';
+
+    if (dto.internalNote) {
+      await this.addInternalNote(disputeId, adminId, { note: dto.internalNote });
+    }
+
+    const savedDispute = await this.disputeRepository.save(dispute);
+
+    // Notify users
+    void this.notificationsService?.notifyUsers?.([dispute.customerId, dispute.sellerId], {
+      type: NotificationType.DISPUTE_RESOLVED,
+      title: 'Dispute Rejected',
+      message: `Dispute #${dispute.id.slice(0, 8).toUpperCase()} has been rejected.`,
+      titleKey: 'notifications.dispute_rejected.title',
+      messageKey: 'notifications.dispute_rejected.message',
+      priority: NotificationPriority.HIGH,
+      data: { disputeId: dispute.id },
+    });
+
+    return savedDispute;
   }
 }

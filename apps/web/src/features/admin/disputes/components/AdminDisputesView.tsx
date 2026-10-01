@@ -77,16 +77,16 @@ export function AdminDisputesView({ lang = 'en' }: AdminDisputesViewProps) {
             {isBn ? 'পর্যালোচনাধীন' : 'Under Review'}
           </Badge>
         );
-      case 'RESOLVED_REFUNDED':
+      case 'RESOLVED':
         return (
           <Badge
             variant="secondary"
             className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
           >
-            {isBn ? 'রিফান্ড সম্পন্ন' : 'Resolved'}
+            {isBn ? 'রিফান্ড সম্পন্ন / মীমাংসিত' : 'Resolved'}
           </Badge>
         );
-      case 'RESOLVED_REJECTED':
+      case 'REJECTED':
       default:
         return (
           <Badge
@@ -165,10 +165,10 @@ export function AdminDisputesView({ lang = 'en' }: AdminDisputesViewProps) {
                   <SelectItem value="UNDER_REVIEW">
                     {isBn ? 'পর্যালোচনাধীন' : 'Under Review'}
                   </SelectItem>
-                  <SelectItem value="RESOLVED_REFUNDED">
-                    {isBn ? 'রিফান্ড সম্পন্ন' : 'Resolved'}
+                  <SelectItem value="RESOLVED">
+                    {isBn ? 'মীমাংসিত' : 'Resolved'}
                   </SelectItem>
-                  <SelectItem value="RESOLVED_REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
+                  <SelectItem value="REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
