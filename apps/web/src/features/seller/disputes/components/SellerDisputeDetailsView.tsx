@@ -123,7 +123,7 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
 
   const statusMeta = getDisputeStatusMeta(dispute.status);
   const isResolved =
-    dispute.status === 'RESOLVED_REFUNDED' || dispute.status === 'RESOLVED_REJECTED';
+    dispute.status === 'RESOLVED' || dispute.status === 'REJECTED' || dispute.status === 'CANCELLED';
   const messages = dispute.messages ?? [];
 
   return (
@@ -207,13 +207,13 @@ export function SellerDisputeDetailsView({ lang = 'en', id }: SellerDisputeDetai
             {dispute.adminDecision && (
               <div
                 className={`rounded-xl border p-4 ${
-                  dispute.status === 'RESOLVED_REFUNDED'
+                  dispute.status === 'RESOLVED'
                     ? 'border-success/30 bg-success/5'
                     : 'border-destructive/25 bg-destructive/5'
                 }`}
               >
                 <p className="text-foreground flex items-center gap-2 text-sm font-semibold">
-                  {dispute.status === 'RESOLVED_REFUNDED' ? (
+                  {dispute.status === 'RESOLVED' ? (
                     <CheckCircle2 className="text-success h-4 w-4" />
                   ) : (
                     <AlertTriangle className="text-destructive h-4 w-4" />

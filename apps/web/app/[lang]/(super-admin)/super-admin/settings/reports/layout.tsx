@@ -5,13 +5,14 @@ export const metadata: Metadata = {
   title: 'Analytics & Reports | Gramer Bazar',
 };
 
-export default function ReportsLayout({
+export default async function ReportsLayout({
   children,
-  params: { lang },
+  params,
 }: {
   children: React.ReactNode;
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
+  const { lang } = await params;
   return (
     <AnalyticsReportsLayout lang={lang} namespace="super-admin">
       {children}

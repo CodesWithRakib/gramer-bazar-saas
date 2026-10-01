@@ -153,6 +153,8 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
   const isResolved =
     dispute.status === 'RESOLVED' || dispute.status === 'REJECTED' || dispute.status === 'CANCELLED';
 
+  const isBn = lang === 'bn';
+
   const formatCurrency = (amount: number) => {
     return isBn ? `৳${amount.toLocaleString('bn-BD')}` : `৳${amount.toLocaleString('en-US')}`;
   };
