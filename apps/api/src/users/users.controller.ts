@@ -87,6 +87,24 @@ export class UsersController {
     return this.usersService.findAll(page, limit, search, role);
   }
 
+  @Get(':id')
+  @Permissions('users.read')
+  @ApiOperation({
+    summary: 'Retrieve a single user by identifier',
+    description:
+      'Requires ADMIN or SUPER_ADMIN role. Returns one user record without sensitive security hashes.',
+  })
+  @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'User UUID identifier' })
+  @ApiStandardResponse({
+    type: UserResponseDto,
+    status: HttpStatus.OK,
+    description: 'User details retrieved successfully',
+  })
+  @ApiCommonErrors([401, 403, 404, 500])
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.usersService.findById(id);
+  }
+
   @Post()
   @Permissions('users.create')
   @ApiOperation({

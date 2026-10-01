@@ -40,6 +40,9 @@ import {
   ApiCommonErrors,
 } from '../common/decorators/api-standard-response.decorator.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
+import { ImpersonationGuard } from '../common/guards/impersonation.guard.js';
+import { BlockDuringImpersonation } from '../common/decorators/block-during-impersonation.decorator.js';
+import { getEffectivePermissions, isSuperAdmin } from '../common/utils/permission.js';
 
 const authThrottle = (envKey: string, fallback: number) => {
   const raw = Number(process.env[envKey]);
@@ -218,7 +221,7 @@ export class AuthController {
   @ApiCommonErrors([401, 500])
   @HttpCode(HttpStatus.OK)
   async logout(@Request() req: any, @Res({ passthrough: true }) res: Response) {
-    await this.authService.logout(req.user.id);
+    await this.authService.logout(req.user.id, req.user.impersonation ?? null);
     this.clearCookies(res);
     return { message: 'Logged out successfully' };
   }
@@ -252,12 +255,17 @@ export class AuthController {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       roles: user.roles?.map((r: any) => (typeof r === 'string' ? r : r.name)) || [],
+      permissions: Array.from(getEffectivePermissions(user)).sort(),
+      isSuperAdmin: isSuperAdmin(user),
+      // Present only while authenticated with a temporary impersonation token.
+      impersonation: user.impersonation ?? null,
     };
   }
 
   @Patch('me')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ImpersonationGuard)
+  @BlockDuringImpersonation()
   @ApiOperation({
     summary: 'Update current user personal profile',
     description: 'Modifies first name, last name, or phone number of the authenticated user.',
@@ -274,7 +282,8 @@ export class AuthController {
 
   @Patch('me/password')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ImpersonationGuard)
+  @BlockDuringImpersonation()
   @ApiOperation({
     summary: 'Change account password',
     description: 'Validates existing password and applies new password for the current user.',
@@ -342,7 +351,8 @@ export class AuthController {
 
   @Delete('me')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ImpersonationGuard)
+  @BlockDuringImpersonation()
   @ApiOperation({
     summary: 'Schedule account deletion',
     description: 'Flags authenticated account for soft deletion and scheduled purge.',

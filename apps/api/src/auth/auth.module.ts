@@ -1,4 +1,5 @@
 import { Module, Global } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -8,12 +9,16 @@ import { UsersModule } from '../users/users.module.js';
 import { OtpModule } from '../otp/otp.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
+import {
+  ImpersonationSession,
+} from '../impersonation/entities/impersonation-session.entity.js';
 
 @Global()
 @Module({
   imports: [
     UsersModule,
     OtpModule,
+    TypeOrmModule.forFeature([ImpersonationSession]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

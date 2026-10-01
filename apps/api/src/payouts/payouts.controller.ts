@@ -17,6 +17,8 @@ import { ReviewPayoutDto } from './dto/review-payout.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { PermissionsGuard } from '../common/guards/permissions.guard.js';
+import { ImpersonationGuard } from '../common/guards/impersonation.guard.js';
+import { BlockDuringImpersonation } from '../common/decorators/block-during-impersonation.decorator.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { Permissions } from '../common/decorators/permissions.decorator.js';
 import { Role } from '../roles/enums/role.enum.js';
@@ -37,6 +39,8 @@ export class PayoutsController {
 
   @Post('request')
   @Roles(Role.SELLER)
+  @UseGuards(ImpersonationGuard)
+  @BlockDuringImpersonation()
   @ApiOperation({
     summary: 'Request a new payout (Seller)',
     description: 'Submits a withdrawal request from seller available wallet balance.',
@@ -67,6 +71,8 @@ export class PayoutsController {
 
   @Post('rider/request')
   @Roles(Role.RIDER)
+  @UseGuards(ImpersonationGuard)
+  @BlockDuringImpersonation()
   @ApiOperation({
     summary: 'Request a new payout (Rider)',
     description:

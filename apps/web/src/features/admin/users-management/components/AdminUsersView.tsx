@@ -1,13 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { useSelector } from 'react-redux';
 import { useGetUsersQuery, User, useUpdateUserStatusMutation } from '@/features/users/usersApi';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, UserCog } from 'lucide-react';
+import { RootState } from '@/store/store';
+import { userIsSuperAdmin } from '@/lib/roles';
 import {
   Select,
   SelectContent,
@@ -17,6 +21,8 @@ import {
 } from '@/components/ui/select';
 import { UserRoleDialog } from './UserRoleDialog';
 import { AdminCreateUserDialog } from './AdminCreateUserDialog';
+import { ImpersonateUserDialog } from './ImpersonateUserDialog';
+import { isImpersonatable } from '@/features/users/impersonationEligibility';
 
 export interface AdminUsersViewProps {
   lang?: string;
@@ -30,11 +36,15 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [editingRolesUser, setEditingRolesUser] = useState<User | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [impersonateTarget, setImpersonateTarget] = useState<User | null>(null);
 
   const { data, isLoading, isError, refetch } = useGetUsersQuery({ page, limit, search });
   const [updateStatus] = useUpdateUserStatusMutation();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
 
-  const isSuperAdmin = namespace === 'super-admin';
+  const isSuperAdmin = namespace === 'super-admin' || userIsSuperAdmin(currentUser);
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
+  const viewLabel = lang === 'bn' ? 'দেখুন' : 'View';
 
   const filteredUsers = React.useMemo(() => {
     let list = data?.data || [];
@@ -93,7 +103,12 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
         const isActive = user.status === 'ACTIVE';
 
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={`/${lang}/${basePath}/users-management/users/${user.id}`}>
+                {viewLabel}
+              </Link>
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setEditingRolesUser(user)}>
               Roles
             </Button>
@@ -110,6 +125,17 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
             >
               {isActive ? 'Suspend' : 'Activate'}
             </Button>
+            {userIsSuperAdmin(currentUser) && isImpersonatable(user, currentUser?.id) && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setImpersonateTarget(user)}
+                aria-label={`Impersonate ${user.firstName ?? user.phone}`}
+              >
+                <UserCog className="me-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                {lang === 'bn' ? 'প্রবেশ' : 'Impersonate'}
+              </Button>
+            )}
           </div>
         );
       },
@@ -204,6 +230,15 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
         onOpenChange={setIsCreateOpen}
         isSuperAdmin={isSuperAdmin}
       />
+
+      {impersonateTarget && (
+        <ImpersonateUserDialog
+          user={impersonateTarget}
+          open={!!impersonateTarget}
+          onOpenChange={(open) => !open && setImpersonateTarget(null)}
+          lang={lang}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -9,6 +10,7 @@ import { UsersService } from '../users/users.service.js';
 import { OtpService } from '../otp/otp.service.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { UserStatus } from '../users/enums/user-status.enum.js';
+import { ImpersonationSession } from '../impersonation/entities/impersonation-session.entity.js';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -33,6 +35,10 @@ describe('AuthService', () => {
   };
   const settingsService = {
     isSellerRegistrationAllowed: vi.fn().mockResolvedValue(true),
+  };
+  const impersonationRepository = {
+    findOne: vi.fn(),
+    save: vi.fn(),
   };
 
   const makeUser = (overrides: Record<string, unknown> = {}) => ({
@@ -59,6 +65,10 @@ describe('AuthService', () => {
         { provide: JwtService, useValue: jwtService },
         { provide: ConfigService, useValue: configService },
         { provide: SettingsService, useValue: settingsService },
+        {
+          provide: getRepositoryToken(ImpersonationSession),
+          useValue: impersonationRepository,
+        },
       ],
     }).compile();
 

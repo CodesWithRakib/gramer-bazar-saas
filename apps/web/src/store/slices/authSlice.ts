@@ -5,6 +5,35 @@ export interface RoleRef {
   name?: string;
 }
 
+export type ImpersonationReason =
+  | 'QA_TESTING'
+  | 'BUG_INVESTIGATION'
+  | 'CUSTOMER_SUPPORT'
+  | 'ACCOUNT_VERIFICATION'
+  | 'TROUBLESHOOTING'
+  | 'OTHER';
+
+/**
+ * Server-issued impersonation context. Present on the profile only while the
+ * session is a temporary Super Admin impersonation session.
+ *
+ * ACTOR (actorUserId) is the real Super Admin. targetUserId is the effective
+ * user whose experience is being viewed.
+ */
+export interface ImpersonationContext {
+  sessionId: string;
+  actorUserId: string;
+  actorName: string | null;
+  actorRoles?: string[];
+  targetUserId: string;
+  targetName: string | null;
+  targetRole: string;
+  reason: ImpersonationReason;
+  reasonNote: string | null;
+  startedAt: string;
+  expiresAt: string;
+}
+
 export interface UserProfile {
   id: string;
   phone: string;
@@ -17,6 +46,8 @@ export interface UserProfile {
   permissions?: string[];
   /** True when the account holds the SUPER_ADMIN role. */
   isSuperAdmin?: boolean;
+  /** Populated only during a temporary impersonation session. */
+  impersonation?: ImpersonationContext | null;
   [key: string]: unknown;
 }
 

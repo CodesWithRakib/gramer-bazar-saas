@@ -1,4 +1,6 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
@@ -10,6 +12,11 @@ import { User } from '../users/entities/user.entity.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { getEffectivePermissions, isSuperAdmin } from '../common/utils/permission.js';
+import type { ImpersonationPrincipal } from '../common/utils/impersonation.js';
+import {
+  ImpersonationSession,
+} from '../impersonation/entities/impersonation-session.entity.js';
+import { ImpersonationStatus } from '../impersonation/enums/impersonation.enum.js';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +26,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly settingsService: SettingsService,
+    @InjectRepository(ImpersonationSession)
+    private readonly impersonationRepository: Repository<ImpersonationSession>,
   ) {}
 
   async sendOtp(phone: string): Promise<{ message: string }> {
@@ -165,8 +174,11 @@ export class AuthService {
    * Shape the user returned to the client. `permissions` carries the effective
    * permission set so the frontend can gate navigation — the backend still
    * enforces every permission independently on each request.
+   *
+   * `impersonation` is populated only for temporary impersonation sessions; a
+   * normal session always reports `null`.
    */
-  private toSessionUser(user: User) {
+  private toSessionUser(user: User, impersonation: ImpersonationPrincipal | null = null) {
     const roles = user.roles?.map((r) => r.name) || [];
     return {
       id: user.id,
@@ -178,7 +190,55 @@ export class AuthService {
       roles,
       permissions: Array.from(getEffectivePermissions(user)).sort(),
       isSuperAdmin: isSuperAdmin(user),
+      impersonation,
     };
+  }
+
+  /**
+   * Issue a short-lived access token that carries BOTH identities:
+   *   sub = effective (impersonated) user
+   *   act = actor (Super Admin)
+   *   imp = impersonation session id
+   *
+   * The actor's refresh token is intentionally left untouched so their real
+   * session is never destroyed by impersonation.
+   */
+  async buildImpersonationSession(
+    actor: User,
+    target: User,
+    impersonation: ImpersonationPrincipal,
+  ) {
+    const remainingSeconds = Math.max(
+      1,
+      Math.floor((new Date(impersonation.expiresAt).getTime() - Date.now()) / 1000),
+    );
+    const payload = {
+      sub: target.id,
+      phone: target.phone,
+      act: actor.id,
+      imp: impersonation.sessionId,
+    };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>(
+        'JWT_ACCESS_SECRET',
+        'super-secret-key-for-dev-only',
+      ),
+      expiresIn: `${remainingSeconds}s`,
+    });
+
+    return {
+      accessToken,
+      user: this.toSessionUser(target, impersonation),
+    };
+  }
+
+  /**
+   * Issue a fresh normal session for the Super Admin when impersonation ends.
+   * No credentials are required — the actor identity is proven by the
+   * impersonation session that was just validated server-side.
+   */
+  async restoreActorSession(actor: User) {
+    return this.generateTokens(actor);
   }
 
   async refreshTokens(refreshToken: string) {
@@ -205,7 +265,33 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  async logout(userId: string) {
+  /**
+   * Terminate the session.
+   *
+   * When logging out during impersonation, the impersonation session is ended
+   * and the ACTOR's refresh token is revoked — never the impersonated user's.
+   * This guarantees the Super Admin's real session cannot stay alive after a
+   * logout performed while impersonating.
+   */
+  async logout(userId: string, impersonation?: ImpersonationPrincipal | null) {
+    if (impersonation) {
+      try {
+        const session = await this.impersonationRepository.findOne({
+          where: { id: impersonation.sessionId },
+        });
+        if (session && session.status === ImpersonationStatus.ACTIVE) {
+          session.status = ImpersonationStatus.ENDED;
+          session.endedAt = new Date();
+          session.endReason = 'LOGGED_OUT_BY_ACTOR';
+          await this.impersonationRepository.save(session);
+        }
+      } catch {
+        // Best-effort; the important part is revoking the actor's token below.
+      }
+      await this.usersService.update(impersonation.actorUserId, { refreshTokenHash: null });
+      return { message: 'Logged out successfully' };
+    }
+
     await this.usersService.update(userId, {
       refreshTokenHash: null,
     });

@@ -19,6 +19,14 @@ export interface User {
   createdAt: string;
 }
 
+export interface UserDetail extends User {
+  avatar: string | null;
+  isPhoneVerified: boolean;
+  isEmailVerified: boolean;
+  lastLoginAt: string | null;
+  updatedAt: string;
+}
+
 export interface PaginatedUsers {
   data: User[];
   meta: {
@@ -47,6 +55,12 @@ export const usersApi = api.injectEndpoints({
       query: (params) => ({
         url: '/users',
         params,
+      }),
+      providesTags: ['User'],
+    }),
+    getUser: builder.query<UserDetail, string>({
+      query: (id) => ({
+        url: `/users/${id}`,
       }),
       providesTags: ['User'],
     }),
@@ -79,6 +93,7 @@ export const usersApi = api.injectEndpoints({
 
 export const {
   useGetUsersQuery,
+  useGetUserQuery,
   useCreateUserMutation,
   useUpdateUserStatusMutation,
   useUpdateUserRolesMutation,

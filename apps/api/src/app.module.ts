@@ -44,6 +44,8 @@ import { FlashSalesModule } from './flash-sales/flash-sales.module.js';
 import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
 import { AdminsModule } from './admins/admins.module.js';
+import { ImpersonationModule } from './impersonation/impersonation.module.js';
+import { ImpersonationActivityInterceptor } from './impersonation/impersonation-activity.interceptor.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
@@ -52,6 +54,7 @@ import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSc
 import { RiderSystem1790700000000 } from './migrations/1790700000000-RiderSystem.js';
 import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSystem.js';
 import { AdminRbac1790900000000 } from './migrations/1790900000000-AdminRbac.js';
+import { ImpersonationSessions1791000000000 } from './migrations/1791000000000-ImpersonationSessions.js';
 
 @Module({
   imports: [
@@ -87,6 +90,7 @@ import { AdminRbac1790900000000 } from './migrations/1790900000000-AdminRbac.js'
             RiderSystem1790700000000,
             SellerSystem1790800000000,
             AdminRbac1790900000000,
+            ImpersonationSessions1791000000000,
           ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,
@@ -177,10 +181,15 @@ import { AdminRbac1790900000000 } from './migrations/1790900000000-AdminRbac.js'
     SettingsModule,
     ApplicationsModule,
     AdminsModule,
+    ImpersonationModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: 'APP_INTERCEPTOR',
+      useClass: ImpersonationActivityInterceptor,
+    },
     {
       provide: 'APP_GUARD',
       useClass: WsSafeThrottlerGuard,

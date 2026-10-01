@@ -212,6 +212,7 @@ export const api = createApi({
     'Payment',
     'Admin',
     'Role',
+    'Impersonation',
   ],
   endpoints: () => ({}),
 });

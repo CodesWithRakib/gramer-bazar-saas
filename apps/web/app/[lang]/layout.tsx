@@ -72,6 +72,7 @@ import { CartDrawer } from '@/components/cart/CartDrawer';
 import { CSPostHogProvider } from '@/providers/PostHogProvider';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { ImpersonationBanner } from '@/components/impersonation/ImpersonationBanner';
 
 import { ThemePaletteProvider } from '@/providers/ThemePaletteProvider';
 import { ThemeDevToolbar } from '@/components/theme/ThemeDevToolbar';
@@ -103,6 +104,7 @@ export default async function RootLayout({
             <ReduxProvider>
               <AuthProvider>
                 <SocketProvider>
+                  <ImpersonationBanner lang={lang} />
                   <ClientLayoutWrapper lang={lang}>{children}</ClientLayoutWrapper>
                   <LoginModal lang={lang} />
                   <CartDrawer lang={lang} />
