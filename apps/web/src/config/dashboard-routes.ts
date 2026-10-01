@@ -20,6 +20,7 @@ import {
   Bell,
   History,
   Banknote,
+  Megaphone,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -221,6 +222,15 @@ export const superAdminRoutes: DashboardRoute[] = [
   },
 
   // Section: System & Policies
+  {
+    title: 'Announcements',
+    titleBn: 'ঘোষণা',
+    href: '/super-admin/communication/announcements',
+    icon: Megaphone,
+    section: 'System',
+    sectionBn: 'সিস্টেম',
+    matchPrefixes: ['/super-admin/communication/announcements', '/super-admin/communication/history', '/super-admin/communication/templates'],
+  },
   {
     title: 'Messages',
     titleBn: 'কমিউনিকেশন',

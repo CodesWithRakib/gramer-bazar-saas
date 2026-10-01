@@ -34,6 +34,7 @@ export enum NotificationType {
   DISPUTE_OPENED = 'DISPUTE_OPENED',
   DISPUTE_RESOLVED = 'DISPUTE_RESOLVED',
   SYSTEM = 'SYSTEM',
+  ADMIN_ANNOUNCEMENT = 'ADMIN_ANNOUNCEMENT',
   // Backward compatibility aliases
   ORDER_UPDATE = 'ORDER_UPDATE',
   PROMO = 'PROMO',

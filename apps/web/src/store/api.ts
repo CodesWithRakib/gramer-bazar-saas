@@ -213,6 +213,8 @@ export const api = createApi({
     'Admin',
     'Role',
     'Impersonation',
+    'Announcement',
+    'AnnouncementTemplate',
   ],
   endpoints: () => ({}),
 });

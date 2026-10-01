@@ -58,6 +58,8 @@ import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSyst
 import { AdminRbac1790900000000 } from './migrations/1790900000000-AdminRbac.js';
 import { ImpersonationSessions1791000000000 } from './migrations/1791000000000-ImpersonationSessions.js';
 import { NotificationsUpgrade1791100000000 } from './migrations/1791100000000-NotificationsUpgrade.js';
+import { AnnouncementsModule } from './announcements/announcements.module.js';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -145,6 +147,7 @@ import { NotificationsUpgrade1791100000000 } from './migrations/1791100000000-No
       inject: [ConfigService],
     }),
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: Number(process.env.THROTTLE_TTL_MS ?? 60000),
@@ -188,6 +191,7 @@ import { NotificationsUpgrade1791100000000 } from './migrations/1791100000000-No
     ApplicationsModule,
     AdminsModule,
     ImpersonationModule,
+    AnnouncementsModule,
   ],
   controllers: [AppController],
   providers: [
