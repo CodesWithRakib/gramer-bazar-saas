@@ -172,6 +172,88 @@
   }
 }
 
+/* =========================================================================
+   CUSTOM BESPOKE TOAST NOTIFICATION COLOR SYSTEM
+   Handcrafted executive pigments with superior contrast & dark-mode parity.
+   Zero generic Tailwind color classes.
+   ========================================================================= */
+
+/* Pillar & Progress Bar Gradients */
+.gb-toast-bar-success { background: linear-gradient(180deg, #065f46 0%, #059669 45%, #10b981 100%); }
+.gb-toast-bar-error   { background: linear-gradient(180deg, #881337 0%, #be123c 45%, #e11d48 100%); }
+.gb-toast-bar-warning { background: linear-gradient(180deg, #92400e 0%, #d97706 45%, #f59e0b 100%); }
+.gb-toast-bar-info    { background: linear-gradient(180deg, #1e40af 0%, #2563eb 45%, #0284c7 100%); }
+.gb-toast-bar-loading { background: linear-gradient(180deg, #0e4b36 0%, #136348 45%, #10b981 100%); }
+.gb-toast-bar-default { background: linear-gradient(180deg, #334155 0%, #64748b 100%); }
+
+/* Ambient Radial Glow Washes */
+.gb-toast-glow-success { background: radial-gradient(circle at top left, rgba(5, 150, 105, 0.16) 0%, rgba(16, 185, 129, 0.04) 50%, transparent 75%); }
+.gb-toast-glow-error   { background: radial-gradient(circle at top left, rgba(190, 18, 60, 0.15) 0%, rgba(225, 29, 72, 0.04) 50%, transparent 75%); }
+.gb-toast-glow-warning { background: radial-gradient(circle at top left, rgba(217, 119, 6, 0.15) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 75%); }
+.gb-toast-glow-info    { background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.15) 0%, rgba(2, 132, 199, 0.04) 50%, transparent 75%); }
+.gb-toast-glow-loading { background: radial-gradient(circle at top left, rgba(19, 99, 72, 0.16) 0%, transparent 75%); }
+.gb-toast-glow-default { background: radial-gradient(circle at top left, rgba(100, 116, 139, 0.09) 0%, transparent 75%); }
+
+:is(.dark *) .gb-toast-glow-success { background: radial-gradient(circle at top left, rgba(16, 185, 129, 0.22) 0%, transparent 75%); }
+:is(.dark *) .gb-toast-glow-error   { background: radial-gradient(circle at top left, rgba(225, 29, 72, 0.22) 0%, transparent 75%); }
+:is(.dark *) .gb-toast-glow-warning { background: radial-gradient(circle at top left, rgba(245, 158, 11, 0.20) 0%, transparent 75%); }
+:is(.dark *) .gb-toast-glow-info    { background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.20) 0%, transparent 75%); }
+:is(.dark *) .gb-toast-glow-loading { background: radial-gradient(circle at top left, rgba(52, 211, 153, 0.22) 0%, transparent 75%); }
+:is(.dark *) .gb-toast-glow-default { background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.14) 0%, transparent 75%); }
+
+/* Icon Badge Container & Stroke */
+.gb-toast-icon-success { background-color: rgba(6, 95, 70, 0.08); border-color: rgba(5, 150, 105, 0.28); color: #065f46; }
+.gb-toast-icon-error   { background-color: rgba(190, 18, 60, 0.08); border-color: rgba(190, 18, 60, 0.26); color: #9f1239; }
+.gb-toast-icon-warning { background-color: rgba(217, 119, 6, 0.09); border-color: rgba(217, 119, 6, 0.30); color: #92400e; }
+.gb-toast-icon-info    { background-color: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.26); color: #1d4ed8; }
+.gb-toast-icon-loading { background-color: rgba(19, 99, 72, 0.08); border-color: rgba(19, 99, 72, 0.28); color: #136348; }
+.gb-toast-icon-default { background-color: rgba(100, 116, 139, 0.08); border-color: rgba(100, 116, 139, 0.24); color: #334155; }
+
+:is(.dark *) .gb-toast-icon-success { background-color: rgba(16, 185, 129, 0.16); border-color: rgba(52, 211, 153, 0.36); color: #34d399; }
+:is(.dark *) .gb-toast-icon-error   { background-color: rgba(225, 29, 72, 0.16); border-color: rgba(251, 113, 133, 0.36); color: #fb7185; }
+:is(.dark *) .gb-toast-icon-warning { background-color: rgba(245, 158, 11, 0.16); border-color: rgba(251, 191, 36, 0.36); color: #fbbf24; }
+:is(.dark *) .gb-toast-icon-info    { background-color: rgba(59, 130, 246, 0.16); border-color: rgba(96, 165, 250, 0.36); color: #60a5fa; }
+:is(.dark *) .gb-toast-icon-loading { background-color: rgba(52, 211, 153, 0.16); border-color: rgba(52, 211, 153, 0.36); color: #34d399; }
+:is(.dark *) .gb-toast-icon-default { background-color: rgba(148, 163, 184, 0.15); border-color: rgba(148, 163, 184, 0.32); color: #cbd5e1; }
+
+/* Status Badges */
+.gb-toast-badge-success { background-color: rgba(6, 95, 70, 0.08); color: #064e3b; border-color: rgba(5, 150, 105, 0.30); }
+.gb-toast-badge-error   { background-color: rgba(190, 18, 60, 0.08); color: #881337; border-color: rgba(190, 18, 60, 0.28); }
+.gb-toast-badge-warning { background-color: rgba(217, 119, 6, 0.09); color: #78350f; border-color: rgba(217, 119, 6, 0.32); }
+.gb-toast-badge-info    { background-color: rgba(37, 99, 235, 0.08); color: #1e3a8a; border-color: rgba(37, 99, 235, 0.28); }
+.gb-toast-badge-loading { background-color: rgba(19, 99, 72, 0.08); color: #0e4b36; border-color: rgba(19, 99, 72, 0.30); }
+.gb-toast-badge-default { background-color: rgba(100, 116, 139, 0.08); color: #1e293b; border-color: rgba(100, 116, 139, 0.26); }
+
+:is(.dark *) .gb-toast-badge-success { background-color: rgba(16, 185, 129, 0.16); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.36); }
+:is(.dark *) .gb-toast-badge-error   { background-color: rgba(225, 29, 72, 0.16); color: #fda4af; border-color: rgba(251, 113, 133, 0.36); }
+:is(.dark *) .gb-toast-badge-warning { background-color: rgba(245, 158, 11, 0.16); color: #fde68a; border-color: rgba(251, 191, 36, 0.36); }
+:is(.dark *) .gb-toast-badge-info    { background-color: rgba(59, 130, 246, 0.16); color: #93c5fd; border-color: rgba(96, 165, 250, 0.36); }
+:is(.dark *) .gb-toast-badge-loading { background-color: rgba(52, 211, 153, 0.16); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.36); }
+:is(.dark *) .gb-toast-badge-default { background-color: rgba(148, 163, 184, 0.15); color: #e2e8f0; border-color: rgba(148, 163, 184, 0.32); }
+
+/* Interactive Live Preview Pill Buttons */
+.gb-btn-preview-success { background-color: rgba(6, 95, 70, 0.08); color: #065f46; border: 1px solid rgba(5, 150, 105, 0.28); }
+.gb-btn-preview-success:hover { background-color: rgba(6, 95, 70, 0.14); }
+.gb-btn-preview-error   { background-color: rgba(190, 18, 60, 0.08); color: #9f1239; border: 1px solid rgba(190, 18, 60, 0.26); }
+.gb-btn-preview-error:hover { background-color: rgba(190, 18, 60, 0.14); }
+.gb-btn-preview-warning { background-color: rgba(217, 119, 6, 0.09); color: #92400e; border: 1px solid rgba(217, 119, 6, 0.30); }
+.gb-btn-preview-warning:hover { background-color: rgba(217, 119, 6, 0.16); }
+.gb-btn-preview-info    { background-color: rgba(37, 99, 235, 0.08); color: #1d4ed8; border: 1px solid rgba(37, 99, 235, 0.26); }
+.gb-btn-preview-info:hover { background-color: rgba(37, 99, 235, 0.14); }
+.gb-btn-preview-loading { background-color: rgba(19, 99, 72, 0.08); color: #136348; border: 1px solid rgba(19, 99, 72, 0.28); }
+.gb-btn-preview-loading:hover { background-color: rgba(19, 99, 72, 0.14); }
+
+:is(.dark *) .gb-btn-preview-success { background-color: rgba(16, 185, 129, 0.16); color: #34d399; border-color: rgba(52, 211, 153, 0.36); }
+:is(.dark *) .gb-btn-preview-success:hover { background-color: rgba(16, 185, 129, 0.24); }
+:is(.dark *) .gb-btn-preview-error   { background-color: rgba(225, 29, 72, 0.16); color: #fb7185; border-color: rgba(251, 113, 133, 0.36); }
+:is(.dark *) .gb-btn-preview-error:hover { background-color: rgba(225, 29, 72, 0.24); }
+:is(.dark *) .gb-btn-preview-warning { background-color: rgba(245, 158, 11, 0.16); color: #fbbf24; border-color: rgba(251, 191, 36, 0.36); }
+:is(.dark *) .gb-btn-preview-warning:hover { background-color: rgba(245, 158, 11, 0.24); }
+:is(.dark *) .gb-btn-preview-info    { background-color: rgba(59, 130, 246, 0.16); color: #60a5fa; border-color: rgba(96, 165, 250, 0.36); }
+:is(.dark *) .gb-btn-preview-info:hover { background-color: rgba(59, 130, 246, 0.24); }
+:is(.dark *) .gb-btn-preview-loading { background-color: rgba(52, 211, 153, 0.16); color: #34d399; border-color: rgba(52, 211, 153, 0.36); }
+:is(.dark *) .gb-btn-preview-loading:hover { background-color: rgba(52, 211, 153, 0.24); }
+
 @layer base {
   /* =========================================================================
      DEFAULT / PALETTE A — Clean Marketplace (Default Theme)
@@ -179,49 +261,49 @@
      ========================================================================= */
   :root,
   [data-theme='clean'] {
-    --background: 0 0% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 210 20% 99%;
+    --foreground: 222.2 47% 11.2%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222.2 47% 11.2%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222.2 47% 11.2%;
 
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
-    --primary-hover: 142.1 76.2% 31%;
+    --primary: 156 68% 25%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 156 68% 20%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 214 25% 95%;
+    --secondary-foreground: 222.2 47% 11.2%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 215 20% 96%;
+    --muted-foreground: 215 16% 46%;
 
-    --accent: 142.1 40% 96%;
-    --accent-foreground: 142.1 76.2% 25%;
+    --accent: 156 45% 94%;
+    --accent-foreground: 156 68% 20%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 142.1 76.2% 36.3%;
+    --border: 215 20% 90%;
+    --input: 215 20% 90%;
+    --ring: 156 68% 25%;
     --radius: 0.5rem;
 
     --surface: 0 0% 100%;
-    --surface-muted: 210 40% 98%;
+    --surface-muted: 210 25% 98%;
 
-    --price: 142.1 76.2% 32%;
-    --discount: 0 84.2% 60.2%;
-    --discount-foreground: 210 40% 98%;
-    --rating: 38 92% 50%;
-    --stock: 142 76% 36%;
-    --stock-foreground: 355.7 100% 97.3%;
+    --price: 156 75% 24%;
+    --discount: 354 78% 54%;
+    --discount-foreground: 0 0% 100%;
+    --rating: 38 92% 44%;
+    --stock: 156 65% 26%;
+    --stock-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
-    --success-foreground: 355.7 100% 97.3%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 48 96% 89%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --info: 214 95% 54%;
-    --info-foreground: 210 40% 98%;
+    --success: 152 68% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 44%;
+    --warning-foreground: 40 95% 96%;
+    --destructive: 354 78% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --info: 212 90% 50%;
+    --info-foreground: 0 0% 100%;
 
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -432,48 +514,48 @@
   .dark,
   .dark[data-theme='clean'],
   [data-theme='clean'].dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222.2 47% 7%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 47% 9.5%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 47% 9.5%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --primary-hover: 142.1 70.6% 50%;
+    --primary: 156 60% 45%;
+    --primary-foreground: 156 80% 8%;
+    --primary-hover: 156 60% 50%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 217.2 32.6% 15%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217.2 32.6% 15%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 156 35% 15%;
+    --accent-foreground: 156 60% 80%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142.1 70.6% 45.3%;
+    --border: 217.2 32.6% 17%;
+    --input: 217.2 32.6% 17%;
+    --ring: 156 60% 45%;
 
-    --surface: 222.2 84% 6%;
-    --surface-muted: 217.2 32.6% 14%;
+    --surface: 222.2 47% 8.5%;
+    --surface-muted: 217.2 32.6% 13%;
 
-    --price: 142.1 70.6% 45.3%;
-    --discount: 0 62.8% 50%;
-    --discount-foreground: 210 40% 98%;
+    --price: 156 60% 48%;
+    --discount: 354 70% 55%;
+    --discount-foreground: 0 0% 100%;
     --rating: 38 92% 50%;
-    --stock: 142 70% 45%;
-    --stock-foreground: 144.9 80.4% 10%;
+    --stock: 156 60% 45%;
+    --stock-foreground: 156 80% 8%;
 
-    --success: 142 70% 45%;
-    --success-foreground: 144.9 80.4% 10%;
+    --success: 152 65% 44%;
+    --success-foreground: 152 80% 8%;
     --warning: 38 92% 50%;
     --warning-foreground: 48 96% 89%;
-    --destructive: 0 62.8% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --info: 214 95% 54%;
-    --info-foreground: 210 40% 98%;
+    --destructive: 354 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --info: 212 90% 58%;
+    --info-foreground: 0 0% 100%;
   }
 
   .dark[data-theme='fresh'],

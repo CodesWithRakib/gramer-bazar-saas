@@ -88,7 +88,10 @@ export class OrdersService {
           );
         }
 
-        const unitPrice = Number(dbProduct.discountPrice ?? dbProduct.price);
+        const unitPrice =
+          dbProduct.discountPrice && Number(dbProduct.discountPrice) > 0
+            ? Number(dbProduct.discountPrice)
+            : Number(dbProduct.price);
         const itemSubtotal = unitPrice * cartItem.quantity;
         subtotal += itemSubtotal;
 
@@ -111,9 +114,10 @@ export class OrdersService {
       let appliedCoupon: Coupon | null = null;
       let couponUsage: CouponUsage | null = null;
 
-      if (checkoutDto.couponCode) {
+      if (checkoutDto.couponCode && checkoutDto.couponCode.trim()) {
+        const cleanCouponCode = checkoutDto.couponCode.trim().toUpperCase();
         appliedCoupon = await manager.findOne(Coupon, {
-          where: { code: checkoutDto.couponCode.toUpperCase() },
+          where: { code: cleanCouponCode },
           lock: { mode: 'pessimistic_write' },
         });
 
@@ -137,7 +141,8 @@ export class OrdersService {
         ) {
           throw new BadRequestException('This coupon has reached its usage limit');
         }
-        if (subtotal < (appliedCoupon.minOrderAmount || 0)) {
+        const minOrder = Number(appliedCoupon.minOrderAmount || 0);
+        if (subtotal < minOrder) {
           throw new BadRequestException(
             `Minimum order amount of ${appliedCoupon.minOrderAmount} BDT is required to use this coupon`,
           );
@@ -151,9 +156,10 @@ export class OrdersService {
           throw new BadRequestException('You have reached the maximum usage limit for this coupon');
         }
 
-        if (appliedCoupon.discountType === DiscountType.FIXED) {
+        const rawType = String(appliedCoupon.discountType || '').trim().toUpperCase();
+        if (rawType === 'FIXED' || rawType === DiscountType.FIXED) {
           discount = Number(appliedCoupon.discountValue);
-        } else if (appliedCoupon.discountType === DiscountType.PERCENTAGE) {
+        } else if (rawType === 'PERCENTAGE' || rawType === DiscountType.PERCENTAGE) {
           discount = subtotal * (Number(appliedCoupon.discountValue) / 100);
           if (
             appliedCoupon.maxDiscountAmount &&
@@ -172,19 +178,19 @@ export class OrdersService {
         couponUsage = new CouponUsage();
         couponUsage.couponId = appliedCoupon.id;
         couponUsage.userId = userId;
-        couponUsage.discountAmount = discount;
+        couponUsage.discountAmount = Number(discount.toFixed(2));
       }
 
-      const total = subtotal + deliveryFee - discount;
+      const total = Math.max(0, subtotal + deliveryFee - discount);
 
       // 5. Create Order
       const order = new Order();
       order.userId = userId;
       order.addressId = address.id;
-      order.subtotal = subtotal;
-      order.deliveryFee = deliveryFee;
-      order.discount = discount;
-      order.total = total;
+      order.subtotal = Number(subtotal.toFixed(2));
+      order.deliveryFee = Number(deliveryFee.toFixed(2));
+      order.discount = Number(discount.toFixed(2));
+      order.total = Number(total.toFixed(2));
       order.status = OrderStatus.PENDING;
       order.paymentMethod = checkoutDto.paymentMethod;
       order.paymentStatus = PaymentStatus.PENDING;
@@ -217,6 +223,7 @@ export class OrdersService {
     // 8. Payment Gateway Session Initiation (runs after order is committed to satisfy foreign keys)
     let paymentUrl = null;
     if (savedOrder.paymentMethod !== PaymentMethod.COD) {
+      savedOrder.total = Number(savedOrder.total);
       paymentUrl = await this.paymentsService.initPayment(
         savedOrder,
         {

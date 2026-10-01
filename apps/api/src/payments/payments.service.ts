@@ -180,7 +180,7 @@ export class PaymentsService {
       const frontendBase =
         this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
       return {
-        paymentUrl: `${frontendBase}/${lang}/checkout/success?mock_payment=true&tran_id=${transactionId}&orderId=${order.id}`,
+        paymentUrl: `${frontendBase}/${lang}/customer/payment/success?mock_payment=true&tran_id=${transactionId}&orderId=${order.id}`,
         transactionId,
         paymentId: payment.id,
       };

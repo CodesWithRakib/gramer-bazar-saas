@@ -98,8 +98,12 @@ export function ThemePaletteSwitcher({
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
-          <div className="absolute end-0 sm:start-0 bottom-full mb-2 w-80 sm:w-96 rounded-2xl border border-border/80 bg-card p-4 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div
+            className="fixed inset-0 z-[9991] bg-black/40 backdrop-blur-xs sm:bg-transparent sm:backdrop-blur-none"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="fixed inset-x-3 bottom-16 sm:absolute sm:inset-x-auto sm:start-0 sm:bottom-full sm:mb-2 w-auto sm:w-96 max-w-[calc(100vw-24px)] rounded-2xl border border-border/80 bg-card/95 backdrop-blur-xl p-4 shadow-2xl z-[9992] animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-border/60">
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
@@ -177,39 +181,39 @@ export function ThemePaletteSwitcher({
                   {isBn ? 'লাইভ প্রিভিউ' : 'Live Preview'}
                 </span>
               </div>
-              <div className="grid grid-cols-5 gap-1.5">
+              <div className="grid grid-cols-5 gap-1 sm:gap-1.5">
                 <button
                   type="button"
                   onClick={() => triggerToastDemo('success')}
-                  className="px-2 py-1 text-[10px] font-semibold rounded-md bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors cursor-pointer text-center"
+                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-success transition-all cursor-pointer text-center"
                 >
                   Success
                 </button>
                 <button
                   type="button"
                   onClick={() => triggerToastDemo('error')}
-                  className="px-2 py-1 text-[10px] font-semibold rounded-md bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25 transition-colors cursor-pointer text-center"
+                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-error transition-all cursor-pointer text-center"
                 >
                   Error
                 </button>
                 <button
                   type="button"
                   onClick={() => triggerToastDemo('warning')}
-                  className="px-2 py-1 text-[10px] font-semibold rounded-md bg-warning/15 text-warning border border-warning/30 hover:bg-warning/25 transition-colors cursor-pointer text-center"
+                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-warning transition-all cursor-pointer text-center"
                 >
                   Warning
                 </button>
                 <button
                   type="button"
                   onClick={() => triggerToastDemo('info')}
-                  className="px-2 py-1 text-[10px] font-semibold rounded-md bg-info/15 text-info border border-info/30 hover:bg-info/25 transition-colors cursor-pointer text-center"
+                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-info transition-all cursor-pointer text-center"
                 >
                   Info
                 </button>
                 <button
                   type="button"
                   onClick={() => triggerToastDemo('loading')}
-                  className="px-2 py-1 text-[10px] font-semibold rounded-md bg-primary/15 text-primary border border-primary/30 hover:bg-primary/25 transition-colors cursor-pointer text-center"
+                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-loading transition-all cursor-pointer text-center"
                 >
                   Loading
                 </button>

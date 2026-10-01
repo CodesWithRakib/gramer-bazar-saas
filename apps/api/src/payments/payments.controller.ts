@@ -138,12 +138,12 @@ export class PaymentsController {
 
     if (result.success) {
       return res.redirect(
-        `${baseUrl}/${lang}/payment/success?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}`,
+        `${baseUrl}/${lang}/customer/payment/success?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}`,
       );
     }
 
     return res.redirect(
-      `${baseUrl}/${lang}/payment/failed?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}&reason=${encodeURIComponent(result.message || 'Validation failed')}`,
+      `${baseUrl}/${lang}/customer/payment/failed?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}&reason=${encodeURIComponent(result.message || 'Validation failed')}`,
     );
   }
 
@@ -161,7 +161,7 @@ export class PaymentsController {
     const tranId = payload.tran_id;
 
     return res.redirect(
-      `${baseUrl}/${lang}/payment/failed?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}`,
+      `${baseUrl}/${lang}/customer/payment/failed?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}`,
     );
   }
 
@@ -179,7 +179,7 @@ export class PaymentsController {
     const tranId = payload.tran_id;
 
     return res.redirect(
-      `${baseUrl}/${lang}/payment/cancelled?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}`,
+      `${baseUrl}/${lang}/customer/payment/cancelled?orderId=${encodeURIComponent(orderId)}&tran_id=${encodeURIComponent(tranId)}`,
     );
   }
 

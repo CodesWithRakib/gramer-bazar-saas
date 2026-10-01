@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   BadRequestException,
   Logger,
+  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -53,7 +54,7 @@ export function getDirectCanonicalKey(userAId: string, userBId: string): string 
 }
 
 @Injectable()
-export class ChatService {
+export class ChatService implements OnModuleInit {
   private readonly logger = new Logger(ChatService.name);
 
   constructor(
@@ -64,6 +65,65 @@ export class ChatService {
     private readonly usersService: UsersService,
     private readonly auditLogsService: AuditLogsService,
   ) {}
+
+  async onModuleInit() {
+    await this.ensureChatSchema();
+  }
+
+  public async ensureChatSchema() {
+    try {
+      if (typeof this.conversationRepository?.query === 'function') {
+        await this.conversationRepository.query(`
+          ALTER TABLE "conversations" 
+          ADD COLUMN IF NOT EXISTS "type" character varying(32) NOT NULL DEFAULT 'DIRECT',
+          ADD COLUMN IF NOT EXISTS "canonical_key" character varying(255),
+          ADD COLUMN IF NOT EXISTS "status" character varying(32) NOT NULL DEFAULT 'ACTIVE',
+          ADD COLUMN IF NOT EXISTS "priority" character varying(32) NOT NULL DEFAULT 'MEDIUM',
+          ADD COLUMN IF NOT EXISTS "support_case_number" character varying(64),
+          ADD COLUMN IF NOT EXISTS "assigned_admin_id" uuid,
+          ADD COLUMN IF NOT EXISTS "closed_at" TIMESTAMP,
+          ADD COLUMN IF NOT EXISTS "last_message_id" uuid,
+          ADD COLUMN IF NOT EXISTS "last_message_at" TIMESTAMP,
+          ADD COLUMN IF NOT EXISTS "last_message_preview" text;
+        `);
+
+        await this.conversationRepository.query(`
+          DO $$
+          BEGIN
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_constraint WHERE conname = 'FK_conversations_assigned_admin'
+            ) THEN
+              ALTER TABLE "conversations"
+              ADD CONSTRAINT "FK_conversations_assigned_admin"
+              FOREIGN KEY ("assigned_admin_id") REFERENCES "users"("id") ON DELETE SET NULL;
+            END IF;
+          END $$;
+        `);
+
+        await this.conversationRepository.query(`
+          CREATE UNIQUE INDEX IF NOT EXISTS "idx_conversations_canonical_key" 
+          ON "conversations" ("canonical_key") 
+          WHERE "canonical_key" IS NOT NULL;
+        `);
+      }
+
+      if (typeof this.messageRepository?.query === 'function') {
+        await this.messageRepository.query(`
+          ALTER TABLE "messages"
+          ADD COLUMN IF NOT EXISTS "status" character varying(32) NOT NULL DEFAULT 'SENT',
+          ADD COLUMN IF NOT EXISTS "delivered_at" TIMESTAMP,
+          ADD COLUMN IF NOT EXISTS "read_at" TIMESTAMP,
+          ADD COLUMN IF NOT EXISTS "client_message_id" character varying(128),
+          ADD COLUMN IF NOT EXISTS "metadata" jsonb;
+        `);
+      }
+
+      this.logger.log('Chat schema columns and constraints verified successfully');
+    } catch (err: unknown) {
+      const error = err as Error;
+      this.logger.warn(`Chat schema auto-upgrade skipped or failed: ${error.message}`);
+    }
+  }
 
   async getUserConversations(user: User, type?: ConversationType) {
     const isAdmin = isUserAdmin(user);
@@ -87,7 +147,20 @@ export class ChatService {
       convQuery = convQuery.andWhere('conversation.type = :type', { type });
     }
 
-    const conversations = await convQuery.orderBy('conversation.updatedAt', 'DESC').getMany();
+    let conversations: Conversation[];
+    try {
+      conversations = await convQuery.orderBy('conversation.updatedAt', 'DESC').getMany();
+    } catch (err: any) {
+      if (err?.message?.includes('assigned_admin_id') || err?.message?.includes('column')) {
+        this.logger.warn(
+          `getUserConversations failed with column error, attempting schema auto-repair: ${err.message}`,
+        );
+        await this.ensureChatSchema();
+        conversations = await convQuery.orderBy('conversation.updatedAt', 'DESC').getMany();
+      } else {
+        throw err;
+      }
+    }
 
     if (conversations.length === 0) {
       return [];

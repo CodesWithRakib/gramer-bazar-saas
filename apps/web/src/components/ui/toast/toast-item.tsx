@@ -21,53 +21,53 @@ interface ToastItemProps {
 
 interface ToastTypeStyle {
   barClass: string;
-  iconBgClass: string;
-  iconColorClass: string;
+  glowClass: string;
+  iconClass: string;
   badgeClass: string;
   defaultIcon: React.ElementType;
 }
 
 const TYPE_STYLES: Record<ToastType, ToastTypeStyle> = {
   success: {
-    barClass: 'bg-success',
-    iconBgClass: 'bg-success/15 border-success/25',
-    iconColorClass: 'text-success',
-    badgeClass: 'bg-success/10 text-success border-success/20',
+    barClass: 'gb-toast-bar-success',
+    glowClass: 'gb-toast-glow-success',
+    iconClass: 'gb-toast-icon-success',
+    badgeClass: 'gb-toast-badge-success',
     defaultIcon: CheckCircle2,
   },
   error: {
-    barClass: 'bg-destructive',
-    iconBgClass: 'bg-destructive/15 border-destructive/25',
-    iconColorClass: 'text-destructive',
-    badgeClass: 'bg-destructive/10 text-destructive border-destructive/20',
+    barClass: 'gb-toast-bar-error',
+    glowClass: 'gb-toast-glow-error',
+    iconClass: 'gb-toast-icon-error',
+    badgeClass: 'gb-toast-badge-error',
     defaultIcon: AlertCircle,
   },
   warning: {
-    barClass: 'bg-warning',
-    iconBgClass: 'bg-warning/15 border-warning/25',
-    iconColorClass: 'text-warning',
-    badgeClass: 'bg-warning/10 text-warning border-warning/20',
+    barClass: 'gb-toast-bar-warning',
+    glowClass: 'gb-toast-glow-warning',
+    iconClass: 'gb-toast-icon-warning',
+    badgeClass: 'gb-toast-badge-warning',
     defaultIcon: AlertTriangle,
   },
   info: {
-    barClass: 'bg-info',
-    iconBgClass: 'bg-info/15 border-info/25',
-    iconColorClass: 'text-info',
-    badgeClass: 'bg-info/10 text-info border-info/20',
+    barClass: 'gb-toast-bar-info',
+    glowClass: 'gb-toast-glow-info',
+    iconClass: 'gb-toast-icon-info',
+    badgeClass: 'gb-toast-badge-info',
     defaultIcon: Info,
   },
   loading: {
-    barClass: 'bg-primary',
-    iconBgClass: 'bg-primary/15 border-primary/25',
-    iconColorClass: 'text-primary',
-    badgeClass: 'bg-primary/10 text-primary border-primary/20',
+    barClass: 'gb-toast-bar-loading',
+    glowClass: 'gb-toast-glow-loading',
+    iconClass: 'gb-toast-icon-loading',
+    badgeClass: 'gb-toast-badge-loading',
     defaultIcon: Loader2,
   },
   default: {
-    barClass: 'bg-muted-foreground/50',
-    iconBgClass: 'bg-muted border-border',
-    iconColorClass: 'text-foreground',
-    badgeClass: 'bg-muted text-muted-foreground border-border',
+    barClass: 'gb-toast-bar-default',
+    glowClass: 'gb-toast-glow-default',
+    iconClass: 'gb-toast-icon-default',
+    badgeClass: 'gb-toast-badge-default',
     defaultIcon: Info,
   },
 };
@@ -127,14 +127,20 @@ export function ToastItem({ toast }: ToastItemProps) {
       role={role}
       aria-live={ariaLive}
       aria-atomic="true"
-      className={`group/toast relative w-full overflow-hidden rounded-xl border border-border/80 bg-card/95 backdrop-blur-md shadow-lg shadow-black/5 dark:shadow-black/25 text-card-foreground select-none transition-all duration-240 ease-out ${
+      className={`group/toast relative w-full overflow-hidden rounded-2xl border border-border/80 bg-card/95 backdrop-blur-xl shadow-[0_12px_32px_-4px_rgba(0,0,0,0.12),0_4px_12px_-2px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.6),0_4px_16px_-4px_rgba(0,0,0,0.3)] text-card-foreground select-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         isMounted && !isDismissing
           ? 'opacity-100 translate-y-0 scale-100'
-          : 'opacity-0 -translate-y-2 scale-96'
+          : 'opacity-0 -translate-y-3 scale-95 pointer-events-none'
       } ${className}`}
     >
-      <div className="flex items-start gap-3 p-3.5 pe-9">
-        {/* Subtle Brand/Semantic Accent Pillar */}
+      {/* Subtle Luminous Ambient Radial Wash */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute -top-10 -start-10 h-32 w-32 rounded-full blur-2xl transition-opacity duration-500 ${style.glowClass}`}
+      />
+
+      <div className="relative flex items-start gap-3.5 p-3.5 pe-9">
+        {/* Handcrafted Brand/Semantic Accent Pillar */}
         <div
           aria-hidden="true"
           className={`absolute top-0 bottom-0 start-0 w-1 ${style.barClass}`}
@@ -142,12 +148,12 @@ export function ToastItem({ toast }: ToastItemProps) {
 
         {/* Semantic Icon Badge */}
         <div
-          className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border mt-0.5 shadow-2xs ${style.iconBgClass} ${style.iconColorClass}`}
+          className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center border mt-0.5 shadow-2xs transition-transform duration-200 group-hover/toast:scale-105 ${style.iconClass}`}
         >
           {customIcon ? (
             customIcon
           ) : (
-            <IconComponent className={`w-4 h-4 stroke-[2.4] ${isSpinning ? 'animate-spin' : ''}`} />
+            <IconComponent className={`w-4 h-4 stroke-[2.3] ${isSpinning ? 'animate-spin' : ''}`} />
           )}
         </div>
 
@@ -155,13 +161,13 @@ export function ToastItem({ toast }: ToastItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             {title && (
-              <h4 className="text-sm font-semibold tracking-tight text-foreground leading-snug break-words">
+              <h4 className="text-[13.5px] font-semibold tracking-tight text-foreground leading-snug break-words">
                 {title}
               </h4>
             )}
             {badge && (
               <span
-                className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border ${style.badgeClass}`}
+                className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide border ${style.badgeClass}`}
               >
                 {badge}
               </span>
@@ -169,7 +175,7 @@ export function ToastItem({ toast }: ToastItemProps) {
           </div>
 
           {description && (
-            <div className="text-xs text-muted-foreground mt-1 leading-relaxed break-words font-normal">
+            <div className="text-xs text-muted-foreground/90 mt-1 leading-relaxed break-words font-normal">
               {description}
             </div>
           )}
@@ -184,7 +190,7 @@ export function ToastItem({ toast }: ToastItemProps) {
                     action.onClick(e);
                     handleDismiss();
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs transition-all active:scale-95 cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span>{action.label}</span>
                   <ArrowRight className="w-3 h-3 rtl:rotate-180" />
@@ -215,7 +221,7 @@ export function ToastItem({ toast }: ToastItemProps) {
                     cancel.onClick?.();
                     handleDismiss();
                   }}
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
                 >
                   {cancel.label || 'Dismiss'}
                 </button>
@@ -230,7 +236,7 @@ export function ToastItem({ toast }: ToastItemProps) {
         type="button"
         onClick={handleDismiss}
         aria-label="Close notification"
-        className="absolute top-2.5 end-2.5 w-6 h-6 rounded-md flex items-center justify-center text-muted-foreground/60 hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute top-2.5 end-2.5 w-6 h-6 rounded-lg flex items-center justify-center text-muted-foreground/60 hover:text-foreground hover:bg-muted/80 transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       >
         <X className="w-3.5 h-3.5" />
       </button>
@@ -242,7 +248,7 @@ export function ToastItem({ toast }: ToastItemProps) {
           className="absolute bottom-0 inset-x-0 h-0.5 bg-muted/40 overflow-hidden"
         >
           <div
-            className={`h-full ${style.barClass} opacity-60 origin-left motion-reduce:hidden`}
+            className={`h-full ${style.barClass} opacity-85 origin-left motion-reduce:hidden group-hover/toast:[animation-play-state:paused]`}
             style={{
               animation: `toast-progress ${duration}ms linear forwards`,
             }}

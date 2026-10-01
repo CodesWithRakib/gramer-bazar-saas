@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Resend } from 'resend';
@@ -16,7 +16,7 @@ import { QueryNotificationsDto } from './dto/notification-response.dto.js';
 import { PaginationMetaDto } from '../common/dto/api-response.dto.js';
 
 @Injectable()
-export class NotificationsService {
+export class NotificationsService implements OnModuleInit {
   private readonly logger = new Logger(NotificationsService.name);
   private resend: Resend | null = null;
   private defaultFromEmail: string;
@@ -42,6 +42,49 @@ export class NotificationsService {
     }
   }
 
+  async onModuleInit() {
+    await this.ensureNotificationSchema();
+  }
+
+  public async ensureNotificationSchema() {
+    try {
+      if (typeof this.notificationRepo?.query === 'function') {
+        await this.notificationRepo.query(`
+          ALTER TABLE "notifications" 
+          ADD COLUMN IF NOT EXISTS "title_key" character varying(150),
+          ADD COLUMN IF NOT EXISTS "message_key" character varying(150),
+          ADD COLUMN IF NOT EXISTS "priority" character varying(20) NOT NULL DEFAULT 'NORMAL';
+        `);
+
+        // Convert type column from enum to varchar(50) if it is still an enum
+        await this.notificationRepo.query(`
+          DO $$
+          BEGIN
+            IF EXISTS (
+              SELECT 1 FROM information_schema.columns 
+              WHERE table_name = 'notifications' AND column_name = 'type' AND udt_name = 'notifications_type_enum'
+            ) THEN
+              ALTER TABLE "notifications" ALTER COLUMN "type" TYPE character varying(50) USING "type"::text;
+            END IF;
+          END $$;
+        `);
+
+        await this.notificationRepo.query(`
+          CREATE INDEX IF NOT EXISTS "idx_notifications_user_unread" 
+          ON "notifications" ("user_id", "is_read", "created_at");
+
+          CREATE INDEX IF NOT EXISTS "idx_notifications_user_created" 
+          ON "notifications" ("user_id", "created_at");
+        `);
+      }
+
+      this.logger.log('Notification schema columns and indexes verified successfully');
+    } catch (err: unknown) {
+      const error = err as Error;
+      this.logger.warn(`Notification schema auto-upgrade skipped or failed: ${error.message}`);
+    }
+  }
+
   // --- In-App Notifications ---
 
   /**
@@ -60,7 +103,18 @@ export class NotificationsService {
         data: dto.data || null,
       });
 
-      const saved = await this.notificationRepo.save(entity);
+      let saved: Notification;
+      try {
+        saved = await this.notificationRepo.save(entity);
+      } catch (saveErr: any) {
+        if (saveErr?.message?.includes('title_key') || saveErr?.message?.includes('column')) {
+          this.logger.warn(`create notification column error, attempting auto-repair: ${saveErr.message}`);
+          await this.ensureNotificationSchema();
+          saved = await this.notificationRepo.save(entity);
+        } else {
+          throw saveErr;
+        }
+      }
 
       this.eventEmitter.emit('notification.created', {
         id: saved.id,
@@ -106,7 +160,18 @@ export class NotificationsService {
         }),
       );
 
-      const saved = await this.notificationRepo.save(entities);
+      let saved: Notification[];
+      try {
+        saved = await this.notificationRepo.save(entities);
+      } catch (saveErr: any) {
+        if (saveErr?.message?.includes('title_key') || saveErr?.message?.includes('column')) {
+          this.logger.warn(`createMany notifications column error, attempting auto-repair: ${saveErr.message}`);
+          await this.ensureNotificationSchema();
+          saved = await this.notificationRepo.save(entities);
+        } else {
+          throw saveErr;
+        }
+      }
 
       for (const item of saved) {
         this.eventEmitter.emit('notification.created', {
@@ -228,7 +293,21 @@ export class NotificationsService {
       qb.andWhere('n.isRead = :isRead', { isRead: false });
     }
 
-    const [data, total] = await qb.getManyAndCount();
+    let data: Notification[];
+    let total: number;
+    try {
+      [data, total] = await qb.getManyAndCount();
+    } catch (err: any) {
+      if (err?.message?.includes('title_key') || err?.message?.includes('column')) {
+        this.logger.warn(
+          `getUserNotifications failed with column error, attempting schema auto-repair: ${err.message}`,
+        );
+        await this.ensureNotificationSchema();
+        [data, total] = await qb.getManyAndCount();
+      } else {
+        throw err;
+      }
+    }
 
     return {
       data,

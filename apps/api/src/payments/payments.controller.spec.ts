@@ -64,7 +64,7 @@ describe('PaymentsController', () => {
     );
 
     expect(res.redirect).toHaveBeenCalledWith(
-      expect.stringContaining('/en/payment/success?orderId=order-123&tran_id=GBZ_SUCCESS'),
+      expect.stringContaining('/en/customer/payment/success?orderId=order-123&tran_id=GBZ_SUCCESS'),
     );
   });
 

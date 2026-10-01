@@ -44,12 +44,13 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
+    if (isRedirecting) return;
     if (!isAuthenticated) {
       router.push(`/${lang}/login?redirect=/${lang}/customer/checkout`);
     } else if (items.length === 0) {
       router.push(`/${lang}/cart`);
     }
-  }, [isAuthenticated, items.length, router, lang]);
+  }, [isAuthenticated, items.length, router, lang, isRedirecting]);
 
   // Derived state (React-sanctioned): pick a default address / open the form
   // the moment the address list arrives.
@@ -58,6 +59,26 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
     setSelectedAddressId(defaultAddress.id);
   } else if (addresses && addresses.length === 0 && !showAddressForm) {
     setShowAddressForm(true);
+  }
+
+  if (isRedirecting) {
+    return (
+      <div className="container max-w-lg py-28 px-4 flex flex-col items-center justify-center text-center space-y-6">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold">
+            {isBn ? 'পেমেন্ট গেটওয়েতে নিয়ে যাওয়া হচ্ছে...' : 'Redirecting to payment gateway...'}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            {isBn
+              ? 'অনুগ্রহ করে অপেক্ষা করুন, ব্রাউজার রিফ্রেশ করবেন না।'
+              : 'Please wait, do not close or refresh your browser.'}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (!isAuthenticated || items.length === 0) return null;
@@ -86,13 +107,15 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
       };
 
       const res = await checkoutOrder(orderData).unwrap();
-      dispatch(clearCart());
       if (res.paymentUrl) {
         setIsRedirecting(true);
+        dispatch(clearCart());
         window.location.href = res.paymentUrl;
-      } else {
-        router.push(`/${lang}/customer/orders/${res.order.id}?success=true`);
+        return;
       }
+
+      dispatch(clearCart());
+      router.push(`/${lang}/customer/orders/${res.order.id}?success=true`);
     } catch (err) {
       setIsRedirecting(false);
       setErrorMsg(

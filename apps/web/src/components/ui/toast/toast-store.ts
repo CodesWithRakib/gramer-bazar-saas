@@ -83,7 +83,9 @@ class ToastStore {
     this.isPaused = true;
     const now = Date.now();
 
-    this.timers.forEach((timer, id) => {
+    // Snapshot entries to prevent infinite iteration issues during mutations
+    const snapshot = Array.from(this.timers.entries());
+    snapshot.forEach(([id, timer]) => {
       clearTimeout(timer.timeoutId);
       const elapsed = now - timer.startedAt;
       const remaining = Math.max(0, timer.remaining - elapsed);
@@ -95,7 +97,10 @@ class ToastStore {
     if (!this.isPaused) return;
     this.isPaused = false;
 
-    this.timers.forEach((timer, id) => {
+    // Critical: Snapshot entries before calling startTimer, because startTimer deletes and re-inserts
+    // into this.timers. In JavaScript, mutating a Map during forEach causes infinite loops.
+    const snapshot = Array.from(this.timers.entries());
+    snapshot.forEach(([id, timer]) => {
       if (timer.remaining > 0) {
         this.startTimer(id, timer.remaining);
       }
@@ -128,8 +133,9 @@ class ToastStore {
     // If an item with this ID already exists, update it cleanly
     const existingIndex = this.toasts.findIndex((t) => t.id === id);
     if (existingIndex !== -1) {
-      this.toasts[existingIndex] = {
-        ...this.toasts[existingIndex],
+      const updated = [...this.toasts];
+      updated[existingIndex] = {
+        ...updated[existingIndex],
         type,
         title,
         description: mergedOptions.description,
@@ -142,6 +148,7 @@ class ToastStore {
         className: mergedOptions.className,
         isDismissing: false,
       };
+      this.toasts = updated;
 
       if (!this.isPaused && duration !== Infinity) {
         this.startTimer(id, duration);
@@ -226,12 +233,14 @@ class ToastStore {
     const current = this.toasts[index];
     const duration = updates.duration ?? current.duration;
 
-    this.toasts[index] = {
+    const updated = [...this.toasts];
+    updated[index] = {
       ...current,
       ...updates,
       duration,
       isDismissing: false,
     };
+    this.toasts = updated;
 
     if (duration !== Infinity && !this.isPaused) {
       this.startTimer(stringId, duration);
@@ -284,7 +293,7 @@ class ToastStore {
   };
 
   public clear = () => {
-    this.timers.forEach((timer) => clearTimeout(timer.timeoutId));
+    Array.from(this.timers.values()).forEach((timer) => clearTimeout(timer.timeoutId));
     this.timers.clear();
     this.toasts = [];
     this.notify();

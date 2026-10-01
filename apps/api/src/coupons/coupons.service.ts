@@ -201,9 +201,10 @@ export class CouponsService {
 
     // Calculate discount
     let discount = 0;
-    if (coupon.discountType === DiscountType.FIXED) {
+    const rawType = String(coupon.discountType || '').trim().toUpperCase();
+    if (rawType === 'FIXED' || rawType === DiscountType.FIXED) {
       discount = Number(coupon.discountValue);
-    } else if (coupon.discountType === DiscountType.PERCENTAGE) {
+    } else if (rawType === 'PERCENTAGE' || rawType === DiscountType.PERCENTAGE) {
       discount = subtotal * (Number(coupon.discountValue) / 100);
       if (coupon.maxDiscountAmount && discount > Number(coupon.maxDiscountAmount)) {
         discount = Number(coupon.maxDiscountAmount);

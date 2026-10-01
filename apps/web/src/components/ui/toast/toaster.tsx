@@ -3,6 +3,7 @@
 import React, { useSyncExternalStore } from 'react';
 import { toastStore } from './toast-store';
 import { ToastItem } from './toast-item';
+import { ToastItemData } from './types';
 
 export interface ToasterProps {
   className?: string;
@@ -10,12 +11,14 @@ export interface ToasterProps {
     'top-right' | 'top-center' | 'top-left' | 'bottom-right' | 'bottom-left' | 'bottom-center';
 }
 
+const EMPTY_TOASTS: ToastItemData[] = [];
+const getServerSnapshot = () => EMPTY_TOASTS;
+
 export function Toaster({ className = '', position = 'top-right' }: ToasterProps) {
   const toasts = useSyncExternalStore(
     toastStore.subscribe,
     toastStore.getSnapshot,
-    // Server snapshot fallback
-    () => []
+    getServerSnapshot
   );
 
   if (!toasts || toasts.length === 0) {

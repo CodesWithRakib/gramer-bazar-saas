@@ -51,10 +51,13 @@ import { join } from 'path';
 import { MaintenanceGuard } from './common/guards/maintenance.guard.js';
 import { StorageModule } from './storage/storage.module.js';
 import { InitialSchema1790406745498 } from './migrations/1790406745498-InitialSchema.js';
+import { ProductionMessagingUpgrade1790500000000 } from './migrations/1790500000000-ProductionMessagingUpgrade.js';
+import { AddPerformanceIndexes1790600000000 } from './migrations/1790600000000-AddPerformanceIndexes.js';
 import { RiderSystem1790700000000 } from './migrations/1790700000000-RiderSystem.js';
 import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSystem.js';
 import { AdminRbac1790900000000 } from './migrations/1790900000000-AdminRbac.js';
 import { ImpersonationSessions1791000000000 } from './migrations/1791000000000-ImpersonationSessions.js';
+import { NotificationsUpgrade1791100000000 } from './migrations/1791100000000-NotificationsUpgrade.js';
 
 @Module({
   imports: [
@@ -87,10 +90,13 @@ import { ImpersonationSessions1791000000000 } from './migrations/1791000000000-I
           synchronize: syncEnabled,
           migrations: [
             InitialSchema1790406745498,
+            ProductionMessagingUpgrade1790500000000,
+            AddPerformanceIndexes1790600000000,
             RiderSystem1790700000000,
             SellerSystem1790800000000,
             AdminRbac1790900000000,
             ImpersonationSessions1791000000000,
+            NotificationsUpgrade1791100000000,
           ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,
