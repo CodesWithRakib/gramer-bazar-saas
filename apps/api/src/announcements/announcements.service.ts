@@ -106,7 +106,7 @@ export class AnnouncementsService {
   private async resolveRecipients(announcement: Announcement): Promise<string[]> {
     const userIds = new Set<string>();
     const activeUsersQuery = this.userRepo.createQueryBuilder('user')
-      .where('user.isActive = :isActive', { isActive: true });
+      .where('user.status = :status', { status: 'ACTIVE' });
 
     if (announcement.audienceType === AudienceType.EVERYONE) {
       const users = await activeUsersQuery.select('user.id').getMany();
