@@ -47,4 +47,8 @@ export default () => ({
     secretKey: process.env.SUPABASE_SECRET_KEY,
     bucket: process.env.SUPABASE_BUCKET || 'gramer-bazar',
   },
+  broadcast: {
+    // 'mock' (default) or 'whatsapp'. WhatsApp is not implemented yet.
+    provider: process.env.BROADCAST_PROVIDER || 'mock',
+  },
 });

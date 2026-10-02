@@ -224,6 +224,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @OnEvent('broadcast.campaign.updated')
+  handleBroadcastCampaignUpdated(payload: {
+    id: string;
+    title: string;
+    status: string;
+    event: string;
+    totalRecipients?: number;
+    sentCount?: number;
+    deliveredCount?: number;
+    failedCount?: number;
+  }) {
+    if (!this.server) return;
+    this.server.to('admin_room').emit('broadcast_campaign_updated', payload);
+  }
+
   @OnEvent('notification.created')
   handleNotificationCreated(payload: {
     id: string;

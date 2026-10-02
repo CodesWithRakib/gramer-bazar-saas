@@ -243,6 +243,16 @@ export const superAdminRoutes: DashboardRoute[] = [
     matchPrefixes: ['/super-admin/communication/announcements', '/super-admin/communication/history', '/super-admin/communication/templates'],
   },
   {
+    title: 'Broadcast',
+    titleBn: 'ব্রডকাস্ট',
+    href: '/super-admin/broadcast',
+    icon: Megaphone,
+    superAdminOnly: true,
+    section: 'Governance',
+    sectionBn: 'প্রশাসন',
+    matchPrefixes: ['/super-admin/broadcast'],
+  },
+  {
     title: 'Messages',
     titleBn: 'কমিউনিকেশন',
     href: '/super-admin/messages',

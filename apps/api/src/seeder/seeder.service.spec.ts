@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 import { User } from '../users/entities/user.entity.js';
+import { BroadcastTemplate } from '../broadcast/entities/broadcast-template.entity.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { Shop } from '../shops/entities/shop.entity.js';
@@ -122,6 +123,7 @@ describe('SeederService - seedUsersAndShops', () => {
         { provide: getRepositoryToken(RiderProfile), useValue: makeRepo() },
         { provide: getRepositoryToken(RiderEarning), useValue: makeRepo() },
         { provide: getRepositoryToken(Otp), useValue: makeRepo() },
+        { provide: getRepositoryToken(BroadcastTemplate), useValue: makeRepo() },
       ],
     }).compile();
 

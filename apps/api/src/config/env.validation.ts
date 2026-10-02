@@ -53,6 +53,18 @@ export const envValidationSchema = z
     SUPABASE_BUCKET: z.string().default('gramer-bazar'),
     DB_SYNCHRONIZE: z.string().optional(),
     MIGRATIONS_RUN: z.string().optional(),
+    // Broadcast & Marketing Communication
+    BROADCAST_PROVIDER: z.enum(['mock', 'whatsapp']).default('mock'),
+    BROADCAST_MOCK_FAILURE_RATE: z.coerce.number().min(0).max(1).optional(),
+    BROADCAST_SIMULATED_RECEIPT_DELAY_MS: z.coerce.number().optional(),
+    BROADCAST_MOCK_READ_RATE: z.coerce.number().min(0).max(1).optional(),
+    DISABLE_BROADCAST_WORKER: z.string().optional(),
+    // Future WhatsApp integration (NOT used yet — see docs/broadcast/WHATSAPP_INTEGRATION.md)
+    WHATSAPP_ACCESS_TOKEN: z.string().optional(),
+    WHATSAPP_PHONE_NUMBER_ID: z.string().optional(),
+    WHATSAPP_BUSINESS_ACCOUNT_ID: z.string().optional(),
+    WHATSAPP_WEBHOOK_VERIFY_TOKEN: z.string().optional(),
+    WHATSAPP_API_BASE_URL: z.string().optional(),
     SEED_ADMIN_PASSWORD: z.string().optional(),
     SEED_SHOP_OWNER_PASSWORD: z.string().optional(),
     SEED_CUSTOMER_PASSWORD: z.string().optional(),

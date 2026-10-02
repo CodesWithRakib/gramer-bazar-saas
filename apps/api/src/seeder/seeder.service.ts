@@ -55,6 +55,11 @@ import { SellerApplication } from '../applications/entities/seller-application.e
 import { RiderApplication } from '../applications/entities/rider-application.entity.js';
 import { ApplicationStatus } from '../applications/enums/application-status.enum.js';
 import { ProductRequest } from '../product-requests/entities/product-request.entity.js';
+import { BroadcastTemplate } from '../broadcast/entities/broadcast-template.entity.js';
+import {
+  BROADCAST_DEMO_TEMPLATES,
+  BROADCAST_DEMO_TEMPLATE_DEFAULTS,
+} from '../broadcast/seed/broadcast-demo-templates.data.js';
 import { ProductRequestHistory } from '../product-requests/entities/product-request-history.entity.js';
 import { ProductRequestStatus } from '../product-requests/enums/product-request-status.enum.js';
 import { Dispute } from '../disputes/entities/dispute.entity.js';
@@ -146,6 +151,8 @@ export class SeederService {
     @InjectRepository(RiderProfile) private riderProfileRepo: Repository<RiderProfile>,
     @InjectRepository(RiderEarning) private riderEarningRepo: Repository<RiderEarning>,
     @InjectRepository(Otp) private otpRepo: Repository<Otp>,
+    @InjectRepository(BroadcastTemplate)
+    private broadcastTemplateRepo: Repository<BroadcastTemplate>,
   ) {}
 
   async seed() {
@@ -191,6 +198,7 @@ export class SeederService {
     await this.seedDemandEvents(users.customers, catalog.products);
     await this.seedMarketing(sellerProducts);
     await this.seedOtps();
+    await this.seedBroadcastDemoTemplates();
 
     this.logger.log('--- Production-Ready Gramer Bazar Seed Completed Successfully ---');
     return {
@@ -342,6 +350,31 @@ export class SeederService {
     }
 
     this.logger.log('Locations successfully seeded.');
+  }
+
+  /**
+   * Idempotently seed DEVELOPMENT-ONLY broadcast templates. Never overwrites an
+   * existing template and clearly names them [DEMO] so they are not mistaken for
+   * approved WhatsApp templates.
+   */
+  async seedBroadcastDemoTemplates() {
+    for (const demo of BROADCAST_DEMO_TEMPLATES) {
+      const existing = await this.broadcastTemplateRepo.findOne({ where: { name: demo.name } });
+      if (existing) continue;
+      await this.broadcastTemplateRepo.save(
+        this.broadcastTemplateRepo.create({
+          name: demo.name,
+          description: demo.description,
+          language: demo.language,
+          category: demo.category,
+          body: demo.body,
+          variables: demo.variables.map((variable) => ({ ...variable, required: variable.required ?? true })),
+          provider: BROADCAST_DEMO_TEMPLATE_DEFAULTS.provider,
+          providerStatus: BROADCAST_DEMO_TEMPLATE_DEFAULTS.providerStatus,
+          status: demo.status,
+        }),
+      );
+    }
   }
 
   async seedUsers() {
