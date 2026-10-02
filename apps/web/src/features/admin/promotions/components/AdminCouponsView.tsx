@@ -36,13 +36,14 @@ import { Ticket, Plus, Trash2, Calendar, Users, Edit, Search, X } from 'lucide-r
 import { customToast as toast } from '@/components/ui/custom-toast';
 import { AdminPagination } from '@/components/ui/AdminPagination';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminCouponsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
+export function AdminCouponsView({ lang = 'en', namespace = 'admin' }: AdminCouponsViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
   const [couponToDelete, setCouponToDelete] = useState<string | null>(null);
@@ -195,17 +196,25 @@ export function AdminCouponsView({ lang = 'en' }: AdminCouponsViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Ticket className="h-8 w-8 text-primary" />
-            {isBn ? 'প্ল্যাটফর্ম কুপনসমূহ' : 'Platform Coupons'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isBn
-              ? 'প্ল্যাটফর্ম-ওয়াইড এবং স্টোর কুপনসমূহ নিয়ন্ত্রণ ও পরিচালনা করুন।'
-              : 'Create and manage global or targeted discount coupons.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/promotions`}
+          label="Back to Promotions Hub"
+          labelBn="প্রমোশন হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <Ticket className="h-8 w-8 text-primary" />
+              {isBn ? 'প্ল্যাটফর্ম কুপনসমূহ' : 'Platform Coupons'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isBn
+                ? 'প্ল্যাটফর্ম-ওয়াইড এবং স্টোর কুপনসমূহ নিয়ন্ত্রণ ও পরিচালনা করুন।'
+                : 'Create and manage global or targeted discount coupons.'}
+            </p>
+          </div>
         </div>
       </div>
 

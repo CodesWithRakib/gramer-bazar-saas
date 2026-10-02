@@ -1,4 +1,4 @@
-import { AdminOrdersView } from '@/features/super-admin/orders';
+import { OrdersHubView } from '@/features/super-admin/orders';
 
 export default async function SuperAdminOrdersPage({
   params,
@@ -6,5 +6,5 @@ export default async function SuperAdminOrdersPage({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
-  return <AdminOrdersView lang={lang} namespace="super-admin" />;
+  return <OrdersHubView lang={lang} namespace="super-admin" />;
 }

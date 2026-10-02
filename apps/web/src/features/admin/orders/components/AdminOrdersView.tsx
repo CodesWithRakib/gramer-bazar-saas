@@ -11,6 +11,7 @@ import {
 } from '@/features/orders/ordersApi';
 import { useGetRidersQuery, useAssignDeliveryMutation } from '@/features/deliveries/deliveriesApi';
 import { DataTable } from '@/components/ui/data-table';
+import { BackButton } from '@/components/common/BackButton';
 import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -249,35 +250,25 @@ export function AdminOrdersView({ lang = 'en', namespace = 'admin' }: AdminOrder
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {isSuperAdmin ? 'All Platform Orders' : 'Order Management'}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            {isSuperAdmin
-              ? 'Super Admin oversight of all marketplace orders across all stores, riders, and regions.'
-              : 'Track, fulfill, and assign riders for customer orders.'}
-          </p>
-        </div>
-      </div>
-
-      {/* Sub-Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 pb-2 border-b">
-        <Link
+      <div>
+        <BackButton
           href={`/${lang}/${namespace}/orders`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground"
-        >
-          <ShoppingCart className="w-3.5 h-3.5" />
-          <span>{lang === 'bn' ? 'সকল অর্ডার' : 'All Orders'}</span>
-        </Link>
-        <Link
-          href={`/${lang}/${namespace}/orders/deliveries`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <Truck className="w-3.5 h-3.5" />
-          <span>{lang === 'bn' ? 'লাইভ ডেলিভারি' : 'Live Deliveries'}</span>
-        </Link>
+          label="Back to Orders Hub"
+          labelBn="অর্ডার হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {isSuperAdmin ? 'All Platform Orders' : 'Order Management'}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {isSuperAdmin
+                ? 'Super Admin oversight of all marketplace orders across all stores, riders, and regions.'
+                : 'Track, fulfill, and assign riders for customer orders.'}
+            </p>
+          </div>
+        </div>
       </div>
 
       <DataTable

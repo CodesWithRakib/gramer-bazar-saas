@@ -20,13 +20,14 @@ import {
 import { useGetAuditLogsQuery } from '@/features/audit-logs/auditLogsApi';
 import { ScrollText, Search, X } from 'lucide-react';
 import AdminPagination from '@/components/AdminPagination';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AuditLogsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
+export function AuditLogsView({ lang = 'en', namespace = 'admin' }: AuditLogsViewProps) {
   const isBn = lang === 'bn';
 
   const [page, setPage] = useState(1);
@@ -51,6 +52,12 @@ export function AuditLogsView({ lang = 'en' }: AuditLogsViewProps) {
   return (
     <div className="space-y-6">
       <div>
+        <BackButton
+          href={`/${lang}/${namespace}/settings`}
+          label="Back to Settings Hub"
+          labelBn="সেটিংস হাবে ফিরে যান"
+          lang={lang}
+        />
         <h1 className="text-3xl font-bold tracking-tight">{isBn ? 'অডিট লগস' : 'Audit Logs'}</h1>
         <p className="text-sm text-muted-foreground mt-1">
           {isBn

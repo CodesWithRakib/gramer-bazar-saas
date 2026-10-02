@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useGetAdminDeliveriesQuery, Delivery } from '@/features/deliveries/deliveriesApi';
 import { DataTable } from '@/components/ui/data-table';
+import { BackButton } from '@/components/common/BackButton';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 
@@ -12,7 +13,10 @@ export interface AdminDeliveriesViewProps {
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminDeliveriesView({ lang = 'en' }: AdminDeliveriesViewProps) {
+export function AdminDeliveriesView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminDeliveriesViewProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -72,12 +76,24 @@ export function AdminDeliveriesView({ lang = 'en' }: AdminDeliveriesViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Deliveries</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Track real-time rider assignments and delivery status.
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/orders`}
+          label="Back to Orders Hub"
+          labelBn="অর্ডার হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {lang === 'bn' ? 'ডেলিভারি ট্র্যাকিং ও লজিস্টিকস' : 'Deliveries & Logistics'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {lang === 'bn'
+                ? 'রিয়েল-টাইম রাইডার অ্যাসাইনমেন্ট এবং ডেলিভারি স্থিতি পর্যবেক্ষণ করুন।'
+                : 'Track real-time rider assignments and delivery status.'}
+            </p>
+          </div>
         </div>
       </div>
 

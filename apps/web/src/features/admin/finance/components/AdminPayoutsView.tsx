@@ -35,13 +35,14 @@ import { format } from 'date-fns';
 import { customToast as toast } from '@/components/ui/custom-toast';
 import { Loader2, CheckCircle, XCircle, Search, X, Check, Eye } from 'lucide-react';
 import AdminPagination from '@/components/AdminPagination';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminPayoutsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
+export function AdminPayoutsView({ lang = 'en', namespace = 'admin' }: AdminPayoutsViewProps) {
   const isBn = lang === 'bn';
 
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>(
@@ -136,16 +137,24 @@ export function AdminPayoutsView({ lang = 'en' }: AdminPayoutsViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isBn ? 'পেআউট অনুরোধসমূহ' : 'Payout Requests'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isBn
-              ? 'সেলারদের পেআউট অনুরোধ পর্যালোচনা করুন এবং উত্তোলন প্রক্রিয়া সম্পন্ন করুন।'
-              : 'Review and process seller withdrawal requests.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/finance`}
+          label="Back to Finance Hub"
+          labelBn="অর্থ ও পেআউট হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {isBn ? 'পেআউট অনুরোধসমূহ' : 'Payout Requests'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isBn
+                ? 'সেলারদের পেআউট অনুরোধ পর্যালোচনা করুন এবং উত্তোলন প্রক্রিয়া সম্পন্ন করুন।'
+                : 'Review and process seller withdrawal requests.'}
+            </p>
+          </div>
         </div>
       </div>
 

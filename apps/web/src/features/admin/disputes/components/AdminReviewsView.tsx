@@ -10,13 +10,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, Check, X, ShieldAlert } from 'lucide-react';
 import { customToast as toast } from '@/components/ui/custom-toast';
+import { BackButton } from '@/components/common/BackButton';
+import { getUserRoles, userIsSuperAdmin } from '@/lib/roles';
 
 export interface AdminReviewsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
+export function AdminReviewsView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminReviewsViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
 
@@ -32,14 +37,16 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
 
   const [moderateReview, { isLoading: isModerating }] = useModerateReviewMutation();
 
+  const roles = user ? getUserRoles(user) : [];
+  const hasAccess = isAuthenticated && (userIsSuperAdmin(user) || roles.includes('ADMIN'));
+
   useEffect(() => {
-    // Basic protection; ideally should use a layout guard or HOC
-    if (!isAuthenticated || !user?.roles?.includes('ADMIN')) {
+    if (!isAuthenticated || !hasAccess) {
       router.push(`/${lang}/login`);
     }
-  }, [isAuthenticated, user?.roles, router, lang]);
+  }, [isAuthenticated, hasAccess, router, lang]);
 
-  if (!isAuthenticated || !user?.roles?.includes('ADMIN')) return null;
+  if (!isAuthenticated || !hasAccess) return null;
 
   const reviews = data?.data || [];
   const meta = data?.meta;
@@ -55,10 +62,18 @@ export function AdminReviewsView({ lang = 'en' }: AdminReviewsViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {isBn ? 'রিভিউ মডারেশন' : 'Review Moderation'}
-        </h1>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/disputes`}
+          label="Back to Disputes Hub"
+          labelBn="বিরোধ হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {isBn ? 'রিভিউ মডারেশন' : 'Review Moderation'}
+          </h1>
+        </div>
       </div>
 
       <Card>

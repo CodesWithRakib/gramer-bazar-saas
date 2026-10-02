@@ -36,13 +36,17 @@ import { Flame, Plus, Trash2, Calendar, Edit, Image as ImageIcon, Search, X } fr
 import { customToast as toast } from '@/components/ui/custom-toast';
 import AdminPagination from '@/components/ui/AdminPagination';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminFlashSalesViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
+export function AdminFlashSalesView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminFlashSalesViewProps) {
   const isBn = lang === 'bn';
   const router = useRouter();
 
@@ -177,17 +181,25 @@ export function AdminFlashSalesView({ lang = 'en' }: AdminFlashSalesViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Flame className="h-8 w-8 text-red-500 fill-current" />
-            {isBn ? 'ফ্ল্যাশ সেল ম্যানেজমেন্ট' : 'Flash Sale Management'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isBn
-              ? 'সীমিত সময়ের ক্যাম্পেইন ও বিশেষ মূল্যছাড় নিয়ন্ত্রণ করুন।'
-              : 'Configure time-limited flash sale promotions and items.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/promotions`}
+          label="Back to Promotions Hub"
+          labelBn="প্রমোশন হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <Flame className="h-8 w-8 text-red-500 fill-current" />
+              {isBn ? 'ফ্ল্যাশ সেল ম্যানেজমেন্ট' : 'Flash Sale Management'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isBn
+                ? 'সীমিত সময়ের ক্যাম্পেইন ও বিশেষ মূল্যছাড় নিয়ন্ত্রণ করুন।'
+                : 'Configure time-limited flash sale promotions and items.'}
+            </p>
+          </div>
         </div>
       </div>
 

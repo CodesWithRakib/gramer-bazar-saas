@@ -15,13 +15,19 @@ import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { customToast as toast } from '@/components/ui/custom-toast';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminDisputeDetailsViewProps {
   lang?: string;
   id: string;
+  namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetailsViewProps) {
+export function AdminDisputeDetailsView({
+  lang = 'en',
+  id,
+  namespace = 'admin',
+}: AdminDisputeDetailsViewProps) {
   // id is passed from server component props
   const { data: dispute, isLoading } = useGetAdminDisputeDetailsQuery(id);
   const [addMessage, { isLoading: isSending }] = useAddAdminDisputeMessageMutation();
@@ -162,12 +168,12 @@ export function AdminDisputeDetailsView({ lang = 'en', id }: AdminDisputeDetails
   return (
     <div className="w-full space-y-6">
       <div className="flex justify-between items-center mb-4">
-        <Link
-          href={`/${lang}/admin/disputes`}
-          className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-        >
-          <ArrowLeft className="me-2 rtl:rotate-180" /> Back to Disputes
-        </Link>
+        <BackButton
+          href={`/${lang}/${namespace}/disputes/list`}
+          label="Back to Disputes List"
+          labelBn="বিরোধ তালিকায় ফিরে যান"
+          lang={lang}
+        />
 
         {!isResolved && !showResolutionForm && !showRejectForm && (
           <div className="flex gap-2">

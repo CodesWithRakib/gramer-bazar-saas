@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/toast/toast-store';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useParams } from 'next/navigation';
+import { BackButton } from '@/components/common/BackButton';
 
 export function AnnouncementsHistoryView() {
   const params = useParams();
@@ -118,17 +119,25 @@ export function AnnouncementsHistoryView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Megaphone className="h-6 w-6 text-primary" />
-            {isBn ? 'ঘোষণার ইতিহাস' : 'Announcement History'}
-          </h2>
-          <p className="text-muted-foreground">
-            {isBn 
-              ? 'অতীতের ঘোষণা এবং তাদের ডেলিভারি পরিসংখ্যান দেখুন।' 
-              : 'View past announcements and their delivery statistics.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${params.lang || 'en'}/super-admin/communication`}
+          label="Back to Communication Hub"
+          labelBn="কমিউনিকেশন হাবে ফিরে যান"
+          lang={params.lang as string}
+        />
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <Megaphone className="h-6 w-6 text-primary" />
+              {isBn ? 'ঘোষণার ইতিহাস' : 'Announcement History'}
+            </h2>
+            <p className="text-muted-foreground">
+              {isBn 
+                ? 'অতীতের ঘোষণা এবং তাদের ডেলিভারি পরিসংখ্যান দেখুন।' 
+                : 'View past announcements and their delivery statistics.'}
+            </p>
+          </div>
         </div>
       </div>
 

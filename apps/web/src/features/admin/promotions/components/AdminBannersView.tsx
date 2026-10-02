@@ -39,13 +39,14 @@ import Image from 'next/image';
 import { AdminPagination } from '@/components/ui/AdminPagination';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { customToast as toast } from '@/components/ui/custom-toast';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminBannersViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
+export function AdminBannersView({ lang = 'en', namespace = 'admin' }: AdminBannersViewProps) {
   const isBn = lang === 'bn';
 
   const { data: banners = [], isLoading } = useGetAdminBannersQuery();
@@ -156,16 +157,24 @@ export function AdminBannersView({ lang = 'en' }: AdminBannersViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isBn ? 'প্রচারমূলক ব্যানারসমূহ' : 'Campaign Banners'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isBn
-              ? 'হোমপেজ ও বিভিন্ন পেজের ব্যানার স্লাইডার এবং প্রচার নিয়ন্ত্রণ করুন।'
-              : 'Manage marketing promotional banners, hero sliders, and custom links.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/promotions`}
+          label="Back to Promotions Hub"
+          labelBn="প্রমোশন হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {isBn ? 'প্রচারমূলক ব্যানারসমূহ' : 'Campaign Banners'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isBn
+                ? 'হোমপেজ ও বিভিন্ন পেজের ব্যানার স্লাইডার এবং প্রচার নিয়ন্ত্রণ করুন।'
+                : 'Manage marketing promotional banners, hero sliders, and custom links.'}
+            </p>
+          </div>
         </div>
       </div>
 

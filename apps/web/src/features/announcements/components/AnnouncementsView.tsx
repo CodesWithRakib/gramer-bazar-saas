@@ -26,6 +26,7 @@ import { Loader2, Send, Clock, Save, Megaphone, X, Search } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Label } from '@/components/ui/label';
 import { useGetAnnouncementTemplatesQuery } from '../announcementsApi';
+import { BackButton } from '@/components/common/BackButton';
 
 export function AnnouncementsView() {
   const router = useRouter();
@@ -121,22 +122,30 @@ export function AnnouncementsView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Megaphone className="h-6 w-6 text-primary" />
-            {isBn ? 'ঘোষণা তৈরি করুন' : 'Create Announcement'}
-          </h2>
-          <p className="text-muted-foreground">
-            {isBn ? 'গ্রামের বাজার ব্যবহারকারীদের কাছে বার্তা এবং ঘোষণা সম্প্রচার করুন।' : 'Broadcast messages and announcements to Gramer Bazar users.'}
-          </p>
-        </div>
+      <div>
+        <BackButton
+          href={`/${params.lang || 'en'}/super-admin/communication`}
+          label="Back to Communication Hub"
+          labelBn="কমিউনিকেশন হাবে ফিরে যান"
+          lang={params.lang as string}
+        />
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <Megaphone className="h-6 w-6 text-primary" />
+              {isBn ? 'ঘোষণা তৈরি করুন' : 'Create Announcement'}
+            </h2>
+            <p className="text-muted-foreground">
+              {isBn ? 'গ্রামের বাজার ব্যবহারকারীদের কাছে বার্তা এবং ঘোষণা সম্প্রচার করুন।' : 'Broadcast messages and announcements to Gramer Bazar users.'}
+            </p>
+          </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => router.push('./history')}>
             <Clock className="mr-2 h-4 w-4" /> {isBn ? 'ইতিহাস' : 'History'}
           </Button>
         </div>
       </div>
+    </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { BackButton } from '@/components/common/BackButton';
 import AdminPagination from '@/components/AdminPagination';
 
 export interface AdminDisputesViewProps {
@@ -21,7 +22,10 @@ export interface AdminDisputesViewProps {
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminDisputesView({ lang = 'en' }: AdminDisputesViewProps) {
+export function AdminDisputesView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminDisputesViewProps) {
   const isBn = lang === 'bn';
 
   const { data: disputes = [], isLoading, isError, refetch } = useGetAdminDisputesQuery();
@@ -101,16 +105,24 @@ export function AdminDisputesView({ lang = 'en' }: AdminDisputesViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isBn ? 'সকল বিরোধ ও অভিযোগ' : 'All Disputes'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isBn
-              ? 'প্ল্যাটফর্মের সকল বিরোধ পর্যালোচনা করুন এবং প্রশাসনিক সিদ্ধান্ত নিন।'
-              : 'Audit and resolve all customer-seller dispute cases across the platform.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/disputes`}
+          label="Back to Disputes Hub"
+          labelBn="বিরোধ হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {isBn ? 'সকল বিরোধ ও অভিযোগ' : 'All Disputes'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isBn
+                ? 'প্ল্যাটফর্মের সকল বিরোধ পর্যালোচনা করুন এবং প্রশাসনিক সিদ্ধান্ত নিন।'
+                : 'Audit and resolve all customer-seller dispute cases across the platform.'}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -296,7 +308,7 @@ export function AdminDisputesView({ lang = 'en' }: AdminDisputesViewProps) {
                           size="sm"
                           className="rounded-full gap-1 text-xs"
                         >
-                          <Link href={`/${lang}/admin/disputes/${dispute.id}`}>
+                          <Link href={`/${lang}/${namespace}/disputes/${dispute.id}`}>
                             <Eye className="h-3.5 w-3.5" />
                             <span>{isBn ? 'পর্যালোচনা' : 'Review'}</span>
                           </Link>

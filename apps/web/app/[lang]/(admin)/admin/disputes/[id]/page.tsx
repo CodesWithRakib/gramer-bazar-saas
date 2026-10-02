@@ -6,5 +6,5 @@ export default async function AdminDisputeDetailsPage({
   params: Promise<{ lang: string; id: string }>;
 }) {
   const { lang, id } = await params;
-  return <AdminDisputeDetailsView lang={lang} id={id} />;
+  return <AdminDisputeDetailsView lang={lang} id={id} namespace="admin" />;
 }

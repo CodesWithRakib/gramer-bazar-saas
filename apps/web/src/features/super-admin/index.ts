@@ -7,3 +7,5 @@ export * from './disputes';
 export * from './finance';
 export * from './messages';
 export * from './settings';
+export * from './communication';
+export * from './broadcast';

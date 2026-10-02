@@ -36,6 +36,7 @@ import {
   Activity,
   ArrowLeft,
 } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 
 const settingsSchema = z.object({
   platformName: z.string().min(2, 'Platform name is required').max(150),
@@ -151,13 +152,12 @@ export function GeneralSettingsView({ lang = 'en', namespace }: GeneralSettingsV
     <div className="space-y-8 w-full pb-16">
       {/* Back button */}
       <div>
-        <Link
+        <BackButton
           href={`/${lang}/${basePath}/settings`}
-          className="inline-flex items-center text-xs font-semibold text-muted-foreground hover:text-primary transition-colors mb-3"
-        >
-          <ArrowLeft className="w-4 h-4 me-1.5 rtl:rotate-180" />
-          {isBn ? 'সেটিংস হাবে ফিরে যান' : 'Back to Settings Hub'}
-        </Link>
+          label="Back to Settings Hub"
+          labelBn="সেটিংস হাবে ফিরে যান"
+          lang={lang}
+        />
         <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
           {isBn ? 'সিস্টেম ও গেটওয়ে কনফিগারেশন' : 'System & Gateway Configuration'}
         </h1>

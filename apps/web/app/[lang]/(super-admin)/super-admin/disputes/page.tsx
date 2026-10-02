@@ -1,4 +1,4 @@
-import { AdminDisputesView } from '@/features/super-admin/disputes';
+import { DisputesHubView } from '@/features/super-admin/disputes';
 
 export default async function SuperAdminDisputesPage({
   params,
@@ -6,5 +6,5 @@ export default async function SuperAdminDisputesPage({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
-  return <AdminDisputesView lang={lang} namespace="super-admin" />;
+  return <DisputesHubView lang={lang} namespace="super-admin" />;
 }

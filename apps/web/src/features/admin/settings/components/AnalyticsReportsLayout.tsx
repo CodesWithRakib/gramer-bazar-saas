@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { BarChart3, TrendingUp, Package, Users, Search } from 'lucide-react';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AnalyticsReportsLayoutProps {
   children: React.ReactNode;
@@ -58,6 +59,12 @@ export function AnalyticsReportsLayout({
   return (
     <div className="space-y-8">
       <div>
+        <BackButton
+          href={`/${lang}/${namespace}/settings`}
+          label="Back to Settings Hub"
+          labelBn="সেটিংস হাবে ফিরে যান"
+          lang={lang}
+        />
         <h1 className="text-3xl font-bold tracking-tight">
           {isBn ? 'অ্যানালিটিক্স ও রিপোর্ট' : 'Analytics & Reports'}
         </h1>

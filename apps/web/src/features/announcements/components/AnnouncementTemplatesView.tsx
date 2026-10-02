@@ -5,23 +5,35 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useGetAnnouncementTemplatesQuery } from '../announcementsApi';
 import { Loader2, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useParams } from 'next/navigation';
+import { BackButton } from '@/components/common/BackButton';
 
 export function AnnouncementTemplatesView() {
+  const params = useParams();
+  const isBn = params.lang === 'bn';
   const { data: templates, isLoading } = useGetAnnouncementTemplatesQuery();
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Layers className="h-6 w-6 text-primary" />
-            Announcement Templates
-          </h2>
-          <p className="text-muted-foreground">
-            Manage reusable announcement templates.
-          </p>
+      <div>
+        <BackButton
+          href={`/${params.lang || 'en'}/super-admin/communication`}
+          label="Back to Communication Hub"
+          labelBn="কমিউনিকেশন হাবে ফিরে যান"
+          lang={params.lang as string}
+        />
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <Layers className="h-6 w-6 text-primary" />
+              {isBn ? 'ঘোষণা টেমপ্লেটসমূহ' : 'Announcement Templates'}
+            </h2>
+            <p className="text-muted-foreground">
+              {isBn ? 'পুনর্ব্যবহারযোগ্য ঘোষণা ও মেসেজ টেমপ্লেট পরিচালনা করুন।' : 'Manage reusable announcement templates.'}
+            </p>
+          </div>
+          <Button>{isBn ? 'নতুন টেমপ্লেট' : 'Create Template'}</Button>
         </div>
-        <Button>Create Template</Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

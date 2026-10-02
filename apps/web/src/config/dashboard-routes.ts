@@ -234,13 +234,13 @@ export const superAdminRoutes: DashboardRoute[] = [
 
   // Section: System & Policies
   {
-    title: 'Announcements',
-    titleBn: 'ঘোষণা',
-    href: '/super-admin/communication/announcements',
+    title: 'Communication',
+    titleBn: 'কমিউনিকেশন হাব',
+    href: '/super-admin/communication',
     icon: Megaphone,
     section: 'System',
     sectionBn: 'সিস্টেম',
-    matchPrefixes: ['/super-admin/communication/announcements', '/super-admin/communication/history', '/super-admin/communication/templates'],
+    matchPrefixes: ['/super-admin/communication'],
   },
   {
     title: 'Broadcast',

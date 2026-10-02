@@ -32,13 +32,14 @@ import {
 } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AdminPagination from '@/components/AdminPagination';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminPaymentsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
+export function AdminPaymentsView({ lang = 'en', namespace = 'admin' }: AdminPaymentsViewProps) {
   const isBn = lang === 'bn';
 
   const [search, setSearch] = useState('');
@@ -104,26 +105,33 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-            <CreditCard className="w-8 h-8 text-primary" />
-            {isBn ? 'পেমেন্ট ট্রানজ্যাকশনসমূহ' : 'Payment Transactions'}
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {isBn
-              ? 'SSLCOMMERZ গেটওয়ে ও সকল অনলাইন পেমেন্টের বিবরণী পর্যবেক্ষণ করুন'
-              : 'Audit and monitor SSLCOMMERZ gateway and payment transactions'}
-          </p>
-        </div>
+      <div>
+        <BackButton
+          href={`/${lang}/${namespace}/finance`}
+          label="Back to Finance Hub"
+          labelBn="অর্থ ও পেআউট হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+              <CreditCard className="w-8 h-8 text-primary" />
+              {isBn ? 'পেমেন্ট ট্রানজ্যাকশনসমূহ' : 'Payment Transactions'}
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {isBn
+                ? 'SSLCOMMERZ গেটওয়ে ও সকল অনলাইন পেমেন্টের বিবরণী পর্যবেক্ষণ করুন'
+                : 'Audit and monitor SSLCOMMERZ gateway and payment transactions'}
+            </p>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm" className="gap-2">
-            <Link href={`/${lang}/admin/settings`}>
-              <Settings className="w-4 h-4" />
-              {isBn ? 'গেটওয়ে ও টানেল সেটিংস' : 'Gateway & Tunnel'}
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm" className="gap-2">
+              <Link href={`/${lang}/${namespace}/settings`}>
+                <Settings className="w-4 h-4" />
+                {isBn ? 'গেটওয়ে ও টানেল সেটিংস' : 'Gateway & Tunnel'}
+              </Link>
+            </Button>
 
           <Button
             variant="outline"
@@ -137,6 +145,7 @@ export function AdminPaymentsView({ lang = 'en' }: AdminPaymentsViewProps) {
           </Button>
         </div>
       </div>
+    </div>
 
       {/* Main Table Card */}
       <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 dark:border-border dark:bg-card">
