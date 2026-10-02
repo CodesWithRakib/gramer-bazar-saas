@@ -7,6 +7,7 @@ import { RootState } from '@/store/store';
 import { initSocket, disconnectSocket, getSocket } from '@/lib/socket';
 import { useOrderRealtimeSync } from '@/hooks/useOrderRealtimeSync';
 import { useNotificationListener } from '@/hooks/useNotificationListener';
+import { useDisputeRealtimeSync } from '@/hooks/useDisputeRealtimeSync';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -34,6 +35,7 @@ export const useSocket = () => useContext(SocketContext);
 const SocketListeners = () => {
   useOrderRealtimeSync();
   useNotificationListener();
+  useDisputeRealtimeSync();
   return null;
 };
 

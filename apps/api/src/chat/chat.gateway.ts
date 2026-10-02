@@ -239,6 +239,69 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to('admin_room').emit('broadcast_campaign_updated', payload);
   }
 
+  @OnEvent('dispute.created')
+  handleDisputeCreated(payload: {
+    disputeId: string;
+    orderId: string;
+    customerId: string;
+    sellerId: string;
+    reason: string;
+    status: string;
+    createdAt?: string;
+  }) {
+    if (!this.server) return;
+    this.server.to('admin_room').emit('dispute:created', payload);
+    if (payload.sellerId) {
+      this.server.to(`user_${payload.sellerId}`).emit('dispute:created', payload);
+    }
+    if (payload.customerId) {
+      this.server.to(`user_${payload.customerId}`).emit('dispute:created', payload);
+    }
+  }
+
+  @OnEvent('dispute.message.created')
+  handleDisputeMessageCreated(payload: {
+    disputeId: string;
+    messageId: string;
+    senderId: string;
+    senderRole: string;
+    customerId: string;
+    sellerId: string;
+    message: string;
+    createdAt?: string;
+  }) {
+    if (!this.server) return;
+    this.server.to('admin_room').emit('dispute:message', payload);
+    if (payload.sellerId) {
+      this.server.to(`user_${payload.sellerId}`).emit('dispute:message', payload);
+    }
+    if (payload.customerId) {
+      this.server.to(`user_${payload.customerId}`).emit('dispute:message', payload);
+    }
+  }
+
+  @OnEvent('dispute.status.updated')
+  handleDisputeStatusUpdated(payload: {
+    disputeId: string;
+    orderId: string;
+    customerId: string;
+    sellerId: string;
+    status: string;
+    resolutionType?: string | null;
+    refundAmount?: number | null;
+    adminDecision?: string | null;
+    updatedAt?: string;
+  }) {
+    if (!this.server) return;
+    this.server.to('admin_room').emit('dispute:updated', payload);
+    if (payload.sellerId) {
+      this.server.to(`user_${payload.sellerId}`).emit('dispute:updated', payload);
+    }
+    if (payload.customerId) {
+      this.server.to(`user_${payload.customerId}`).emit('dispute:updated', payload);
+    }
+  }
+
   @OnEvent('notification.created')
   handleNotificationCreated(payload: {
     id: string;

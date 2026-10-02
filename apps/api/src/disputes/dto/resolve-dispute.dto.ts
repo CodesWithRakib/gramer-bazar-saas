@@ -1,11 +1,12 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsNumber, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { DisputeResolutionType } from '../enums/dispute-resolution-type.enum.js';
 
 export class ResolveDisputeDto {
-  @ApiProperty({ enum: ['FULL_REFUND', 'PARTIAL_REFUND', 'REPLACEMENT', 'NO_REFUND'], example: 'FULL_REFUND' })
-  @IsEnum(['FULL_REFUND', 'PARTIAL_REFUND', 'REPLACEMENT', 'NO_REFUND'])
+  @ApiProperty({ enum: DisputeResolutionType, example: DisputeResolutionType.FULL_REFUND })
+  @IsEnum(DisputeResolutionType)
   @IsNotEmpty()
-  resolutionType: string;
+  resolutionType: DisputeResolutionType;
 
   @ApiPropertyOptional({ example: 450.00 })
   @IsNumber()

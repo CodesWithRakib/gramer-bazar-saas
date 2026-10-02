@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Dispute } from './entities/dispute.entity.js';
 import { DisputeMessage } from './entities/dispute-message.entity.js';
 import { Order } from '../orders/entities/order.entity.js';
@@ -10,11 +11,13 @@ import { ResolveDisputeDto } from './dto/resolve-dispute.dto.js';
 import { RejectDisputeDto } from './dto/reject-dispute.dto.js';
 import { AddInternalNoteDto } from './dto/add-internal-note.dto.js';
 import { DisputeStatus } from './enums/dispute-status.enum.js';
+import { DisputeResolutionType } from './enums/dispute-resolution-type.enum.js';
 import { OrderStatus } from '../orders/enums/order-status.enum.js';
 import { WalletsService } from '../wallets/wallets.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { NotificationType, NotificationPriority } from '../notifications/entities/notification.entity.js';
 import { DisputeInternalNote } from './entities/dispute-internal-note.entity.js';
+import { AuditLogsService } from '../audit-logs/audit-logs.service.js';
 
 @Injectable()
 export class DisputesService {
@@ -29,6 +32,8 @@ export class DisputesService {
     private readonly orderRepository: Repository<Order>,
     private readonly walletsService: WalletsService,
     private readonly notificationsService: NotificationsService,
+    private readonly auditLogsService: AuditLogsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createDispute(customerId: string, createDisputeDto: CreateDisputeDto) {
@@ -72,6 +77,26 @@ export class DisputesService {
 
     const savedDispute = await this.disputeRepository.save(dispute);
     
+    // Audit Log
+    void this.auditLogsService?.record?.({
+      actorId: customerId,
+      action: 'DISPUTE_CREATED',
+      targetType: 'Dispute',
+      targetId: savedDispute.id,
+      details: JSON.stringify({ orderId: order.id, reason: savedDispute.reason }),
+    });
+
+    // Real-time Event
+    this.eventEmitter.emit('dispute.created', {
+      disputeId: savedDispute.id,
+      orderId: order.id,
+      customerId,
+      sellerId,
+      reason: savedDispute.reason,
+      status: savedDispute.status,
+      createdAt: savedDispute.createdAt ? savedDispute.createdAt.toISOString() : new Date().toISOString(),
+    });
+
     // Notify Seller
     void this.notificationsService?.notifyUser?.(sellerId, {
       type: NotificationType.DISPUTE_OPENED,
@@ -158,12 +183,43 @@ export class DisputesService {
       attachment: dto.attachment,
     });
 
-    await this.disputeMessageRepository.save(message);
+    const savedMessage = await this.disputeMessageRepository.save(message);
 
     // If a new message is added, change status back to UNDER_REVIEW if it was OPEN
     if (dispute.status === DisputeStatus.OPEN) {
       dispute.status = DisputeStatus.UNDER_REVIEW;
       await this.disputeRepository.save(dispute);
+      this.eventEmitter.emit('dispute.status.updated', {
+        disputeId: dispute.id,
+        orderId: dispute.orderId,
+        customerId: dispute.customerId,
+        sellerId: dispute.sellerId,
+        status: dispute.status,
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    // Real-time Event for new message
+    this.eventEmitter.emit('dispute.message.created', {
+      disputeId: dispute.id,
+      messageId: savedMessage.id,
+      senderId,
+      senderRole: role.toUpperCase(),
+      customerId: dispute.customerId,
+      sellerId: dispute.sellerId,
+      message: savedMessage.message,
+      createdAt: savedMessage.createdAt ? savedMessage.createdAt.toISOString() : new Date().toISOString(),
+    });
+
+    // Audit log if admin message
+    if (role === 'admin') {
+      void this.auditLogsService?.record?.({
+        actorId: senderId,
+        action: 'DISPUTE_ADMIN_MESSAGE',
+        targetType: 'Dispute',
+        targetId: dispute.id,
+        details: JSON.stringify({ messageId: savedMessage.id }),
+      });
     }
 
     // Notify the other party
@@ -191,7 +247,7 @@ export class DisputesService {
       });
     }
 
-    return message;
+    return savedMessage;
   }
 
   async addInternalNote(disputeId: string, adminId: string, dto: AddInternalNoteDto) {
@@ -204,7 +260,17 @@ export class DisputesService {
       note: dto.note,
     });
 
-    return this.disputeInternalNoteRepository.save(note);
+    const savedNote = await this.disputeInternalNoteRepository.save(note);
+
+    void this.auditLogsService?.record?.({
+      actorId: adminId,
+      action: 'DISPUTE_INTERNAL_NOTE_ADDED',
+      targetType: 'Dispute',
+      targetId: disputeId,
+      details: JSON.stringify({ noteId: savedNote.id }),
+    });
+
+    return savedNote;
   }
 
   async resolveDispute(disputeId: string, adminId: string, dto: ResolveDisputeDto) {
@@ -217,7 +283,7 @@ export class DisputesService {
     if (dto.refundAmount) dispute.refundAmount = dto.refundAmount;
 
     // Refund Logic
-    if (dto.resolutionType === 'FULL_REFUND' || dto.resolutionType === 'PARTIAL_REFUND') {
+    if (dto.resolutionType === DisputeResolutionType.FULL_REFUND || dto.resolutionType === DisputeResolutionType.PARTIAL_REFUND) {
       const amount = dto.refundAmount || Number(dispute.order.total);
       
       // Debit seller, credit customer
@@ -237,6 +303,32 @@ export class DisputesService {
     }
 
     const savedDispute = await this.disputeRepository.save(dispute);
+
+    // Audit Log
+    void this.auditLogsService?.record?.({
+      actorId: adminId,
+      action: 'DISPUTE_RESOLVED',
+      targetType: 'Dispute',
+      targetId: dispute.id,
+      details: JSON.stringify({
+        resolutionType: dto.resolutionType,
+        refundAmount: dispute.refundAmount,
+        adminDecision: dto.adminDecision,
+      }),
+    });
+
+    // Real-time Event
+    this.eventEmitter.emit('dispute.status.updated', {
+      disputeId: dispute.id,
+      orderId: dispute.orderId,
+      customerId: dispute.customerId,
+      sellerId: dispute.sellerId,
+      status: DisputeStatus.RESOLVED,
+      resolutionType: dto.resolutionType,
+      refundAmount: dispute.refundAmount,
+      adminDecision: dto.adminDecision,
+      updatedAt: new Date().toISOString(),
+    });
 
     // Notify users
     void this.notificationsService?.notifyUsers?.([dispute.customerId, dispute.sellerId], {
@@ -258,13 +350,34 @@ export class DisputesService {
 
     dispute.status = DisputeStatus.REJECTED;
     dispute.adminDecision = dto.reason;
-    dispute.resolutionType = 'REJECTED';
+    dispute.resolutionType = DisputeResolutionType.REJECTED;
 
     if (dto.internalNote) {
       await this.addInternalNote(disputeId, adminId, { note: dto.internalNote });
     }
 
     const savedDispute = await this.disputeRepository.save(dispute);
+
+    // Audit Log
+    void this.auditLogsService?.record?.({
+      actorId: adminId,
+      action: 'DISPUTE_REJECTED',
+      targetType: 'Dispute',
+      targetId: dispute.id,
+      details: JSON.stringify({ reason: dto.reason }),
+    });
+
+    // Real-time Event
+    this.eventEmitter.emit('dispute.status.updated', {
+      disputeId: dispute.id,
+      orderId: dispute.orderId,
+      customerId: dispute.customerId,
+      sellerId: dispute.sellerId,
+      status: DisputeStatus.REJECTED,
+      resolutionType: DisputeResolutionType.REJECTED,
+      adminDecision: dto.reason,
+      updatedAt: new Date().toISOString(),
+    });
 
     // Notify users
     void this.notificationsService?.notifyUsers?.([dispute.customerId, dispute.sellerId], {
