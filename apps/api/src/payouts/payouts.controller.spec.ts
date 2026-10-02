@@ -3,6 +3,7 @@ import { PayoutsController } from './payouts.controller.js';
 import { PayoutsService } from './payouts.service.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
+import { ImpersonationGuard } from '../common/guards/impersonation.guard.js';
 
 describe('PayoutsController', () => {
   let controller: PayoutsController;
@@ -15,6 +16,8 @@ describe('PayoutsController', () => {
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(ImpersonationGuard)
       .useValue({ canActivate: () => true })
       .compile();
 

@@ -3,7 +3,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
-import { ArrowLeft, UserCog, Mail, Phone, Calendar, BadgeCheck, ShieldX } from 'lucide-react';
+import {
+  ArrowLeft,
+  UserCog,
+  Mail,
+  Phone,
+  Calendar,
+  BadgeCheck,
+  ShieldX,
+  ShieldAlert,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 
 import { RootState } from '@/store/store';
 import { userIsSuperAdmin } from '@/lib/roles';
@@ -60,11 +71,15 @@ export function AdminUserDetailView({
   const { data: user, isLoading, isError, refetch } = useGetUserQuery(id);
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const isSuperAdmin = userIsSuperAdmin(currentUser);
+  const [historyPage, setHistoryPage] = useState(1);
   const { data: history, isLoading: isHistoryLoading } = useGetTargetImpersonationHistoryQuery(
-    id,
+    { userId: id, page: historyPage, limit: 5 },
     { skip: !isSuperAdmin }
   );
   const [isImpersonateOpen, setIsImpersonateOpen] = useState(false);
+
+  const historyItems = history?.data ?? [];
+  const historyMeta = history?.meta;
 
   const canImpersonate = isSuperAdmin && !!user && isImpersonatable(user, currentUser?.id);
 
@@ -206,35 +221,94 @@ export function AdminUserDetailView({
 
       {isSuperAdmin && (
         <div className="rounded-2xl border bg-card p-5">
-          <h2 className="mb-4 text-sm font-semibold text-foreground">{t.historyTitle}</h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-foreground">{t.historyTitle}</h2>
+            <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
+              <Link
+                href={`/${lang}/super-admin/users-management/impersonation-audit?targetUserId=${id}`}
+              >
+                {t.historyViewAll}
+              </Link>
+            </Button>
+          </div>
           {isHistoryLoading ? (
             <p className="text-sm text-muted-foreground">{t.historyLoading}</p>
-          ) : !history || history.length === 0 ? (
+          ) : historyItems.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t.historyEmpty}</p>
           ) : (
-            <ul className="space-y-3">
-              {history.map((item) => (
-                <li
-                  key={item.sessionId}
-                  className="flex flex-wrap items-start justify-between gap-2 rounded-xl border p-3"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium break-words text-foreground">
-                      {item.actorName || (lang === 'bn' ? 'সুপার অ্যাডমিন' : 'Super Admin')}
-                    </p>
-                    <p className="text-xs text-muted-foreground break-words">
-                      {imp.reasons[item.reason]}
-                      {item.reasonNote ? ` — ${item.reasonNote}` : ''}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {t.historyStarted}: {formatDateTime(item.startedAt, lang)}
-                      {item.endedAt ? ` · ${t.historyEnded}: ${formatDateTime(item.endedAt, lang)}` : ''}
-                    </p>
+            <>
+              <ul className="space-y-3">
+                {historyItems.map((item) => (
+                  <li
+                    key={item.sessionId}
+                    className="flex flex-wrap items-start justify-between gap-2 rounded-xl border p-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium break-words text-foreground">
+                        {item.actorName || (lang === 'bn' ? 'সুপার অ্যাডমিন' : 'Super Admin')}
+                      </p>
+                      <p className="text-xs text-muted-foreground break-words">
+                        {imp.reasons[item.reason]}
+                        {item.reasonNote ? ` — ${item.reasonNote}` : ''}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t.historyStarted}: {formatDateTime(item.startedAt, lang)}
+                        {item.endedAt
+                          ? ` · ${t.historyEnded}: ${formatDateTime(item.endedAt, lang)}`
+                          : ''}
+                      </p>
+                      {item.blockedActionCount > 0 && (
+                        <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-2">
+                          <p className="flex items-center gap-1.5 text-xs font-medium text-destructive">
+                            <ShieldAlert className="h-3.5 w-3.5" aria-hidden="true" />
+                            {item.blockedActionCount} {t.historyBlocked}
+                          </p>
+                          <ul className="mt-1 space-y-0.5">
+                            {item.blockedActions.map((action, index) => (
+                              <li
+                                key={`${action.path}-${index}`}
+                                className="text-[11px] text-muted-foreground break-all"
+                              >
+                                <span className="font-medium">{action.method}</span> {action.path}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                    <Badge variant={statusVariant(item.status)}>{statusLabel(item.status)}</Badge>
+                  </li>
+                ))}
+              </ul>
+
+              {historyMeta && historyMeta.totalPages > 1 && (
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    {t.historyPage} {historyMeta.page} / {historyMeta.totalPages}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={historyMeta.page <= 1}
+                      onClick={() => setHistoryPage((prev) => Math.max(1, prev - 1))}
+                    >
+                      <ChevronLeft className="me-1 h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
+                      {t.historyPrev}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={historyMeta.page >= historyMeta.totalPages}
+                      onClick={() => setHistoryPage((prev) => prev + 1)}
+                    >
+                      {t.historyNext}
+                      <ChevronRight className="ms-1 h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
+                    </Button>
                   </div>
-                  <Badge variant={statusVariant(item.status)}>{statusLabel(item.status)}</Badge>
-                </li>
-              ))}
-            </ul>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

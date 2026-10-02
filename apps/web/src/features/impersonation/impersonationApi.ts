@@ -22,11 +22,30 @@ export interface StartImpersonationResponse {
 
 export type ImpersonationStatus = 'ACTIVE' | 'ENDED' | 'EXPIRED';
 
-/** One recorded impersonation session, as shown in the user history panel. */
+/** A sensitive action that enforcement blocked while impersonating. */
+export interface BlockedImpersonationAction {
+  method: string;
+  path: string;
+  createdAt: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+/** One recorded impersonation session, as shown in history / audit views. */
 export interface ImpersonationHistoryItem {
   sessionId: string;
   actorUserId: string;
   actorName: string | null;
+  targetUserId: string;
+  targetName: string | null;
   targetRole: string;
   reason: ImpersonationReason;
   reasonNote: string | null;
@@ -34,6 +53,24 @@ export interface ImpersonationHistoryItem {
   startedAt: string;
   endedAt: string | null;
   expiresAt: string;
+  blockedActions: BlockedImpersonationAction[];
+  blockedActionCount: number;
+}
+
+export interface TargetImpersonationHistoryArgs {
+  userId: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ImpersonationSessionsArgs {
+  page?: number;
+  limit?: number;
+  status?: ImpersonationStatus | 'ALL';
+  reason?: ImpersonationReason | 'ALL';
+  targetRole?: string | 'ALL';
+  targetUserId?: string;
+  search?: string;
 }
 
 export const impersonationApi = api.injectEndpoints({
@@ -63,9 +100,26 @@ export const impersonationApi = api.injectEndpoints({
       query: () => '/admin/impersonation/session',
       providesTags: ['Impersonation'],
     }),
-    /** Recent impersonation sessions targeting a user (Super Admin only). */
-    getTargetImpersonationHistory: builder.query<ImpersonationHistoryItem[], string>({
-      query: (userId) => `/admin/impersonation/target/${userId}`,
+    /** Paginated impersonation sessions targeting a user (Super Admin only). */
+    getTargetImpersonationHistory: builder.query<
+      PaginatedResponse<ImpersonationHistoryItem>,
+      TargetImpersonationHistoryArgs
+    >({
+      query: ({ userId, page, limit }) => ({
+        url: `/admin/impersonation/target/${userId}`,
+        params: { page, limit },
+      }),
+      providesTags: ['Impersonation'],
+    }),
+    /** Platform-wide impersonation session listing (Super Admin only). */
+    getImpersonationSessions: builder.query<
+      PaginatedResponse<ImpersonationHistoryItem>,
+      ImpersonationSessionsArgs
+    >({
+      query: (params) => ({
+        url: '/admin/impersonation/sessions',
+        params,
+      }),
       providesTags: ['Impersonation'],
     }),
   }),
@@ -77,4 +131,5 @@ export const {
   useGetImpersonationSessionQuery,
   useLazyGetImpersonationSessionQuery,
   useGetTargetImpersonationHistoryQuery,
+  useGetImpersonationSessionsQuery,
 } = impersonationApi;

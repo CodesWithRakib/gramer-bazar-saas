@@ -14,7 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 import { ImpersonationService } from './impersonation.service.js';
 import { StartImpersonationDto } from './dto/start-impersonation.dto.js';
@@ -137,22 +137,65 @@ export class ImpersonationController {
 
   /**
    * Recent impersonation sessions targeting a user (Super Admin only), used by
-   * the user details page history panel.
+   * the user details page history panel. Paginated.
    */
   @Get('target/:userId')
   @UseGuards(RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   @ApiOperation({
-    summary: 'Get recent impersonation history for a target user (Super Admin only)',
+    summary: 'Get paginated impersonation history for a target user (Super Admin only)',
     description:
-      'Returns the most recent impersonation sessions in which this user was the impersonated (effective) user.',
+      'Returns impersonation sessions in which this user was the impersonated (effective) user, newest first, including any sensitive actions that were blocked.',
   })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiCommonErrors([401, 403])
   async targetHistory(
     @Param('userId', ParseUUIDPipe) userId: string,
+    @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
-    return this.impersonationService.getTargetHistory(userId, Number(limit));
+    return this.impersonationService.getTargetHistory(userId, Number(page), Number(limit));
+  }
+
+  /**
+   * Platform-wide impersonation session listing (Super Admin only) powering the
+   * impersonation audit view.
+   */
+  @Get('sessions')
+  @UseGuards(RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  @ApiOperation({
+    summary: 'List all impersonation sessions platform-wide (Super Admin only)',
+    description:
+      'Paginated audit listing of every impersonation session, filterable by status, reason, effective role, and free-text search.',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'reason', required: false, type: String })
+  @ApiQuery({ name: 'targetRole', required: false, type: String })
+  @ApiQuery({ name: 'targetUserId', required: false, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiCommonErrors([401, 403])
+  async sessions(
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
+    @Query('status') status?: string,
+    @Query('reason') reason?: string,
+    @Query('targetRole') targetRole?: string,
+    @Query('targetUserId') targetUserId?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.impersonationService.getAllSessions({
+      page: Number(page),
+      limit: Number(limit),
+      status,
+      reason,
+      targetRole,
+      targetUserId,
+      search,
+    });
   }
 
   /** Inspect the current Super Admin's active impersonation session, if any. */

@@ -39,6 +39,25 @@ export class AuditLogsService {
     }
   }
 
+  /**
+   * Sensitive actions that were blocked while impersonating, keyed to the
+   * impersonation session that attempted them. Used to surface enforcement in
+   * the impersonation history / audit views.
+   */
+  async findBlockedImpersonationActions(sessionIds: string[]): Promise<AuditLog[]> {
+    if (!sessionIds.length) {
+      return [];
+    }
+
+    return this.auditLogRepository
+      .createQueryBuilder('log')
+      .where('log.action = :action', { action: 'IMPERSONATED_ACTION_BLOCKED' })
+      .andWhere('log.targetType = :targetType', { targetType: 'ImpersonationSession' })
+      .andWhere('log.targetId IN (:...sessionIds)', { sessionIds })
+      .orderBy('log.createdAt', 'DESC')
+      .getMany();
+  }
+
   async findAll(page = 1, limit = 20, search?: string) {
     const query = this.auditLogRepository
       .createQueryBuilder('log')

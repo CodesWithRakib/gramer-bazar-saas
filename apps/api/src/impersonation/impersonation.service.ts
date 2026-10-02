@@ -30,6 +30,49 @@ export interface ImpersonationRequestMeta {
   userAgent?: string | null;
 }
 
+/** A sensitive action that impersonation enforcement blocked for a session. */
+export interface BlockedImpersonationAction {
+  method: string;
+  path: string;
+  createdAt: string;
+}
+
+/** One impersonation session as returned to the admin history / audit views. */
+export interface ImpersonationHistoryRecord {
+  sessionId: string;
+  actorUserId: string;
+  actorName: string | null;
+  targetUserId: string;
+  targetName: string | null;
+  targetRole: string;
+  reason: ImpersonationReason;
+  reasonNote: string | null;
+  status: ImpersonationStatus;
+  startedAt: string;
+  endedAt: string | null;
+  expiresAt: string;
+  blockedActions: BlockedImpersonationAction[];
+  blockedActionCount: number;
+}
+
+/** Filters for the platform-wide impersonation audit listing. */
+export interface ImpersonationSessionFilters {
+  page?: number;
+  limit?: number;
+  status?: string;
+  reason?: string;
+  targetRole?: string;
+  targetUserId?: string;
+  search?: string;
+}
+
+export interface ImpersonationPage {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 @Injectable()
 export class ImpersonationService {
   constructor(
@@ -214,21 +257,31 @@ export class ImpersonationService {
     return { ...tokens, impersonation: null };
   }
 
-  /**
-   * Recent impersonation sessions targeting a specific user, newest first.
-   * Used by the Super Admin user details page to surface the audit history.
-   */
-  async getTargetHistory(targetUserId: string, limit = 10) {
-    const sessions = await this.impersonationRepository.find({
-      where: { targetUserId },
-      order: { startedAt: 'DESC' },
-      take: Math.min(Math.max(limit, 1), 50),
-    });
+  private clampPage(page: unknown): number {
+    const value = Math.floor(Number(page));
+    return Number.isFinite(value) && value > 0 ? value : 1;
+  }
 
-    return sessions.map((session) => ({
+  private clampLimit(limit: unknown, fallback: number, max = 50): number {
+    const value = Math.floor(Number(limit));
+    if (!Number.isFinite(value) || value <= 0) return fallback;
+    return Math.min(value, max);
+  }
+
+  private buildPage(total: number, page: number, limit: number): ImpersonationPage {
+    return { total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  private toHistoryRecord(session: ImpersonationSession): Omit<
+    ImpersonationHistoryRecord,
+    'blockedActions' | 'blockedActionCount'
+  > {
+    return {
       sessionId: session.id,
       actorUserId: session.actorUserId,
       actorName: session.actorName,
+      targetUserId: session.targetUserId,
+      targetName: session.targetName,
       targetRole: session.targetRole,
       reason: session.reason,
       reasonNote: session.reasonNote,
@@ -236,7 +289,117 @@ export class ImpersonationService {
       startedAt: session.startedAt.toISOString(),
       endedAt: session.endedAt ? session.endedAt.toISOString() : null,
       expiresAt: session.expiresAt.toISOString(),
-    }));
+    };
+  }
+
+  /** Group blocked sensitive actions by the impersonation session they belong to. */
+  private async loadBlockedActions(
+    sessions: ImpersonationSession[],
+  ): Promise<Map<string, BlockedImpersonationAction[]>> {
+    const map = new Map<string, BlockedImpersonationAction[]>();
+    if (!sessions.length) return map;
+
+    const logs = await this.auditLogsService.findBlockedImpersonationActions(
+      sessions.map((session) => session.id),
+    );
+
+    for (const log of logs) {
+      if (!log.targetId) continue;
+      let details: { method?: string; path?: string } = {};
+      try {
+        details = log.details ? JSON.parse(log.details) : {};
+      } catch {
+        details = {};
+      }
+      const list = map.get(log.targetId) ?? [];
+      list.push({
+        method: details.method ?? 'UNKNOWN',
+        path: details.path ?? '',
+        createdAt: log.createdAt.toISOString(),
+      });
+      map.set(log.targetId, list);
+    }
+
+    return map;
+  }
+
+  private async decorateWithBlockedActions(
+    sessions: ImpersonationSession[],
+  ): Promise<ImpersonationHistoryRecord[]> {
+    const blockedMap = await this.loadBlockedActions(sessions);
+    return sessions.map((session) => {
+      const blockedActions = blockedMap.get(session.id) ?? [];
+      return {
+        ...this.toHistoryRecord(session),
+        blockedActions,
+        blockedActionCount: blockedActions.length,
+      };
+    });
+  }
+
+  /**
+   * Paginated impersonation sessions targeting a specific user, newest first.
+   * Used by the Super Admin user details page to surface the audit history.
+   */
+  async getTargetHistory(targetUserId: string, page = 1, limit = 10) {
+    const safePage = this.clampPage(page);
+    const safeLimit = this.clampLimit(limit, 10);
+
+    const [sessions, total] = await this.impersonationRepository.findAndCount({
+      where: { targetUserId },
+      order: { startedAt: 'DESC' },
+      skip: (safePage - 1) * safeLimit,
+      take: safeLimit,
+    });
+
+    return {
+      data: await this.decorateWithBlockedActions(sessions),
+      meta: this.buildPage(total, safePage, safeLimit),
+    };
+  }
+
+  /**
+   * Platform-wide impersonation session listing for the Super Admin audit view.
+   * Supports filtering by status, reason, effective role, and free-text search.
+   */
+  async getAllSessions(filters: ImpersonationSessionFilters = {}) {
+    const safePage = this.clampPage(filters.page);
+    const safeLimit = this.clampLimit(filters.limit, 20);
+
+    const query = this.impersonationRepository
+      .createQueryBuilder('session')
+      .orderBy('session.startedAt', 'DESC');
+
+    if (filters.status) {
+      query.andWhere('session.status = :status', { status: filters.status });
+    }
+    if (filters.reason) {
+      query.andWhere('session.reason = :reason', { reason: filters.reason });
+    }
+    if (filters.targetRole) {
+      query.andWhere('session.targetRole = :targetRole', { targetRole: filters.targetRole });
+    }
+    if (filters.targetUserId) {
+      query.andWhere('session.targetUserId = :targetUserId', {
+        targetUserId: filters.targetUserId,
+      });
+    }
+    if (filters.search) {
+      query.andWhere(
+        '(session.actorName ILIKE :search OR session.targetName ILIKE :search OR session.reasonNote ILIKE :search)',
+        { search: `%${filters.search}%` },
+      );
+    }
+
+    const [sessions, total] = await query
+      .skip((safePage - 1) * safeLimit)
+      .take(safeLimit)
+      .getManyAndCount();
+
+    return {
+      data: await this.decorateWithBlockedActions(sessions),
+      meta: this.buildPage(total, safePage, safeLimit),
+    };
   }
 
   /** Current active impersonation session for an actor, or null. */

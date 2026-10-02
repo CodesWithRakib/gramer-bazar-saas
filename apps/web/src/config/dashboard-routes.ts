@@ -21,6 +21,7 @@ import {
   History,
   Banknote,
   Megaphone,
+  UserCog,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -209,6 +210,16 @@ export const superAdminRoutes: DashboardRoute[] = [
       '/super-admin/riders',
       '/super-admin/admins',
     ],
+  },
+  {
+    title: 'Impersonation Audit',
+    titleBn: 'প্রবেশ অডিট',
+    href: '/super-admin/users-management/impersonation-audit',
+    icon: UserCog,
+    superAdminOnly: true,
+    section: 'Governance',
+    sectionBn: 'প্রশাসন',
+    matchPrefixes: ['/super-admin/users-management/impersonation-audit'],
   },
   {
     title: 'Finance & Payouts',
