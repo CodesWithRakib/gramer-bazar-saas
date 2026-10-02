@@ -29,6 +29,7 @@ import {
 } from '@/lib/notification-format';
 import { isNotificationSoundEnabled, setNotificationSoundEnabled } from '@/lib/notification-sound';
 import { AppNotification, NotificationType } from '@/types/notifications';
+import { getUserRoles } from '@/lib/roles';
 
 export function NotificationBell({ lang = 'bn' }: { lang?: string }) {
   const isBn = lang === 'bn';
@@ -58,17 +59,20 @@ export function NotificationBell({ lang = 'bn' }: { lang?: string }) {
 
   const unreadCount = unreadData?.count ?? 0;
   const notifications: AppNotification[] = notifData?.items ?? [];
-  const roles = Array.isArray(user?.roles) ? user.roles : [];
+  const userRoles = getUserRoles(user);
 
   // Determine Notification Center Link based on primary role
   const getNotificationCenterUrl = () => {
-    if (roles.includes('admin') || roles.includes('super-admin')) {
+    if (userRoles.includes('SUPER_ADMIN')) {
+      return `/${lang}/super-admin/notifications`;
+    }
+    if (userRoles.includes('ADMIN')) {
       return `/${lang}/admin/notifications`;
     }
-    if (roles.includes('seller')) {
+    if (userRoles.includes('SELLER')) {
       return `/${lang}/seller/notifications`;
     }
-    if (roles.includes('rider')) {
+    if (userRoles.includes('RIDER')) {
       return `/${lang}/rider/notifications`;
     }
     return `/${lang}/customer/notifications`;
@@ -223,7 +227,7 @@ export function NotificationBell({ lang = 'bn' }: { lang?: string }) {
               ) : (
                 notifications.map((notif) => {
                   const { title, message } = formatNotificationText(notif, lang);
-                  const targetUrl = getNotificationActionUrl(notif, roles, lang);
+                  const targetUrl = getNotificationActionUrl(notif, userRoles, lang);
                   const relativeTime = formatNotificationTime(notif.createdAt, lang);
 
                   const itemContent = (

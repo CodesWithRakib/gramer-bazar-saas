@@ -23,6 +23,7 @@ import { UserRoleDialog } from './UserRoleDialog';
 import { AdminCreateUserDialog } from './AdminCreateUserDialog';
 import { ImpersonateUserDialog } from './ImpersonateUserDialog';
 import { isImpersonatable } from '@/features/users/impersonationEligibility';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminUsersViewProps {
   lang?: string;
@@ -144,16 +145,24 @@ export function AdminUsersView({ lang = 'en', namespace = 'admin' }: AdminUsersV
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {isSuperAdmin ? 'All Users (Governance & Operations)' : 'User Management'}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            {isSuperAdmin
-              ? 'Super Admin view of all platform users, roles, and security access levels.'
-              : 'View and manage platform customer, seller, and rider accounts.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/users-management`}
+          label="Back to Users & Partners"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {isSuperAdmin ? 'All Users (Governance & Operations)' : 'User Management'}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {isSuperAdmin
+                ? 'Super Admin view of all platform users, roles, and security access levels.'
+                : 'View and manage platform customer, seller, and rider accounts.'}
+            </p>
+          </div>
         </div>
       </div>
 

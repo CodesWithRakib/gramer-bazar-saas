@@ -15,6 +15,7 @@ function makeQueryBuilder(overrides: Record<string, unknown> = {}) {
     select: vi.fn().mockReturnThis(),
     orderBy: vi.fn().mockReturnThis(),
     take: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
     getMany: vi.fn().mockResolvedValue([]),
     getCount: vi.fn().mockResolvedValue(0),
     ...overrides,
@@ -26,13 +27,14 @@ describe('BroadcastAudienceService', () => {
   let qb: ReturnType<typeof makeQueryBuilder>;
 
   const userRepo = { createQueryBuilder: vi.fn() };
-  const preferenceRepo = { count: vi.fn().mockResolvedValue(0) };
+  const preferenceRepo = { count: vi.fn().mockResolvedValue(0), find: vi.fn().mockResolvedValue([]) };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     qb = makeQueryBuilder();
     userRepo.createQueryBuilder.mockReturnValue(qb);
     preferenceRepo.count.mockResolvedValue(0);
+    preferenceRepo.find.mockResolvedValue([]);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -114,5 +116,34 @@ describe('BroadcastAudienceService', () => {
       optedOutCustomers: 0,
     });
     expect(result.byAudienceType).toHaveProperty(BroadcastAudienceType.ALL_CUSTOMERS);
+  });
+
+  it('searches customers with proper column selection including createdAt', async () => {
+    qb.getMany.mockResolvedValue([
+      {
+        id: 'u-1',
+        firstName: 'Rakib',
+        lastName: 'Hasan',
+        phone: '+8801700000000',
+        email: 'rakib@example.com',
+        lastLoginAt: new Date(),
+        createdAt: new Date(),
+      },
+    ]);
+
+    const result = await service.searchCustomers('rakib', 15);
+
+    expect(qb.select).toHaveBeenCalledWith(
+      expect.arrayContaining(['u.id', 'u.firstName', 'u.lastName', 'u.phone', 'u.createdAt']),
+    );
+    expect(qb.orderBy).toHaveBeenCalledWith('u.createdAt', 'DESC');
+    expect(qb.limit).toHaveBeenCalledWith(15);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      id: 'u-1',
+      name: 'Rakib Hasan',
+      email: 'rakib@example.com',
+      marketingOptIn: true,
+    });
   });
 });

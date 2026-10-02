@@ -149,15 +149,18 @@ export function getNotificationActionUrl(
   lang: string = 'bn'
 ): string | null {
   const data = notification.data || {};
-  const isSeller = roles.includes('seller');
-  const isRider = roles.includes('rider');
-  const isAdmin = roles.includes('admin') || roles.includes('super-admin');
+  const normalizedRoles = roles.map((r) => String(r).toUpperCase());
+  const isSuperAdmin = normalizedRoles.includes('SUPER_ADMIN');
+  const isAdmin = normalizedRoles.includes('ADMIN') || isSuperAdmin;
+  const isSeller = normalizedRoles.includes('SELLER');
+  const isRider = normalizedRoles.includes('RIDER');
+  const adminBase = isSuperAdmin ? 'super-admin' : 'admin';
 
   // Orders
   if (notification.type.includes('ORDER') || notification.type === NotificationType.ORDER_UPDATE) {
     if (data.orderId) {
       if (isAdmin) {
-        return `/${lang}/admin/orders/${data.orderId}`;
+        return `/${lang}/${adminBase}/orders/${data.orderId}`;
       }
       if (isSeller) {
         return `/${lang}/seller/orders/${data.orderId}`;
@@ -174,7 +177,7 @@ export function getNotificationActionUrl(
         : `/${lang}/rider/deliveries`;
     }
     if (isAdmin) {
-      return `/${lang}/admin/deliveries`;
+      return `/${lang}/${adminBase}/deliveries`;
     }
     if (data.orderId) {
       return `/${lang}/customer/orders/${data.orderId}`;
@@ -184,14 +187,14 @@ export function getNotificationActionUrl(
   // Applications
   if (notification.type.includes('SELLER_APPLICATION')) {
     if (isAdmin) {
-      return `/${lang}/admin/applications/seller`;
+      return `/${lang}/${adminBase}/users-management/seller-applications`;
     }
     return `/${lang}/seller`;
   }
 
   if (notification.type.includes('RIDER_APPLICATION')) {
     if (isAdmin) {
-      return `/${lang}/admin/applications/rider`;
+      return `/${lang}/${adminBase}/users-management/rider-applications`;
     }
     return `/${lang}/rider`;
   }
@@ -199,7 +202,7 @@ export function getNotificationActionUrl(
   // Payouts
   if (notification.type.includes('PAYOUT')) {
     if (isAdmin) {
-      return `/${lang}/admin/payouts`;
+      return `/${lang}/${adminBase}/finance`;
     }
     return `/${lang}/seller/payouts`;
   }
@@ -207,7 +210,7 @@ export function getNotificationActionUrl(
   // Product Requests
   if (notification.type === NotificationType.REQUEST && data.requestId) {
     if (isAdmin) {
-      return `/${lang}/admin/product-requests`;
+      return `/${lang}/${adminBase}/products/product-requests`;
     }
     return `/${lang}/customer/product-requests/${data.requestId}`;
   }

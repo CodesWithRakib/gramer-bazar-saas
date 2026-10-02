@@ -8,6 +8,7 @@ import { ArrowLeft, ShieldAlert, X } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { BackButton } from '@/components/common/BackButton';
 import {
   Select,
   SelectContent,
@@ -164,18 +165,18 @@ export function ImpersonationAuditView({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/${lang}/super-admin/users-management`}
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ArrowLeft className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
-            </Link>
+      <div>
+        <BackButton
+          href={`/${lang}/super-admin/users-management`}
+          label="Back to Users & Staff"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{t.title}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
         </div>
       </div>
 

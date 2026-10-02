@@ -9,13 +9,18 @@ import {
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminProductRequestsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminProductRequestsView({ lang = 'en' }: AdminProductRequestsViewProps) {
+export function AdminProductRequestsView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminProductRequestsViewProps) {
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -64,12 +69,24 @@ export function AdminProductRequestsView({ lang = 'en' }: AdminProductRequestsVi
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Product Requests</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Review customer product requests and track fulfillment status.
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/products`}
+          label="Back to Products Hub"
+          labelBn="পণ্য হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {lang === 'bn' ? 'গ্রাহক পণ্য অনুরোধ' : 'Customer Product Requests'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {lang === 'bn'
+                ? 'গ্রাহকদের চাহিদা অনুযায়ী পণ্যের অনুরোধ পর্যালোচনা এবং ক্যাটালগে অন্তর্ভুক্ত করুন।'
+                : 'Review customer product requests and track procurement fulfillment status.'}
+            </p>
+          </div>
         </div>
       </div>
 

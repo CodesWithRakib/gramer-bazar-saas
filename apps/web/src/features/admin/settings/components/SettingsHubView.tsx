@@ -123,3 +123,5 @@ export function SettingsHubView({ lang = 'en', namespace = 'admin' }: SettingsHu
     />
   );
 }
+
+export default SettingsHubView;

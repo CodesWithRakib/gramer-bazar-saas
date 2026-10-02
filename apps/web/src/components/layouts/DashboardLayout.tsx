@@ -201,6 +201,22 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeType, user]);
 
+  // Keep authenticated users in their authentic role dashboard namespace
+  React.useEffect(() => {
+    if (!user) return;
+    const roles = getUserRoles(user);
+    const isSuperAdmin = roles.includes('SUPER_ADMIN');
+    const isAdmin = roles.includes('ADMIN') && !isSuperAdmin;
+
+    if (isSuperAdmin && routeType === 'admin') {
+      const target = pathname.replace(`/${lang}/admin`, `/${lang}/super-admin`);
+      router.replace(target);
+    } else if (isAdmin && routeType === 'super-admin') {
+      const target = pathname.replace(`/${lang}/super-admin`, `/${lang}/admin`);
+      router.replace(target);
+    }
+  }, [user, routeType, pathname, lang, router]);
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -326,11 +342,15 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
                 <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
                   <Link
                     href={
-                      routeType === 'seller'
-                        ? `/${lang}/seller/profile`
-                        : routeType === 'rider'
-                          ? `/${lang}/rider/profile`
-                          : `/${lang}/customer/profile`
+                      userRoles.includes('SUPER_ADMIN')
+                        ? `/${lang}/super-admin/settings`
+                        : userRoles.includes('ADMIN')
+                          ? `/${lang}/admin/settings`
+                          : userRoles.includes('SELLER')
+                            ? `/${lang}/seller/profile`
+                            : userRoles.includes('RIDER')
+                              ? `/${lang}/rider/profile`
+                              : `/${lang}/customer/profile`
                     }
                     className="flex items-center gap-2 w-full"
                   >
@@ -342,11 +362,15 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
                 <DropdownMenuItem asChild className="rounded-lg cursor-pointer py-2 text-xs">
                   <Link
                     href={
-                      routeType === 'admin'
-                        ? `/${lang}/admin/settings`
-                        : routeType === 'super-admin'
-                          ? `/${lang}/super-admin/settings`
-                          : `/${lang}/customer/settings`
+                      userRoles.includes('SUPER_ADMIN')
+                        ? `/${lang}/super-admin/settings`
+                        : userRoles.includes('ADMIN')
+                          ? `/${lang}/admin/settings`
+                          : userRoles.includes('SELLER')
+                            ? `/${lang}/seller/settings`
+                            : userRoles.includes('RIDER')
+                              ? `/${lang}/rider/settings`
+                              : `/${lang}/customer/profile`
                     }
                     className="flex items-center gap-2 w-full"
                   >

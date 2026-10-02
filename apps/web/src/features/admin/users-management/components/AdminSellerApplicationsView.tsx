@@ -30,14 +30,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { CheckCircle2, XCircle, Eye, Store, Clock } from 'lucide-react';
 import { customToast as toast } from '@/components/ui/custom-toast';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminSellerApplicationsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicationsViewProps) {
+export function AdminSellerApplicationsView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminSellerApplicationsViewProps) {
   const isBn = lang === 'bn';
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -197,16 +202,24 @@ export function AdminSellerApplicationsView({ lang = 'en' }: AdminSellerApplicat
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            {isBn ? 'সেলার আবেদনসমূহ' : 'Seller Partner Applications'}
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {isBn
-              ? 'দোকানদার পার্টনারদের আবেদন যাচাই করে অনুমোদন বা বাতিল করুন।'
-              : 'Review and approve merchant applications to grant seller portal access.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/users-management`}
+          label="Back to Users & Partners"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              {isBn ? 'সেলার আবেদনসমূহ' : 'Seller Partner Applications'}
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {isBn
+                ? 'দোকানদার পার্টনারদের আবেদন যাচাই করে অনুমোদন বা বাতিল করুন।'
+                : 'Review and approve merchant applications to grant seller portal access.'}
+            </p>
+          </div>
         </div>
       </div>
 

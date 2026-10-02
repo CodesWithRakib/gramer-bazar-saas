@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import { ArrowLeft } from 'lucide-react';
 import { customToast as toast } from '@/components/ui/custom-toast';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface SuperAdminCreateUserViewProps {
   lang?: string;
@@ -66,13 +67,13 @@ export function SuperAdminCreateUserView({ lang = 'en' }: SuperAdminCreateUserVi
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <Link
-          href={`/${lang}/super-admin`}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-        </Link>
+      <div>
+        <BackButton
+          href={`/${lang}/super-admin/users-management`}
+          label="Back to Users & Staff"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
             {isBn ? 'নতুন স্টাফ বা অ্যাডমিন তৈরি' : 'Create Staff or Admin User'}

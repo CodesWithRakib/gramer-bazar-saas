@@ -17,9 +17,10 @@ import { getApiErrorMessage } from '@/lib/apiError';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { AddProductDialog, EditProductDialog, ProductImagesDialog } from './ProductDialogs';
 import { ProductImporterModal } from './ProductImporterModal';
-import { Images, Edit, Trash2, Package, Tag, Building2, ClipboardList } from 'lucide-react';
+import { Images, Edit, Trash2, Package } from 'lucide-react';
 import Link from 'next/link';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminProductsViewProps {
   lang?: string;
@@ -27,6 +28,8 @@ export interface AdminProductsViewProps {
 }
 
 export function AdminProductsView({ lang = 'en', namespace = 'admin' }: AdminProductsViewProps) {
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
+  const isSuperAdmin = namespace === 'super-admin';
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [search, setSearch] = useState('');
@@ -245,49 +248,31 @@ export function AdminProductsView({ lang = 'en', namespace = 'admin' }: AdminPro
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            {lang === 'bn' ? 'মাস্টার প্রোডাক্ট ক্যাটালগ' : 'Master Product Catalog'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {lang === 'bn'
-              ? 'সকল পণ্য তালিকা, ক্যাটাগরি, ব্র্যান্ড ও পণ্য অনুরোধ ব্যবস্থাপনা।'
-              : 'Global catalog items, categories, brands, and product requests.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/products`}
+          label="Back to Products Hub"
+          labelBn="পণ্য হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              {isSuperAdmin
+                ? lang === 'bn'
+                  ? 'মাস্টার প্রোডাক্ট ক্যাটালগ'
+                  : 'Master Product Catalog'
+                : lang === 'bn'
+                  ? 'পণ্য তালিকা ও ইনভেন্টরি'
+                  : 'Product Catalog & Inventory'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {lang === 'bn'
+                ? 'সকল পণ্য তালিকা, স্টক, মূল্য ও ভ্যারিয়েশন পরিচালনা করুন।'
+                : 'Browse, filter, edit, import, and manage global catalog products.'}
+            </p>
+          </div>
         </div>
-      </div>
-
-      {/* Sub-Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 pb-2 border-b">
-        <Link
-          href={`/${lang}/${namespace}/products`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground"
-        >
-          <Package className="w-3.5 h-3.5" />
-          <span>{lang === 'bn' ? 'সকল পণ্য' : 'All Products'}</span>
-        </Link>
-        <Link
-          href={`/${lang}/${namespace}/products/categories`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <Tag className="w-3.5 h-3.5" />
-          <span>{lang === 'bn' ? 'ক্যাটাগরি' : 'Categories'}</span>
-        </Link>
-        <Link
-          href={`/${lang}/${namespace}/products/brands`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>{lang === 'bn' ? 'ব্র্যান্ডসমূহ' : 'Brands'}</span>
-        </Link>
-        <Link
-          href={`/${lang}/${namespace}/products/product-requests`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <ClipboardList className="w-3.5 h-3.5" />
-          <span>{lang === 'bn' ? 'পণ্য অনুরোধ' : 'Product Requests'}</span>
-        </Link>
       </div>
 
       <DataTable

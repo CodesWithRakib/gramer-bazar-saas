@@ -36,6 +36,7 @@ import { userIsSuperAdmin } from '@/lib/roles';
 import { UserPlus, ArrowLeft, MoreVertical, KeyRound, Shield, UserX, Loader2 } from 'lucide-react';
 import { AdminPermissionsDialog } from './AdminPermissionsDialog';
 import { AdminCreateDialog } from './AdminCreateDialog';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface SuperAdminAdminsViewProps {
   lang?: string;
@@ -205,24 +206,24 @@ export function SuperAdminAdminsView({ lang = 'en' }: SuperAdminAdminsViewProps)
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/${lang}/super-admin`}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-            </Link>
+      <div>
+        <BackButton
+          href={`/${lang}/super-admin/users-management`}
+          label="Back to Users & Staff"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
               {isBn ? 'অ্যাডমিন পরিচালনা' : 'Admin Management'}
             </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {isBn
+                ? 'অ্যাডমিন অ্যাকাউন্ট তৈরি করুন, পারমিশন নির্ধারণ করুন এবং অ্যাকাউন্ট নিয়ন্ত্রণ করুন।'
+                : 'Create administrative accounts, assign granular permissions, and control access.'}
+            </p>
           </div>
-          <p className="text-muted-foreground text-sm mt-1">
-            {isBn
-              ? 'অ্যাডমিন অ্যাকাউন্ট তৈরি করুন, পারমিশন নির্ধারণ করুন এবং অ্যাকাউন্ট নিয়ন্ত্রণ করুন।'
-              : 'Create administrative accounts, assign granular permissions, and control access.'}
-          </p>
         </div>
       </div>
 

@@ -8,13 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Role, useUpdateUserStatusMutation } from '@/features/users/usersApi';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminSellersViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminSellersView({ lang = 'en' }: AdminSellersViewProps) {
+export function AdminSellersView({ lang = 'en', namespace = 'admin' }: AdminSellersViewProps) {
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -85,8 +87,25 @@ export function AdminSellersView({ lang = 'en' }: AdminSellersViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Sellers</h1>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/users-management`}
+          label="Back to Users & Partners"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {lang === 'bn' ? 'সেলার ও দোকানসমূহ' : 'Sellers & Stores'}
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {lang === 'bn'
+                ? 'অনুমোদিত মার্চেন্ট অ্যাকাউন্ট ও স্টোর ফ্রন্ট পরিচালনা করুন।'
+                : 'Oversee verified merchant stores, inspect status, and manage partner accounts.'}
+            </p>
+          </div>
+        </div>
       </div>
 
       <DataTable

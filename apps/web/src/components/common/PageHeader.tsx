@@ -18,6 +18,10 @@ export interface PageHeaderProps {
   primaryAction?: React.ReactNode;
   secondaryActions?: React.ReactNode;
   className?: string;
+  backHref?: string;
+  backLabel?: string;
+  backLabelBn?: string;
+  lang?: string;
 }
 
 export function PageHeader({
@@ -28,9 +32,26 @@ export function PageHeader({
   primaryAction,
   secondaryActions,
   className,
+  backHref,
+  backLabel,
+  backLabelBn,
+  lang = 'en',
 }: PageHeaderProps) {
+  const isBn = lang === 'bn';
   return (
     <div className={cn('space-y-3 pb-6 border-b border-border/40', className)}>
+      {backHref && (
+        <div className="mb-1">
+          <Link
+            href={backHref}
+            className="group inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronRight className="w-4 h-4 rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:rotate-0 rtl:group-hover:translate-x-0.5" />
+            <span>{isBn ? backLabelBn || 'ফিরে যান' : backLabel || 'Back'}</span>
+          </Link>
+        </div>
+      )}
+
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav
           aria-label="Breadcrumb"

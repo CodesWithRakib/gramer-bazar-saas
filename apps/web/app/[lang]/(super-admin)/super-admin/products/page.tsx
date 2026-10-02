@@ -1,4 +1,4 @@
-import { AdminProductsView } from '@/features/super-admin/products';
+import { ProductsHubView } from '@/features/super-admin/products';
 
 export default async function SuperAdminProductsPage({
   params,
@@ -6,5 +6,5 @@ export default async function SuperAdminProductsPage({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
-  return <AdminProductsView lang={lang} namespace="super-admin" />;
+  return <ProductsHubView lang={lang} namespace="super-admin" />;
 }

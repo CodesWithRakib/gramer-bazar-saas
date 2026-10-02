@@ -30,14 +30,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { CheckCircle2, XCircle, Eye, Truck, Clock } from 'lucide-react';
 import { customToast as toast } from '@/components/ui/custom-toast';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminRiderApplicationsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicationsViewProps) {
+export function AdminRiderApplicationsView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminRiderApplicationsViewProps) {
   const isBn = lang === 'bn';
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -196,16 +201,24 @@ export function AdminRiderApplicationsView({ lang = 'en' }: AdminRiderApplicatio
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            {isBn ? 'রাইডার আবেদনসমূহ' : 'Rider Partner Applications'}
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {isBn
-              ? 'ডেলিভারি রাইডারদের আবেদন যাচাই করে অনুমোদন বা বাতিল করুন।'
-              : 'Review delivery partner applications to authorize rider app access.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/users-management`}
+          label="Back to Users & Partners"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              {isBn ? 'রাইডার আবেদনসমূহ' : 'Rider Partner Applications'}
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {isBn
+                ? 'ডেলিভারি রাইডারদের আবেদন যাচাই করে অনুমোদন বা বাতিল করুন।'
+                : 'Review delivery partner applications to authorize rider app access.'}
+            </p>
+          </div>
         </div>
       </div>
 

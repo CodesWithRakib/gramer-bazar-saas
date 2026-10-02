@@ -23,7 +23,11 @@ export interface AdminCategoriesViewProps {
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
+export function AdminCategoriesView({
+  lang = 'en',
+  namespace = 'admin',
+}: AdminCategoriesViewProps) {
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [search, setSearch] = useState('');
@@ -127,6 +131,10 @@ export function AdminCategoriesView({ lang = 'en' }: AdminCategoriesViewProps) {
   return (
     <div className="space-y-6">
       <PageHeader
+        backHref={`/${lang}/${basePath}/products`}
+        backLabel="Back to Products Hub"
+        backLabelBn="পণ্য হাবে ফিরে যান"
+        lang={lang}
         title={lang === 'bn' ? 'ক্যাটাগরি ও সাব-ক্যাটাগরি' : 'Categories & Subcategories'}
         description={
           lang === 'bn'

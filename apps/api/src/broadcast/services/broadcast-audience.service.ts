@@ -168,9 +168,9 @@ export class BroadcastAudienceService {
       : recipientCount;
 
     const sampleUsers = await this.buildAudienceQuery(audienceType, config, { requireOptIn })
-      .select(['u.id', 'u.firstName', 'u.lastName', 'u.phone', 'u.email', 'u.lastLoginAt'])
+      .select(['u.id', 'u.firstName', 'u.lastName', 'u.phone', 'u.email', 'u.lastLoginAt', 'u.createdAt'])
       .orderBy('u.createdAt', 'ASC')
-      .take(5)
+      .limit(5)
       .getMany();
 
     const totalCustomers = await this.userRepo
@@ -250,9 +250,9 @@ export class BroadcastAudienceService {
       .createQueryBuilder('u')
       .innerJoin('u.roles', 'role', 'role.name = :customerRole', { customerRole: CUSTOMER_ROLE })
       .where('u.status = :active', { active: 'ACTIVE' })
-      .select(['u.id', 'u.firstName', 'u.lastName', 'u.phone', 'u.email', 'u.lastLoginAt'])
+      .select(['u.id', 'u.firstName', 'u.lastName', 'u.phone', 'u.email', 'u.lastLoginAt', 'u.createdAt'])
       .orderBy('u.createdAt', 'DESC')
-      .take(limit);
+      .limit(limit);
 
     if (search) {
       qb.andWhere('(u.firstName ILIKE :search OR u.lastName ILIKE :search OR u.phone ILIKE :search OR u.email ILIKE :search)', {

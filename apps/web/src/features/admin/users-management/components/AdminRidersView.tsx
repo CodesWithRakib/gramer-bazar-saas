@@ -7,13 +7,15 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Role } from '@/features/users/usersApi';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminRidersViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminRidersView({ lang = 'en' }: AdminRidersViewProps) {
+export function AdminRidersView({ lang = 'en', namespace = 'admin' }: AdminRidersViewProps) {
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -59,8 +61,25 @@ export function AdminRidersView({ lang = 'en' }: AdminRidersViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Riders</h1>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/users-management`}
+          label="Back to Users & Partners"
+          labelBn="ব্যবহারকারী হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {lang === 'bn' ? 'ডেলিভারি রাইডার বহর' : 'Delivery Riders'}
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {lang === 'bn'
+                ? 'সক্রিয় ডেলিভারি কর্মী, অঞ্চল জোন এবং স্থিতি পর্যবেক্ষণ করুন।'
+                : 'Monitor active delivery personnel, vehicle allocations, and rider statuses.'}
+            </p>
+          </div>
+        </div>
       </div>
 
       <DataTable

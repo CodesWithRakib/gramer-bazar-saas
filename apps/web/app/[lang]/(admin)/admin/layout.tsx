@@ -14,7 +14,7 @@ export default function AdminLayout({
   const { lang } = use(params);
 
   return (
-    <RouteGuard lang={lang} allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
+    <RouteGuard lang={lang} allowedRoles={['ADMIN']}>
       <DashboardLayout routeType="admin" lang={lang}>
         {children}
       </DashboardLayout>

@@ -58,30 +58,31 @@ function LoginForm({ lang }: { lang: string }) {
   const [verifyOtp, { isLoading: isVerifyingOtp }] = useVerifyOtpMutation();
 
   const handleRoleRedirect = (roles: string[]) => {
+    const isSuperAdmin = roles.includes('SUPER_ADMIN');
+    const isAdmin = roles.includes('ADMIN') && !isSuperAdmin;
+    const isSeller = roles.includes('SELLER');
+    const isRider = roles.includes('RIDER');
+
     if (redirectParam && redirectParam.startsWith('/')) {
       const isSuperAdminRoute = redirectParam.includes('/super-admin');
       const isAdminRoute = redirectParam.includes('/admin') && !isSuperAdminRoute;
       const isSellerRoute = redirectParam.includes('/seller');
       const isRiderRoute = redirectParam.includes('/rider');
 
-      if (isSuperAdminRoute) {
-        if (roles.includes('SUPER_ADMIN')) {
-          router.push(redirectParam);
-          return;
-        }
-        router.push(`/${lang}/unauthorized`);
+      if (isSuperAdmin) {
+        // Rewrite /admin/* redirects to /super-admin/*
+        const target = isAdminRoute ? redirectParam.replace('/admin', '/super-admin') : redirectParam;
+        router.push(target);
         return;
       }
-      if (isAdminRoute) {
-        if (roles.includes('ADMIN') || roles.includes('SUPER_ADMIN')) {
-          router.push(redirectParam);
-          return;
-        }
-        router.push(`/${lang}/unauthorized`);
+      if (isAdmin) {
+        // Rewrite /super-admin/* redirects to /admin/*
+        const target = isSuperAdminRoute ? redirectParam.replace('/super-admin', '/admin') : redirectParam;
+        router.push(target);
         return;
       }
       if (isSellerRoute) {
-        if (roles.includes('SELLER')) {
+        if (isSeller) {
           router.push(redirectParam);
           return;
         }
@@ -89,7 +90,7 @@ function LoginForm({ lang }: { lang: string }) {
         return;
       }
       if (isRiderRoute) {
-        if (roles.includes('RIDER')) {
+        if (isRider) {
           router.push(redirectParam);
           return;
         }

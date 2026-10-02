@@ -1,4 +1,5 @@
 export * from './AdminProductsView';
+export * from './ProductsHubView';
 export * from './AdminCategoriesView';
 export * from './AdminBrandsView';
 export * from './ProductDialogs';

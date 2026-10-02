@@ -58,16 +58,63 @@ export function RouteGuard({ children, allowedRoles, lang, requireAuth = true }:
     );
   }
 
-  // 3. Role authorization check
+  // 3. Role authorization & Authentic Route Enforcer
+  const userRoles = getUserRoles(user);
+  const isSuperAdmin = userRoles.includes('SUPER_ADMIN');
+  const isAdmin = userRoles.includes('ADMIN') && !isSuperAdmin;
+  const isSeller = userRoles.includes('SELLER');
+  const isRider = userRoles.includes('RIDER');
+
+  // Automatic Role Alignment:
+  // If Super Admin attempts to access /admin or /admin/*, redirect to /super-admin/*
+  if (isSuperAdmin && (pathname === `/${lang}/admin` || pathname.startsWith(`/${lang}/admin/`))) {
+    const target = pathname.replace(`/${lang}/admin`, `/${lang}/super-admin`);
+    router.replace(target);
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary opacity-80" />
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">
+          {isBn ? 'সুপার অ্যাডমিন কনসোলে নিয়ে যাওয়া হচ্ছে...' : 'Redirecting to Super Admin Console...'}
+        </p>
+      </div>
+    );
+  }
+
+  // If Admin attempts to access /super-admin or /super-admin/*, redirect to /admin/*
+  if (isAdmin && (pathname === `/${lang}/super-admin` || pathname.startsWith(`/${lang}/super-admin/`))) {
+    const target = pathname.replace(`/${lang}/super-admin`, `/${lang}/admin`);
+    router.replace(target);
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary opacity-80" />
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">
+          {isBn ? 'অ্যাডমিন প্যানেলে নিয়ে যাওয়া হচ্ছে...' : 'Redirecting to Admin Portal...'}
+        </p>
+      </div>
+    );
+  }
+
   if (allowedRoles && allowedRoles.length > 0) {
     const hasPermission = userHasRole(user, ...allowedRoles);
-
-    // Super Admin has master access across all protected dashboards
-    const isSuperAdmin = userHasRole(user, 'SUPER_ADMIN');
-    const isAllowed = hasPermission || isSuperAdmin;
+    const isAllowed = hasPermission || (isSuperAdmin && allowedRoles.includes('SUPER_ADMIN'));
 
     if (!isAllowed) {
-      const userRoles = getUserRoles(user);
+      // Automatic role redirection for users landing in wrong portal
+      if (pathname.includes('/admin') || pathname.includes('/super-admin')) {
+        if (isSeller) {
+          router.replace(`/${lang}/seller`);
+          return null;
+        }
+        if (isRider) {
+          router.replace(`/${lang}/rider`);
+          return null;
+        }
+        if (!isSuperAdmin && !isAdmin) {
+          router.replace(`/${lang}/customer`);
+          return null;
+        }
+      }
+
       return (
         <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-lg bg-card border rounded-3xl p-8 shadow-sm text-center">
@@ -89,21 +136,28 @@ export function RouteGuard({ children, allowedRoles, lang, requireAuth = true }:
                   {isBn ? 'হোম পেজ' : 'Go Home'}
                 </Link>
               </Button>
-              {userRoles.includes('SELLER') && (
+              {isSuperAdmin && (
+                <Button className="w-full sm:w-auto" asChild>
+                  <Link href={`/${lang}/super-admin`}>
+                    {isBn ? 'সুপার অ্যাডমিন কনসোল' : 'Super Admin Console'}
+                  </Link>
+                </Button>
+              )}
+              {isAdmin && (
+                <Button className="w-full sm:w-auto" asChild>
+                  <Link href={`/${lang}/admin`}>{isBn ? 'অ্যাডমিন প্যানেল' : 'Admin Portal'}</Link>
+                </Button>
+              )}
+              {isSeller && (
                 <Button className="w-full sm:w-auto" asChild>
                   <Link href={`/${lang}/seller`}>
                     {isBn ? 'সেলার ড্যাশবোর্ড' : 'Seller Portal'}
                   </Link>
                 </Button>
               )}
-              {userRoles.includes('RIDER') && (
+              {isRider && (
                 <Button className="w-full sm:w-auto" asChild>
                   <Link href={`/${lang}/rider`}>{isBn ? 'রাইডার অ্যাপ' : 'Rider Portal'}</Link>
-                </Button>
-              )}
-              {(userRoles.includes('ADMIN') || userRoles.includes('SUPER_ADMIN')) && (
-                <Button className="w-full sm:w-auto" asChild>
-                  <Link href={`/${lang}/admin`}>{isBn ? 'অ্যাডমিন প্যানেল' : 'Admin Portal'}</Link>
                 </Button>
               )}
             </div>

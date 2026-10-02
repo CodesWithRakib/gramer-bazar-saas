@@ -8,13 +8,15 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AddBrandDialog, EditBrandDialog } from './BrandDialogs';
+import { BackButton } from '@/components/common/BackButton';
 
 export interface AdminBrandsViewProps {
   lang?: string;
   namespace?: 'admin' | 'super-admin';
 }
 
-export function AdminBrandsView({ lang = 'en' }: AdminBrandsViewProps) {
+export function AdminBrandsView({ lang = 'en', namespace = 'admin' }: AdminBrandsViewProps) {
+  const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
@@ -71,16 +73,24 @@ export function AdminBrandsView({ lang = 'en' }: AdminBrandsViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {lang === 'bn' ? 'ব্র্যান্ড ব্যবস্থাপনা' : 'Brand Management'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {lang === 'bn'
-              ? 'উৎপাদক এবং প্রস্তুতকারক ব্র্যান্ড এবং ক্যাটাগরি সংযোগ পরিচালনা করুন'
-              : 'Manage manufacturer brands and their associated marketplace categories.'}
-          </p>
+      <div>
+        <BackButton
+          href={`/${lang}/${basePath}/products`}
+          label="Back to Products Hub"
+          labelBn="পণ্য হাবে ফিরে যান"
+          lang={lang}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {lang === 'bn' ? 'ব্র্যান্ড ব্যবস্থাপনা' : 'Brand Management'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {lang === 'bn'
+                ? 'উৎপাদক এবং প্রস্তুতকারক ব্র্যান্ড এবং ক্যাটাগরি সংযোগ পরিচালনা করুন।'
+                : 'Manage manufacturer brands and their associated marketplace categories.'}
+            </p>
+          </div>
         </div>
       </div>
 
