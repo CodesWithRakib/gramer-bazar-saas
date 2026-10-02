@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
   <defs>
-    <linearGradient id="iconTerracottaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="appIconTerracottaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#f97316"/>
       <stop offset="40%" stop-color="#ea580c"/>
       <stop offset="100%" stop-color="#c2410c"/>
     </linearGradient>
-    <linearGradient id="iconGoldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="appIconGoldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#fbbf24"/>
       <stop offset="50%" stop-color="#f59e0b"/>
       <stop offset="100%" stop-color="#d97706"/>
@@ -13,7 +13,7 @@
   </defs>
 
   <!-- Rounded Brand Squircle Container in Rich Terracotta -->
-  <rect width="512" height="512" rx="112" fill="url(#iconTerracottaGrad)"/>
+  <rect width="512" height="512" rx="112" fill="url(#appIconTerracottaGrad)"/>
   
   <!-- Subtle Inner Border with Warm Opacity -->
   <rect x="16" y="16" width="480" height="480" rx="96" stroke="#ffffff" stroke-opacity="0.22" stroke-width="4"/>
@@ -23,7 +23,7 @@
 
   <!-- Stylized Village Terracotta Woven Basket / Basin (মাটির পাত্র) -->
   <path d="M140 310 C140 310, 160 410, 256 410 C352 410, 372 310, 372 310 Z" fill="#ffffff" fill-opacity="0.96"/>
-  <ellipse cx="256" cy="310" rx="116" ry="24" fill="url(#iconGoldGrad)"/>
+  <ellipse cx="256" cy="310" rx="116" ry="24" fill="url(#appIconGoldGrad)"/>
   
   <!-- Basket Woven Artisan Accent Pattern -->
   <path d="M190 326 L230 402 M256 332 L256 410 M322 326 L282 402" stroke="#ea580c" stroke-width="6" stroke-linecap="round"/>
@@ -33,7 +33,7 @@
   <path d="M256 310 Q254 210 256 120" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
 
   <!-- Top Center Sprout Leaf (Golden Harvest Crown) -->
-  <path d="M256 115 C275 80, 256 50, 256 50 C256 50, 237 80, 256 115 Z" fill="url(#iconGoldGrad)"/>
+  <path d="M256 115 C275 80, 256 50, 256 50 C256 50, 237 80, 256 115 Z" fill="url(#appIconGoldGrad)"/>
 
   <!-- Left Main Leaf (Pure White) -->
   <path d="M254 215 C200 200, 170 145, 170 145 C170 145, 225 140, 254 185 Z" fill="#ffffff"/>
@@ -41,7 +41,7 @@
   <path d="M254 185 Q212 170 185 152" stroke="#ea580c" stroke-width="4" stroke-linecap="round"/>
 
   <!-- Right Main Leaf (Harvest Gold) -->
-  <path d="M258 190 C312 175, 342 120, 342 120 C342 120, 287 115, 258 160 Z" fill="url(#iconGoldGrad)"/>
+  <path d="M258 190 C312 175, 342 120, 342 120 C342 120, 287 115, 258 160 Z" fill="url(#appIconGoldGrad)"/>
   <!-- Right Leaf Vein -->
   <path d="M258 160 Q300 145 327 127" stroke="#b45309" stroke-width="4" stroke-linecap="round"/>
 

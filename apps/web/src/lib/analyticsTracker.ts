@@ -33,10 +33,21 @@ class AnalyticsTracker {
   }
 
   public track(eventType: EventType, payload?: TrackingPayload) {
-    this.queue.push({
-      eventType,
-      ...payload,
-    });
+    const sanitized: AnalyticsEvent = { eventType };
+    if (payload?.productId && typeof payload.productId === 'string' && payload.productId.trim()) {
+      sanitized.productId = payload.productId.trim();
+    }
+    if (payload?.categoryId && typeof payload.categoryId === 'string' && payload.categoryId.trim()) {
+      sanitized.categoryId = payload.categoryId.trim();
+    }
+    if (payload?.productRequestId && typeof payload.productRequestId === 'string' && payload.productRequestId.trim()) {
+      sanitized.productRequestId = payload.productRequestId.trim();
+    }
+    if (payload?.searchQuery && typeof payload.searchQuery === 'string' && payload.searchQuery.trim()) {
+      sanitized.searchQuery = payload.searchQuery.trim();
+    }
+
+    this.queue.push(sanitized);
 
     // If the queue gets too large, flush immediately
     if (this.queue.length >= 50) {
@@ -52,7 +63,10 @@ class AnalyticsTracker {
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-      const token = localStorage.getItem('token');
+      const token =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('access_token') || localStorage.getItem('token')
+          : null;
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -62,18 +76,14 @@ class AnalyticsTracker {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      // Using fetch instead of RTK Query to avoid circular dependencies and keep it lightweight
-      // Also allows 'keepalive: true' which is great for page unloads
       await fetch(`${baseUrl}/analytics/events/bulk`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ events: eventsToSend }),
-        keepalive: true, // Crucial for beforeunload
+        credentials: 'include',
       });
     } catch (error) {
-      console.error('Failed to flush analytics events', error);
-      // In a more robust system, we might push them back to the queue
-      // this.queue = [...eventsToSend, ...this.queue];
+      // Gracefully silent on telemetry network failures
     }
   }
 }

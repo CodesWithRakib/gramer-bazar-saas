@@ -94,7 +94,7 @@ export function FlashSalesSection({ lang }: { lang: string }) {
         </div>
 
         {/* Product Cards Grid / Horizontal Scroll on mobile */}
-        <div className="flex md:grid overflow-x-auto snap-x snap-mandatory sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-2.5 md:gap-3 pb-2 md:pb-0 scrollbar-none md:mx-0 md:px-0 w-full min-w-0 overscroll-x-contain">
+        <div className="flex md:grid overflow-x-auto snap-x snap-mandatory sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-2.5 md:gap-3 pb-2 md:pb-0 scrollbar-none md:mx-0 md:px-0 w-full min-w-0 max-w-full overscroll-x-contain">
           {items.slice(0, 6).map((item) => {
             if (!item.sellerProduct) return null;
             const originalPrice = Number(item.sellerProduct.price);

@@ -38,7 +38,7 @@ import {
   MessageCircle,
   Layers,
 } from 'lucide-react';
-import Image from 'next/image';
+import { CustomImage } from '@/components/ui/CustomImage';
 import Link from 'next/link';
 import { toast } from '@/components/ui/custom-toast';
 
@@ -236,23 +236,18 @@ export default function ShopProfilePage({
   ].filter(Boolean).length;
 
   return (
-    <div className="pb-16 bg-muted/10 min-h-screen">
+    <div className="pb-8 sm:pb-12 bg-muted/10 w-full">
       {/* 1. Hero Cover Banner */}
-      <div className="relative h-48 md:h-72 lg:h-80 w-full bg-emerald-900 overflow-hidden">
-        {shop.banner ? (
-          <Image
-            src={shop.banner}
-            alt={isBn ? shop.nameBn : shop.nameEn}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="absolute inset-0 bg-emerald-800 flex items-center justify-center">
-            <Store className="w-24 h-24 text-white/20" />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+      <div className="relative h-48 md:h-72 lg:h-80 w-full bg-emerald-950 overflow-hidden">
+        <CustomImage
+          src={shop.banner}
+          fallbackSrc="/banners/banner-village-market.jpg"
+          alt={isBn ? shop.nameBn : shop.nameEn}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none" />
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl -mt-16 md:-mt-20 relative z-10">
@@ -260,19 +255,14 @@ export default function ShopProfilePage({
         <div className="bg-card border border-border/80 rounded-2xl p-4 md:p-6 shadow-sm mb-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6">
             {/* Logo */}
-            <div className="w-28 h-28 md:w-36 md:h-36 bg-background rounded-2xl border-4 border-background overflow-hidden flex items-center justify-center shadow-md shrink-0 relative">
-              {shop.logo ? (
-                <Image
-                  src={shop.logo}
-                  alt={isBn ? shop.nameBn : shop.nameEn}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-primary text-primary-foreground flex items-center justify-center text-4xl md:text-5xl font-bold">
-                  {shop.nameEn.charAt(0)}
-                </div>
-              )}
+            <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 bg-background rounded-2xl border-4 border-background overflow-hidden flex items-center justify-center shadow-md shrink-0 relative">
+              <CustomImage
+                src={shop.logo}
+                fallbackSrc="/placeholder.jpg"
+                alt={isBn ? shop.nameBn : shop.nameEn}
+                fill
+                className="object-cover"
+              />
             </div>
 
             {/* Info */}
@@ -514,7 +504,7 @@ export default function ShopProfilePage({
         )}
 
         {/* 5. Main 2-Column Storefront Layout */}
-        <div className="flex flex-col lg:flex-row items-start gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row items-start gap-6 mb-2 sm:mb-4">
           {/* Left Column: Desktop Sidebar (Shop Categories & Shop Filters) */}
           <aside className="hidden lg:block w-64 xl:w-72 shrink-0 space-y-4 sticky top-20">
             {/* Shop Categories Card */}

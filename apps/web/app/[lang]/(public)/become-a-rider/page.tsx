@@ -19,6 +19,9 @@ import {
   ArrowRight,
   Sparkles,
   Bike,
+  ShieldCheck,
+  Smartphone,
+  Award,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +35,7 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/custom-toast';
+import { CustomImage } from '@/components/ui/CustomImage';
 
 export default function BecomeARiderPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -95,28 +99,54 @@ export default function BecomeARiderPage({ params }: { params: Promise<{ lang: s
   return (
     <div className="min-h-screen bg-background pb-16">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-muted/40 py-16 md:py-24 border-b">
-        <div className="container max-w-5xl mx-auto px-4 text-center space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 text-xs font-semibold text-blue-600">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 text-white py-14 sm:py-20 md:py-24 border-b border-blue-500/20 shadow-md">
+        <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay">
+          <CustomImage
+            src="/banners/banner-village-market.jpg"
+            alt="Rider Hero Banner"
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="container max-w-5xl mx-auto px-4 relative z-10 text-center space-y-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 text-xs font-semibold text-yellow-300 shadow-xs">
             <Bike className="w-4 h-4" />
-            <span>{isBn ? 'গ্রামের বাজার রাইডার পার্টনার' : 'Gramer Bazar Rider Partner'}</span>
+            <span>{isBn ? 'গ্রামের বাজার রাইডার নেটওয়ার্ক' : 'Gramer Bazar Rider Network'}</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
             {isBn
               ? 'নিজের সুবিধাজনক সময়ে ডেলিভারি দিন, আয় করুন সম্মানজনক অর্থ'
-              : 'Earn With Pride in Your Own Community'}
+              : 'Deliver with Freedom & Earn with Pride in Your Upazila'}
           </h1>
 
-          <p className="max-w-2xl mx-auto text-muted-foreground text-base md:text-lg leading-relaxed">
+          <p className="max-w-2xl mx-auto text-white/85 text-xs sm:text-base md:text-lg leading-relaxed">
             {isBn
-              ? 'বাইক, সাইকেল বা স্কুটারে আপনার ইউনিয়নে তাজা মুদি ও পণ্য ডেলিভারি করুন। সাপ্তাহিক পেমেন্ট এবং বোনাস সুবিধা উপভোগ করুন।'
+              ? 'বাইক, সাইকেল বা স্কুটারে আপনার চেনা ইউনিয়নে খাঁটি মুদি ও পণ্য পৌঁছে দিন। সাপ্তাহিক নিশ্চিত পেমেন্ট, ফুয়েল ভাতা এবং পারফরম্যান্স বোনাস।'
               : 'Flexible local shifts, competitive per-delivery payouts, and weekly settlements. Become an essential delivery hero connecting village markets to doorstep.'}
           </p>
 
+          {/* Quick Perks Pills */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs font-semibold text-blue-200">
+            <span className="bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1 rounded-full">
+              💰 {isBn ? '৳৪০ - ৳৮০ প্রতি ট্রিপ' : '৳40 - ৳80 Per Trip'}
+            </span>
+            <span className="bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1 rounded-full">
+              ⚡ {isBn ? '১০০% কাস্টমার টিপস আপনার' : '100% Tips Are Yours'}
+            </span>
+            <span className="bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1 rounded-full">
+              📅 {isBn ? 'সাপ্তাহিক বিকাশ/ব্যাংক পেআউট' : 'Weekly Direct Payouts'}
+            </span>
+            <span className="bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1 rounded-full">
+              🚲 {isBn ? 'বাইক বা সাইকেল' : 'Cycle, Bike or Scooter'}
+            </span>
+          </div>
+
           {!isAuthenticated && (
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="rounded-2xl px-8 shadow-md" asChild>
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <Button size="lg" className="bg-yellow-400 hover:bg-yellow-500 text-stone-900 font-extrabold rounded-2xl px-8 h-12 shadow-lg transition-transform active:scale-95" asChild>
                 <Link
                   href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-rider`)}`}
                 >
@@ -124,7 +154,7 @@ export default function BecomeARiderPage({ params }: { params: Promise<{ lang: s
                   <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="rounded-2xl px-8" asChild>
+              <Button size="lg" variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-2xl px-8 h-12 backdrop-blur-sm" asChild>
                 <Link href={`/${lang}/register`}>
                   {isBn ? 'নতুন অ্যাকাউন্ট খুলুন' : 'Create Free Account'}
                 </Link>
@@ -134,8 +164,44 @@ export default function BecomeARiderPage({ params }: { params: Promise<{ lang: s
         </div>
       </section>
 
+      {/* 4-Step Rider Onboarding Timeline */}
+      <section className="container max-w-5xl mx-auto px-4 -mt-8 relative z-20">
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm">
+          <div className="text-center mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground">
+              {isBn ? 'সহজ ৪ ধাপে রাইডার হওয়ার উপায়' : 'Become a Delivery Partner in 4 Steps'}
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              {isBn ? 'আপনার এলাকার সবচেয়ে বিশ্বস্ত ডেলিভারি টিমে যোগ দিন' : 'Join the fastest growing hyper-local delivery force'}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">1</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '১. অনলাইন আবেদন' : '1. Online Application'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'নাম, NID এবং পছন্দের ডেলিভারি জোন নির্বাচন করে ফরম পূরণ করুন।' : 'Submit personal details, NID, and your preferred operating zone.'}</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">2</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '২. হাব ভেরিফিকেশন' : '2. Hub Document Check'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'উপজেলা হাবে এসে কাগজপত্র যাচাই ও পরিচয় নিশ্চিত করুন।' : 'Quick in-person verification at your local Upazila distribution hub.'}</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">3</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '৩. কিট ও প্রশিক্ষণ' : '3. Kit & Rider App'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'ডেলিভারি ব্যাগ, টি-শার্ট ও রাইডার অ্যাপ ব্যবহারের নির্দেশনা গ্রহণ করুন।' : 'Receive official delivery gear, insulated food bag, and app training.'}</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">4</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '৪. ট্রিপ ও আয় শুরু' : '4. Start Earning'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'অ্যাপ অন করে অর্ডার পিক ও ড্রপ করুন, সপ্তাহে আয় বুঝে নিন।' : 'Go online whenever you want, complete orders, and earn weekly.'}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Perks */}
-      <section className="container max-w-6xl mx-auto px-4 py-12">
+      <section className="container max-w-6xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-3xl bg-card border shadow-sm space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center">

@@ -186,7 +186,7 @@ export function Footer({ lang }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href={`/${lang}/contact`} className="hover:text-primary transition-colors">
+                <Link href={`/${lang}/partner-inquiries`} className="hover:text-primary transition-colors">
                   {isBn ? 'অংশীদারিত্ব সহায়তা' : 'Partner Inquiries'}
                 </Link>
               </li>

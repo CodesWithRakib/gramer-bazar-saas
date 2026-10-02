@@ -35,33 +35,41 @@ export function MarketplaceHero({ lang }: MarketplaceHeroProps) {
   return (
     <div className="space-y-4 md:space-y-5">
       {/* Top Marketplace Context & Trending Bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 px-1">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 px-1 w-full max-w-full overflow-hidden">
         {/* Location & Freshness Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border/80 text-xs font-semibold text-foreground/90 shadow-2xs w-fit">
-          <span className="relative flex h-2 w-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border/80 text-xs font-semibold text-foreground/90 shadow-2xs w-fit max-w-full min-w-0">
+          <span className="relative flex h-2 w-2 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
           </span>
           <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
-          <span className="truncate">
-            {isBn
-              ? 'খানসামা, দিনাজপুর • সরাসরি স্থানীয় কৃষক ও খামারি থেকে দ্রুত ডেলিভারি'
-              : 'Serving Khansama, Dinajpur & Nearby Local Markets'}
+          <span className="truncate min-w-0 text-[11px] sm:text-xs">
+            {isBn ? (
+              <>
+                <span>খানসামা, দিনাজপুর</span>
+                <span className="hidden xs:inline"> • সরাসরি স্থানীয় কৃষক থেকে ডেলিভারি</span>
+              </>
+            ) : (
+              <>
+                <span>Khansama, Dinajpur</span>
+                <span className="hidden xs:inline"> & Nearby Local Markets</span>
+              </>
+            )}
           </span>
         </div>
 
         {/* Trending Searches Tags */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs text-muted-foreground w-full max-w-full flex-nowrap">
           <span className="inline-flex items-center gap-1 font-semibold text-foreground/80 shrink-0">
             <TrendingUp className="h-3.5 w-3.5 text-primary" />
-            {isBn ? 'জনপ্রিয়:' : 'Trending:'}
+            <span className="hidden xs:inline">{isBn ? 'জনপ্রিয়:' : 'Trending:'}</span>
           </span>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-nowrap">
             {popularTags.map((tag) => (
               <Link
                 key={tag.query}
                 href={`/${lang}/search?q=${encodeURIComponent(tag.query)}`}
-                className="px-2.5 py-0.5 rounded-full bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/40 border border-border/70 text-[11px] font-medium transition-all shrink-0"
+                className="px-2.5 py-0.5 rounded-full bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/40 border border-border/70 text-[11px] font-medium transition-all shrink-0 whitespace-nowrap"
               >
                 {tag.label}
               </Link>

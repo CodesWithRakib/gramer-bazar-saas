@@ -19,12 +19,16 @@ import {
   Star,
   ClipboardList,
   ChevronRight,
+  Palette,
+  Check,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { useThemePalette } from '@/providers/ThemePaletteProvider';
+import { ThemePaletteId } from '@/config/theme';
 
 export interface CustomerSettingsViewProps {
   lang?: string;
@@ -34,6 +38,7 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
   const isBn = lang === 'bn';
   const dispatch = useDispatch();
   const router = useRouter();
+  const { palette, setPalette, availablePalettes } = useThemePalette();
 
   const customerQuickLinks = [
     {
@@ -204,6 +209,80 @@ export function CustomerSettingsView({ lang = 'en' }: CustomerSettingsViewProps)
           })}
         </div>
       </div>
+
+      {/* ─── Appearance / Theme Palette ──────────────────────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="w-5 h-5 text-primary" />
+            {isBn ? 'ডিজাইন থিম ও কালার প্যালেট' : 'Theme & Color Palette'}
+          </CardTitle>
+          <CardDescription>
+            {isBn
+              ? 'আপনার পছন্দমতো কালার প্যালেট নির্বাচন করুন। এটি সম্পূর্ণ অ্যাপ্লিকেশনের ব্র্যান্ড রঙ পরিবর্তন করবে।'
+              : 'Choose your preferred color palette. This changes the brand colors across the entire application.'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {availablePalettes.map((p) => {
+              const isActive = p.id === palette;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    setPalette(p.id as ThemePaletteId);
+                    toast.success(
+                      isBn
+                        ? `${p.nameBn} প্যালেট সক্রিয় করা হয়েছে`
+                        : `${p.nameEn} palette activated`
+                    );
+                  }}
+                  className={`relative text-start p-3.5 rounded-xl border-2 transition-all cursor-pointer group focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary ${
+                    isActive
+                      ? 'border-primary bg-primary/5 shadow-sm'
+                      : 'border-border/60 hover:border-border hover:bg-muted/30'
+                  }`}
+                >
+                  {/* Active Indicator */}
+                  {isActive && (
+                    <div className="absolute top-2 end-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="w-3 h-3 text-primary-foreground stroke-[3]" />
+                    </div>
+                  )}
+
+                  {/* Color Swatches */}
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <div
+                      className="w-8 h-8 rounded-lg shadow-xs border border-black/10"
+                      style={{ backgroundColor: p.primaryHex }}
+                      title="Primary"
+                    />
+                    <div
+                      className="w-6 h-6 rounded-md shadow-xs border border-black/10"
+                      style={{ backgroundColor: p.accentHex }}
+                      title="Accent"
+                    />
+                    <div
+                      className="w-4 h-4 rounded shadow-xs border border-black/10 bg-background"
+                      title="Background"
+                    />
+                  </div>
+
+                  {/* Name & Description */}
+                  <h4 className="text-xs font-semibold text-foreground leading-snug">
+                    {isBn ? p.nameBn : p.nameEn}
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">
+                    {isBn ? p.descriptionBn : p.descriptionEn}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <div>
         <h2 className="text-xl font-bold flex items-center gap-2">

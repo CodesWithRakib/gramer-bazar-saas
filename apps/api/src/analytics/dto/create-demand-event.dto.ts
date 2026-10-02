@@ -1,6 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsUUID, IsString, IsOptional, ValidateNested, IsArray } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsUUID,
+  IsString,
+  IsOptional,
+  ValidateNested,
+  IsArray,
+  ValidateIf,
+} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import { DemandEventType } from '../enums/demand-event.enum.js';
 
 export class CreateDemandEventDto {
@@ -10,21 +18,28 @@ export class CreateDemandEventDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
+  @ValidateIf((o) => typeof o.productId === 'string' && o.productId.length > 0)
   @IsUUID()
   productId?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
+  @ValidateIf((o) => typeof o.categoryId === 'string' && o.categoryId.length > 0)
   @IsUUID()
   categoryId?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   searchQuery?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
+  @ValidateIf((o) => typeof o.productRequestId === 'string' && o.productRequestId.length > 0)
   @IsUUID()
   productRequestId?: string;
 }

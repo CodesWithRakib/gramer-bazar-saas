@@ -29,19 +29,18 @@ export function Toaster({ className = '', position = 'top-right' }: ToasterProps
   const getPositionClasses = () => {
     switch (position) {
       case 'top-left':
-        return 'top-3 inset-x-3 sm:top-5 sm:inset-x-auto sm:start-5';
+        return 'top-4 inset-x-4 sm:top-5 sm:inset-x-auto sm:start-5';
       case 'top-center':
-        return 'top-3 inset-x-3 sm:top-5 sm:inset-x-auto sm:start-1/2 sm:-translate-x-1/2';
+        return 'top-4 inset-x-4 sm:top-5 sm:inset-x-auto sm:start-1/2 sm:-translate-x-1/2';
       case 'bottom-right':
-        return 'bottom-3 inset-x-3 sm:bottom-5 sm:inset-x-auto sm:end-5 pb-[env(safe-area-inset-bottom,0px)]';
+        return 'bottom-4 inset-x-4 sm:bottom-5 sm:inset-x-auto sm:end-5 pb-[env(safe-area-inset-bottom,0px)]';
       case 'bottom-left':
-        return 'bottom-3 inset-x-3 sm:bottom-5 sm:inset-x-auto sm:start-5 pb-[env(safe-area-inset-bottom,0px)]';
+        return 'bottom-4 inset-x-4 sm:bottom-5 sm:inset-x-auto sm:start-5 pb-[env(safe-area-inset-bottom,0px)]';
       case 'bottom-center':
-        return 'bottom-3 inset-x-3 sm:bottom-5 sm:inset-x-auto sm:start-1/2 sm:-translate-x-1/2 pb-[env(safe-area-inset-bottom,0px)]';
+        return 'bottom-4 inset-x-4 sm:bottom-5 sm:inset-x-auto sm:start-1/2 sm:-translate-x-1/2 pb-[env(safe-area-inset-bottom,0px)]';
       case 'top-right':
       default:
-        // Mobile: centered at top with safe margins; Desktop: top-end
-        return 'top-3 inset-x-3 sm:top-5 sm:inset-x-auto sm:end-5 pt-[env(safe-area-inset-top,0px)]';
+        return 'top-4 inset-x-4 sm:top-5 sm:inset-x-auto sm:end-5 pt-[env(safe-area-inset-top,0px)]';
     }
   };
 
@@ -53,7 +52,8 @@ export function Toaster({ className = '', position = 'top-right' }: ToasterProps
       onMouseLeave={() => toastStore.resumeAll()}
       onFocusCapture={() => toastStore.pauseAll()}
       onBlurCapture={() => toastStore.resumeAll()}
-      className={`fixed ${getPositionClasses()} z-[9999] pointer-events-none flex flex-col gap-2.5 w-auto sm:w-[400px] max-w-full ${className}`}
+      className={`fixed ${getPositionClasses()} z-[9999] pointer-events-none
+        flex flex-col gap-3 w-auto sm:w-[380px] max-w-full ${className}`}
     >
       {toasts.map((item) => (
         <div key={item.id} className="pointer-events-auto w-full">

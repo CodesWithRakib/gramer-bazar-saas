@@ -82,10 +82,10 @@ export function MobileCategoryDrawer({ lang, isOpen, onOpenChange }: MobileCateg
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent
         side={isBn ? 'right' : 'left'}
-        className="flex w-[85vw] max-w-[340px] flex-col bg-background p-0"
+        className="flex w-[85vw] max-w-[340px] flex-col bg-background p-0 h-dvh max-h-screen"
       >
         {/* Clean Header with Logo only */}
-        <SheetHeader className="p-4 border-b border-border/70 bg-background text-start">
+        <SheetHeader className="p-4 border-b border-border/70 bg-background text-start shrink-0">
           <div className="flex items-center">
             <BrandLogo
               href={`/${lang}`}
@@ -414,7 +414,7 @@ export function MobileCategoryDrawer({ lang, isOpen, onOpenChange }: MobileCateg
         </div>
 
         {/* Clean Footer Info in Drawer */}
-        <div className="p-3 border-t border-border/60 bg-muted/10 space-y-1.5 text-xs">
+        <div className="p-3 border-t border-border/60 bg-muted/10 space-y-1.5 text-xs shrink-0">
           <Link
             href={`/${lang}/contact`}
             onClick={() => onOpenChange(false)}

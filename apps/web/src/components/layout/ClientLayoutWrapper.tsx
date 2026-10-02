@@ -14,7 +14,7 @@ export function ClientLayoutWrapper({
   lang: string;
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const pathname = usePathname() || '';
 
   // Dashboard routes where we don't want the global storefront header/footer
   const isDashboardRoute =
@@ -50,7 +50,7 @@ export function ClientLayoutWrapper({
 
   if (isDashboardRoute || isAuthRoute) {
     return (
-      <main className="flex-grow flex flex-col w-full min-w-0 max-w-full overflow-x-clip">
+      <main className="flex-grow flex flex-col w-full min-w-0 max-w-full">
         {children}
       </main>
     );

@@ -28,6 +28,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/custom-toast';
 import { Badge } from '@/components/ui/badge';
+import { CustomImage } from '@/components/ui/CustomImage';
 
 export default function BecomeASellerPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params);
@@ -128,28 +129,51 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
   return (
     <div className="min-h-screen bg-background pb-16">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-muted/40 py-16 md:py-24 border-b">
-        <div className="container max-w-5xl mx-auto px-4 text-center space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-xs font-semibold text-primary">
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-900 via-teal-900 to-emerald-950 text-white py-14 sm:py-20 md:py-24 border-b border-emerald-500/20 shadow-md">
+        <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay">
+          <CustomImage
+            src="/banners/banner-village-market.jpg"
+            alt="Seller Hero Banner"
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="container max-w-5xl mx-auto px-4 relative z-10 text-center space-y-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 text-xs font-semibold text-yellow-300 shadow-xs">
             <Store className="w-4 h-4" />
-            <span>{isBn ? 'গ্রামের বাজার সেলার পার্টনার' : 'Gramer Bazar Seller Partner'}</span>
+            <span>{isBn ? 'গ্রামের বাজার সেলার নেটওয়ার্ক' : 'Gramer Bazar Merchant Network'}</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
             {isBn
               ? 'আপনার স্থানীয় ব্যবসা ছড়িয়ে দিন হাজারো গ্রাহকের কাছে'
               : 'Grow Your Local Business Across Rural Bangladesh'}
           </h1>
 
-          <p className="max-w-2xl mx-auto text-muted-foreground text-base md:text-lg leading-relaxed">
+          <p className="max-w-2xl mx-auto text-white/85 text-xs sm:text-base md:text-lg leading-relaxed">
             {isBn
               ? 'জিরো প্ল্যাটফর্ম ফিতে যুক্ত হোন গ্রামের বাজারের সাথে। সহজেই পণ্য তালিকাভুক্ত করুন এবং দ্রুত ডেলিভারির মাধ্যমে আপনার বিক্রি বাড়ান।'
-              : 'Join as a verified merchant. Reach thousands of local households in your Upazila with automated catalog management, daily payouts, and swift deliveries.'}
+              : 'Join as a verified merchant. Reach thousands of local households in your Upazila with automated catalog management, direct weekly settlements, and swift deliveries.'}
           </p>
 
+          {/* Quick Stats Pills */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs font-semibold text-emerald-200">
+            <span className="bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1 rounded-full">
+              ✨ {isBn ? '০% প্ল্যাটফর্ম ফি' : '0% Initial Platform Fee'}
+            </span>
+            <span className="bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1 rounded-full">
+              ⚡ {isBn ? '২৪ ঘণ্টায় ভেরিফিকেশন' : '24h Fast Approval'}
+            </span>
+            <span className="bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1 rounded-full">
+              💰 {isBn ? 'সাপ্তাহিক সরাসরি পেআউট' : 'Weekly Direct Settlements'}
+            </span>
+          </div>
+
           {!isAuthenticated && (
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="rounded-2xl px-8 shadow-md" asChild>
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <Button size="lg" className="bg-yellow-400 hover:bg-yellow-500 text-stone-900 font-extrabold rounded-2xl px-8 h-12 shadow-lg transition-transform active:scale-95" asChild>
                 <Link
                   href={`/${lang}/login?redirect=${encodeURIComponent(`/${lang}/become-a-seller`)}`}
                 >
@@ -157,7 +181,7 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
                   <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="rounded-2xl px-8" asChild>
+              <Button size="lg" variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-2xl px-8 h-12 backdrop-blur-sm" asChild>
                 <Link href={`/${lang}/register`}>
                   {isBn ? 'নতুন অ্যাকাউন্ট খুলুন' : 'Create Free Account'}
                 </Link>
@@ -167,8 +191,44 @@ export default function BecomeASellerPage({ params }: { params: Promise<{ lang: 
         </div>
       </section>
 
+      {/* 4-Step Onboarding Timeline */}
+      <section className="container max-w-5xl mx-auto px-4 -mt-8 relative z-20">
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm">
+          <div className="text-center mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground">
+              {isBn ? 'সহজ ৪ ধাপে সেলার হওয়ার উপায়' : 'Become a Verified Seller in 4 Easy Steps'}
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              {isBn ? 'ঝামেলামুক্ত দ্রুত ভেরিফিকেশন ও লিস্টিং প্রক্রিয়া' : 'Frictionless digital onboarding designed for local traders & farmers'}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground font-black text-xs flex items-center justify-center">1</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '১. আবেদন জমা দিন' : '1. Submit Form'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'দোকানের নাম, ঠিকানা এবং NID/ট্রেড লাইসেন্স প্রদান করুন।' : 'Fill shop info, category, and valid NID/Trade License details.'}</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground font-black text-xs flex items-center justify-center">2</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '২. হাব ভেরিফিকেশন' : '2. Hub Verification'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'আমাদের উপজেলা টিম ২৪ ঘণ্টার মধ্যে যাচাই ও অনুমোদন করবে।' : 'Our local Upazila team reviews and activates your account.'}</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground font-black text-xs flex items-center justify-center">3</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '৩. পণ্য তালিকাভুক্ত করুন' : '3. List Products'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'সেলার পোর্টাল থেকে ছবি ও দামসহ পণ্য যোগ করুন সহজে।' : 'Upload catalog items with simple photo and price inputs.'}</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground font-black text-xs flex items-center justify-center">4</div>
+              <h3 className="font-bold text-xs sm:text-sm text-foreground">{isBn ? '৪. ডেলিভারি ও পেআউট' : '4. Fulfill & Earn'}</h3>
+              <p className="text-[11px] text-muted-foreground">{isBn ? 'রাইডার এসে পার্সেল নেবে এবং প্রতি সপ্তাহে সরাসরি টাকা বুঝে নিন।' : 'Riders pick up orders, and revenue settles weekly directly.'}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Benefits Grid */}
-      <section className="container max-w-6xl mx-auto px-4 py-12">
+      <section className="container max-w-6xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-3xl bg-card border shadow-sm space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">

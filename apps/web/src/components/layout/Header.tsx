@@ -172,7 +172,7 @@ export function Header({ lang }: HeaderProps) {
         <div className="hidden md:block border-t border-border/50 bg-background/90 py-1.5 px-4 text-xs font-medium">
           <div className="container mx-auto max-w-7xl flex items-center justify-between gap-4">
             {/* Left: Mega Menu Trigger & Category Quick Links */}
-            <div className="flex items-center gap-3 lg:gap-4 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-3 lg:gap-4 no-scrollbar">
               <CategoryMegaMenu lang={lang} />
 
               <div className="h-4 w-px bg-border/60" />

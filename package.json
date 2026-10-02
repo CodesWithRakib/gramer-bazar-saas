@@ -5,6 +5,10 @@
   "scripts": {
     "dev": "pnpm --parallel -r run dev",
     "build": "pnpm -r run build",
+    "start": "pnpm --filter api --filter web --parallel run start",
+    "start:prod": "pnpm --filter api run start:prod",
+    "start:web": "pnpm -C apps/web start",
+    "start:api": "pnpm -C apps/api run start:prod",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm -r run typecheck",
     "format": "pnpm -r run format",

@@ -54,52 +54,62 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
   }
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
+    <div className="container max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-10">
       {flashSales.map((sale) => (
         <div key={sale.id} className="space-y-6">
           {/* Flash Sale Hero Banner */}
-          <div className="relative rounded-2xl overflow-hidden shadow-md bg-primary text-primary-foreground p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            {sale.bannerImage && (
-              <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <CustomImage src={sale.bannerImage} alt={sale.name} fill className="object-cover" />
+          <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-amber-600 via-orange-600 to-rose-700 dark:from-amber-950 dark:via-orange-950 dark:to-rose-950 text-white p-5 sm:p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 border border-white/10">
+            {sale.bannerImage ? (
+              <div className="absolute inset-0 opacity-25 pointer-events-none mix-blend-overlay">
+                <CustomImage
+                  src={sale.bannerImage}
+                  alt={sale.name}
+                  fill
+                  fallbackSrc="/banners/banner-honey-ghee.jpg"
+                  className="object-cover"
+                />
               </div>
+            ) : (
+              <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-300 via-transparent to-transparent" />
             )}
 
-            <div className="relative z-10 flex items-center gap-4 text-center md:text-start">
-              <div className="bg-primary-foreground/15 p-3.5 rounded-2xl backdrop-blur-md shrink-0 shadow-xs">
-                <Zap className="w-8 h-8 text-primary-foreground fill-current" />
+            <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-start gap-4 max-w-xl">
+              <div className="bg-white/15 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl shrink-0 shadow-lg border border-white/20 text-yellow-300">
+                <Flame className="w-8 h-8 sm:w-10 sm:h-10 fill-current animate-pulse" />
               </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl md:text-3xl font-extrabold">{sale.name}</h1>
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+                    {sale.name}
+                  </h1>
                   <Badge
                     variant="secondary"
-                    className="bg-primary-foreground text-primary font-bold text-xs"
+                    className="bg-yellow-400 text-stone-900 hover:bg-yellow-300 font-extrabold text-[11px] px-2.5 py-0.5 shadow-sm uppercase tracking-wider"
                   >
                     {isBn ? 'লাইভ অফার' : 'LIVE DEAL'}
                   </Badge>
                 </div>
-                <p className="text-primary-foreground/90 text-sm mt-1 max-w-xl">
+                <p className="text-white/90 text-xs sm:text-sm md:text-base leading-relaxed">
                   {isBn
-                    ? 'দারুণ ডিসকাউন্টে সংগ্রহ করুন আপনার প্রয়োজনীয় সেরা পণ্যগুলো!'
-                    : 'Exclusive heavy discounts on top products. Available while stocks last!'}
+                    ? 'দারুণ ডিসকাউন্টে সংগ্রহ করুন আপনার প্রয়োজনীয় খাঁটি পণ্যগুলো! স্টক সীমিত, এখনই অর্ডার করুন।'
+                    : 'Exclusive limited-time price drops on top village essentials. Available while stocks last!'}
                 </p>
               </div>
             </div>
 
             {/* Countdown Box */}
-            <div className="relative z-10 flex flex-col items-center bg-black/35 backdrop-blur-md rounded-2xl p-4 border border-white/15 min-w-[220px] shadow-sm">
-              <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-yellow-300">
-                <Clock className="w-3.5 h-3.5" />
+            <div className="relative z-10 w-full sm:w-auto flex flex-col items-center bg-black/40 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/20 shadow-xl">
+              <div className="flex items-center gap-1.5 mb-2.5 text-xs font-bold text-yellow-300 uppercase tracking-wider">
+                <Clock className="w-4 h-4 animate-spin text-yellow-300" style={{ animationDuration: '6s' }} />
                 <span>{isBn ? 'অফার শেষ হতে বাকি' : 'Sale Ends In'}</span>
               </div>
-              <CountdownTimer targetDate={sale.endDate} lang={lang} />
+              <CountdownTimer targetDate={sale.endDate} lang={lang} variant="hero" />
             </div>
           </div>
 
           {/* Flash Sale Items Grid */}
           {sale.items && sale.items.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
               {sale.items.map((item) => {
                 if (!item.sellerProduct) return null;
                 const total = item.quantitySold + item.quantityAvailable;
@@ -107,7 +117,10 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
                   total > 0 ? Math.min(100, Math.round((item.quantitySold / total) * 100)) : 0;
 
                 return (
-                  <div key={item.id} className="flex flex-col">
+                  <div
+                    key={item.id}
+                    className="flex flex-col rounded-2xl border bg-card p-2 sm:p-2.5 transition-all duration-200 hover:shadow-md hover:border-orange-500/30"
+                  >
                     <ProductCard
                       product={item.sellerProduct}
                       lang={lang}
@@ -115,19 +128,19 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
                     />
 
                     {/* Stock Remaining Indicator */}
-                    <div className="mt-2 px-1">
-                      <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                    <div className="mt-3 px-1 space-y-1">
+                      <div className="w-full bg-muted rounded-full h-2 overflow-hidden shadow-inner">
                         <div
-                          className="bg-orange-600 h-1.5 rounded-full"
-                          style={{ width: `${soldPercent}%` }}
+                          className="bg-gradient-to-r from-orange-500 to-rose-600 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${Math.max(5, soldPercent)}%` }}
                         />
                       </div>
-                      <div className="flex justify-between items-center mt-1 text-[10px] text-muted-foreground font-medium">
-                        <span>
+                      <div className="flex justify-between items-center text-[10px] sm:text-xs text-muted-foreground font-medium">
+                        <span className="text-orange-600 dark:text-orange-400 font-semibold">
                           {isBn ? 'বিক্রি' : 'Sold'}: {item.quantitySold}
                         </span>
                         <span>
-                          {isBn ? 'অবশিষ্ট' : 'Left'}: {item.quantityAvailable}
+                          {isBn ? 'মজুত' : 'Left'}: {item.quantityAvailable}
                         </span>
                       </div>
                     </div>
@@ -136,13 +149,13 @@ export default function FlashSalePage({ params }: { params: Promise<{ lang: stri
               })}
             </div>
           ) : (
-            <div className="text-center py-12 bg-muted/20 rounded-2xl border border-dashed text-muted-foreground flex flex-col items-center gap-2">
-              <PackageX className="w-8 h-8 text-muted-foreground/40" />
-              <span>
+            <div className="text-center py-16 bg-muted/20 rounded-3xl border border-dashed text-muted-foreground flex flex-col items-center gap-3">
+              <PackageX className="w-10 h-10 text-muted-foreground/40" />
+              <p className="font-semibold text-sm sm:text-base">
                 {isBn
                   ? 'এই সেলে বর্তমানে কোনো পণ্য অন্তর্ভুক্ত নেই'
                   : 'No items listed in this sale'}
-              </span>
+              </p>
             </div>
           )}
         </div>

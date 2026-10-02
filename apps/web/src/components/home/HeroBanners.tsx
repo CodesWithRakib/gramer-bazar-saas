@@ -170,7 +170,7 @@ export function HeroBanners({ lang }: { lang: string }) {
 
   return (
     <div
-      className="relative w-full h-[320px] sm:h-[360px] md:h-[400px] lg:h-[420px] xl:h-[440px] rounded-2xl overflow-hidden group select-none shadow-sm border border-border/40 focus:outline-hidden"
+      className="relative w-full h-[340px] sm:h-[370px] md:h-[400px] lg:h-[420px] xl:h-[440px] rounded-2xl overflow-hidden group select-none shadow-sm border border-border/40 focus:outline-hidden"
       tabIndex={0}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsPaused(true)}
@@ -203,13 +203,13 @@ export function HeroBanners({ lang }: { lang: string }) {
           </div>
 
           {/* High-Contrast Directional Scrim for Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20 sm:bg-gradient-to-r sm:from-black/85 sm:via-black/50 sm:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 sm:bg-gradient-to-r sm:from-black/85 sm:via-black/50 sm:to-transparent" />
 
           {/* Banner Editorial Content Overlay */}
-          <div className="absolute inset-0 z-10 flex flex-col justify-end sm:justify-center p-5 sm:p-7 md:p-9 max-w-xl text-white">
-            <div className="space-y-2.5 sm:space-y-3.5">
+          <div className="absolute inset-0 z-10 flex flex-col justify-end sm:justify-center p-4 xs:p-5 sm:p-7 md:p-9 max-w-xl text-white">
+            <div className="space-y-2 xs:space-y-2.5 sm:space-y-3.5 pb-2 sm:pb-0">
               {/* Campaign Pill */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/90 text-white text-[11px] sm:text-xs font-bold shadow-md w-fit backdrop-blur-xs">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary/95 text-white text-[10px] sm:text-xs font-bold shadow-md w-fit backdrop-blur-xs">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -218,34 +218,34 @@ export function HeroBanners({ lang }: { lang: string }) {
               </div>
 
               {/* Title */}
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight drop-shadow-md">
+              <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-snug drop-shadow-md">
                 {currentBanner.title ||
                   (isBn ? 'তাজা ও খাঁটি পণ্য সরাসরি খামার থেকে' : 'Fresh & Pure Farm Products')}
               </h2>
 
               {/* Subtitle */}
-              <p className="text-xs sm:text-sm md:text-base text-white/85 line-clamp-2 max-w-md leading-relaxed font-medium">
+              <p className="text-[11px] xs:text-xs sm:text-sm md:text-base text-white/90 line-clamp-2 max-w-md leading-relaxed font-medium">
                 {isBn
                   ? 'আপনার এলাকার কৃষক ও খাঁটি খামারিদের উৎপাদিত তাজা শাকসবজি, খাঁটি মধু ও নিত্যপণ্য।'
                   : 'Authentic local vegetables, pure honey, mustard oil & daily essentials delivered fast.'}
               </p>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-2 xs:gap-3 pt-1">
                 <Button
                   size="default"
-                  className="rounded-full h-9 sm:h-10 px-5 sm:px-6 bg-primary hover:bg-primary/90 text-white text-xs sm:text-sm font-bold shadow-lg shadow-primary/30 transition-transform active:scale-95 flex items-center gap-2 group/btn"
+                  className="rounded-full h-8 xs:h-9 sm:h-10 px-4 xs:px-5 sm:px-6 bg-primary hover:bg-primary/90 text-white text-xs sm:text-sm font-bold shadow-lg shadow-primary/30 transition-transform active:scale-95 flex items-center gap-1.5 xs:gap-2 group/btn"
                   asChild
                 >
                   <Link href={currentBanner.linkUrl || `/${lang}/products`}>
                     <span>{isBn ? 'এখনই কিনুন' : 'Shop Now'}</span>
-                    <ChevronRight className="w-4 h-4 rtl:rotate-180 transition-transform group-hover/btn:translate-x-0.5" />
+                    <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 rtl:rotate-180 transition-transform group-hover/btn:translate-x-0.5" />
                   </Link>
                 </Button>
                 <Button
                   size="default"
                   variant="outline"
-                  className="rounded-full h-9 sm:h-10 px-4 sm:px-5 bg-white/15 hover:bg-white/25 text-white border-white/30 text-xs sm:text-sm font-semibold backdrop-blur-sm transition-all"
+                  className="rounded-full h-8 xs:h-9 sm:h-10 px-3 xs:px-4 sm:px-5 bg-white/15 hover:bg-white/25 text-white border-white/30 text-xs sm:text-sm font-semibold backdrop-blur-sm transition-all"
                   asChild
                 >
                   <Link href={`/${lang}/categories`}>
@@ -264,27 +264,27 @@ export function HeroBanners({ lang }: { lang: string }) {
           <button
             onClick={prevSlide}
             aria-label={isBn ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-all shadow-md z-20"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-all shadow-md z-20"
           >
-            <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
+            <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 rtl:rotate-180" />
           </button>
           <button
             onClick={nextSlide}
             aria-label={isBn ? 'পরবর্তী স্লাইড' : 'Next slide'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-all shadow-md z-20"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-all shadow-md z-20"
           >
-            <ChevronRight className="h-5 w-5 rtl:rotate-180" />
+            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 rtl:rotate-180" />
           </button>
 
           {/* Indicators / Progress Pills */}
-          <div className="absolute bottom-3 sm:bottom-4 right-4 sm:right-6 flex items-center gap-1.5 z-20 bg-black/35 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+          <div className="absolute bottom-2.5 end-2.5 sm:bottom-4 sm:end-6 flex items-center gap-1.5 z-20 bg-black/40 backdrop-blur-md px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full border border-white/10">
             {banners.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
                 aria-label={`${isBn ? 'স্লাইড' : 'Slide'} ${idx + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex ? 'bg-primary w-6' : 'bg-white/50 hover:bg-white w-2'
+                  idx === currentIndex ? 'bg-primary w-5 sm:w-6' : 'bg-white/50 hover:bg-white w-1.5 sm:w-2'
                 }`}
               />
             ))}

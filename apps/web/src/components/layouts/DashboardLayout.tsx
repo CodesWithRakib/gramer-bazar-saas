@@ -270,7 +270,7 @@ export function DashboardLayout({ children, routeType, lang }: DashboardLayoutPr
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Dashboard Header */}
-        <header className="sticky top-0 z-30 h-16 bg-background border-b border-border flex items-center justify-between px-4 sm:px-6">
+        <header className="sticky top-0 z-40 h-16 bg-background border-b border-border flex items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
             {/* Mobile Sidebar Trigger */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

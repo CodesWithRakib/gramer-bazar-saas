@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
   CheckCircle2,
@@ -19,60 +19,69 @@ interface ToastItemProps {
   toast: ToastItemData;
 }
 
-interface ToastTypeStyle {
-  barClass: string;
-  glowClass: string;
-  iconClass: string;
-  badgeClass: string;
+interface ToastTypeConfig {
+  iconBg: string;
+  iconColor: string;
+  iconBorder: string;
+  accentColor: string;
+  progressColor: string;
   defaultIcon: React.ElementType;
 }
 
-const TYPE_STYLES: Record<ToastType, ToastTypeStyle> = {
+const TYPE_CONFIG: Record<ToastType, ToastTypeConfig> = {
   success: {
-    barClass: 'gb-toast-bar-success',
-    glowClass: 'gb-toast-glow-success',
-    iconClass: 'gb-toast-icon-success',
-    badgeClass: 'gb-toast-badge-success',
+    iconBg: 'bg-emerald-50 dark:bg-emerald-950/40',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    iconBorder: 'ring-emerald-200/60 dark:ring-emerald-800/40',
+    accentColor: 'text-emerald-600 dark:text-emerald-400',
+    progressColor: 'bg-emerald-500',
     defaultIcon: CheckCircle2,
   },
   error: {
-    barClass: 'gb-toast-bar-error',
-    glowClass: 'gb-toast-glow-error',
-    iconClass: 'gb-toast-icon-error',
-    badgeClass: 'gb-toast-badge-error',
+    iconBg: 'bg-rose-50 dark:bg-rose-950/40',
+    iconColor: 'text-rose-600 dark:text-rose-400',
+    iconBorder: 'ring-rose-200/60 dark:ring-rose-800/40',
+    accentColor: 'text-rose-600 dark:text-rose-400',
+    progressColor: 'bg-rose-500',
     defaultIcon: AlertCircle,
   },
   warning: {
-    barClass: 'gb-toast-bar-warning',
-    glowClass: 'gb-toast-glow-warning',
-    iconClass: 'gb-toast-icon-warning',
-    badgeClass: 'gb-toast-badge-warning',
+    iconBg: 'bg-amber-50 dark:bg-amber-950/40',
+    iconColor: 'text-amber-600 dark:text-amber-400',
+    iconBorder: 'ring-amber-200/60 dark:ring-amber-800/40',
+    accentColor: 'text-amber-600 dark:text-amber-400',
+    progressColor: 'bg-amber-500',
     defaultIcon: AlertTriangle,
   },
   info: {
-    barClass: 'gb-toast-bar-info',
-    glowClass: 'gb-toast-glow-info',
-    iconClass: 'gb-toast-icon-info',
-    badgeClass: 'gb-toast-badge-info',
+    iconBg: 'bg-sky-50 dark:bg-sky-950/40',
+    iconColor: 'text-sky-600 dark:text-sky-400',
+    iconBorder: 'ring-sky-200/60 dark:ring-sky-800/40',
+    accentColor: 'text-sky-600 dark:text-sky-400',
+    progressColor: 'bg-sky-500',
     defaultIcon: Info,
   },
   loading: {
-    barClass: 'gb-toast-bar-loading',
-    glowClass: 'gb-toast-glow-loading',
-    iconClass: 'gb-toast-icon-loading',
-    badgeClass: 'gb-toast-badge-loading',
+    iconBg: 'bg-slate-50 dark:bg-slate-800/40',
+    iconColor: 'text-slate-600 dark:text-slate-300',
+    iconBorder: 'ring-slate-200/60 dark:ring-slate-700/40',
+    accentColor: 'text-slate-600 dark:text-slate-400',
+    progressColor: 'bg-slate-400',
     defaultIcon: Loader2,
   },
   default: {
-    barClass: 'gb-toast-bar-default',
-    glowClass: 'gb-toast-glow-default',
-    iconClass: 'gb-toast-icon-default',
-    badgeClass: 'gb-toast-badge-default',
+    iconBg: 'bg-slate-50 dark:bg-slate-800/40',
+    iconColor: 'text-slate-600 dark:text-slate-300',
+    iconBorder: 'ring-slate-200/60 dark:ring-slate-700/40',
+    accentColor: 'text-slate-600 dark:text-slate-400',
+    progressColor: 'bg-slate-400',
     defaultIcon: Info,
   },
 };
 
-export function ToastItem({ toast }: ToastItemProps) {
+const SWIPE_THRESHOLD = 80;
+
+export function ToastItem({ toast: toastData }: ToastItemProps) {
   const {
     id,
     type,
@@ -87,24 +96,48 @@ export function ToastItem({ toast }: ToastItemProps) {
     customContent,
     isDismissing,
     className = '',
-  } = toast;
+  } = toastData;
 
   const [isMounted, setIsMounted] = useState(false);
+  const [swipeX, setSwipeX] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const startXRef = useRef(0);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Trigger smooth enter animation on next microtask
-    const timer = requestAnimationFrame(() => setIsMounted(true));
-    return () => cancelAnimationFrame(timer);
+    const raf = requestAnimationFrame(() => setIsMounted(true));
+    return () => cancelAnimationFrame(raf);
   }, []);
+
+  // ─── Swipe to dismiss ─────────────────────────────────────────────
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    startXRef.current = e.touches[0].clientX;
+    setIsSwiping(true);
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isSwiping) return;
+    const deltaX = e.touches[0].clientX - startXRef.current;
+    setSwipeX(deltaX);
+  }, [isSwiping]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsSwiping(false);
+    if (Math.abs(swipeX) > SWIPE_THRESHOLD) {
+      toastStore.dismiss(id);
+    } else {
+      setSwipeX(0);
+    }
+  }, [swipeX, id]);
 
   // Custom rendered toast
   if (customContent) {
     return (
       <div
-        className={`w-full transition-all duration-240 ease-out ${
+        className={`w-full transition-all duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isMounted && !isDismissing
             ? 'opacity-100 translate-y-0 scale-100'
-            : 'opacity-0 -translate-y-2 scale-96'
+            : 'opacity-0 -translate-y-3 scale-95'
         } ${className}`}
       >
         {customContent(id)}
@@ -112,62 +145,65 @@ export function ToastItem({ toast }: ToastItemProps) {
     );
   }
 
-  const style = TYPE_STYLES[type] || TYPE_STYLES.default;
-  const IconComponent = style.defaultIcon;
+  const config = TYPE_CONFIG[type] || TYPE_CONFIG.default;
+  const IconComponent = config.defaultIcon;
   const isSpinning = type === 'loading';
   const role = type === 'error' || type === 'warning' ? 'alert' : 'status';
   const ariaLive = type === 'error' ? 'assertive' : 'polite';
 
-  const handleDismiss = () => {
-    toastStore.dismiss(id);
-  };
+  const handleDismiss = () => toastStore.dismiss(id);
+
+  const swipeOpacity = Math.max(0, 1 - Math.abs(swipeX) / 200);
+  const swipeStyle = swipeX !== 0
+    ? { transform: `translateX(${swipeX}px)`, opacity: swipeOpacity, transition: isSwiping ? 'none' : undefined }
+    : undefined;
 
   return (
     <div
+      ref={elementRef}
       role={role}
       aria-live={ariaLive}
       aria-atomic="true"
-      className={`group/toast relative w-full overflow-hidden rounded-2xl border border-border/80 bg-card/95 backdrop-blur-xl shadow-[0_12px_32px_-4px_rgba(0,0,0,0.12),0_4px_12px_-2px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.6),0_4px_16px_-4px_rgba(0,0,0,0.3)] text-card-foreground select-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        isMounted && !isDismissing
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={swipeStyle}
+      className={`group/toast relative w-full overflow-hidden rounded-xl bg-white dark:bg-slate-900
+        border border-slate-200/80 dark:border-slate-700/60
+        shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]
+        dark:shadow-[0_4px_32px_-4px_rgba(0,0,0,0.5),0_2px_12px_-2px_rgba(0,0,0,0.3)]
+        text-slate-900 dark:text-slate-50 select-none
+        transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
+        ${isMounted && !isDismissing
           ? 'opacity-100 translate-y-0 scale-100'
-          : 'opacity-0 -translate-y-3 scale-95 pointer-events-none'
-      } ${className}`}
+          : 'opacity-0 -translate-y-3 scale-[0.97] pointer-events-none'
+        } ${className}`}
     >
-      {/* Subtle Luminous Ambient Radial Wash */}
-      <div
-        aria-hidden="true"
-        className={`pointer-events-none absolute -top-10 -start-10 h-32 w-32 rounded-full blur-2xl transition-opacity duration-500 ${style.glowClass}`}
-      />
-
-      <div className="relative flex items-start gap-3.5 p-3.5 pe-9">
-        {/* Handcrafted Brand/Semantic Accent Pillar */}
+      <div className="relative flex items-start gap-3 p-3.5 pe-10">
+        {/* Semantic Icon */}
         <div
-          aria-hidden="true"
-          className={`absolute top-0 bottom-0 start-0 w-1 ${style.barClass}`}
-        />
-
-        {/* Semantic Icon Badge */}
-        <div
-          className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center border mt-0.5 shadow-2xs transition-transform duration-200 group-hover/toast:scale-105 ${style.iconClass}`}
+          className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ring-1 ${config.iconBg} ${config.iconColor} ${config.iconBorder}`}
         >
           {customIcon ? (
             customIcon
           ) : (
-            <IconComponent className={`w-4 h-4 stroke-[2.3] ${isSpinning ? 'animate-spin' : ''}`} />
+            <IconComponent
+              className={`w-[18px] h-[18px] stroke-[2.2] ${isSpinning ? 'animate-spin' : ''}`}
+            />
           )}
         </div>
 
-        {/* Text Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
+        {/* Content */}
+        <div className="flex-1 min-w-0 pt-0.5">
+          <div className="flex items-center gap-2">
             {title && (
-              <h4 className="text-[13.5px] font-semibold tracking-tight text-foreground leading-snug break-words">
+              <p className="text-[13.5px] font-semibold leading-snug text-slate-900 dark:text-slate-50 break-words">
                 {title}
-              </h4>
+              </p>
             )}
             {badge && (
               <span
-                className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide border ${style.badgeClass}`}
+                className={`inline-flex items-center px-1.5 py-px rounded-md text-[10px] font-bold uppercase tracking-wider ${config.iconBg} ${config.accentColor}`}
               >
                 {badge}
               </span>
@@ -175,14 +211,14 @@ export function ToastItem({ toast }: ToastItemProps) {
           </div>
 
           {description && (
-            <div className="text-xs text-muted-foreground/90 mt-1 leading-relaxed break-words font-normal">
+            <p className="text-[12.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed break-words">
               {description}
-            </div>
+            </p>
           )}
 
-          {/* Action / Link / Cancel Controls */}
+          {/* Actions */}
           {(action || link || cancel) && (
-            <div className="flex items-center gap-2 mt-2.5 flex-wrap">
+            <div className="flex items-center gap-2 mt-2.5">
               {action && (
                 <button
                   type="button"
@@ -190,7 +226,11 @@ export function ToastItem({ toast }: ToastItemProps) {
                     action.onClick(e);
                     handleDismiss();
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs transition-all active:scale-95 cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold
+                    bg-slate-900 dark:bg-white text-white dark:text-slate-900
+                    hover:bg-slate-800 dark:hover:bg-slate-100
+                    shadow-sm transition-all active:scale-[0.97] cursor-pointer
+                    focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-400`}
                 >
                   <span>{action.label}</span>
                   <ArrowRight className="w-3 h-3 rtl:rotate-180" />
@@ -203,7 +243,7 @@ export function ToastItem({ toast }: ToastItemProps) {
                   target={link.external ? '_blank' : '_self'}
                   rel={link.external ? 'noopener noreferrer' : undefined}
                   onClick={handleDismiss}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline transition-colors"
+                  className={`inline-flex items-center gap-1 text-[12px] font-semibold ${config.accentColor} hover:underline transition-colors`}
                 >
                   <span>{link.label}</span>
                   {link.external ? (
@@ -221,7 +261,7 @@ export function ToastItem({ toast }: ToastItemProps) {
                     cancel.onClick?.();
                     handleDismiss();
                   }}
-                  className="px-2.5 py-1.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   {cancel.label || 'Dismiss'}
                 </button>
@@ -231,24 +271,26 @@ export function ToastItem({ toast }: ToastItemProps) {
         </div>
       </div>
 
-      {/* Dismiss Button */}
+      {/* Close Button — appears on hover */}
       <button
         type="button"
         onClick={handleDismiss}
         aria-label="Close notification"
-        className="absolute top-2.5 end-2.5 w-6 h-6 rounded-lg flex items-center justify-center text-muted-foreground/60 hover:text-foreground hover:bg-muted/80 transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute top-3 end-3 w-6 h-6 rounded-md flex items-center justify-center
+          text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300
+          hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer
+          opacity-0 group-hover/toast:opacity-100 focus-visible:opacity-100
+          focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-300"
       >
         <X className="w-3.5 h-3.5" />
       </button>
 
-      {/* Optional Animated Timeout Progress Bar */}
+      {/* Progress Bar — thin, minimal */}
       {duration !== Infinity && duration > 0 && (
-        <div
-          aria-hidden="true"
-          className="absolute bottom-0 inset-x-0 h-0.5 bg-muted/40 overflow-hidden"
-        >
+        <div className="absolute bottom-0 inset-x-0 h-[2px] bg-slate-100 dark:bg-slate-800">
           <div
-            className={`h-full ${style.barClass} opacity-85 origin-left motion-reduce:hidden group-hover/toast:[animation-play-state:paused]`}
+            className={`h-full ${config.progressColor} opacity-60 origin-left
+              motion-reduce:hidden group-hover/toast:[animation-play-state:paused]`}
             style={{
               animation: `toast-progress ${duration}ms linear forwards`,
             }}

@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: '#10b981', // Tailwind Emerald 500
+    theme_color: '#ea580c', // Terracotta Warm Primary
     icons: [
       {
         src: '/icon.png',

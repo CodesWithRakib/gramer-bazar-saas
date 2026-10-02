@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Palette, Check, Bell, X } from 'lucide-react';
 import { useThemePalette } from '@/providers/ThemePaletteProvider';
 import { ThemePaletteId } from '@/config/theme';
@@ -88,7 +88,7 @@ export function ThemePaletteSwitcher({
         className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/80 bg-card text-card-foreground hover:bg-muted/70 shadow-xs text-xs font-semibold transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Palette className="w-3.5 h-3.5 text-primary" />
-        <span className="truncate max-w-[120px]">
+        <span className="truncate max-w-[140px]">
           {availablePalettes
             .find((p) => p.id === palette)
             ?.[isBn ? 'nameBn' : 'nameEn']?.split('—')[1]
@@ -171,54 +171,56 @@ export function ThemePaletteSwitcher({
               })}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-border/60">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <Bell className="w-3.5 h-3.5 text-primary" />
-                  {isBn ? 'টোস্ট টেস্ট করুন' : 'Test Custom Toasts'}
-                </span>
-                <span className="text-[10px] text-muted-foreground">
-                  {isBn ? 'লাইভ প্রিভিউ' : 'Live Preview'}
-                </span>
+            {showToastDemo && (
+              <div className="mt-4 pt-3 border-t border-border/60">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Bell className="w-3.5 h-3.5 text-primary" />
+                    {isBn ? 'টোস্ট টেস্ট করুন' : 'Test Custom Toasts'}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {isBn ? 'লাইভ প্রিভিউ' : 'Live Preview'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1 sm:gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => triggerToastDemo('success')}
+                    className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-success transition-all cursor-pointer text-center"
+                  >
+                    Success
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => triggerToastDemo('error')}
+                    className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-error transition-all cursor-pointer text-center"
+                  >
+                    Error
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => triggerToastDemo('warning')}
+                    className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-warning transition-all cursor-pointer text-center"
+                  >
+                    Warning
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => triggerToastDemo('info')}
+                    className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-info transition-all cursor-pointer text-center"
+                  >
+                    Info
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => triggerToastDemo('loading')}
+                    className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-loading transition-all cursor-pointer text-center"
+                  >
+                    Loading
+                  </button>
+                </div>
               </div>
-              <div className="grid grid-cols-5 gap-1 sm:gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => triggerToastDemo('success')}
-                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-success transition-all cursor-pointer text-center"
-                >
-                  Success
-                </button>
-                <button
-                  type="button"
-                  onClick={() => triggerToastDemo('error')}
-                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-error transition-all cursor-pointer text-center"
-                >
-                  Error
-                </button>
-                <button
-                  type="button"
-                  onClick={() => triggerToastDemo('warning')}
-                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-warning transition-all cursor-pointer text-center"
-                >
-                  Warning
-                </button>
-                <button
-                  type="button"
-                  onClick={() => triggerToastDemo('info')}
-                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-info transition-all cursor-pointer text-center"
-                >
-                  Info
-                </button>
-                <button
-                  type="button"
-                  onClick={() => triggerToastDemo('loading')}
-                  className="px-1.5 py-1 text-[10px] font-semibold rounded-lg gb-btn-preview-loading transition-all cursor-pointer text-center"
-                >
-                  Loading
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         </>
       )}

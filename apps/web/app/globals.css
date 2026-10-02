@@ -4,13 +4,71 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* =========================================================================
+   GLOBAL STACKING CONTEXT & OVERFLOW SYSTEM
+   Professional architecture (Stripe, Vercel, Linear).
+   ========================================================================= */
+
+/* 1. Global viewport overflow protection:
+      Using overflow-x: clip does NOT create a scroll container,
+      so overflow-y remains 'visible', preserving position: sticky
+      on all headers and navigation elements while strictly preventing
+      any horizontal scroll or layout shifts on mobile devices. */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+/* Prevent Radix scroll-lock from removing horizontal clipping.
+   react-remove-scroll continues to intercept touch and wheel events via JS. */
+html body[data-scroll-locked] {
+  overflow-x: clip !important;
+  max-width: 100vw !important;
+}
+
+/* When body is scroll-locked by any Radix modal, sheet, drawer or dialog,
+   lock sticky header to fixed viewport coordinates so it never gets thrown
+   to -scrollY and never disappears off screen. */
+body[data-scroll-locked] header,
+body[data-scroll-locked] header[class*="sticky"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 50 !important;
+}
+
+/* 2. Sticky headers must allow dropdowns and mega menus to escape */
+header[class*="sticky"] {
+  overflow: visible !important;
+}
+
+header[class*="sticky"] > div {
+  overflow: visible;
+}
+
 @theme {
+  /* ─── Primary Font Stacks (Premium) ──────────────────────────────── */
   --font-sans:
-    var(--font-plus-jakarta), var(--font-hind-siliguri), var(--font-noto-bengali), ui-sans-serif,
-    system-ui, sans-serif;
+    var(--font-inter), var(--font-dm-sans), var(--font-plus-jakarta),
+    var(--font-noto-bengali), var(--font-anek-bangla), var(--font-hind-siliguri),
+    ui-sans-serif, system-ui, sans-serif;
   --font-bengali:
-    var(--font-hind-siliguri), var(--font-noto-bengali), var(--font-plus-jakarta), ui-sans-serif,
-    system-ui, sans-serif;
+    var(--font-noto-bengali), var(--font-anek-bangla), var(--font-hind-siliguri),
+    var(--font-inter), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* ─── Specialized Font Stacks ──────────────────────────────────── */
+  --font-heading:
+    var(--font-outfit), var(--font-inter), var(--font-plus-jakarta),
+    var(--font-anek-bangla), ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    var(--font-dm-sans), var(--font-inter), var(--font-plus-jakarta),
+    ui-sans-serif, system-ui, sans-serif;
+  --font-serif-bn:
+    var(--font-tiro-bangla), var(--font-anek-bangla), var(--font-hind-siliguri),
+    serif;
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
@@ -70,6 +128,46 @@
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
 }
+
+/* ─── Bengali / Bangla Font Rendering Fix ────────────────────────────────────
+   Matches the crisp rendering quality of the Bangladesh National Portal
+   (bangladesh.gov.bd) which uses Noto Sans Bengali 400.
+   Key issues fixed:
+   1. text-rendering: optimizeLegibility — enables proper Bangla conjunct shaping
+   2. -webkit-font-smoothing: antialiased — prevents blurry subpixel rendering
+   3. font-feature-settings — enables kern, liga, calt for correct script shaping
+   4. letter-spacing: 0 — Bengali script MUST NOT have letter-spacing (breaks glyphs)
+   5. font-synthesis: none — prevents browser from faking bold/italic weights
+──────────────────────────────────────────────────────────────────────────────── */
+
+:lang(bn),
+[lang='bn'],
+.font-bengali,
+:is([lang='bn'] *) {
+  font-family: var(--font-noto-bengali), var(--font-anek-bangla), var(--font-hind-siliguri),
+    ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings:
+    'kern' 1,
+    'liga' 1,
+    'calt' 1;
+  font-synthesis: none;
+  letter-spacing: 0 !important; /* Never apply letter-spacing to Bengali — breaks conjuncts */
+  word-spacing: 0.05em;
+}
+
+/* Ensure Bengali numerals (০১২৩...) render correctly */
+:lang(bn) *,
+[lang='bn'] * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: 0;
+}
+
+
 
 @utility container {
   margin-inline: auto;
@@ -161,6 +259,17 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+
+  /* Bengali script must NEVER have letter-spacing — it breaks conjunct consonants (যুক্তাক্ষর) */
+  :lang(bn),
+  [lang='bn'],
+  :lang(bn) *,
+  [lang='bn'] * {
+    letter-spacing: 0 !important;
+    word-break: normal;
+    overflow-wrap: break-word;
+    line-height: 1.75; /* Bengali needs more line-height for matras (vowel diacritics) */
+  }
 }
 
 @keyframes toast-progress {
@@ -173,63 +282,10 @@
 }
 
 /* =========================================================================
-   CUSTOM BESPOKE TOAST NOTIFICATION COLOR SYSTEM
-   Handcrafted executive pigments with superior contrast & dark-mode parity.
-   Zero generic Tailwind color classes.
+   TOAST NOTIFICATION SYSTEM
+   The new toast uses Tailwind utility classes directly in the component.
+   Only the preview button styles below are retained for the dev toolbar.
    ========================================================================= */
-
-/* Pillar & Progress Bar Gradients */
-.gb-toast-bar-success { background: linear-gradient(180deg, #065f46 0%, #059669 45%, #10b981 100%); }
-.gb-toast-bar-error   { background: linear-gradient(180deg, #881337 0%, #be123c 45%, #e11d48 100%); }
-.gb-toast-bar-warning { background: linear-gradient(180deg, #92400e 0%, #d97706 45%, #f59e0b 100%); }
-.gb-toast-bar-info    { background: linear-gradient(180deg, #1e40af 0%, #2563eb 45%, #0284c7 100%); }
-.gb-toast-bar-loading { background: linear-gradient(180deg, #0e4b36 0%, #136348 45%, #10b981 100%); }
-.gb-toast-bar-default { background: linear-gradient(180deg, #334155 0%, #64748b 100%); }
-
-/* Ambient Radial Glow Washes */
-.gb-toast-glow-success { background: radial-gradient(circle at top left, rgba(5, 150, 105, 0.16) 0%, rgba(16, 185, 129, 0.04) 50%, transparent 75%); }
-.gb-toast-glow-error   { background: radial-gradient(circle at top left, rgba(190, 18, 60, 0.15) 0%, rgba(225, 29, 72, 0.04) 50%, transparent 75%); }
-.gb-toast-glow-warning { background: radial-gradient(circle at top left, rgba(217, 119, 6, 0.15) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 75%); }
-.gb-toast-glow-info    { background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.15) 0%, rgba(2, 132, 199, 0.04) 50%, transparent 75%); }
-.gb-toast-glow-loading { background: radial-gradient(circle at top left, rgba(19, 99, 72, 0.16) 0%, transparent 75%); }
-.gb-toast-glow-default { background: radial-gradient(circle at top left, rgba(100, 116, 139, 0.09) 0%, transparent 75%); }
-
-:is(.dark *) .gb-toast-glow-success { background: radial-gradient(circle at top left, rgba(16, 185, 129, 0.22) 0%, transparent 75%); }
-:is(.dark *) .gb-toast-glow-error   { background: radial-gradient(circle at top left, rgba(225, 29, 72, 0.22) 0%, transparent 75%); }
-:is(.dark *) .gb-toast-glow-warning { background: radial-gradient(circle at top left, rgba(245, 158, 11, 0.20) 0%, transparent 75%); }
-:is(.dark *) .gb-toast-glow-info    { background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.20) 0%, transparent 75%); }
-:is(.dark *) .gb-toast-glow-loading { background: radial-gradient(circle at top left, rgba(52, 211, 153, 0.22) 0%, transparent 75%); }
-:is(.dark *) .gb-toast-glow-default { background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.14) 0%, transparent 75%); }
-
-/* Icon Badge Container & Stroke */
-.gb-toast-icon-success { background-color: rgba(6, 95, 70, 0.08); border-color: rgba(5, 150, 105, 0.28); color: #065f46; }
-.gb-toast-icon-error   { background-color: rgba(190, 18, 60, 0.08); border-color: rgba(190, 18, 60, 0.26); color: #9f1239; }
-.gb-toast-icon-warning { background-color: rgba(217, 119, 6, 0.09); border-color: rgba(217, 119, 6, 0.30); color: #92400e; }
-.gb-toast-icon-info    { background-color: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.26); color: #1d4ed8; }
-.gb-toast-icon-loading { background-color: rgba(19, 99, 72, 0.08); border-color: rgba(19, 99, 72, 0.28); color: #136348; }
-.gb-toast-icon-default { background-color: rgba(100, 116, 139, 0.08); border-color: rgba(100, 116, 139, 0.24); color: #334155; }
-
-:is(.dark *) .gb-toast-icon-success { background-color: rgba(16, 185, 129, 0.16); border-color: rgba(52, 211, 153, 0.36); color: #34d399; }
-:is(.dark *) .gb-toast-icon-error   { background-color: rgba(225, 29, 72, 0.16); border-color: rgba(251, 113, 133, 0.36); color: #fb7185; }
-:is(.dark *) .gb-toast-icon-warning { background-color: rgba(245, 158, 11, 0.16); border-color: rgba(251, 191, 36, 0.36); color: #fbbf24; }
-:is(.dark *) .gb-toast-icon-info    { background-color: rgba(59, 130, 246, 0.16); border-color: rgba(96, 165, 250, 0.36); color: #60a5fa; }
-:is(.dark *) .gb-toast-icon-loading { background-color: rgba(52, 211, 153, 0.16); border-color: rgba(52, 211, 153, 0.36); color: #34d399; }
-:is(.dark *) .gb-toast-icon-default { background-color: rgba(148, 163, 184, 0.15); border-color: rgba(148, 163, 184, 0.32); color: #cbd5e1; }
-
-/* Status Badges */
-.gb-toast-badge-success { background-color: rgba(6, 95, 70, 0.08); color: #064e3b; border-color: rgba(5, 150, 105, 0.30); }
-.gb-toast-badge-error   { background-color: rgba(190, 18, 60, 0.08); color: #881337; border-color: rgba(190, 18, 60, 0.28); }
-.gb-toast-badge-warning { background-color: rgba(217, 119, 6, 0.09); color: #78350f; border-color: rgba(217, 119, 6, 0.32); }
-.gb-toast-badge-info    { background-color: rgba(37, 99, 235, 0.08); color: #1e3a8a; border-color: rgba(37, 99, 235, 0.28); }
-.gb-toast-badge-loading { background-color: rgba(19, 99, 72, 0.08); color: #0e4b36; border-color: rgba(19, 99, 72, 0.30); }
-.gb-toast-badge-default { background-color: rgba(100, 116, 139, 0.08); color: #1e293b; border-color: rgba(100, 116, 139, 0.26); }
-
-:is(.dark *) .gb-toast-badge-success { background-color: rgba(16, 185, 129, 0.16); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.36); }
-:is(.dark *) .gb-toast-badge-error   { background-color: rgba(225, 29, 72, 0.16); color: #fda4af; border-color: rgba(251, 113, 133, 0.36); }
-:is(.dark *) .gb-toast-badge-warning { background-color: rgba(245, 158, 11, 0.16); color: #fde68a; border-color: rgba(251, 191, 36, 0.36); }
-:is(.dark *) .gb-toast-badge-info    { background-color: rgba(59, 130, 246, 0.16); color: #93c5fd; border-color: rgba(96, 165, 250, 0.36); }
-:is(.dark *) .gb-toast-badge-loading { background-color: rgba(52, 211, 153, 0.16); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.36); }
-:is(.dark *) .gb-toast-badge-default { background-color: rgba(148, 163, 184, 0.15); color: #e2e8f0; border-color: rgba(148, 163, 184, 0.32); }
 
 /* Interactive Live Preview Pill Buttons */
 .gb-btn-preview-success { background-color: rgba(6, 95, 70, 0.08); color: #065f46; border: 1px solid rgba(5, 150, 105, 0.28); }
@@ -256,10 +312,64 @@
 
 @layer base {
   /* =========================================================================
-     DEFAULT / PALETTE A — Clean Marketplace (Default Theme)
-     Trustworthy, balanced commerce green and crisp neutrals.
+     DEFAULT / PRIMARY PALETTE — Solar Terracotta & Warm Earth
+     Bengal terracotta pottery, sunlit clay, and artisanal warmth.
      ========================================================================= */
   :root,
+  [data-theme='terracotta'],
+  [data-theme='warm'] {
+    --background: 20 10% 98.5%;
+    --foreground: 24 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 24 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 10% 10%;
+
+    --primary: 21 90% 48%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 21 90% 42%;
+
+    --secondary: 24 15% 94%;
+    --secondary-foreground: 24 10% 10%;
+
+    --muted: 24 12% 94%;
+    --muted-foreground: 24 10% 46%;
+
+    --accent: 34 100% 92%;
+    --accent-foreground: 21 90% 20%;
+
+    --border: 24 15% 88%;
+    --input: 24 15% 88%;
+    --ring: 21 90% 48%;
+    --radius: 0.5rem;
+
+    --surface: 0 0% 100%;
+    --surface-muted: 24 15% 96%;
+
+    --price: 21 95% 42%;
+    --discount: 350 80% 50%;
+    --discount-foreground: 0 0% 100%;
+    --rating: 38 92% 44%;
+    --stock: 142 70% 32%;
+    --stock-foreground: 0 0% 100%;
+
+    --success: 142 70% 32%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 44%;
+    --warning-foreground: 40 95% 96%;
+    --destructive: 350 80% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --info: 200 80% 45%;
+    --info-foreground: 0 0% 100%;
+
+    --chart-1: 21 90% 48%;
+    --chart-2: 38 92% 44%;
+    --chart-3: 142 70% 32%;
+    --chart-4: 24 15% 75%;
+    --chart-5: 21 90% 30%;
+  }
+
+  /* Optional alternative: Clean Emerald */
   [data-theme='clean'] {
     --background: 210 20% 99%;
     --foreground: 222.2 47% 11.2%;

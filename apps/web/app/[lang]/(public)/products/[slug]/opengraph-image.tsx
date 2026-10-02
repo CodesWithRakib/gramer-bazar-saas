@@ -61,7 +61,7 @@ export default async function Image({ params }: { params: { slug: string; lang: 
           <div
             style={{
               fontSize: 32,
-              color: '#16a34a',
+              color: '#ea580c',
               fontWeight: 'bold',
               marginBottom: 20,
             }}
@@ -86,7 +86,7 @@ export default async function Image({ params }: { params: { slug: string; lang: 
           <div
             style={{
               fontSize: 48,
-              color: '#16a34a',
+              color: '#ea580c',
               fontWeight: 'bold',
               display: 'flex',
               alignItems: 'center',
@@ -132,7 +132,7 @@ export default async function Image({ params }: { params: { slug: string; lang: 
     return new ImageResponse(
       <div
         style={{
-          background: '#16a34a',
+          background: '#ea580c',
           width: '100%',
           height: '100%',
           display: 'flex',
