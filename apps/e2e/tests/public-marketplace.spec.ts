@@ -16,7 +16,14 @@ test.describe('Public Marketplace & Discovery', () => {
     await waitForHydration(page);
 
     await expect(page).toHaveTitle(/Gramer Bazar/i);
-    await expect(page.getByRole('heading', { name: /categories/i }).first()).toBeVisible();
+
+    // Dismiss promotional campaign modal if it popped up
+    const promoDismiss = page.getByRole('button', { name: /dismiss|close/i }).first();
+    if (await promoDismiss.isVisible().catch(() => false)) {
+      await promoDismiss.click();
+    }
+
+    await expect(page.getByRole('heading', { name: /shop by category|categor/i }).first()).toBeVisible();
     await expect(page.getByText(/featured products/i).first()).toBeVisible();
 
     // Verify no console exceptions or error boundaries
@@ -30,7 +37,7 @@ test.describe('Public Marketplace & Discovery', () => {
     await expect(page.getByRole('heading', { name: /categor/i }).first()).toBeVisible();
 
     // Verify categories list contains items from API
-    const categoryCards = page.locator('a[href*="/catalog?category="]');
+    const categoryCards = page.locator('a[href*="/categories/"]');
     await expect(categoryCards.first()).toBeVisible({ timeout: 15000 });
     expect(await categoryCards.count()).toBeGreaterThan(0);
   });
@@ -39,7 +46,8 @@ test.describe('Public Marketplace & Discovery', () => {
     await page.goto('/en/search?q=grocery');
     await waitForHydration(page);
 
-    await expect(page.getByPlaceholder(/search products/i).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /results for "grocery"|all products/i })).toBeVisible();
+    await expect(page.locator('input[type="search"]:visible').first()).toBeVisible();
     await expect(page.getByText(/something went wrong/i)).toHaveCount(0);
   });
 

@@ -432,15 +432,25 @@ export class OrdersService {
     const { targetStatus, reason } = dto;
 
     const transitionResult = await this.dataSource.transaction(async (manager) => {
-      // 1. Fetch Order with items, seller products, shops and lock
+      // 1. Fetch Order with lock (avoid outer joins in locked query)
       const order = await manager.findOne(Order, {
         where: { id: orderId },
-        relations: ['items', 'items.sellerProduct', 'items.sellerProduct.shop', 'address', 'user'],
         lock: { mode: 'pessimistic_write' },
       });
 
       if (!order) {
         throw new NotFoundException('Order not found');
+      }
+
+      // Load relations separately after acquiring the lock
+      const orderWithRelations = await manager.findOne(Order, {
+        where: { id: orderId },
+        relations: ['items', 'items.sellerProduct', 'items.sellerProduct.shop', 'address', 'user'],
+      });
+      if (orderWithRelations) {
+        order.items = orderWithRelations.items;
+        order.address = orderWithRelations.address;
+        order.user = orderWithRelations.user;
       }
 
       if (order.status === targetStatus) {
@@ -476,9 +486,14 @@ export class OrdersService {
         if (itemIds.length > 0) {
           const dbProducts = await manager.find(SellerProduct, {
             where: { id: In(itemIds) },
-            relations: ['inventory'],
+          });
+          const inventories = await manager.find(Inventory, {
+            where: { sellerProductId: In(itemIds) },
             lock: { mode: 'pessimistic_write' },
           });
+          for (const product of dbProducts) {
+            product.inventory = inventories.find((i) => i.sellerProductId === product.id) as any;
+          }
 
           const inventoryUpdates: Inventory[] = [];
           for (const orderItem of order.items) {

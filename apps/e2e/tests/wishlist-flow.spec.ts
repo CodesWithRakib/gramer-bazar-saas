@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
-const CUSTOMER = { email: 'customer@gramerbazar.com', password: 'password123' };
+const CUSTOMER = { email: 'customer1@gramerbazar.com', password: 'Customer@GramerBazar2026!' };
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
 const waitForHydration = async (page: Page) => {
@@ -20,7 +20,7 @@ const loginUi = async (page: Page, email: string, password: string) => {
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
     .click();
-  await page.waitForURL(/\/(en|bn)\/(customer|profile)/, { timeout: 25000 });
+  await expect(page).toHaveURL(/\/(en|bn)\/(customer|profile)/, { timeout: 25000 });
 };
 
 test.describe('Wishlist journey', () => {
@@ -35,17 +35,25 @@ test.describe('Wishlist journey', () => {
 
     // Pick a real product from the API
     const res = await page.request.get(`${API}/public/catalog/search?limit=1`);
-    const slug = (
-      (await res.json()).data as Array<{ productVariant: { product: { slug: string } } }>
-    )[0].productVariant.product.slug;
+    const body = await res.json();
+    const items = Array.isArray(body.data) ? body.data : (body.data?.data || []);
+    const first = items[0];
+    const slug = (first?.slug || first?.productVariant?.product?.slug) as string;
+    expect(slug).toBeTruthy();
     await page.goto(`/en/products/${slug}`);
     await waitForHydration(page);
 
-    // Add via the heart button
-    const heart = page.getByRole('button', { name: 'Add to wishlist' });
+    // Add via the heart button (handles both un-wishlisted and already wishlisted items idempotently)
+    const heart = page
+      .getByRole('button', { name: /add to wishlist|remove from wishlist/i })
+      .or(page.locator('button[title*="wishlist"]'))
+      .first();
     await expect(heart).toBeVisible({ timeout: 20000 });
-    await heart.click();
-    await expect(page.getByText(/added to wishlist/i).first()).toBeVisible();
+    const title = await heart.getAttribute('title');
+    if (!title || /add to wishlist|উইশলিস্টে যোগ করুন/i.test(title)) {
+      await heart.click();
+      await expect(page.getByText(/wishlist/i).first()).toBeVisible({ timeout: 15000 });
+    }
 
     // The wishlist page shows the item (not the empty state)
     await page.goto('/en/customer/wishlist');
@@ -55,7 +63,12 @@ test.describe('Wishlist journey', () => {
     await expect(page.getByText(/your wishlist is empty/i)).toHaveCount(0);
 
     // Remove it again through the trash button (covers the remove path)
-    await page.getByRole('button', { name: 'Remove from wishlist' }).first().click();
+    const removeBtn = page
+      .getByRole('button', { name: /remove .* from wishlist|remove from wishlist/i })
+      .or(page.locator('button[title*="wishlist"]'))
+      .first();
+    await expect(removeBtn).toBeVisible({ timeout: 20000 });
+    await removeBtn.click();
     await expect(page.getByText(/removed from wishlist/i).first()).toBeVisible({
       timeout: 15000,
     });

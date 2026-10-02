@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
-const CUSTOMER = { email: 'customer@gramerbazar.com', password: 'password123' };
-const SELLER = { email: 'seller1@gramerbazar.com', password: 'password123' };
+const CUSTOMER = { email: 'customer1@gramerbazar.com', password: 'Customer@GramerBazar2026!' };
+const SELLER = { email: 'seller1@gramerbazar.com', password: 'Shop@GramerBazar2026!' };
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
 const waitForHydration = async (page: Page) => {
@@ -21,7 +21,7 @@ const login = async (page: Page, creds: { email: string; password: string }) => 
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
     .click();
-  await page.waitForURL(/\/(en)\/(customer|profile|admin|seller|rider)/, { timeout: 25000 });
+  await expect(page).toHaveURL(/\/(en)\/(customer|profile|admin|seller|rider)/, { timeout: 25000 });
 };
 
 test.describe('Chat & socket consistency', () => {
@@ -100,15 +100,17 @@ test.describe('Chat & socket consistency', () => {
 
     // Client-side navigation through the dashboard sidebar
     await page
+      .locator('aside')
       .getByRole('link', { name: 'Messages', exact: true })
       .first()
       .click();
-    await page.waitForURL(/\/en\/seller\/messages/, { timeout: 30000 });
+    await expect(page).toHaveURL(/\/en\/seller\/messages/, { timeout: 30000 });
     await page
+      .locator('aside')
       .getByRole('link', { name: 'Dashboard', exact: true })
       .first()
       .click();
-    await page.waitForURL(/\/en\/seller$/, { timeout: 30000 });
+    await expect(page).toHaveURL(/\/en\/seller$/, { timeout: 30000 });
     await page.waitForTimeout(2000);
 
     expect(

@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 const ADMIN = { email: 'admin@gramerbazar.com', password: 'password123' };
-const SELLER = { email: 'seller1@gramerbazar.com', password: 'password123' };
+const SELLER = { email: 'seller1@gramerbazar.com', password: 'Shop@GramerBazar2026!' };
 
 const waitForHydration = async (page: Page) => {
   await page.waitForFunction(
@@ -41,7 +41,7 @@ const ADMIN_ROUTES: { label: string; path: string }[] = [
 test.describe('Admin E2E Workflows', () => {
   test.beforeEach(async ({ page }) => {
     await login(page, ADMIN);
-    await page.waitForURL(/\/en\/admin/, { timeout: 25000 });
+    await expect(page).toHaveURL(/\/en\/admin/, { timeout: 25000 });
   });
 
   test('admin login lands on the dashboard with platform metrics', async ({
@@ -52,8 +52,8 @@ test.describe('Admin E2E Workflows', () => {
     });
     await expect(page.getByText('Total Sales').first()).toBeVisible();
     await expect(page.getByText('Total Orders').first()).toBeVisible();
-    await expect(page.getByText('Customers').first()).toBeVisible();
-    await expect(page.getByText('Sellers').first()).toBeVisible();
+    await expect(page.getByText('Active Shops').first()).toBeVisible();
+    await expect(page.getByText(/registered sellers|Active Disputes|Pending Apps/i).first()).toBeVisible();
     await expectNoErrorBoundary(page);
   });
 
@@ -67,11 +67,13 @@ test.describe('Admin E2E Workflows', () => {
     }
 
     for (const route of ADMIN_ROUTES) {
-      await page
+      const link = page
+        .locator('aside')
         .getByRole('link', { name: route.label, exact: true })
-        .first()
-        .click();
-      await page.waitForURL(new RegExp(`${route.path.replace(/\//g, '\\/')}$`), {
+        .first();
+      await link.scrollIntoViewIfNeeded();
+      await link.click();
+      await expect(page).toHaveURL(new RegExp(`${route.path.replace(/\//g, '\\/')}$`), {
         timeout: 45000,
       });
       // Every admin page renders its own heading and no error boundary
@@ -82,11 +84,13 @@ test.describe('Admin E2E Workflows', () => {
 
   test('admin settings persist across reloads', async ({ page }) => {
     const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-    const token = await page.evaluate(() => localStorage.getItem('token'));
+    const token = await page.evaluate(
+      () => localStorage.getItem('access_token') || localStorage.getItem('token'),
+    );
 
-    await page.goto('/en/admin/settings');
+    await page.goto('/en/admin/settings/general');
     await expect(
-      page.getByRole('heading', { name: /System Settings/ }).first(),
+      page.getByRole('heading', { name: /Configuration/i }).first(),
     ).toBeVisible({ timeout: 25000 });
 
     const nameField = page.getByLabel('Platform Name');
@@ -95,14 +99,16 @@ test.describe('Admin E2E Workflows', () => {
 
     try {
       await nameField.fill(next);
-      await page.getByRole('button', { name: 'Save Changes' }).click();
+      await page.getByRole('button', { name: /Save Platform Settings|Save Changes/i }).click();
       await expect(page.getByText(/Settings saved/i).first()).toBeVisible({ timeout: 20000 });
 
       // The value must be persisted server-side, not only in local state
       const res = await page.request.get(`${api}/admin/settings`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      expect((await res.json()).platformName).toBe(next);
+      const settingsJson = await res.json();
+      const platformName = settingsJson.data?.platformName || settingsJson.platformName;
+      expect(platformName).toBe(next);
 
       await page.reload();
       await expect(page.getByLabel('Platform Name')).toHaveValue(next, {
@@ -110,7 +116,7 @@ test.describe('Admin E2E Workflows', () => {
       });
     } finally {
       await page.getByLabel('Platform Name').fill(current);
-      await page.getByRole('button', { name: 'Save Changes' }).click();
+      await page.getByRole('button', { name: /Save Platform Settings|Save Changes/i }).click();
       await expect(page.getByText(/Settings saved/i).first()).toBeVisible({
         timeout: 20000,
       });
@@ -120,42 +126,40 @@ test.describe('Admin E2E Workflows', () => {
 
   test('admin can close and reopen seller registration', async ({ page }) => {
     const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-    const token = await page.evaluate(() => localStorage.getItem('token'));
+    const token = await page.evaluate(
+      () => localStorage.getItem('access_token') || localStorage.getItem('token'),
+    );
     const authHeaders = { Authorization: `Bearer ${token}` };
 
-    await page.goto('/en/admin/settings');
+    await page.goto('/en/admin/settings/general');
     const toggle = page.getByRole('checkbox', { name: /Allow New Seller Registrations/i });
     await expect(toggle).toBeVisible({ timeout: 25000 });
     const wasEnabled = await toggle.isChecked();
 
     const readFlag = async () => {
       const res = await page.request.get(`${api}/admin/settings`, { headers: authHeaders });
-      return (await res.json()).allowSellerRegistration as boolean;
+      const json = await res.json();
+      return (json.data?.allowSellerRegistration ?? json.allowSellerRegistration) as boolean;
     };
 
     try {
       if (wasEnabled) await toggle.click();
-      await page.getByRole('button', { name: 'Save Changes' }).click();
+      await page.getByRole('button', { name: /Save Platform Settings|Save Changes/i }).click();
       await expect(page.getByText(/Settings saved/i).first()).toBeVisible({ timeout: 20000 });
       expect(await readFlag()).toBe(false);
     } finally {
-      // Never leave seller registration disabled for the rest of the suite
-      const now = await readFlag();
-      if (!now) {
-        const current = page.getByRole('checkbox', {
-          name: /Allow New Seller Registrations/i,
-        });
-        await current.click();
-        await page.getByRole('button', { name: 'Save Changes' }).click();
-        await expect(page.getByText(/Settings saved/i).first()).toBeVisible({ timeout: 20000 });
-      }
+      // Ensure seller registration is restored to true via API
+      await page.request.patch(`${api}/admin/settings`, {
+        headers: authHeaders,
+        data: { allowSellerRegistration: true },
+      });
     }
 
     expect(await readFlag()).toBe(true);
   });
 
   test('admin audit log page renders the log feed', async ({ page }) => {
-    await page.goto('/en/admin/audit-logs');
+    await page.goto('/en/admin/settings/audit-logs');
     await expect(
       page.getByRole('heading', { name: /Audit Logs/ }).first(),
     ).toBeVisible({ timeout: 25000 });
@@ -175,10 +179,14 @@ test.describe('Admin E2E Workflows', () => {
 test.describe('Admin area access control', () => {
   test('a seller cannot open the admin area', async ({ page }) => {
     await login(page, SELLER);
-    await page.waitForURL(/\/en\/seller/, { timeout: 25000 });
+    await expect(page).toHaveURL(/\/en\/seller/, { timeout: 25000 });
 
     await page.goto('/en/admin/users-management');
-    await expect(page.getByText(/Access Denied|403/i)).toBeVisible({ timeout: 20000 });
+    // RouteGuard strictly blocks seller: either displays 403 or auto-redirects to /seller
+    await expect(
+      page.getByText(/Access Denied|403/i).or(page.locator('h1:has-text("Seller dashboard")')),
+    ).toBeVisible({ timeout: 20000 });
+    expect(page.url()).not.toContain('/admin/users-management');
     await expectNoErrorBoundary(page);
   });
 });

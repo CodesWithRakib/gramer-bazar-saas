@@ -15,19 +15,20 @@ test.describe('Internationalization, Responsive & Accessibility Audit', () => {
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
-    // Toggle language switcher
-    const langBtn = page.getByRole('button', { name: /বাংলা|en/i }).first();
-    await expect(langBtn).toBeVisible();
-    await langBtn.click();
-
-    // Check dropdown options if present or direct toggle
-    const bnOption = page.getByText(/বাংলা/i).first();
-    if (await bnOption.isVisible()) {
-      await bnOption.click();
-    }
-
-    await page.waitForURL(/\/bn/, { timeout: 15000 });
+    // 1. Switch to Bangla
+    await page.getByRole('button', { name: /Select language/i }).click();
+    await page.waitForTimeout(400);
+    await page.getByRole('menuitem', { name: /বাংলা/i }).dispatchEvent('click');
+    await expect(page).toHaveURL(/\/bn/, { timeout: 15000 });
     await expect(page.locator('html')).toHaveAttribute('lang', 'bn');
+
+    // 2. Switch back to English
+    await page.waitForTimeout(400);
+    await page.getByRole('button', { name: /Select language/i }).click();
+    await page.waitForTimeout(400);
+    await page.getByRole('menuitem', { name: /English/i }).dispatchEvent('click');
+    await expect(page).toHaveURL(/\/en/, { timeout: 15000 });
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 
   test('responsive drawer behavior on mobile viewport', async ({ page }) => {

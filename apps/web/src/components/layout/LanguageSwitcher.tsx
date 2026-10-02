@@ -95,6 +95,7 @@ export function LanguageSwitcher({
           return (
             <DropdownMenuItem
               key={lang.code}
+              onSelect={() => handleLocaleChange(lang.code)}
               onClick={() => handleLocaleChange(lang.code)}
               className={`flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer ${
                 isSelected ? 'bg-primary/10 text-primary font-semibold' : ''

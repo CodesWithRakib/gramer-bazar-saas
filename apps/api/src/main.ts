@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';

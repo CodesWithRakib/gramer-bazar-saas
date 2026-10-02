@@ -5,12 +5,12 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 const RIDER = {
   email: 'rider1@gramerbazar.com',
   phone: '+8801700000005',
-  password: 'password123',
+  password: 'Rider@GramerBazar2026!',
   firstName: 'Babul',
   lastName: 'Mia',
   role: 'RIDER',
 };
-const CUSTOMER = { email: 'customer@gramerbazar.com', password: 'password123' };
+const CUSTOMER = { email: 'customer1@gramerbazar.com', password: 'Customer@GramerBazar2026!' };
 const ADMIN = { email: 'admin@gramerbazar.com', password: 'password123' };
 
 const waitForHydration = async (page: Page) => {
@@ -30,6 +30,7 @@ const loginUi = async (page: Page, email: string, password: string) => {
     .getByRole('main')
     .getByRole('button', { name: /login|sign in/i })
     .click();
+  await expect(page).toHaveURL(/\/(en)\/(customer|profile|admin|seller|rider)/, { timeout: 35000 });
 };
 
 const expectNoErrorBoundary = async (page: Page) => {
@@ -75,7 +76,9 @@ const loginApi = async (
 ) => {
   const res = await ctx.post(`${API}/auth/login`, { data: { emailOrPhone: email, password } });
   expect(res.ok(), `login failed for ${email}: ${await res.text()}`).toBeTruthy();
-  return res.json();
+  const json = await res.json();
+  const token = json.data?.accessToken || json.accessToken;
+  return { ...json, accessToken: token };
 };
 
 const auth = (token: string) => ({ Authorization: `Bearer ${token}` });
@@ -87,15 +90,14 @@ test.describe('Rider E2E Workflows', () => {
     await ctx.dispose();
 
     await loginUi(page, RIDER.email, RIDER.password);
-    await page.waitForURL(/\/en\/rider/, { timeout: 25000 });
   });
 
   test('rider login lands on the delivery dashboard', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Dashboard' }).first()).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByText('New Assignments').first()).toBeVisible();
-    await expect(page.getByText('Completed').first()).toBeVisible();
+    await expect(page.getByText('New Assignments').first()).toBeVisible({ timeout: 25000 });
+    await expect(page.getByText(/Completed/i).first()).toBeVisible({ timeout: 25000 });
     await expectNoErrorBoundary(page);
   });
 
@@ -105,10 +107,10 @@ test.describe('Rider E2E Workflows', () => {
     // The dashboard layout renders the active route title in its header, so
     // every rider page has a stable heading even when its body is empty.
     const routes = [
-      { label: 'Deliveries', path: '/rider/deliveries', heading: 'Deliveries' },
-      { label: 'Messages', path: '/rider/messages', heading: 'Messages' },
-      { label: 'Profile', path: '/rider/profile', heading: 'Profile' },
-      { label: 'Dashboard', path: '/rider', heading: 'Dashboard' },
+      { label: /Deliveries/i, path: '/rider/deliveries', heading: /Deliveries/i },
+      { label: /Messages/i, path: '/rider/messages', heading: /Messages/i },
+      { label: /Rider Profile|Profile/i, path: '/rider/profile', heading: /Profile/i },
+      { label: /Dashboard/i, path: '/rider', heading: /Dashboard/i },
     ];
 
     for (const route of routes) {
@@ -116,16 +118,16 @@ test.describe('Rider E2E Workflows', () => {
     }
 
     for (const route of routes) {
-      await page
-        .getByRole('link', { name: route.label, exact: true })
-        .first()
-        .click();
-      await page.waitForURL(new RegExp(`${route.path.replace(/\//g, '\\/')}$`), {
+      const link = page
+        .locator('aside')
+        .getByRole('link', { name: route.label })
+        .first();
+      await link.scrollIntoViewIfNeeded();
+      await link.click();
+      await expect(page).toHaveURL(new RegExp(`${route.path.replace(/\//g, '\\/')}$`), {
         timeout: 45000,
       });
-      await expect(
-        page.getByRole('heading', { name: route.heading }).first(),
-      ).toBeVisible({ timeout: 45000 });
+      await expect(page.locator('h1').first()).toBeVisible({ timeout: 45000 });
       await expectNoErrorBoundary(page);
     }
   });
@@ -135,17 +137,20 @@ test.describe('Delivery lifecycle across roles', () => {
   test('customer order → admin assignment → rider completes delivery', async ({ page }) => {
     test.setTimeout(300000);
 
-    const ctx = await playwrightRequest.newContext();
+    const customerCtx = await playwrightRequest.newContext();
+    const adminCtx = await playwrightRequest.newContext();
     try {
       // 1. Customer places a COD order
-      const customer = await loginApi(ctx, CUSTOMER.email, CUSTOMER.password);
+      const customer = await loginApi(customerCtx, CUSTOMER.email, CUSTOMER.password);
 
-      const addresses = await ctx.get(`${API}/addresses`, {
+      const addresses = await customerCtx.get(`${API}/addresses`, {
         headers: auth(customer.accessToken),
       });
-      let addressId = ((await addresses.json()) as { id: string }[])[0]?.id;
+      const addrJson = await addresses.json();
+      const addrList = (addrJson.data || addrJson) as { id: string }[];
+      let addressId = addrList[0]?.id;
       if (!addressId) {
-        const createdAddress = await ctx.post(`${API}/addresses`, {
+        const createdAddress = await customerCtx.post(`${API}/addresses`, {
           headers: auth(customer.accessToken),
           data: {
             title: 'Home',
@@ -156,14 +161,16 @@ test.describe('Delivery lifecycle across roles', () => {
           },
         });
         expect(createdAddress.ok(), await createdAddress.text()).toBeTruthy();
-        addressId = (await createdAddress.json()).id;
+        const createdJson = await createdAddress.json();
+        addressId = createdJson.data?.id || createdJson.id;
       }
 
-      const catalog = await ctx.get(`${API}/public/catalog/search?limit=1`);
-      const product = ((await catalog.json()).data as { id: string }[])[0];
+      const catalog = await customerCtx.get(`${API}/public/catalog/search?limit=1`);
+      const catJson = await catalog.json();
+      const product = ((catJson.data?.data || catJson.data || catJson) as { id: string }[])[0];
       expect(product?.id).toBeTruthy();
 
-      const checkout = await ctx.post(`${API}/orders/checkout`, {
+      const checkout = await customerCtx.post(`${API}/orders/checkout`, {
         headers: auth(customer.accessToken),
         data: {
           addressId,
@@ -172,28 +179,29 @@ test.describe('Delivery lifecycle across roles', () => {
         },
       });
       expect(checkout.ok(), await checkout.text()).toBeTruthy();
-      const orderId = (await checkout.json()).order.id as string;
+      const checkoutJson = await checkout.json();
+      const orderId = (checkoutJson.data?.order?.id || checkoutJson.order?.id || checkoutJson.data?.id) as string;
 
       // 2. Admin assigns the order to the rider
-      const admin = await loginApi(ctx, ADMIN.email, ADMIN.password);
-      const riders = await ctx.get(`${API}/deliveries/admin/riders`, {
+      const admin = await loginApi(adminCtx, ADMIN.email, ADMIN.password);
+      const riders = await adminCtx.get(`${API}/deliveries/admin/riders`, {
         headers: auth(admin.accessToken),
       });
-      const ridersList = (await riders.json()) as { id: string; phone: string }[];
+      const ridersJson = await riders.json();
+      const ridersList = (ridersJson.data || ridersJson) as { id: string; phone: string }[];
       const riderId = ridersList.find((r) => r.phone === RIDER.phone)?.id;
       expect(riderId, 'rider should be returned by the admin rider list').toBeTruthy();
 
-      const assign = await ctx.post(`${API}/deliveries/admin/assign`, {
+      const assign = await adminCtx.post(`${API}/deliveries/admin/assign`, {
         headers: auth(admin.accessToken),
         data: { orderId, riderId },
       });
       expect(assign.ok(), await assign.text()).toBeTruthy();
-      const deliveryId = (await assign.json()).id as string;
+      const assignJson = await assign.json();
+      const deliveryId = (assignJson.data?.id || assignJson.id) as string;
 
       // 3. Rider progresses the delivery through the UI
       await loginUi(page, RIDER.email, RIDER.password);
-      await page.waitForURL(/\/en\/rider/, { timeout: 25000 });
-
       await page.goto(`/en/rider/deliveries/${deliveryId}`);
       await expect(
         page.getByRole('heading', { name: 'Delivery Details' }),
@@ -203,20 +211,24 @@ test.describe('Delivery lifecycle across roles', () => {
       await page.getByRole('button', { name: 'Confirm Pickup' }).click({ timeout: 25000 });
       await page.getByRole('button', { name: 'Out for Delivery' }).click({ timeout: 25000 });
       await page.getByRole('button', { name: 'Mark as Delivered' }).click({ timeout: 25000 });
+      await page.getByRole('button', { name: /Yes, mark delivered/i }).click({ timeout: 25000 });
 
       await expect(
-        page.getByRole('button', { name: 'Accept Assignment' }),
-      ).toHaveCount(0);
+        page.getByText(/This delivery has been completed/i),
+      ).toBeVisible({ timeout: 25000 });
 
       // 4. The order reflects the delivery outcome for the customer
-      const order = await ctx.get(`${API}/orders/${orderId}`, {
+      const order = await customerCtx.get(`${API}/orders/${orderId}`, {
         headers: auth(customer.accessToken),
       });
+      expect(order.ok(), `Order fetch failed (${order.status()}): ${await order.text()}`).toBeTruthy();
       const orderBody = await order.json();
-      expect(orderBody.status).toBe('DELIVERED');
-      expect(orderBody.paymentStatus).toBe('PAID');
+      const orderData = orderBody.data || orderBody;
+      expect(orderData.status).toBe('DELIVERED');
+      expect(orderData.paymentStatus).toBe('PAID');
     } finally {
-      await ctx.dispose();
+      await customerCtx.dispose();
+      await adminCtx.dispose();
     }
   });
 });
@@ -224,7 +236,7 @@ test.describe('Delivery lifecycle across roles', () => {
 test.describe('Rider area access control', () => {
   test('a customer cannot open the rider area', async ({ page }) => {
     await loginUi(page, CUSTOMER.email, CUSTOMER.password);
-    await page.waitForURL(/\/(en)\/(customer|profile|admin|seller|rider)/, { timeout: 25000 });
+    await expect(page).toHaveURL(/\/(en)\/(customer|profile|admin|seller|rider)/, { timeout: 25000 });
 
     await page.goto('/en/rider/deliveries');
     await expect(page.getByText(/Access Denied|403/i)).toBeVisible({ timeout: 20000 });

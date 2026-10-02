@@ -46,7 +46,9 @@ import { getEffectivePermissions, isSuperAdmin } from '../common/utils/permissio
 
 const authThrottle = (envKey: string, fallback: number) => {
   const raw = Number(process.env[envKey]);
-  return Number.isFinite(raw) && raw > 0 ? raw : fallback;
+  if (Number.isFinite(raw) && raw > 0) return raw;
+  if (process.env.NODE_ENV !== 'production') return 100;
+  return fallback;
 };
 
 const SEND_OTP_LIMIT = authThrottle('AUTH_SEND_OTP_THROTTLE_LIMIT', 3);

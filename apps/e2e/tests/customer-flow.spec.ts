@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 const CUSTOMER = {
-  email: 'customer@gramerbazar.com',
-  password: 'password123',
+  email: 'customer1@gramerbazar.com',
+  password: 'Customer@GramerBazar2026!',
 };
 
 /**
@@ -61,7 +61,9 @@ test.describe('Customer E2E Workflows', () => {
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/public/catalog/search?limit=1`,
     );
     const body = await res.json();
-    const slug = (body.data?.[0]?.slug || body.data?.[0]?.productVariant?.product?.slug) as string;
+    const items = Array.isArray(body.data) ? body.data : body.data?.data || [];
+    const first = items[0];
+    const slug = (first?.slug || first?.productVariant?.product?.slug) as string;
     expect(slug).toBeTruthy();
 
     await page.goto(`/en/products/${slug}`);
@@ -124,7 +126,9 @@ test.describe('Customer E2E Workflows', () => {
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/public/catalog/search?limit=1`,
     );
     const body = await res.json();
-    const slug = (body.data?.[0]?.slug || body.data?.[0]?.productVariant?.product?.slug) as string;
+    const items = Array.isArray(body.data) ? body.data : body.data?.data || [];
+    const first = items[0];
+    const slug = (first?.slug || first?.productVariant?.product?.slug) as string;
     await page.goto(`/en/products/${slug}`);
     const addToCart = page.getByRole('button', { name: /add to cart/i });
     await expect(addToCart).toBeVisible({ timeout: 20000 });

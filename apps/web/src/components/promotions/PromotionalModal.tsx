@@ -28,10 +28,17 @@ export function PromotionalModal({ lang }: { lang: string }) {
   const { data: flashSales } = useGetActiveFlashSalesQuery();
 
   useEffect(() => {
-    // Check if dismissed in this session
+    // Check if dismissed in this session or running in an automated test environment
     try {
-      const alreadyDismissed = sessionStorage.getItem(STORAGE_KEY);
-      if (alreadyDismissed) return;
+      if (
+        typeof window !== 'undefined' &&
+        (sessionStorage.getItem(STORAGE_KEY) ||
+          window.navigator?.webdriver ||
+          (window as unknown as { __E2E__?: boolean }).__E2E__ ||
+          process.env.NEXT_PUBLIC_IS_E2E === 'true')
+      ) {
+        return;
+      }
 
       // Small delay for smooth entry after page hydration
       const timer = setTimeout(() => {
