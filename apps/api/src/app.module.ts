@@ -55,10 +55,12 @@ import { ProductionMessagingUpgrade1790500000000 } from './migrations/1790500000
 import { AddPerformanceIndexes1790600000000 } from './migrations/1790600000000-AddPerformanceIndexes.js';
 import { RiderSystem1790700000000 } from './migrations/1790700000000-RiderSystem.js';
 import { SellerSystem1790800000000 } from './migrations/1790800000000-SellerSystem.js';
+import { CreateRefundEntity1790870236048 } from './migrations/1790870236048-CreateRefundEntity.js';
 import { AdminRbac1790900000000 } from './migrations/1790900000000-AdminRbac.js';
 import { ImpersonationSessions1791000000000 } from './migrations/1791000000000-ImpersonationSessions.js';
 import { NotificationsUpgrade1791100000000 } from './migrations/1791100000000-NotificationsUpgrade.js';
 import { BroadcastSystem1791200000000 } from './migrations/1791200000000-BroadcastSystem.js';
+import { DisputeSystemUpgrade1791300000000 } from './migrations/1791300000000-DisputeSystemUpgrade.js';
 import { BroadcastModule } from './broadcast/broadcast.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -98,10 +100,12 @@ import { ScheduleModule } from '@nestjs/schedule';
             AddPerformanceIndexes1790600000000,
             RiderSystem1790700000000,
             SellerSystem1790800000000,
+            CreateRefundEntity1790870236048,
             AdminRbac1790900000000,
             ImpersonationSessions1791000000000,
             NotificationsUpgrade1791100000000,
             BroadcastSystem1791200000000,
+            DisputeSystemUpgrade1791300000000,
           ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,
