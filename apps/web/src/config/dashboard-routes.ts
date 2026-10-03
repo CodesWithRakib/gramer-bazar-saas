@@ -382,6 +382,15 @@ export const sellerRoutes: DashboardRoute[] = [
     matchPrefixes: ['/seller/messages'],
   },
   {
+    title: 'Broadcasts',
+    titleBn: 'অফিসিয়াল ঘোষণা',
+    href: '/seller/broadcasts',
+    icon: Megaphone,
+    section: 'Support',
+    sectionBn: 'সহায়তা ও সেটিংস',
+    matchPrefixes: ['/seller/broadcasts'],
+  },
+  {
     title: 'Disputes',
     titleBn: 'অভিযোগ',
     href: '/seller/disputes',
@@ -473,6 +482,15 @@ export const riderRoutes: DashboardRoute[] = [
     matchPrefixes: ['/rider/messages'],
   },
   {
+    title: 'Broadcasts',
+    titleBn: 'অফিসিয়াল নোটিশ',
+    href: '/rider/broadcasts',
+    icon: Megaphone,
+    section: 'Account',
+    sectionBn: 'অ্যাকাউন্ট',
+    matchPrefixes: ['/rider/broadcasts'],
+  },
+  {
     title: 'Rider Profile',
     titleBn: 'রাইডার প্রোফাইল',
     href: '/rider/profile',
@@ -560,6 +578,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/messages'],
+  },
+  {
+    title: 'Broadcasts',
+    titleBn: 'অফিসিয়াল ঘোষণা',
+    href: '/customer/broadcasts',
+    icon: Megaphone,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/broadcasts'],
   },
   {
     title: 'Notifications',

@@ -7,6 +7,7 @@ import {
   useMarkMessagesAsReadMutation,
   useSendMessageRestMutation,
   type ConversationParticipant,
+  type Conversation,
 } from '@/features/chat/chatApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -28,6 +29,8 @@ import {
   CheckCheck,
   Check,
   AlertCircle,
+  Megaphone,
+  BadgeCheck,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -42,6 +45,7 @@ export function ChatInterface() {
 
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [chatFilter, setChatFilter] = useState<'all' | 'direct' | 'broadcast'>('all');
   const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
 
@@ -129,6 +133,9 @@ export function ChatInterface() {
     } else if (type.includes('DELIVERY')) {
       icon = <Truck className="h-3 w-3 me-1" />;
       label = `Delivery ${refId ? `#${refId.slice(0, 8)}` : ''}`;
+    } else if (type.includes('BROADCAST')) {
+      icon = <Megaphone className="h-3 w-3 me-1 text-emerald-600" />;
+      label = 'Official Broadcast';
     }
 
     return (
@@ -142,18 +149,33 @@ export function ChatInterface() {
     );
   };
 
+  const isBroadcastConversation = useCallback((conv?: Conversation) => {
+    if (!conv) return false;
+    return conv.referenceType === 'BROADCAST' || conv.canonicalKey?.startsWith('broadcast:');
+  }, []);
+
   const filteredConversations = useMemo(() => {
     if (!conversations) return [];
     return conversations
       .filter((conv) => {
+        if (chatFilter === 'broadcast' && !isBroadcastConversation(conv)) return false;
+        if (chatFilter === 'direct' && isBroadcastConversation(conv)) return false;
+
+        const isBroadcast = isBroadcastConversation(conv);
         const other = getOtherParticipant(conv.participants);
-        const fullName = `${other?.firstName || ''} ${other?.lastName || ''}`.toLowerCase();
+        const fullName = isBroadcast
+          ? 'gramer bazar official'
+          : `${other?.firstName || ''} ${other?.lastName || ''}`.toLowerCase();
         const refInfo = `${conv.referenceId || ''} ${conv.referenceType || ''}`.toLowerCase();
         const search = searchQuery.toLowerCase();
         return fullName.includes(search) || refInfo.includes(search);
       })
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  }, [conversations, getOtherParticipant, searchQuery]);
+  }, [conversations, getOtherParticipant, isBroadcastConversation, searchQuery, chatFilter]);
+
+  const broadcastCount = useMemo(() => {
+    return conversations?.filter(isBroadcastConversation).length || 0;
+  }, [conversations, isBroadcastConversation]);
 
   const activeConversation = useMemo(
     () => conversations?.find((c) => c.id === activeConversationId),
@@ -220,6 +242,48 @@ export function ChatInterface() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+
+          <div className="flex gap-1 mt-2.5 bg-muted/60 p-1 rounded-lg text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => setChatFilter('all')}
+              className={`flex-1 py-1 rounded-md transition-all text-center ${
+                chatFilter === 'all'
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setChatFilter('direct')}
+              className={`flex-1 py-1 rounded-md transition-all text-center ${
+                chatFilter === 'direct'
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Direct
+            </button>
+            <button
+              type="button"
+              onClick={() => setChatFilter('broadcast')}
+              className={`flex-1 py-1 rounded-md transition-all flex items-center justify-center gap-1 ${
+                chatFilter === 'broadcast'
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Megaphone className="h-3 w-3 text-emerald-600" />
+              <span>Broadcasts</span>
+              {broadcastCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                  {broadcastCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
         <ScrollArea className="flex-1">
@@ -253,24 +317,43 @@ export function ChatInterface() {
                   >
                     <div className="relative flex-shrink-0">
                       <Avatar className="h-11 w-11 border border-border/80">
-                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                          {other?.firstName?.[0] || 'U'}
-                          {other?.lastName?.[0] || ''}
-                        </AvatarFallback>
+                        {isBroadcastConversation(conv) ? (
+                          <AvatarFallback className="bg-emerald-100 text-emerald-800 font-bold text-xs">
+                            GB
+                          </AvatarFallback>
+                        ) : (
+                          <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                            {other?.firstName?.[0] || 'U'}
+                            {other?.lastName?.[0] || ''}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
-                      {roleName && (
-                        <span className="absolute -bottom-1 -right-1 px-1 py-0.2 text-[9px] font-semibold uppercase rounded bg-muted-foreground text-background border">
-                          {roleName.slice(0, 3)}
+                      {isBroadcastConversation(conv) ? (
+                        <span className="absolute -bottom-1 -right-1 px-1 py-0.2 text-[9px] font-semibold uppercase rounded bg-emerald-600 text-white border border-emerald-700">
+                          OFF
                         </span>
+                      ) : (
+                        roleName && (
+                          <span className="absolute -bottom-1 -right-1 px-1 py-0.2 text-[9px] font-semibold uppercase rounded bg-muted-foreground text-background border">
+                            {roleName.slice(0, 3)}
+                          </span>
+                        )
                       )}
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-0.5">
                         <span
-                          className={`font-medium text-sm truncate ${unreadCount > 0 ? 'text-primary font-bold' : ''}`}
+                          className={`font-medium text-sm truncate flex items-center gap-1 ${unreadCount > 0 ? 'text-primary font-bold' : ''}`}
                         >
-                          {other?.firstName || 'User'} {other?.lastName || ''}
+                          {isBroadcastConversation(conv) ? (
+                            <>
+                              <span>Gramer Bazar Official</span>
+                              <BadgeCheck className="h-3.5 w-3.5 text-emerald-600 fill-emerald-100 flex-shrink-0" />
+                            </>
+                          ) : (
+                            `${other?.firstName || 'User'} ${other?.lastName || ''}`
+                          )}
                         </span>
                         {lastMsg?.createdAt && (
                           <span className="text-[11px] text-muted-foreground flex-shrink-0 ms-1">
@@ -339,25 +422,43 @@ export function ChatInterface() {
                 </Button>
 
                 <Avatar className="h-10 w-10 border border-border/80 flex-shrink-0">
-                  <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                    {activeOtherParticipant?.firstName?.[0] || 'U'}
-                    {activeOtherParticipant?.lastName?.[0] || ''}
-                  </AvatarFallback>
+                  {isBroadcastConversation(activeConversation) ? (
+                    <AvatarFallback className="bg-emerald-100 text-emerald-800 font-bold text-xs">
+                      GB
+                    </AvatarFallback>
+                  ) : (
+                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                      {activeOtherParticipant?.firstName?.[0] || 'U'}
+                      {activeOtherParticipant?.lastName?.[0] || ''}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-sm truncate">
-                      {activeOtherParticipant?.firstName || 'User'}{' '}
-                      {activeOtherParticipant?.lastName || ''}
+                    <h3 className="font-semibold text-sm truncate flex items-center gap-1">
+                      {isBroadcastConversation(activeConversation) ? (
+                        <>
+                          <span>Gramer Bazar Official</span>
+                          <BadgeCheck className="h-4 w-4 text-emerald-600 fill-emerald-100 inline" />
+                        </>
+                      ) : (
+                        `${activeOtherParticipant?.firstName || 'User'} ${activeOtherParticipant?.lastName || ''}`
+                      )}
                     </h3>
-                    {activeOtherParticipant && getParticipantRoleName(activeOtherParticipant) && (
-                      <Badge
-                        variant="secondary"
-                        className="text-[10px] uppercase font-bold py-0 h-4"
-                      >
-                        {getParticipantRoleName(activeOtherParticipant)}
+                    {isBroadcastConversation(activeConversation) ? (
+                      <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-[10px] uppercase font-bold py-0 h-4">
+                        Official Broadcast
                       </Badge>
+                    ) : (
+                      activeOtherParticipant && getParticipantRoleName(activeOtherParticipant) && (
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] uppercase font-bold py-0 h-4"
+                        >
+                          {getParticipantRoleName(activeOtherParticipant)}
+                        </Badge>
+                      )
                     )}
                   </div>
 
@@ -423,10 +524,24 @@ export function ChatInterface() {
                           className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm text-sm break-words ${
                             isMe
                               ? 'bg-primary text-primary-foreground rounded-tr-xs'
-                              : 'bg-background border rounded-tl-xs text-foreground shadow-xs'
+                              : msg.content.startsWith('📢 [')
+                                ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-2 border-emerald-300 dark:border-emerald-800 rounded-tl-xs text-foreground shadow-xs'
+                                : 'bg-background border rounded-tl-xs text-foreground shadow-xs'
                           }`}
                         >
-                          <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                          {msg.content.startsWith('📢 [') ? (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 border-b border-emerald-200 dark:border-emerald-800 pb-1">
+                                <Megaphone className="h-3.5 w-3.5" />
+                                <span>Official Broadcast</span>
+                              </div>
+                              <p className="whitespace-pre-wrap leading-relaxed">
+                                {msg.content.replace(/^📢 /, '')}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                          )}
                           <div
                             className={`flex items-center justify-end gap-1 text-[10px] mt-1 ${
                               isMe ? 'text-primary-foreground/80' : 'text-muted-foreground'

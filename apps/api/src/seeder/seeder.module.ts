@@ -59,6 +59,8 @@ import { RiderProfile } from '../riders/entities/rider-profile.entity.js';
 import { RiderEarning } from '../riders/entities/rider-earning.entity.js';
 import { Otp } from '../otp/entities/otp.entity.js';
 import { BroadcastTemplate } from '../broadcast/entities/broadcast-template.entity.js';
+import { Broadcast } from '../broadcast/entities/broadcast.entity.js';
+import { BroadcastRecipient } from '../broadcast/entities/broadcast-recipient.entity.js';
 import { SeederController } from './seeder.controller.js';
 import { SeederService } from './seeder.service.js';
 
@@ -122,6 +124,8 @@ import { SeederService } from './seeder.service.js';
       RiderEarning,
       Otp,
       BroadcastTemplate,
+      Broadcast,
+      BroadcastRecipient,
     ]),
   ],
   controllers: [SeederController],

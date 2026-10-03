@@ -217,6 +217,7 @@ export const api = createApi({
     'AnnouncementTemplate',
     'Broadcast',
     'BroadcastTemplate',
+    'UserBroadcast',
   ],
   endpoints: () => ({}),
 });

@@ -10,11 +10,13 @@ import { User } from '../users/entities/user.entity.js';
 import { BroadcastTemplatesController } from './controllers/broadcast-templates.controller.js';
 import { BroadcastAudienceController } from './controllers/broadcast-audience.controller.js';
 import { BroadcastCampaignsController } from './controllers/broadcast-campaigns.controller.js';
+import { UserBroadcastsController } from './controllers/user-broadcasts.controller.js';
 
 import { BroadcastTemplatesService } from './services/broadcast-templates.service.js';
 import { BroadcastAudienceService } from './services/broadcast-audience.service.js';
 import { BroadcastCampaignsService } from './services/broadcast-campaigns.service.js';
 import { BroadcastProcessorService } from './services/broadcast-processor.service.js';
+import { UserBroadcastsService } from './services/user-broadcasts.service.js';
 
 import { BroadcastProviderRegistry } from './providers/broadcast-provider.registry.js';
 import { MockBroadcastProvider } from './providers/mock/mock-broadcast.provider.js';
@@ -34,16 +36,23 @@ import { WhatsAppBroadcastProvider } from './providers/whatsapp/whatsapp-broadca
     BroadcastTemplatesController,
     BroadcastAudienceController,
     BroadcastCampaignsController,
+    UserBroadcastsController,
   ],
   providers: [
     BroadcastTemplatesService,
     BroadcastAudienceService,
     BroadcastCampaignsService,
     BroadcastProcessorService,
+    UserBroadcastsService,
     MockBroadcastProvider,
     WhatsAppBroadcastProvider,
     BroadcastProviderRegistry,
   ],
-  exports: [BroadcastTemplatesService, BroadcastCampaignsService, BroadcastAudienceService],
+  exports: [
+    BroadcastTemplatesService,
+    BroadcastCampaignsService,
+    BroadcastAudienceService,
+    UserBroadcastsService,
+  ],
 })
 export class BroadcastModule {}

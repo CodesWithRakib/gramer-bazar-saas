@@ -26,6 +26,7 @@
     "swagger:export": "node dist/swagger/export-swagger.js",
     "swagger:generate": "nest build && node dist/swagger/export-swagger.js",
     "seed": "node dist/seeder/seed-cli.js",
+    "seed:prod": "node dist/seeder/seed-prod-cli.js",
     "verify:seed": "node dist/seeder/verify-seed.js",
     "typeorm": "node ./node_modules/typeorm/cli.js -d dist/config/data-source.js",
     "migration:show": "node ./node_modules/typeorm/cli.js migration:show -d dist/config/data-source.js",

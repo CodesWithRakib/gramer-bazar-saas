@@ -25,6 +25,7 @@ export interface Conversation {
   id: string;
   referenceId?: string | null;
   referenceType?: string | null;
+  canonicalKey?: string | null;
   participants: ConversationParticipant[];
   messages?: ChatMessage[];
   lastMessage?: ChatMessage | null;

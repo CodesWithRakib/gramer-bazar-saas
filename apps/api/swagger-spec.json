@@ -24462,9 +24462,18 @@
     },
     "/api/v1/dev/seed": {
       "post": {
-        "description": "Populates database with sample users, categories, products, shops, and inventory in non-production environments.",
+        "description": "Populates database with full sample users, categories, products, shops, inventory, orders, reviews, and broadcasts.",
         "operationId": "SeederController_seedDatabase",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-seed-secret",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Seeder completed successfully",
@@ -24539,7 +24548,7 @@
             }
           }
         },
-        "summary": "Seed database with sample data (Development only)",
+        "summary": "Seed database with sample data",
         "tags": [
           "System"
         ]
@@ -33027,6 +33036,345 @@
         "summary": "Paginated campaign recipient delivery list",
         "tags": [
           "Broadcast — Campaigns (Super Admin)"
+        ]
+      }
+    },
+    "/api/v1/broadcasts/my-inbox": {
+      "get": {
+        "operationId": "UserBroadcastsController_getMyInbox",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Filter by text search on title or message body",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unreadOnly",
+            "required": false,
+            "in": "query",
+            "description": "Filter only unread broadcast messages",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/UserBroadcastMessageDto"
+                              }
+                            },
+                            "meta": {
+                              "$ref": "#/components/schemas/PaginationMetaDto"
+                            }
+                          },
+                          "required": [
+                            "data",
+                            "meta"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized / Missing or Invalid Authentication Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List broadcast announcements and messages received by the current user",
+        "tags": [
+          "Broadcast — User Inbox"
+        ]
+      }
+    },
+    "/api/v1/broadcasts/my-inbox/unread-count": {
+      "get": {
+        "operationId": "UserBroadcastsController_getUnreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserBroadcastUnreadCountDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized / Missing or Invalid Authentication Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get total unread broadcast count for current user badge indicators",
+        "tags": [
+          "Broadcast — User Inbox"
+        ]
+      }
+    },
+    "/api/v1/broadcasts/my-inbox/{id}": {
+      "get": {
+        "operationId": "UserBroadcastsController_getMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserBroadcastMessageDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized / Missing or Invalid Authentication Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found / Requested resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get details of a specific broadcast message",
+        "tags": [
+          "Broadcast — User Inbox"
+        ]
+      }
+    },
+    "/api/v1/broadcasts/my-inbox/{id}/read": {
+      "patch": {
+        "operationId": "UserBroadcastsController_markAsRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserBroadcastMessageDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized / Missing or Invalid Authentication Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found / Requested resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a received broadcast message as read",
+        "tags": [
+          "Broadcast — User Inbox"
+        ]
+      }
+    },
+    "/api/v1/broadcasts/my-inbox/read-all": {
+      "patch": {
+        "operationId": "UserBroadcastsController_markAllAsRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "nullable": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized / Missing or Invalid Authentication Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark all received broadcast messages as read",
+        "tags": [
+          "Broadcast — User Inbox"
         ]
       }
     }
@@ -44364,6 +44712,85 @@
           "status",
           "attemptCount",
           "createdAt"
+        ]
+      },
+      "UserBroadcastMessageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Recipient record ID"
+          },
+          "broadcastId": {
+            "type": "string",
+            "description": "Broadcast campaign ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Campaign title or subject"
+          },
+          "templateName": {
+            "type": "object",
+            "description": "Template name"
+          },
+          "message": {
+            "type": "string",
+            "description": "Rendered personalized broadcast message"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "QUEUED",
+              "SENDING",
+              "SENT",
+              "DELIVERED",
+              "READ",
+              "FAILED"
+            ]
+          },
+          "isRead": {
+            "type": "boolean",
+            "description": "Whether the recipient has read the message"
+          },
+          "sentAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deliveredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "readAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "broadcastId",
+          "title",
+          "message",
+          "status",
+          "isRead",
+          "createdAt"
+        ]
+      },
+      "UserBroadcastUnreadCountDto": {
+        "type": "object",
+        "properties": {
+          "unreadCount": {
+            "type": "number",
+            "example": 3,
+            "description": "Total number of unread broadcast messages for current user"
+          }
+        },
+        "required": [
+          "unreadCount"
         ]
       },
       "ProductSearchResultResponseDto": {

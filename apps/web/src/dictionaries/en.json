@@ -692,5 +692,24 @@
       "title": "Payout Request Rejected",
       "message": "Your payout request for {{amount}} was declined."
     }
+  },
+  "broadcasts": {
+    "title": "Official Announcements & Broadcasts",
+    "subtitle": "Official platform announcements, seasonal offers, and urgent notices.",
+    "officialChannel": "Gramer Bazar Official Channel",
+    "officialUpdates": "Official updates from Gramer Bazar",
+    "viewInChat": "View in Chat",
+    "searchPlaceholder": "Search broadcasts...",
+    "all": "All",
+    "unread": "Unread",
+    "markAllRead": "Mark All Read",
+    "markRead": "Mark as Read",
+    "copyText": "Copy Text",
+    "copied": "Copied!",
+    "openInChat": "Open in Chat",
+    "noBroadcasts": "No Broadcast Messages Found",
+    "noBroadcastsDesc": "There are no active broadcast messages matching your criteria right now.",
+    "new": "New",
+    "read": "Read"
   }
 }

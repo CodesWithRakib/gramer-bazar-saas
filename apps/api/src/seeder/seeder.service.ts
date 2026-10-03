@@ -86,6 +86,20 @@ import { RiderApplication } from '../applications/entities/rider-application.ent
 import { ApplicationStatus } from '../applications/enums/application-status.enum.js';
 import { ProductRequest } from '../product-requests/entities/product-request.entity.js';
 import { BroadcastTemplate } from '../broadcast/entities/broadcast-template.entity.js';
+import { Broadcast } from '../broadcast/entities/broadcast.entity.js';
+import { BroadcastRecipient } from '../broadcast/entities/broadcast-recipient.entity.js';
+import {
+  BroadcastAudienceType,
+  BroadcastProviderName,
+  BroadcastRecipientStatus,
+  BroadcastStatus,
+} from '../broadcast/enums/broadcast.enums.js';
+import { SEED_BROADCAST_CAMPAIGNS } from './data/seed-broadcasts.data.js';
+import {
+  ConversationType,
+  MessageStatus,
+  MessageType,
+} from '../chat/enums/chat.enum.js';
 import {
   BROADCAST_DEMO_TEMPLATES,
   BROADCAST_DEMO_TEMPLATE_DEFAULTS,
@@ -195,6 +209,10 @@ export class SeederService {
     @InjectRepository(Otp) private otpRepo: Repository<Otp>,
     @InjectRepository(BroadcastTemplate)
     private broadcastTemplateRepo: Repository<BroadcastTemplate>,
+    @InjectRepository(Broadcast)
+    private broadcastRepo: Repository<Broadcast>,
+    @InjectRepository(BroadcastRecipient)
+    private broadcastRecipientRepo: Repository<BroadcastRecipient>,
   ) {}
 
   async seed() {
@@ -242,6 +260,7 @@ export class SeederService {
     await this.seedMarketing(sellerProducts);
     await this.seedOtps();
     await this.seedBroadcastDemoTemplates();
+    await this.seedBroadcastCampaigns(users);
 
     this.logger.log('--- Production-Ready Gramer Bazar Seed Completed Successfully ---');
     return {
@@ -264,6 +283,78 @@ export class SeederService {
         disputes: await this.disputeRepo.count(),
         payoutRequests: await this.payoutRequestRepo.count(),
         couponUsages: await this.couponUsageRepo.count(),
+      },
+    };
+  }
+
+  /**
+   * Essential production seeder.
+   * Only seeds required system data:
+   * 1. RBAC Roles & Permissions
+   * 2. Bangladesh Geo-Locations (Divisions, Districts, Upazilas, Unions)
+   * 3. Root Super Admin account (if not already present, reading credentials from env)
+   * 4. Catalog Categories, Brands, Attributes, and Vertical Taxonomies
+   * 5. Standard Broadcast Message Templates (WhatsApp / Chat)
+   *
+   * Completely excludes mock users, fake orders, fake payments, fake reviews, and test campaigns.
+   */
+  async seedEssential() {
+    this.logger.log('--- Production Essential System Data Seed Starting (Idempotent) ---');
+
+    await this.seedPermissionsAndRolePermissions();
+    await this.seedLocations();
+    const roles = await this.seedRoles();
+
+    // 1. Initial Root Super Admin (from ENV or secure defaults)
+    const adminEmail =
+      process.env.INITIAL_SUPERADMIN_EMAIL ||
+      process.env.ADMIN_EMAIL ||
+      'admin@gramerbazar.com';
+    const adminPassword =
+      process.env.INITIAL_SUPERADMIN_PASSWORD ||
+      process.env.ADMIN_PASSWORD ||
+      'Admin@GramerBazar2026!';
+
+    let rootAdmin = await this.userRepo.findOne({ where: { email: adminEmail } });
+    if (!rootAdmin) {
+      const superAdminRole = roles.get(Role.SUPER_ADMIN);
+      const passwordHash = await bcrypt.hash(adminPassword, 10);
+      const newAdmin = this.userRepo.create({
+        email: adminEmail,
+        passwordHash,
+        firstName: 'Platform',
+        lastName: 'Super Admin',
+        phone: process.env.INITIAL_SUPERADMIN_PHONE || '+8801700000000',
+        roles: superAdminRole ? [superAdminRole] : [],
+        status: UserStatus.ACTIVE,
+        isEmailVerified: true,
+        isPhoneVerified: true,
+      });
+      rootAdmin = await this.userRepo.save(newAdmin);
+      this.logger.log(`Created initial root Super Admin account: ${adminEmail}`);
+    } else {
+      this.logger.log(`Super Admin account already exists: ${adminEmail}. Skipping user creation.`);
+    }
+
+    // 2. Catalog Taxonomy & Verticals
+    const catalog = await this.seedCatalog();
+    await this.seedCategoryBrands(catalog.categories);
+    await this.seedCatalogVerticals();
+
+    // 3. Broadcast Templates (Standard WhatsApp & In-Chat message templates)
+    await this.seedBroadcastDemoTemplates();
+
+    this.logger.log('--- Production Essential System Data Seed Completed Successfully ---');
+    return {
+      message: 'Essential production system data seeded successfully.',
+      stats: {
+        roles: await this.roleRepo.count(),
+        permissions: await this.permissionRepo.count(),
+        divisions: await this.divisionRepo.count(),
+        districts: await this.districtRepo.count(),
+        categories: await this.categoryRepo.count(),
+        brands: await this.brandRepo.count(),
+        broadcastTemplates: await this.broadcastTemplateRepo.count(),
       },
     };
   }
@@ -417,6 +508,186 @@ export class SeederService {
           status: demo.status,
         }),
       );
+    }
+  }
+
+  /**
+   * Idempotently seed realistic demo broadcast campaigns and recipients across
+   * Customers, Sellers, and Riders. Also creates official in-chat conversation
+   * channels so recipients can see broadcasts directly in Chat as a preview
+   * for future direct WhatsApp integration.
+   */
+  async seedBroadcastCampaigns(users: {
+    superAdmin: User;
+    admin: User;
+    customer: User;
+    sellers: User[];
+    riders: User[];
+    customers: User[];
+  }) {
+    this.logger.log('Seeding demo broadcast campaigns, recipients, and in-chat official messaging...');
+    const now = new Date();
+
+    for (const campaignData of SEED_BROADCAST_CAMPAIGNS) {
+      let campaign = await this.broadcastRepo.findOne({
+        where: { title: campaignData.title },
+      });
+
+      const template = await this.broadcastTemplateRepo.findOne({
+        where: { name: campaignData.templateName },
+      });
+
+      let scheduledAt: Date | null = null;
+      if (campaignData.status === BroadcastStatus.SCHEDULED && campaignData.scheduledOffsetHours) {
+        scheduledAt = new Date(now.getTime() + campaignData.scheduledOffsetHours * 60 * 60 * 1000);
+      }
+
+      if (!campaign) {
+        campaign = await this.broadcastRepo.save(
+          this.broadcastRepo.create({
+            title: campaignData.title,
+            templateId: template?.id ?? null,
+            templateName: campaignData.templateName,
+            provider: campaignData.provider,
+            audienceType: campaignData.audienceType,
+            status: campaignData.status,
+            scheduledAt,
+            startedAt:
+              campaignData.status === BroadcastStatus.COMPLETED ||
+              campaignData.status === BroadcastStatus.PROCESSING
+                ? new Date(now.getTime() - 2 * 3600 * 1000)
+                : null,
+            completedAt:
+              campaignData.status === BroadcastStatus.COMPLETED
+                ? new Date(now.getTime() - 1 * 3600 * 1000)
+                : null,
+            totalRecipients: campaignData.totalRecipients,
+            sentCount: campaignData.sentCount,
+            deliveredCount: campaignData.deliveredCount,
+            readCount: campaignData.readCount,
+            failedCount: campaignData.failedCount,
+            createdBy: users.superAdmin.id,
+            createdByName: `${users.superAdmin.firstName || ''} ${users.superAdmin.lastName || ''}`.trim() || 'Super Admin',
+          }),
+        );
+      }
+
+      if (campaignData.totalRecipients === 0) continue;
+
+      let targetUsers: User[] = [];
+      if (campaignData.targetRole === 'CUSTOMER') {
+        targetUsers = users.customers;
+      } else if (campaignData.targetRole === 'SELLER') {
+        targetUsers = users.sellers;
+      } else if (campaignData.targetRole === 'RIDER') {
+        targetUsers = users.riders;
+      }
+
+      const assignedRecipients = targetUsers.slice(0, campaignData.totalRecipients);
+
+      for (let idx = 0; idx < assignedRecipients.length; idx++) {
+        const targetUser = assignedRecipients[idx];
+        const existingRecipient = await this.broadcastRecipientRepo.findOne({
+          where: { broadcastId: campaign.id, customerId: targetUser.id },
+        });
+
+        const customerName = `${targetUser.firstName || ''} ${targetUser.lastName || ''}`.trim() || targetUser.phone;
+        const renderedMessage = campaignData.messageTemplateBn.replace(/\{\{customer_name\}\}/g, customerName);
+
+        let recipientStatus = BroadcastRecipientStatus.SENT;
+        if (idx < campaignData.readCount) {
+          recipientStatus = BroadcastRecipientStatus.READ;
+        } else if (idx < campaignData.deliveredCount) {
+          recipientStatus = BroadcastRecipientStatus.DELIVERED;
+        }
+
+        if (!existingRecipient) {
+          await this.broadcastRecipientRepo.save(
+            this.broadcastRecipientRepo.create({
+              broadcastId: campaign.id,
+              customerId: targetUser.id,
+              customerName,
+              phone: targetUser.phone,
+              personalizedMessage: renderedMessage,
+              status: recipientStatus,
+              providerMessageId: `mock-seed-${campaign.id.slice(0, 8)}-${targetUser.id.slice(0, 8)}`,
+              attemptCount: 1,
+              sentAt: new Date(now.getTime() - 90 * 60 * 1000),
+              deliveredAt:
+                recipientStatus === BroadcastRecipientStatus.DELIVERED ||
+                recipientStatus === BroadcastRecipientStatus.READ
+                  ? new Date(now.getTime() - 80 * 60 * 1000)
+                  : null,
+              readAt:
+                recipientStatus === BroadcastRecipientStatus.READ
+                  ? new Date(now.getTime() - 60 * 60 * 1000)
+                  : null,
+            }),
+          );
+        }
+
+        // In-Chat Official Broadcast Channel Integration
+        if (
+          campaignData.status === BroadcastStatus.COMPLETED ||
+          campaignData.status === BroadcastStatus.PROCESSING
+        ) {
+          const canonicalKey = `broadcast:official:${targetUser.id}`;
+          let officialConv = await this.conversationRepo.findOne({
+            where: { canonicalKey },
+            relations: ['participants'],
+          });
+
+          if (!officialConv) {
+            officialConv = await this.conversationRepo.save(
+              this.conversationRepo.create({
+                canonicalKey,
+                type: ConversationType.DIRECT,
+                referenceType: 'BROADCAST',
+                referenceId: campaign.id,
+                participants: [users.superAdmin, targetUser],
+                lastMessagePreview: renderedMessage,
+                lastMessageAt: new Date(now.getTime() - 60 * 60 * 1000),
+              }),
+            );
+          }
+
+          const existingMsg = await this.messageRepo.findOne({
+            where: {
+              conversationId: officialConv.id,
+              metadata: { broadcastId: campaign.id } as any,
+            },
+          });
+
+          if (!existingMsg) {
+            await this.messageRepo.save(
+              this.messageRepo.create({
+                conversation: officialConv,
+                conversationId: officialConv.id,
+                sender: users.superAdmin,
+                senderId: users.superAdmin.id,
+                senderRole: 'SUPER_ADMIN',
+                content: `📢 [${campaign.title}]\n\n${renderedMessage}`,
+                isRead: recipientStatus === BroadcastRecipientStatus.READ,
+                status:
+                  recipientStatus === BroadcastRecipientStatus.READ
+                    ? MessageStatus.READ
+                    : MessageStatus.DELIVERED,
+                readAt:
+                  recipientStatus === BroadcastRecipientStatus.READ
+                    ? new Date(now.getTime() - 60 * 60 * 1000)
+                    : null,
+                deliveredAt: new Date(now.getTime() - 80 * 60 * 1000),
+                metadata: {
+                  isBroadcast: true,
+                  broadcastId: campaign.id,
+                  title: campaign.title,
+                  targetRole: campaignData.targetRole,
+                },
+              }),
+            );
+          }
+        }
+      }
     }
   }
 

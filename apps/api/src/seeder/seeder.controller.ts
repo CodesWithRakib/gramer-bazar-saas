@@ -4,6 +4,8 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  Headers,
+  ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
@@ -25,14 +27,21 @@ export class SeederController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Seed database with sample data (Development only)',
+    summary: 'Seed database with sample data',
     description:
-      'Populates database with sample users, categories, products, shops, and inventory in non-production environments.',
+      'Populates database with full sample users, categories, products, shops, inventory, orders, reviews, and broadcasts.',
   })
   @ApiStandardResponse({ type: SeederResponseDto, description: 'Seeder completed successfully' })
-  async seedDatabase() {
-    if (process.env.NODE_ENV === 'production') {
-      throw new InternalServerErrorException('Seeder cannot be run in production');
+  async seedDatabase(@Headers('x-seed-secret') seedSecretHeader?: string) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const allowProdSeed =
+      process.env.ALLOW_PRODUCTION_SEED === 'true' ||
+      Boolean(process.env.SEED_SECRET && seedSecretHeader === process.env.SEED_SECRET);
+
+    if (isProduction && !allowProdSeed) {
+      throw new ForbiddenException(
+        'Database seeder is disabled in production. Set ALLOW_PRODUCTION_SEED=true in environment variables or pass valid x-seed-secret header.',
+      );
     }
 
     try {
