@@ -37,6 +37,8 @@ export interface FacetOption {
   slug: string;
   value: string;
   valueBn: string | null;
+  /** Optional swatch colour (e.g. Fashion colour options). */
+  hexColor: string | null;
   count: number;
 }
 
@@ -347,15 +349,29 @@ export class ProductTypesService {
 
     for (const [slug, values] of Object.entries(filter.attributeFilters ?? {})) {
       if (!values || values.length === 0) continue;
+      // Match either a product-level spec value OR a variant-axis value
+      // (variant attributes are stored as JSON on the variant), so variant
+      // dimensions such as Fashion colour/size are filterable everywhere.
       where.push(
-        `EXISTS (
+        `(EXISTS (
            SELECT 1 FROM product_attribute_values pavf
            LEFT JOIN attribute_options aof ON aof.id = pavf.option_id
            JOIN attributes af ON af.id = pavf.attribute_id
            WHERE pavf.product_id = p.id
              AND af.slug = $${index}
              AND (aof.slug = ANY($${index + 1}::text[]) OR pavf.value_text = ANY($${index + 1}::text[]))
-         )`,
+         ) OR EXISTS (
+           SELECT 1
+             FROM product_variants pvf
+             JOIN LATERAL jsonb_each_text(pvf.attributes) je ON true
+             JOIN attributes af2 ON af2.slug = je.key
+             JOIN attribute_options ao2 ON ao2.attribute_id = af2.id AND ao2.is_active = true
+           WHERE pvf.product_id = p.id
+             AND pvf.is_active = true
+             AND af2.slug = $${index}
+             AND (ao2.slug = ANY($${index + 1}::text[]) OR ao2.value = ANY($${index + 1}::text[]))
+             AND je.value = ao2.value
+         ))`,
       );
       params.push(slug, values);
       index += 2;
@@ -403,22 +419,39 @@ export class ProductTypesService {
           slug: string;
           value: string;
           value_bn: string | null;
+          hex_color: string | null;
           count: string;
-        }> = await this.dataSource.query(
-          `SELECT ao.id, ao.slug, ao.value, ao.value_bn, COUNT(DISTINCT p.id)::int AS count
-             FROM attribute_options ao
-             LEFT JOIN product_attribute_values pav
-               ON pav.option_id = ao.id
-             LEFT JOIN products p ON p.id = pav.product_id
-             ${base.joins}
-             ${scopeFilter}
-             WHERE ao.attribute_id = $${scopeParams.length + 1}
-               AND ao.is_active = true
-               AND (${base.where})
-             GROUP BY ao.id, ao.slug, ao.value, ao.value_bn, ao.sort_order
-             ORDER BY ao.sort_order ASC, ao.value ASC`,
-          [...scopeParams, attribute.id],
-        );
+        }> = attribute.isVariantAxis
+          ? await this.dataSource.query(
+              `SELECT ao.id, ao.slug, ao.value, ao.value_bn, ao.hex_color, COUNT(DISTINCT p.id)::int AS count
+                 FROM attribute_options ao
+                 LEFT JOIN product_variants pv2
+                   ON pv2.is_active = true AND pv2.attributes ->> $${scopeParams.length + 2} = ao.value
+                 LEFT JOIN products p ON p.id = pv2.product_id
+                 ${base.joins}
+                 ${scopeFilter}
+                 WHERE ao.attribute_id = $${scopeParams.length + 1}
+                   AND ao.is_active = true
+                   AND (${base.where})
+                 GROUP BY ao.id, ao.slug, ao.value, ao.value_bn, ao.hex_color, ao.sort_order
+                 ORDER BY ao.sort_order ASC, ao.value ASC`,
+              [...scopeParams, attribute.id, attribute.slug],
+            )
+          : await this.dataSource.query(
+              `SELECT ao.id, ao.slug, ao.value, ao.value_bn, ao.hex_color, COUNT(DISTINCT p.id)::int AS count
+                 FROM attribute_options ao
+                 LEFT JOIN product_attribute_values pav
+                   ON pav.option_id = ao.id
+                 LEFT JOIN products p ON p.id = pav.product_id
+                 ${base.joins}
+                 ${scopeFilter}
+                 WHERE ao.attribute_id = $${scopeParams.length + 1}
+                   AND ao.is_active = true
+                   AND (${base.where})
+                 GROUP BY ao.id, ao.slug, ao.value, ao.value_bn, ao.hex_color, ao.sort_order
+                 ORDER BY ao.sort_order ASC, ao.value ASC`,
+              [...scopeParams, attribute.id],
+            );
         groups.push({
           attributeId: attribute.id,
           slug: attribute.slug,
@@ -431,6 +464,7 @@ export class ProductTypesService {
             slug: row.slug,
             value: row.value,
             valueBn: row.value_bn,
+            hexColor: row.hex_color,
             count: Number(row.count),
           })),
         });
@@ -538,17 +572,32 @@ export class ProductTypesService {
       const key = `af${counter}`;
       counter += 1;
       queryBuilder.andWhere(
-        `EXISTS (
-          SELECT 1 FROM product_attribute_values pav_${key}
-          LEFT JOIN attribute_options ao_${key} ON ao_${key}.id = pav_${key}.option_id
-          JOIN attributes a_${key} ON a_${key}.id = pav_${key}.attribute_id
-          WHERE pav_${key}.product_id = ${productAlias}.id
-            AND a_${key}.slug = :${key}_slug
-            AND (
-              ao_${key}.slug IN (:...${key}_values)
-              OR pav_${key}.value_text IN (:...${key}_values)
-              OR CAST(pav_${key}.value_number AS text) IN (:...${key}_values)
-            )
+        `(
+          EXISTS (
+            SELECT 1 FROM product_attribute_values pav_${key}
+            LEFT JOIN attribute_options ao_${key} ON ao_${key}.id = pav_${key}.option_id
+            JOIN attributes a_${key} ON a_${key}.id = pav_${key}.attribute_id
+            WHERE pav_${key}.product_id = ${productAlias}.id
+              AND a_${key}.slug = :${key}_slug
+              AND (
+                ao_${key}.slug IN (:...${key}_values)
+                OR pav_${key}.value_text IN (:...${key}_values)
+                OR CAST(pav_${key}.value_number AS text) IN (:...${key}_values)
+              )
+          )
+          OR EXISTS (
+            SELECT 1
+              FROM product_variants pv_${key}
+              JOIN LATERAL jsonb_each_text(pv_${key}.attributes) je_${key} ON true
+              JOIN attributes a2_${key} ON a2_${key}.slug = je_${key}.key
+              JOIN attribute_options ao2_${key}
+                ON ao2_${key}.attribute_id = a2_${key}.id AND ao2_${key}.is_active = true
+            WHERE pv_${key}.product_id = ${productAlias}.id
+              AND pv_${key}.is_active = true
+              AND a2_${key}.slug = :${key}_slug
+              AND (ao2_${key}.slug IN (:...${key}_values) OR ao2_${key}.value IN (:...${key}_values))
+              AND je_${key}.value = ao2_${key}.value
+          )
         )`,
         { [`${key}_slug`]: slug, [`${key}_values`]: values },
       );

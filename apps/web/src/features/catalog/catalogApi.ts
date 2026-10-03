@@ -36,6 +36,7 @@ export interface AttributeOption {
   attributeId: string;
   value: string;
   valueBn?: string | null;
+  hexColor?: string | null;
   slug: string;
   sortOrder: number;
   isActive: boolean;
@@ -59,6 +60,7 @@ export interface AttributeOptionInput {
   id?: string;
   value: string;
   valueBn?: string | null;
+  hexColor?: string | null;
   slug?: string | null;
   sortOrder?: number;
   isActive?: boolean;
@@ -93,6 +95,7 @@ export interface FacetOption {
   slug: string;
   value: string;
   valueBn: string | null;
+  hexColor?: string | null;
   count: number;
 }
 

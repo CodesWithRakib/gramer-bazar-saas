@@ -330,6 +330,13 @@ export function ProductFilterSidebar({
                               checked={isSelected}
                               className="pointer-events-none data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
+                            {option.hexColor ? (
+                              <span
+                                aria-hidden
+                                className="size-4 rounded-full border border-border shrink-0"
+                                style={{ backgroundColor: option.hexColor }}
+                              />
+                            ) : null}
                             <span className="text-xs md:text-sm truncate">
                               {isBn && option.valueBn ? option.valueBn : option.value}
                             </span>

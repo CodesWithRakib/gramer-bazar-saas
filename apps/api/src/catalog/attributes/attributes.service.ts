@@ -47,6 +47,7 @@ export class AttributesService {
         attributeId,
         value: option.value.trim(),
         valueBn: option.valueBn ?? null,
+        hexColor: option.hexColor ?? null,
         slug,
         sortOrder: option.sortOrder ?? index,
         isActive: option.isActive ?? true,

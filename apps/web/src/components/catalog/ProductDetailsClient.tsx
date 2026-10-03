@@ -21,7 +21,11 @@ import {
   Layers,
   MapPin,
   AlertTriangle,
+  Leaf,
+  Ruler,
+  Check,
 } from 'lucide-react';
+import { FashionSizeChartModal } from '@/components/catalog/FashionSizeChartModal';
 import { Button } from '@/components/ui/button';
 import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { ProductGrid } from '@/components/catalog/ProductGrid';
@@ -178,6 +182,167 @@ export function ProductDetailsClient({
     categoryPath.includes('medicine') ||
     categoryPath.includes('health') ||
     categoryPath.includes('pharma');
+  const isGrocery =
+    categoryPath.includes('grocery') ||
+    categoryPath.includes('fresh') ||
+    categoryPath.includes('food') ||
+    categoryPath.includes('vegetable') ||
+    categoryPath.includes('fruit') ||
+    categoryPath.includes('meat') ||
+    categoryPath.includes('fish') ||
+    categoryPath.includes('grain') ||
+    categoryPath.includes('rice') ||
+    categoryPath.includes('dal') ||
+    categoryPath.includes('dairy');
+  const isFashion =
+    categoryPath.includes('fashion') ||
+    categoryPath.includes('clothing') ||
+    categoryPath.includes('apparel') ||
+    categoryPath.includes('mens') ||
+    categoryPath.includes('womens') ||
+    categoryPath.includes('kid') ||
+    categoryPath.includes('shoe') ||
+    categoryPath.includes('footwear');
+
+  // Attribute helper
+  const getSpec = (slug: string) => {
+    for (const group of specGroups) {
+      for (const spec of group.specs) {
+        if (spec.slug === slug) return spec;
+      }
+    }
+    return null;
+  };
+
+  // Grocery Specs
+  const originSpec = getSpec('grocery-origin');
+  const organicSpec = getSpec('grocery-organic');
+  const storageSpec = getSpec('grocery-storage-type');
+  const shelfLifeSpec = getSpec('grocery-shelf-life');
+  const varietySpec = getSpec('grocery-variety');
+
+  // Fashion Specs
+  const materialSpec = getSpec('fashion-material');
+  const fitSpec = getSpec('fashion-fit');
+  const patternSpec = getSpec('fashion-pattern');
+  const genderSpec = getSpec('fashion-gender');
+  const sleeveSpec = getSpec('fashion-sleeve-type');
+  const neckSpec = getSpec('fashion-neck-type');
+  const careSpec = getSpec('fashion-care-instructions');
+
+  // Multi-variant parsing for Fashion (Color × Size)
+  const COLOR_HEX_MAP: Record<string, string> = {
+    black: '#1a1a1a',
+    white: '#ffffff',
+    red: '#d32f2f',
+    blue: '#1565c0',
+    green: '#2e7d32',
+    yellow: '#f9a825',
+    pink: '#ec407a',
+    purple: '#6a1b9a',
+    brown: '#6d4c41',
+    grey: '#757575',
+    gray: '#757575',
+    orange: '#ef6c00',
+    navy: '#1a237e',
+    maroon: '#800000',
+    beige: '#d7c4a3',
+  };
+
+  const COLOR_BN_MAP: Record<string, string> = {
+    black: 'কালো',
+    white: 'সাদা',
+    red: 'লাল',
+    blue: 'নীল',
+    green: 'সবুজ',
+    yellow: 'হলুদ',
+    pink: 'গোলাপি',
+    purple: 'বেগুনি',
+    brown: 'বাদামি',
+    grey: 'ধূসর',
+    gray: 'ধূসর',
+    orange: 'কমলা',
+    navy: 'নেভি ব্লু',
+    maroon: 'মেরুন',
+    beige: 'বেইজ',
+  };
+
+  const parsedVariants = products.map((p, idx) => {
+    const v = p.productVariant;
+    const attrs = ((v as any).attributes || {}) as Record<string, any>;
+    let color = attrs['fashion-color'];
+    let size =
+      attrs['fashion-size-clothing'] ||
+      attrs['fashion-size-numeric'] ||
+      attrs['fashion-size-kids'] ||
+      attrs['fashion-size-shoe-eu'] ||
+      attrs['fashion-size-shoe-uk'] ||
+      attrs['fashion-size-shoe-us'];
+
+    if (!color && v.nameEn && v.nameEn.includes('/')) {
+      const parts = v.nameEn.split('/').map((s) => s.trim());
+      if (parts.length >= 2) {
+        color = parts[0];
+        size = parts[1];
+      }
+    }
+
+    const vStock = p.inventory?.quantity ?? 0;
+    return {
+      index: idx,
+      product: p,
+      color: color ? String(color) : null,
+      size: size ? String(size) : null,
+      stock: vStock,
+      isOutOfStock: vStock <= 0,
+    };
+  });
+
+  const distinctColors = Array.from(
+    new Set(parsedVariants.map((pv) => pv.color).filter((c): c is string => !!c))
+  );
+  const distinctSizes = Array.from(
+    new Set(parsedVariants.map((pv) => pv.size).filter((s): s is string => !!s))
+  );
+  const hasColorAxis = distinctColors.length > 0;
+  const hasSizeAxis = distinctSizes.length > 0;
+
+  const activeParsed = parsedVariants[selectedVariantIdx];
+  const activeColor = activeParsed?.color || distinctColors[0] || null;
+  const activeSize = activeParsed?.size || distinctSizes[0] || null;
+
+  const handleSelectColor = (newColor: string) => {
+    let match = parsedVariants.find(
+      (pv) => pv.color === newColor && pv.size === activeSize && !pv.isOutOfStock
+    );
+    if (!match) {
+      match = parsedVariants.find((pv) => pv.color === newColor && !pv.isOutOfStock);
+    }
+    if (!match) {
+      match = parsedVariants.find((pv) => pv.color === newColor);
+    }
+    if (match) {
+      setSelectedVariantIdx(match.index);
+      setQuantity(1);
+      if (match.product.productVariant.images?.[0]) {
+        setActiveImage(match.product.productVariant.images[0]);
+      }
+    }
+  };
+
+  const handleSelectSize = (newSize: string) => {
+    let match = parsedVariants.find(
+      (pv) => pv.color === activeColor && pv.size === newSize
+    );
+    if (!match) {
+      match = parsedVariants.find((pv) => pv.size === newSize);
+    }
+    if (match) {
+      setSelectedVariantIdx(match.index);
+      setQuantity(1);
+    }
+  };
+
   const avgRating = masterProduct.averageRating || 0;
   const totalReviews = masterProduct.totalReviews || 0;
 
@@ -621,6 +786,39 @@ export function ProductDetailsClient({
                     <span>{isBn ? 'প্রেসক্রিপশন আবশ্যক' : 'Prescription Required'}</span>
                   </span>
                 )}
+
+                {/* Grocery-Specific Badges */}
+                {organicSpec && (organicSpec.displayValueEn.toLowerCase().includes('organic') || organicSpec.displayValueBn.includes('জৈব')) && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                    <Leaf className="h-3 w-3" />
+                    <span>{isBn ? '১০০% জৈব (Organic)' : '100% Organic'}</span>
+                  </span>
+                )}
+                {originSpec && originSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    <span>{isBn ? `উৎস: ${originSpec.displayValueBn}` : `Origin: ${originSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {storageSpec && storageSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    <span>{isBn ? `সংরক্ষণ: ${storageSpec.displayValueBn}` : `Storage: ${storageSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+
+                {/* Fashion-Specific Badges */}
+                {materialSpec && materialSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? `উপাদান: ${materialSpec.displayValueBn}` : `Material: ${materialSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {fitSpec && fitSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20">
+                    {isBn ? `ফিট: ${fitSpec.displayValueBn}` : `Fit: ${fitSpec.displayValueEn}`}
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -701,42 +899,157 @@ export function ProductDetailsClient({
 
               {/* Multi-Variant Selector (if multiple variants available) */}
               {products.length > 1 && (
-                <div className="mb-5">
-                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider mb-2.5">
-                    {isBn ? 'বিকল্পসমূহ নির্বাচন করুন:' : 'Select Option:'}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {products.map((p, idx) => {
-                      const pName = isBn
-                        ? p.productVariant.nameBn || p.productVariant.product.nameBn
-                        : p.productVariant.nameEn || p.productVariant.product.nameEn;
-                      const pPrice = p.discountPrice || p.price;
-                      const isSelected = selectedVariantIdx === idx;
-                      return (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedVariantIdx(idx);
-                            setQuantity(1);
-                          }}
-                          className={`p-2.5 rounded-xl border text-start transition-all flex flex-col justify-between ${
-                            isSelected
-                              ? 'border-primary bg-primary/10 shadow-xs'
-                              : 'border-border/70 hover:border-primary/40 bg-card'
-                          }`}
-                        >
-                          <span
-                            className={`text-xs font-semibold truncate ${isSelected ? 'text-primary' : 'text-foreground'}`}
+                <div className="mb-5 space-y-4">
+                  {/* Fashion Color Swatches */}
+                  {hasColorAxis && (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                          <span>{isBn ? 'রঙ (Color):' : 'Color:'}</span>
+                          <span className="text-primary normal-case font-extrabold">
+                            {activeColor && isBn ? (COLOR_BN_MAP[activeColor.toLowerCase()] || activeColor) : activeColor}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        {distinctColors.map((colorName) => {
+                          const isSelected = activeColor === colorName;
+                          const hex = COLOR_HEX_MAP[colorName.toLowerCase()] || '#6b7280';
+                          const isLight = hex.toLowerCase() === '#ffffff' || hex.toLowerCase() === '#fffdd0' || hex.toLowerCase() === '#d7c4a3';
+                          const colorStock = parsedVariants
+                            .filter((pv) => pv.color === colorName)
+                            .reduce((sum, cur) => sum + cur.stock, 0);
+                          const isColorOutOfStock = colorStock <= 0;
+
+                          return (
+                            <button
+                              key={colorName}
+                              type="button"
+                              onClick={() => handleSelectColor(colorName)}
+                              disabled={isColorOutOfStock}
+                              title={`${colorName}${isColorOutOfStock ? ' (Out of Stock)' : ''}`}
+                              aria-label={`Select Color ${colorName}`}
+                              className={`group relative flex items-center justify-center h-9 w-9 rounded-full transition-all ${
+                                isSelected
+                                  ? 'ring-2 ring-primary ring-offset-2 scale-110 shadow-sm'
+                                  : isColorOutOfStock
+                                    ? 'opacity-40 cursor-not-allowed border border-dashed border-border'
+                                    : 'hover:scale-105 border border-border/80'
+                              }`}
+                              style={{ backgroundColor: hex }}
+                            >
+                              {isSelected && (
+                                <Check className={`h-4 w-4 ${isLight ? 'text-zinc-900' : 'text-white'}`} />
+                              )}
+                              {isColorOutOfStock && (
+                                <span className="absolute inset-0 flex items-center justify-center">
+                                  <span className="w-full h-0.5 bg-destructive rotate-45" />
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fashion Size Selector Pills + Size Guide Modal Trigger */}
+                  {hasSizeAxis && (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                          <span>{isBn ? 'সাইজ (Size):' : 'Size:'}</span>
+                          <span className="text-primary normal-case font-extrabold">{activeSize}</span>
+                        </span>
+                        <FashionSizeChartModal
+                          lang={lang}
+                          categorySlug={category?.slug}
+                          productTypeName={masterProduct.productType?.nameEn}
+                        />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {distinctSizes.map((sizeName) => {
+                          const sizeVariant = parsedVariants.find(
+                            (pv) => pv.color === activeColor && pv.size === sizeName
+                          );
+                          const isSelected = activeSize === sizeName;
+                          const isSizeOutOfStock = !sizeVariant || sizeVariant.isOutOfStock;
+
+                          return (
+                            <button
+                              key={sizeName}
+                              type="button"
+                              disabled={isSizeOutOfStock}
+                              onClick={() => handleSelectSize(sizeName)}
+                              aria-label={isSizeOutOfStock ? `Size ${sizeName} — Out of Stock` : `Size ${sizeName}`}
+                              className={`min-w-11 h-9 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center select-none ${
+                                isSizeOutOfStock
+                                  ? 'border-border/50 bg-muted/40 text-muted-foreground line-through opacity-50 cursor-not-allowed'
+                                  : isSelected
+                                    ? 'border-primary bg-primary text-primary-foreground shadow-xs'
+                                    : 'border-border/80 hover:border-primary/50 bg-card text-foreground'
+                              }`}
+                            >
+                              {sizeName}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* All Sellable Variant Combinations Grid */}
+                  <div>
+                    <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                      {isBn ? 'বিকল্পসমূহ নির্বাচন করুন:' : 'Select Option:'}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {products.map((p, idx) => {
+                        const pName = isBn
+                          ? p.productVariant.nameBn || p.productVariant.product.nameBn
+                          : p.productVariant.nameEn || p.productVariant.product.nameEn;
+                        const pPrice = p.discountPrice || p.price;
+                        const isSelected = selectedVariantIdx === idx;
+                        const pOutOfStock = (p.inventory?.quantity ?? 0) <= 0;
+                        return (
+                          <button
+                            key={p.id}
+                            type="button"
+                            disabled={pOutOfStock}
+                            onClick={() => {
+                              setSelectedVariantIdx(idx);
+                              setQuantity(1);
+                              if (p.productVariant.images?.[0]) {
+                                setActiveImage(p.productVariant.images[0]);
+                              }
+                            }}
+                            aria-label={pOutOfStock ? `${pName} — Out of Stock` : pName}
+                            className={`p-2.5 rounded-xl border text-start transition-all flex flex-col justify-between ${
+                              pOutOfStock
+                                ? 'border-border/50 bg-muted/40 opacity-60 cursor-not-allowed'
+                                : isSelected
+                                  ? 'border-primary bg-primary/10 shadow-xs'
+                                  : 'border-border/70 hover:border-primary/40 bg-card'
+                            }`}
                           >
-                            {pName}
-                          </span>
-                          <span className="text-xs font-bold text-foreground mt-1 tabular-nums">
-                            {formatCurrency(pPrice, lang)}
-                          </span>
-                        </button>
-                      );
-                    })}
+                            <span
+                              className={`text-xs font-semibold truncate ${isSelected && !pOutOfStock ? 'text-primary' : 'text-foreground'}`}
+                            >
+                              {pName}
+                            </span>
+                            {pOutOfStock ? (
+                              <span className="text-[10px] font-bold text-destructive mt-0.5">
+                                {isBn ? 'স্টক নেই' : 'Out of Stock'}
+                              </span>
+                            ) : (
+                              <span className="text-xs font-bold text-foreground mt-1 tabular-nums">
+                                {formatCurrency(pPrice, lang)}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
@@ -857,6 +1170,36 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'রেজিস্টার্ড চিকিৎসকের নির্দেশনা অনুযায়ী সেবন করুন। প্রস্তাবিত মাত্রার অতিরিক্ত গ্রহণ করবেন না। সরাসরি আলো ও আর্দ্রতা থেকে দূরে, ঠাণ্ডা ও শুষ্ক স্থানে সংরক্ষণ করুন। শিশুদের নাগালের বাইরে রাখুন।'
                       : 'Use strictly as directed by a registered medical practitioner. Do not exceed the recommended dose. Store in a cool, dry place away from direct light and moisture. Keep out of reach of children.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Grocery Freshness & Cold Chain Assurance */}
+              {isGrocery && (
+                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-emerald-950 dark:text-emerald-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
+                    <Leaf className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    <span>{isBn ? 'খামার তাজা ও স্বাস্থ্যকর পণ্য নিশ্চয়তা' : 'Fresh Farm & Quality Hygiene Guarantee'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'আমাদের খাদ্য ও মুদি পণ্য সরাসরি বিশ্বস্ত কৃষক এবং অনুমোদিত প্রস্তুতকারকদের কাছ থেকে সংগৃহীত। স্বাস্থ্যসম্মত উপায়ে প্যাকেজিং ও দ্রুততম ডেলিভারির মাধ্যমে পণ্যের সতেজতা নিশ্চিত করা হয়।'
+                      : 'Sourced directly from verified farmers and certified food producers. Packed hygienically and delivered under strict temperature-controlled standards to preserve natural freshness.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Fashion Size & Hassle-Free Exchange Advisory */}
+              {isFashion && (
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-purple-950 dark:text-purple-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-purple-800 dark:text-purple-400">
+                    <Ruler className="h-4 w-4 shrink-0 text-purple-600 dark:text-purple-400" />
+                    <span>{isBn ? 'সাইজ ও ফিটিং নিশ্চয়তা — সহজ এক্সচেঞ্জ' : 'Fit & Size Guarantee — 7-Day Easy Exchange'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'সাইজে অমিল হলে ৭ দিনের মধ্যে সহজে সাইজ পরিবর্তন (Exchange) করার সুবিধা রয়েছে। অনুগ্রহ করে সাইজ চার্ট দেখে অর্ডার করুন।'
+                      : 'Need a different size? Enjoy our hassle-free 7-day size exchange guarantee on all unworn apparel with original tags attached.'}
                   </p>
                 </div>
               )}

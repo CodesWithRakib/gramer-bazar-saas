@@ -3,6 +3,8 @@ import { AttributeDataType } from '../../catalog/enums/attribute-data-type.enum.
 export interface SeedAttributeOption {
   value: string;
   valueBn?: string;
+  /** Optional swatch colour e.g. "#1a1a1a" (used by Fashion colour options). */
+  hexColor?: string;
 }
 
 export interface SeedAttribute {

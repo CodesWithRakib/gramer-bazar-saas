@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
   MaxLength,
   Min,
   ValidateNested,
@@ -38,6 +39,17 @@ export class AttributeOptionDto {
   @IsString()
   @MaxLength(150)
   slug?: string;
+
+  @ApiPropertyOptional({
+    example: '#1a1a1a',
+    description: 'Optional swatch colour for colour-like option sets',
+  })
+  @IsOptional()
+  @IsString()
+  @Matches(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, {
+    message: 'hexColor must be a hex colour such as #1a1a1a',
+  })
+  hexColor?: string;
 
   @ApiPropertyOptional({ default: 0 })
   @IsOptional()

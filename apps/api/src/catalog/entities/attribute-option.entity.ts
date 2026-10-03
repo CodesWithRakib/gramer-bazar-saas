@@ -39,6 +39,14 @@ export class AttributeOption {
   @Column()
   slug: string;
 
+  /**
+   * Optional swatch colour for colour-like option sets (e.g. Fashion colours).
+   * Kept generic so any vertical can present visual option swatches without a
+   * dedicated colour table.
+   */
+  @Column({ name: 'hex_color', type: 'varchar', length: 9, nullable: true })
+  hexColor: string | null;
+
   @Column({ name: 'sort_order', type: 'int', default: 0 })
   sortOrder: number;
 

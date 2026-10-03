@@ -36249,6 +36249,11 @@
             "example": "am5",
             "description": "Defaults to a slug of the value"
           },
+          "hexColor": {
+            "type": "string",
+            "example": "#1a1a1a",
+            "description": "Optional swatch colour for colour-like option sets"
+          },
           "sortOrder": {
             "type": "number",
             "default": 0

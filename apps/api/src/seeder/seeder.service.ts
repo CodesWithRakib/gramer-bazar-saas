@@ -42,6 +42,8 @@ import type {
   SeedVerticalVariant,
 } from './data/catalog-vertical.types.js';
 import { MEDICINE_VERTICAL } from './data/medicine-taxonomy.data.js';
+import { GROCERY_VERTICAL } from './data/grocery-taxonomy.data.js';
+import { FASHION_VERTICAL } from './data/fashion-taxonomy.data.js';
 import { slugify } from '../common/utils/slug.js';
 import { ProductStatus } from '../catalog/enums/product-status.enum.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
@@ -1173,6 +1175,7 @@ export class SeederService {
               attributeId: attribute.id,
               value: option.value,
               valueBn: option.valueBn ?? null,
+              hexColor: option.hexColor ?? null,
               slug: optionSlug,
               sortOrder: j,
               isActive: true,
@@ -1455,6 +1458,8 @@ export class SeederService {
     };
     await this.seedVerticalCatalog(electronics);
     await this.seedVerticalCatalog(MEDICINE_VERTICAL);
+    await this.seedVerticalCatalog(GROCERY_VERTICAL);
+    await this.seedVerticalCatalog(FASHION_VERTICAL);
   }
 
   private async seedVerticalCatalog(vertical: SeedVertical): Promise<void> {
