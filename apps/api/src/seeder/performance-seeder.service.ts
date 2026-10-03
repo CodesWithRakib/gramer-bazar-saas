@@ -19,7 +19,7 @@ export class PerformanceSeederService {
 
   constructor(private readonly dataSource: DataSource) {}
 
-  async seed(scale: number, randomSeed: number) {
+  async seed(scale: number, randomSeed: number, runId: number) {
     if (process.env.PERFORMANCE_DB !== 'true') {
       throw new Error(
         'Refusing to run performance seeder. PERFORMANCE_DB=true is required to prevent accidental data contamination.'
@@ -41,19 +41,19 @@ export class PerformanceSeederService {
 
     // 1. Generate Users & Sellers & Shops
     this.logger.log(`Generating ${numUsers} Users & Shops...`);
-    const userIds = await this.generateUsersAndShops(numUsers, numSellers, rng);
+    const userIds = await this.generateUsersAndShops(numUsers, numSellers, rng, runId);
     stats.users = numUsers;
     stats.sellers = numSellers;
     stats.shops = numSellers;
 
     // 2. Generate Categories
     this.logger.log(`Generating deep category tree...`);
-    const categoryIds = await this.generateCategories(rng);
+    const categoryIds = await this.generateCategories(rng, runId);
     stats.categories = categoryIds.length;
 
     // 3. Generate Brands
     this.logger.log(`Generating ${numBrands} Brands...`);
-    const brandIds = await this.generateBrands(numBrands, rng);
+    const brandIds = await this.generateBrands(numBrands, rng, runId);
     stats.brands = numBrands;
 
     // 4. Generate Products & Variants & SellerProducts & Inventory
@@ -64,7 +64,8 @@ export class PerformanceSeederService {
       brandIds, 
       userIds.sellers,
       userIds.shops,
-      rng
+      rng,
+      runId
     );
     stats.products = productsCreated;
     stats.variants = variantsCreated;
@@ -87,13 +88,13 @@ export class PerformanceSeederService {
     };
   }
 
-  private async generateUsersAndShops(numUsers: number, numSellers: number, rng: () => number) {
+  private async generateUsersAndShops(numUsers: number, numSellers: number, rng: () => number, runId: number) {
     const BATCH_SIZE = 5000;
     const users: any[] = [];
     const shops: any[] = [];
     const userIds = { customers: [] as string[], sellers: [] as string[], shops: [] as string[] };
 
-    const prefix = Date.now() % 10000;
+    const prefix = runId;
 
     for (let i = 0; i < numUsers; i++) {
       const isSeller = i < numSellers;
@@ -146,8 +147,8 @@ export class PerformanceSeederService {
     return userIds;
   }
 
-  private async generateCategories(rng: () => number) {
-    const prefix = Date.now() % 10000;
+  private async generateCategories(rng: () => number, runId: number) {
+    const prefix = runId;
     // Generate a structured tree up to 4 levels deep
     // ~ 10 roots, each 5 children, each 5 children, each 5 children = 10 + 50 + 250 + 1250 = ~1500 categories
     const categories: any[] = [];
@@ -196,8 +197,8 @@ export class PerformanceSeederService {
     return categoryIds;
   }
 
-  private async generateBrands(numBrands: number, rng: () => number) {
-    const prefix = Date.now() % 10000;
+  private async generateBrands(numBrands: number, rng: () => number, runId: number) {
+    const prefix = runId;
     const BATCH_SIZE = 2000;
     const brands: any[] = [];
     const brandIds: string[] = [];
@@ -230,9 +231,10 @@ export class PerformanceSeederService {
     brandIds: string[], 
     sellerIds: string[], 
     shopIds: string[],
-    rng: () => number
+    rng: () => number,
+    runId: number
   ) {
-    const prefix = Date.now() % 10000;
+    const prefix = runId;
     const BATCH_SIZE = 1000;
     let productsCreated = 0;
     let variantsCreated = 0;
@@ -302,7 +304,7 @@ export class PerformanceSeederService {
         productId,
         nameEn: `${nameEn} - Base Variant`,
         nameBn: `${nameBn} - বেস ভেরিয়েন্ট`,
-        sku: `SKU-PERF-${i}`,
+        sku: `SKU-PERF-${prefix}-${i}`,
       });
       variantsCreated++;
 

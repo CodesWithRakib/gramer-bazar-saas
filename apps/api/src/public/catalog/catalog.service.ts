@@ -65,23 +65,44 @@ export class CatalogService {
       sort = 'newest',
     } = searchDto;
 
-    const query = this.sellerProductRepo
+    // ────────────────────────────────────────────────────────
+    // PHASE 1 — Lightweight ID-only query
+    // Only the JOINs necessary for filtering & sorting.
+    // No images, no brand SELECT, no inventory (unless inStock).
+    // This lets PostgreSQL sort a minimal result set.
+    // ────────────────────────────────────────────────────────
+
+    const idQuery = this.sellerProductRepo
       .createQueryBuilder('sp')
-      .leftJoinAndSelect('sp.productVariant', 'pv')
-      .leftJoinAndSelect('pv.product', 'p')
-      .leftJoinAndSelect('p.category', 'cat')
-      .leftJoinAndSelect('p.subCategory', 'subCat')
-      .leftJoinAndSelect('p.images', 'images')
-      .leftJoinAndSelect('p.brand', 'b')
-      .leftJoinAndSelect('sp.shop', 'shop')
-      .leftJoinAndSelect('sp.inventory', 'inv')
+      .select('sp.id', 'sp_id')
+      .innerJoin('sp.productVariant', 'pv')
+      .innerJoin('pv.product', 'p')
+      .innerJoin('sp.shop', 'shop')
       .where('sp.isActive = :isActive', { isActive: true })
       .andWhere('pv.isActive = :isActive', { isActive: true })
       .andWhere('p.isActive = :isActive', { isActive: true })
       .andWhere('shop.isActive = :isActive', { isActive: true });
 
+    // ── Conditional JOINs (only when the filter actually needs them) ──
+
+    const needsCat = !!(searchDto.categoryPath || searchDto.categorySlug);
+    const needsSubCat = !!(searchDto.categorySlug || searchDto.subCategorySlug);
+    const needsInv = !!searchDto.inStock;
+
+    if (needsCat) {
+      idQuery.leftJoin('p.category', 'cat');
+    }
+    if (needsSubCat) {
+      idQuery.leftJoin('p.subCategory', 'subCat');
+    }
+    if (needsInv) {
+      idQuery.leftJoin('sp.inventory', 'inv');
+    }
+
+    // ── Filters (identical logic to the original) ──
+
     if (q) {
-      query.andWhere(
+      idQuery.andWhere(
         '(p.nameEn ILIKE :q OR p.nameBn ILIKE :q OR pv.nameEn ILIKE :q OR pv.nameBn ILIKE :q OR p.slug ILIKE :q OR EXISTS (SELECT 1 FROM product_attribute_values qav LEFT JOIN attribute_options qao ON qao.id = qav.option_id WHERE qav.product_id = p.id AND (qav.value_text ILIKE :q OR qao.value ILIKE :q OR qao.value_bn ILIKE :q)))',
         { q: `%${q}%` },
       );
@@ -90,7 +111,7 @@ export class CatalogService {
     // Category filter resolves the whole subtree via the materialized path, so
     // any taxonomy depth works without extra relations.
     if (categoryId) {
-      query.andWhere(
+      idQuery.andWhere(
         `(p.categoryId = :categoryId OR p.subCategoryId = :categoryId OR p.categoryId IN (
            WITH RECURSIVE descendants AS (
              SELECT id FROM categories WHERE id = :categoryId
@@ -104,63 +125,61 @@ export class CatalogService {
     }
 
     if (searchDto.categoryPath) {
-      query.andWhere("(cat.path = :categoryPath OR cat.path LIKE :categoryPathPrefix)", {
+      idQuery.andWhere("(cat.path = :categoryPath OR cat.path LIKE :categoryPathPrefix)", {
         categoryPath: searchDto.categoryPath,
         categoryPathPrefix: `${searchDto.categoryPath}/%`,
       });
     }
 
     if (searchDto.categorySlug) {
-      query.andWhere('(cat.slug = :categorySlug OR subCat.slug = :categorySlug)', {
+      idQuery.andWhere('(cat.slug = :categorySlug OR subCat.slug = :categorySlug)', {
         categorySlug: searchDto.categorySlug,
       });
     }
 
     if (subCategoryId) {
-      query.andWhere('p.subCategoryId = :subCategoryId', { subCategoryId });
+      idQuery.andWhere('p.subCategoryId = :subCategoryId', { subCategoryId });
     }
 
     if (searchDto.subCategorySlug) {
-      query.andWhere('subCat.slug = :subCategorySlug', {
+      idQuery.andWhere('subCat.slug = :subCategorySlug', {
         subCategorySlug: searchDto.subCategorySlug,
       });
     }
 
     if (searchDto.productTypeId) {
-      query.andWhere('p.productTypeId = :productTypeId', {
+      idQuery.andWhere('p.productTypeId = :productTypeId', {
         productTypeId: searchDto.productTypeId,
       });
     }
 
     const attributeFilters = this.parseAttributeFilters(searchDto.attributes);
     if (attributeFilters) {
-      this.productTypesService.applyAttributeFilters(query, 'p', attributeFilters);
+      this.productTypesService.applyAttributeFilters(idQuery, 'p', attributeFilters);
     }
 
     if (minPrice !== undefined) {
-      query.andWhere('sp.price >= :minPrice', { minPrice });
+      idQuery.andWhere('sp.price >= :minPrice', { minPrice });
     }
 
     if (maxPrice !== undefined) {
-      query.andWhere('sp.price <= :maxPrice', { maxPrice });
+      idQuery.andWhere('sp.price <= :maxPrice', { maxPrice });
     }
 
     if (searchDto.brandId) {
-      query.andWhere('p.brandId = :brandId', { brandId: searchDto.brandId });
+      idQuery.andWhere('p.brandId = :brandId', { brandId: searchDto.brandId });
     }
 
     if (searchDto.minRating !== undefined && searchDto.minRating > 0) {
-      query.andWhere('p.averageRating >= :minRating', { minRating: searchDto.minRating });
+      idQuery.andWhere('p.averageRating >= :minRating', { minRating: searchDto.minRating });
     }
 
     if (searchDto.inStock) {
-      query.andWhere('inv.quantity > 0');
+      idQuery.andWhere('inv.quantity > 0');
     }
 
-    // ----------------------------------------------------
-    // CURSOR & SORTING LOGIC
-    // ----------------------------------------------------
-    
+    // ── Cursor & Sorting ──
+
     let cursorPayload: any = null;
     if (cursor) {
       cursorPayload = PaginationUtils.decodeCursor(cursor);
@@ -172,52 +191,100 @@ export class CatalogService {
     switch (sort) {
       case 'price_asc':
         if (cursorPayload) {
-          query.andWhere('(sp.price > :price OR (sp.price = :price AND sp.id < :id))', {
+          idQuery.andWhere('(sp.price > :price OR (sp.price = :price AND sp.id < :id))', {
             price: cursorPayload.price,
             id: cursorPayload.id,
           });
         }
-        query.orderBy('sp.price', 'ASC').addOrderBy('sp.id', 'DESC');
+        idQuery.orderBy('sp.price', 'ASC').addOrderBy('sp.id', 'DESC');
         break;
       case 'price_desc':
         if (cursorPayload) {
-          query.andWhere('(sp.price < :price OR (sp.price = :price AND sp.id < :id))', {
+          idQuery.andWhere('(sp.price < :price OR (sp.price = :price AND sp.id < :id))', {
             price: cursorPayload.price,
             id: cursorPayload.id,
           });
         }
-        query.orderBy('sp.price', 'DESC').addOrderBy('sp.id', 'DESC');
+        idQuery.orderBy('sp.price', 'DESC').addOrderBy('sp.id', 'DESC');
         break;
       case 'name_asc':
         if (cursorPayload) {
-          query.andWhere('(p.nameEn > :name OR (p.nameEn = :name AND sp.id < :id))', {
+          idQuery.andWhere('(p.nameEn > :name OR (p.nameEn = :name AND sp.id < :id))', {
             name: cursorPayload.name,
             id: cursorPayload.id,
           });
         }
-        query.orderBy('p.nameEn', 'ASC').addOrderBy('sp.id', 'DESC');
+        idQuery.orderBy('p.nameEn', 'ASC').addOrderBy('sp.id', 'DESC');
         break;
       case 'newest':
       default:
         if (cursorPayload) {
-          query.andWhere('(sp.createdAt < :createdAt OR (sp.createdAt = :createdAt AND sp.id < :id))', {
+          idQuery.andWhere('(sp.createdAt < :createdAt OR (sp.createdAt = :createdAt AND sp.id < :id))', {
             createdAt: new Date(cursorPayload.createdAt),
             id: cursorPayload.id,
           });
         }
-        query.orderBy('sp.createdAt', 'DESC').addOrderBy('sp.id', 'DESC');
+        idQuery.orderBy('sp.createdAt', 'DESC').addOrderBy('sp.id', 'DESC');
         break;
     }
 
-    const limitPlusOne = limit + 1;
-    const items = await query.take(limitPlusOne).getMany();
+    // ── Execute Phase 1 ──
 
-    const hasNextPage = items.length > limit;
-    const slicedItems = hasNextPage ? items.slice(0, limit) : items;
+    const limitPlusOne = limit + 1;
+    const rawIds = await idQuery.limit(limitPlusOne).getRawMany();
+    const allIds: string[] = rawIds.map((r: any) => r.sp_id);
+
+    const hasNextPage = allIds.length > limit;
+    const pageIds = hasNextPage ? allIds.slice(0, limit) : allIds;
+
+    if (pageIds.length === 0) {
+      return {
+        data: [],
+        meta: PaginationUtils.buildCursorMeta([], limit, null),
+      };
+    }
+
+    // ────────────────────────────────────────────────────────
+    // PHASE 2 — Full hydration of only the winning IDs
+    // All 8 JOINs for the full entity graph, but only ~30 rows.
+    // ────────────────────────────────────────────────────────
+
+    const hydrateQuery = this.sellerProductRepo
+      .createQueryBuilder('sp')
+      .leftJoinAndSelect('sp.productVariant', 'pv')
+      .leftJoinAndSelect('pv.product', 'p')
+      .leftJoinAndSelect('p.category', 'cat')
+      .leftJoinAndSelect('p.subCategory', 'subCat')
+      .leftJoinAndSelect('p.images', 'images')
+      .leftJoinAndSelect('p.brand', 'b')
+      .leftJoinAndSelect('sp.shop', 'shop')
+      .leftJoinAndSelect('sp.inventory', 'inv')
+      .where('sp.id IN (:...ids)', { ids: pageIds });
+
+    // Apply the same ORDER BY so items come back in the correct order
+    switch (sort) {
+      case 'price_asc':
+        hydrateQuery.orderBy('sp.price', 'ASC').addOrderBy('sp.id', 'DESC');
+        break;
+      case 'price_desc':
+        hydrateQuery.orderBy('sp.price', 'DESC').addOrderBy('sp.id', 'DESC');
+        break;
+      case 'name_asc':
+        hydrateQuery.orderBy('p.nameEn', 'ASC').addOrderBy('sp.id', 'DESC');
+        break;
+      case 'newest':
+      default:
+        hydrateQuery.orderBy('sp.createdAt', 'DESC').addOrderBy('sp.id', 'DESC');
+        break;
+    }
+
+    const items = await hydrateQuery.getMany();
+
+    // ── Cursor construction (unchanged) ──
     
     let nextCursorPayload = null;
     if (hasNextPage) {
-      const lastItem = slicedItems[slicedItems.length - 1];
+      const lastItem = items[items.length - 1];
       nextCursorPayload = { sort, id: lastItem.id } as Record<string, any>;
       
       switch (sort) {
@@ -235,11 +302,15 @@ export class CatalogService {
       }
     }
 
-    await this.populateProductsMetadata(slicedItems);
+    await this.populateProductsMetadata(items);
+
+    // Build meta using an array with length = limitPlusOne if hasNextPage,
+    // so PaginationUtils.buildCursorMeta sees the overflow correctly.
+    const metaItems = hasNextPage ? [...items, items[0]] : items;
 
     return {
-      data: slicedItems,
-      meta: PaginationUtils.buildCursorMeta(items, limit, nextCursorPayload),
+      data: items,
+      meta: PaginationUtils.buildCursorMeta(metaItems, limit, nextCursorPayload),
     };
   }
 

@@ -12,14 +12,16 @@ async function bootstrap() {
     const seed = parseInt(process.env.SEED || '12345', 10);
 
     const seederService = app.get(PerformanceSeederService);
+    const runId = Date.now() % 100000;
     
     console.log(`\n==========================================`);
     console.log(`🚀 STARTING PERFORMANCE SEED`);
     console.log(`Scale (Target Products): ${scale}`);
     console.log(`Random Seed: ${seed}`);
+    console.log(`Run ID (Namespace): ${runId}`);
     console.log(`==========================================\n`);
 
-    const result = await seederService.seed(scale, seed);
+    const result = await seederService.seed(scale, seed, runId);
 
     console.log('\n==========================================');
     console.log('✅ PERFORMANCE SEED COMPLETED SUCCESSFULLY');
