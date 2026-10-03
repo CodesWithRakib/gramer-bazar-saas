@@ -2578,6 +2578,24 @@ export class SeederService {
     this.logger.log('Seeding realistic order disputes and communication logs...');
     if (orders.length === 0) return;
 
+    // Ensure PostgreSQL disputes_status_enum contains all required enum values
+    const requiredStatuses = [
+      'RESOLVED',
+      'REJECTED',
+      'WAITING_FOR_SELLER',
+      'WAITING_FOR_CUSTOMER',
+      'CANCELLED',
+    ];
+    for (const statusVal of requiredStatuses) {
+      try {
+        await this.dataSource.query(
+          `ALTER TYPE "public"."disputes_status_enum" ADD VALUE IF NOT EXISTS '${statusVal}'`,
+        );
+      } catch {
+        // Ignored if already present or not supported
+      }
+    }
+
     for (const item of SEED_DISPUTES) {
       const orderIndex = item.orderIndex % orders.length;
       const order = orders[orderIndex];
