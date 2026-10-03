@@ -10,6 +10,10 @@ import { Attribute } from './entities/attribute.entity.js';
 import { AttributeOption } from './entities/attribute-option.entity.js';
 import { ProductTypeAttribute } from './entities/product-type-attribute.entity.js';
 import { ProductAttributeValue } from './entities/product-attribute-value.entity.js';
+import { Manufacturer } from './entities/manufacturer.entity.js';
+import { Ingredient } from './entities/ingredient.entity.js';
+import { ProductIngredient } from './entities/product-ingredient.entity.js';
+import { MedicineBatch } from './entities/medicine-batch.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Shop } from '../shops/entities/shop.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
@@ -27,6 +31,13 @@ import { AttributesController } from './attributes/attributes.controller.js';
 import { AttributesService } from './attributes/attributes.service.js';
 import { ProductTypesController } from './product-types/product-types.controller.js';
 import { ProductTypesService } from './product-types/product-types.service.js';
+import { MedicineInventoryService } from './medicine/medicine-inventory.service.js';
+import { ManufacturersController } from './manufacturers/manufacturers.controller.js';
+import { ManufacturersService } from './manufacturers/manufacturers.service.js';
+import { IngredientsController } from './ingredients/ingredients.controller.js';
+import { IngredientsService } from './ingredients/ingredients.service.js';
+import { MedicineBatchesController } from './medicine/batches/medicine-batches.controller.js';
+import { MedicineBatchesService } from './medicine/batches/medicine-batches.service.js';
 
 import { ImportLog } from './importer/entities/import-log.entity.js';
 import { ProductImporterController } from './importer/product-importer.controller.js';
@@ -47,6 +58,10 @@ import { OpenFoodFactsAdapter } from './importer/adapters/openfoodfacts.adapter.
       AttributeOption,
       ProductTypeAttribute,
       ProductAttributeValue,
+      Manufacturer,
+      Ingredient,
+      ProductIngredient,
+      MedicineBatch,
       SellerProduct,
       Shop,
       Inventory,
@@ -60,6 +75,9 @@ import { OpenFoodFactsAdapter } from './importer/adapters/openfoodfacts.adapter.
     ProductVariantsController,
     AttributesController,
     ProductTypesController,
+    ManufacturersController,
+    IngredientsController,
+    MedicineBatchesController,
     ProductImporterController,
   ],
   providers: [
@@ -71,6 +89,10 @@ import { OpenFoodFactsAdapter } from './importer/adapters/openfoodfacts.adapter.
     ProductVariantsService,
     AttributesService,
     ProductTypesService,
+    MedicineInventoryService,
+    ManufacturersService,
+    IngredientsService,
+    MedicineBatchesService,
     ProductImporterService,
     DummyJsonAdapter,
     OpenFoodFactsAdapter,
@@ -83,6 +105,10 @@ import { OpenFoodFactsAdapter } from './importer/adapters/openfoodfacts.adapter.
     CategoriesService,
     AttributesService,
     ProductTypesService,
+    MedicineInventoryService,
+    ManufacturersService,
+    IngredientsService,
+    MedicineBatchesService,
     ProductImporterService,
   ],
 })

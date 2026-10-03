@@ -18,6 +18,10 @@ import { Attribute } from '../catalog/entities/attribute.entity.js';
 import { AttributeOption } from '../catalog/entities/attribute-option.entity.js';
 import { ProductTypeAttribute } from '../catalog/entities/product-type-attribute.entity.js';
 import { ProductAttributeValue } from '../catalog/entities/product-attribute-value.entity.js';
+import { Manufacturer } from '../catalog/entities/manufacturer.entity.js';
+import { Ingredient } from '../catalog/entities/ingredient.entity.js';
+import { ProductIngredient } from '../catalog/entities/product-ingredient.entity.js';
+import { MedicineBatch } from '../catalog/entities/medicine-batch.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Review } from '../reviews/entities/review.entity.js';
@@ -94,6 +98,10 @@ describe('SeederService - seedUsersAndShops', () => {
         { provide: getRepositoryToken(AttributeOption), useValue: makeRepo() },
         { provide: getRepositoryToken(ProductTypeAttribute), useValue: makeRepo() },
         { provide: getRepositoryToken(ProductAttributeValue), useValue: makeRepo() },
+        { provide: getRepositoryToken(Manufacturer), useValue: makeRepo() },
+        { provide: getRepositoryToken(Ingredient), useValue: makeRepo() },
+        { provide: getRepositoryToken(ProductIngredient), useValue: makeRepo() },
+        { provide: getRepositoryToken(MedicineBatch), useValue: makeRepo() },
         { provide: getRepositoryToken(SellerProduct), useValue: makeRepo() },
         { provide: getRepositoryToken(Inventory), useValue: makeRepo() },
         { provide: getRepositoryToken(Review), useValue: makeRepo() },

@@ -46,6 +46,14 @@ export class ValidatedCartItemResponseDto {
 
   @ApiPropertyOptional({ example: null, nullable: true })
   error: string | null;
+
+  @ApiPropertyOptional({
+    example: false,
+    description:
+      'True when the item is a regulated medicine that requires a prescription. ' +
+      'Prepared for the (not yet implemented) prescription verification workflow.',
+  })
+  requiresPrescription?: boolean;
 }
 
 export class CartValidationResultDto {

@@ -9,4 +9,6 @@ export * from './ProductTypeDialogs';
 export * from './ProductDialogs';
 export * from './CategoryDialogs';
 export * from './BrandDialogs';
+export * from './AdminManufacturersView';
+export * from './ManufacturerDialogs';
 export * from './ProductImporterModal';

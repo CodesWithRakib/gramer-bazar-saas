@@ -103,7 +103,12 @@
     "new": "New",
     "noProductsFound": "No products found",
     "relatedProducts": "Related Products",
-    "quickView": "Quick View"
+    "quickView": "Quick View",
+    "manufacturer": "Manufacturer",
+    "requiresPrescription": "Prescription Required",
+    "rxOnly": "Rx",
+    "medicineAdvisory": "Medicine & Healthcare Safety Advisory",
+    "medicineAdvisoryNotice": "Use strictly as directed by a registered medical practitioner. Do not exceed the recommended dose. Store in a cool, dry place away from direct light and moisture. Keep out of reach of children."
   },
   "category": {
     "allCategories": "All Categories",
@@ -203,6 +208,7 @@
   },
   "admin": {
     "brandManagement": "Brand Management",
+    "manufacturerManagement": "Manufacturer Directory",
     "productManagement": "Product Management",
     "categoryManagement": "Category Management",
     "shopManagement": "Shop Management",

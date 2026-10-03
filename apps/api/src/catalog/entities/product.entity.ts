@@ -18,6 +18,8 @@ import { ProductVariant } from './product-variant.entity.js';
 import { ProductImage } from './product-image.entity.js';
 import { ProductType } from './product-type.entity.js';
 import { ProductAttributeValue } from './product-attribute-value.entity.js';
+import { Manufacturer } from './manufacturer.entity.js';
+import { ProductIngredient } from './product-ingredient.entity.js';
 
 @Entity('products')
 @Index('idx_products_category_id', ['categoryId'])
@@ -29,6 +31,8 @@ import { ProductAttributeValue } from './product-attribute-value.entity.js';
 @Index('idx_products_status', ['status'])
 @Index('idx_products_created_at', ['createdAt'])
 @Index('idx_products_owner_shop_id', ['ownerShopId'])
+@Index('idx_products_manufacturer_id', ['manufacturerId'])
+@Index('idx_products_requires_prescription', ['requiresPrescription'])
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -72,6 +76,29 @@ export class Product {
   @ManyToOne(() => Brand, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'brand_id' })
   brand: Relation<Brand> | null;
+
+  /**
+   * Legal producer of the product. Kept separate from the brand so a brand can
+   * be manufactured by a different company (pharma requirement). Nullable so
+   * non-medicine verticals are unaffected.
+   */
+  @Column({ name: 'manufacturer_id', type: 'uuid', nullable: true })
+  manufacturerId: string | null;
+
+  @ManyToOne(() => Manufacturer, (manufacturer) => manufacturer.products, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'manufacturer_id' })
+  manufacturer: Relation<Manufacturer> | null;
+
+  /**
+   * Sellability flag consumed by cart/checkout validation for regulated goods.
+   * Mirrors the `prescription-required` attribute for fast enforcement without
+   * a join; both are populated from the same product authoring flow.
+   */
+  @Column({ name: 'requires_prescription', default: false })
+  requiresPrescription: boolean;
 
   @Column({ name: 'name_en', length: 255 })
   nameEn: string;
@@ -172,6 +199,11 @@ export class Product {
     cascade: true,
   })
   attributeValues: Relation<ProductAttributeValue>[];
+
+  @OneToMany(() => ProductIngredient, (link) => link.product, {
+    cascade: true,
+  })
+  ingredients: Relation<ProductIngredient[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

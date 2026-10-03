@@ -173,6 +173,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.subCategory', 'subCategory')
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.productType', 'productType')
+      .leftJoinAndSelect('product.manufacturer', 'manufacturer')
       .leftJoinAndSelect('product.images', 'images')
       .leftJoinAndSelect('product.variants', 'variants');
 
@@ -264,7 +265,15 @@ export class ProductsService {
   async findOne(id: string): Promise<ProductWithSpecs> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'subCategory', 'brand', 'productType', 'images', 'variants'],
+      relations: [
+        'category',
+        'subCategory',
+        'brand',
+        'manufacturer',
+        'productType',
+        'images',
+        'variants',
+      ],
       order: {
         images: {
           isPrimary: 'DESC',
@@ -285,7 +294,15 @@ export class ProductsService {
   async findBySlug(slug: string): Promise<ProductWithSpecs> {
     const product = await this.productsRepository.findOne({
       where: { slug },
-      relations: ['category', 'subCategory', 'brand', 'productType', 'images', 'variants'],
+      relations: [
+        'category',
+        'subCategory',
+        'brand',
+        'manufacturer',
+        'productType',
+        'images',
+        'variants',
+      ],
       order: {
         images: {
           isPrimary: 'DESC',

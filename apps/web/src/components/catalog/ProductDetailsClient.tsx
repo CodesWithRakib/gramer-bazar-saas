@@ -20,6 +20,7 @@ import {
   Clock,
   Layers,
   MapPin,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
@@ -167,8 +168,16 @@ export function ProductDetailsClient({
   const isOutOfStock = stock <= 0;
   const unit = masterProduct.unit;
   const brand = masterProduct.brand;
+  const manufacturer = masterProduct.manufacturer;
+  const requiresPrescription = masterProduct.requiresPrescription;
   const category = masterProduct.category;
   const subCategory = masterProduct.subCategory;
+  const categoryPath = `${category?.path || ''} ${category?.slug || ''}`.toLowerCase();
+  const isMedicine =
+    !!requiresPrescription ||
+    categoryPath.includes('medicine') ||
+    categoryPath.includes('health') ||
+    categoryPath.includes('pharma');
   const avgRating = masterProduct.averageRating || 0;
   const totalReviews = masterProduct.totalReviews || 0;
 
@@ -515,6 +524,17 @@ export function ProductDetailsClient({
                         </span>
                       </div>
                     )}
+                    {manufacturer && (
+                      <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
+                        <span className="font-semibold text-muted-foreground">
+                          {isBn ? 'প্রস্তুতকারক' : 'Manufacturer'}
+                        </span>
+                        <span className="col-span-2 font-medium text-foreground">
+                          {isBn ? manufacturer.nameBn : manufacturer.nameEn}
+                          {manufacturer.country ? ` (${manufacturer.country})` : ''}
+                        </span>
+                      </div>
+                    )}
                     {unit && (
                       <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
                         <span className="font-semibold text-muted-foreground">
@@ -584,9 +604,21 @@ export function ProductDetailsClient({
                     {isBn ? brand.nameBn : brand.nameEn}
                   </span>
                 )}
+                {manufacturer && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                    {isBn ? 'প্রস্তুতকারক: ' : 'Mfg: '}
+                    {isBn ? manufacturer.nameBn : manufacturer.nameEn}
+                  </span>
+                )}
                 {subCategory && (
                   <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground">
                     {isBn ? subCategory.nameBn : subCategory.nameEn}
+                  </span>
+                )}
+                {requiresPrescription && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <span className="font-serif font-black">Rx</span>
+                    <span>{isBn ? 'প্রেসক্রিপশন আবশ্যক' : 'Prescription Required'}</span>
                   </span>
                 )}
               </div>
@@ -813,6 +845,21 @@ export function ProductDetailsClient({
                   </div>
                 </div>
               </div>
+
+              {/* Medicine Safety Disclaimer Advisory (if medicine/pharma product) */}
+              {isMedicine && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-amber-950 dark:text-amber-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400">
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>{isBn ? 'ঔষধ ব্যবহারের সাধারণ নিরাপত্তা পরামর্শ' : 'Medicine & Healthcare Safety Advisory'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'রেজিস্টার্ড চিকিৎসকের নির্দেশনা অনুযায়ী সেবন করুন। প্রস্তাবিত মাত্রার অতিরিক্ত গ্রহণ করবেন না। সরাসরি আলো ও আর্দ্রতা থেকে দূরে, ঠাণ্ডা ও শুষ্ক স্থানে সংরক্ষণ করুন। শিশুদের নাগালের বাইরে রাখুন।'
+                      : 'Use strictly as directed by a registered medical practitioner. Do not exceed the recommended dose. Store in a cool, dry place away from direct light and moisture. Keep out of reach of children.'}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Merchant / Shop Information Card */}

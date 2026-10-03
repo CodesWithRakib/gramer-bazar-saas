@@ -15,6 +15,10 @@ import { Attribute } from '../catalog/entities/attribute.entity.js';
 import { AttributeOption } from '../catalog/entities/attribute-option.entity.js';
 import { ProductTypeAttribute } from '../catalog/entities/product-type-attribute.entity.js';
 import { ProductAttributeValue } from '../catalog/entities/product-attribute-value.entity.js';
+import { Manufacturer } from '../catalog/entities/manufacturer.entity.js';
+import { Ingredient } from '../catalog/entities/ingredient.entity.js';
+import { ProductIngredient } from '../catalog/entities/product-ingredient.entity.js';
+import { MedicineBatch } from '../catalog/entities/medicine-batch.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Review } from '../reviews/entities/review.entity.js';
@@ -74,6 +78,10 @@ import { SeederService } from './seeder.service.js';
       AttributeOption,
       ProductTypeAttribute,
       ProductAttributeValue,
+      Manufacturer,
+      Ingredient,
+      ProductIngredient,
+      MedicineBatch,
       SellerProduct,
       Inventory,
       Review,

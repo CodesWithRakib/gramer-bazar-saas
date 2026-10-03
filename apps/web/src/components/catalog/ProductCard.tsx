@@ -25,6 +25,7 @@ import {
   Wheat,
   Shirt,
   Utensils,
+  Activity,
 } from 'lucide-react';
 import type { SellerProduct } from '@/features/catalog/catalogApi';
 import { RootState } from '@/store/store';
@@ -200,6 +201,26 @@ function getCategoryTheme(
       badgeClass: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20',
       accentBorder: 'hover:border-primary/50',
       icon: 'shirt',
+    };
+  }
+
+  // Medicine, Healthcare & Pharmacy
+  if (
+    combined.includes('medicine') ||
+    combined.includes('health') ||
+    combined.includes('pharma') ||
+    combined.includes('ঔষধ') ||
+    combined.includes('স্বাস্থ্য') ||
+    combined.includes('tablet') ||
+    combined.includes('capsule') ||
+    combined.includes('syrup')
+  ) {
+    return {
+      type: 'medicine',
+      label: isBn ? 'স্বাস্থ্য ও ঔষধ' : 'Health & Medicine',
+      badgeClass: 'bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/20',
+      accentBorder: 'hover:border-teal-500/50',
+      icon: 'activity',
     };
   }
 
@@ -410,6 +431,8 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         return <ShieldCheck className="w-2.5 h-2.5" />;
       case 'zap':
         return <Zap className="w-2.5 h-2.5" />;
+      case 'activity':
+        return <Activity className="w-2.5 h-2.5" />;
       default:
         return <Sparkles className="w-2.5 h-2.5" />;
     }
@@ -437,6 +460,11 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
           {discountPercent !== null && discountPercent > 0 && !isOutOfStock && (
             <div className="bg-discount text-discount-foreground text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs tracking-tight">
               -{discountPercent}%
+            </div>
+          )}
+          {productData?.requiresPrescription && (
+            <div className="bg-amber-600 text-white text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-2xs tracking-tight flex items-center gap-0.5">
+              <span className="font-serif">Rx</span>
             </div>
           )}
         </div>

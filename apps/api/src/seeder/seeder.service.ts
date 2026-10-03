@@ -18,16 +18,30 @@ import { Attribute } from '../catalog/entities/attribute.entity.js';
 import { AttributeOption } from '../catalog/entities/attribute-option.entity.js';
 import { ProductTypeAttribute } from '../catalog/entities/product-type-attribute.entity.js';
 import { ProductAttributeValue } from '../catalog/entities/product-attribute-value.entity.js';
+import { Manufacturer } from '../catalog/entities/manufacturer.entity.js';
+import { Ingredient } from '../catalog/entities/ingredient.entity.js';
+import { ProductIngredient } from '../catalog/entities/product-ingredient.entity.js';
+import { MedicineBatch } from '../catalog/entities/medicine-batch.entity.js';
+import { BatchStatus } from '../catalog/enums/medicine-batch-status.enum.js';
 import { AttributeDataType } from '../catalog/enums/attribute-data-type.enum.js';
 import {
   ELECTRONICS_ATTRIBUTES,
   ELECTRONICS_BRANDS,
   ELECTRONICS_PRODUCTS,
   ELECTRONICS_TAXONOMY,
-  SeedAttribute,
-  SeedElectronicsProduct,
-  SeedTaxonomyNode,
 } from './data/electronics-taxonomy.data.js';
+import type {
+  SeedAttribute,
+  SeedBrand,
+  SeedManufacturer,
+  SeedProductIngredient,
+  SeedProductBatch,
+  SeedTaxonomyNode,
+  SeedVertical,
+  SeedVerticalProduct,
+  SeedVerticalVariant,
+} from './data/catalog-vertical.types.js';
+import { MEDICINE_VERTICAL } from './data/medicine-taxonomy.data.js';
 import { slugify } from '../common/utils/slug.js';
 import { ProductStatus } from '../catalog/enums/product-status.enum.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
@@ -133,6 +147,11 @@ export class SeederService {
     private productTypeAttributeRepo: Repository<ProductTypeAttribute>,
     @InjectRepository(ProductAttributeValue)
     private productAttributeValueRepo: Repository<ProductAttributeValue>,
+    @InjectRepository(Manufacturer) private manufacturerRepo: Repository<Manufacturer>,
+    @InjectRepository(Ingredient) private ingredientRepo: Repository<Ingredient>,
+    @InjectRepository(ProductIngredient)
+    private productIngredientRepo: Repository<ProductIngredient>,
+    @InjectRepository(MedicineBatch) private medicineBatchRepo: Repository<MedicineBatch>,
     @InjectRepository(SellerProduct) private sellerProductRepo: Repository<SellerProduct>,
     @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
     @InjectRepository(Review) private reviewRepo: Repository<Review>,
@@ -189,7 +208,7 @@ export class SeederService {
     const shops = await this.seedShops(users.sellers);
     const catalog = await this.seedCatalog();
     await this.seedCategoryBrands(catalog.categories);
-    await this.seedElectronicsCatalog();
+    await this.seedCatalogVerticals();
     const sellerProducts = await this.seedInventory(
       shops,
       catalog.products,
@@ -834,10 +853,13 @@ export class SeederService {
   //  Electronics vertical slice (taxonomy engine demonstration)
   // ==========================================================================
 
-  private async upsertElectronicsAttributes(): Promise<Map<string, Attribute>> {
+  private async upsertVerticalAttributes(
+    defs: SeedAttribute[],
+    label: string,
+  ): Promise<Map<string, Attribute>> {
     const map = new Map<string, Attribute>();
-    for (let i = 0; i < ELECTRONICS_ATTRIBUTES.length; i++) {
-      const def = ELECTRONICS_ATTRIBUTES[i];
+    for (let i = 0; i < defs.length; i++) {
+      const def = defs[i];
       let attribute = await this.attributeRepo.findOne({ where: { slug: def.slug } });
       if (!attribute) {
         attribute = await this.attributeRepo.save(
@@ -889,11 +911,14 @@ export class SeederService {
       }
       map.set(def.slug, attribute);
     }
-    this.logger.log(`Electronics attributes ready (${map.size}).`);
+    this.logger.log(`${label} attributes ready (${map.size}).`);
     return map;
   }
 
-  private async upsertElectronicsTaxonomy(): Promise<Map<string, Category>> {
+  private async upsertVerticalTaxonomy(
+    root: SeedTaxonomyNode,
+    label: string,
+  ): Promise<Map<string, Category>> {
     const byPath = new Map<string, Category>();
     const walk = async (
       node: SeedTaxonomyNode,
@@ -911,6 +936,7 @@ export class SeederService {
         descriptionBn: node.descriptionBn ?? category?.descriptionBn ?? null,
         level: parent ? (parent.level ?? 0) + 1 : 0,
         path,
+        isRegulated: node.isRegulated ?? parent?.isRegulated ?? false,
         isActive: true,
       };
       if (!category) {
@@ -926,14 +952,16 @@ export class SeederService {
         await walk(child, category, path);
       }
     };
-    await walk(ELECTRONICS_TAXONOMY, null, null);
-    this.logger.log(`Electronics taxonomy ready (${byPath.size} categories).`);
+    await walk(root, null, null);
+    this.logger.log(`${label} taxonomy ready (${byPath.size} categories).`);
     return byPath;
   }
 
-  private async upsertElectronicsProductTypes(
+  private async upsertVerticalProductTypes(
+    root: SeedTaxonomyNode,
     byPath: Map<string, Category>,
     attributes: Map<string, Attribute>,
+    label: string,
   ): Promise<Map<string, ProductType>> {
     const map = new Map<string, ProductType>();
     const walk = async (node: SeedTaxonomyNode, path: string): Promise<void> => {
@@ -981,29 +1009,67 @@ export class SeederService {
         await walk(child, `${path}/${child.slug}`);
       }
     };
-    await walk(ELECTRONICS_TAXONOMY, ELECTRONICS_TAXONOMY.slug);
-    this.logger.log(`Electronics product types ready (${map.size}).`);
+    await walk(root, root.slug);
+    this.logger.log(`${label} product types ready (${map.size}).`);
     return map;
   }
 
-  private async upsertElectronicsBrands(): Promise<Map<string, Brand>> {
+  private async upsertVerticalBrands(defs: SeedBrand[]): Promise<Map<string, Brand>> {
     const map = new Map<string, Brand>();
-    for (const name of ELECTRONICS_BRANDS) {
-      const slug = slugify(name, 'brand', 120);
+    for (const def of defs) {
+      const slug = slugify(def.name, 'brand', 120);
       let brand = await this.brandRepo.findOne({ where: { slug } });
       if (!brand) {
         brand = await this.brandRepo.save(
-          this.brandRepo.create({ nameEn: name, nameBn: name, slug, isActive: true }),
+          this.brandRepo.create({ nameEn: def.name, nameBn: def.name, slug, isActive: true }),
         );
       }
-      map.set(name, brand);
+      map.set(def.name, brand);
     }
     return map;
   }
 
-  private async saveElectronicsSpecs(
+  private async upsertVerticalManufacturers(
+    defs: SeedManufacturer[],
+  ): Promise<Map<string, Manufacturer>> {
+    const map = new Map<string, Manufacturer>();
+    for (const def of defs) {
+      const slug = slugify(def.name, 'manufacturer', 200);
+      let manufacturer = await this.manufacturerRepo.findOne({ where: { slug } });
+      const payload = {
+        nameEn: def.name,
+        nameBn: def.nameBn ?? def.name,
+        country: def.country ?? null,
+        website: def.website ?? null,
+        isActive: true,
+      };
+      if (!manufacturer) {
+        manufacturer = await this.manufacturerRepo.save(
+          this.manufacturerRepo.create({ slug, ...payload }),
+        );
+      } else {
+        Object.assign(manufacturer, payload);
+        manufacturer = await this.manufacturerRepo.save(manufacturer);
+      }
+      map.set(def.name, manufacturer);
+    }
+    return map;
+  }
+
+  private async upsertIngredient(name: string): Promise<Ingredient> {
+    const slug = slugify(name, 'ingredient', 200);
+    let ingredient = await this.ingredientRepo.findOne({ where: { slug } });
+    if (!ingredient) {
+      ingredient = await this.ingredientRepo.save(
+        this.ingredientRepo.create({ nameEn: name, nameBn: name, slug, isActive: true }),
+      );
+    }
+    return ingredient;
+  }
+
+  private async saveVerticalSpecs(
     productId: string,
-    specs: SeedElectronicsProduct['specs'],
+    specs: SeedVerticalProduct['specs'],
     attributes: Map<string, Attribute>,
   ): Promise<void> {
     await this.productAttributeValueRepo.delete({ productId });
@@ -1048,22 +1114,103 @@ export class SeederService {
     }
   }
 
-  private async seedElectronicsCatalog(): Promise<void> {
-    this.logger.log('Seeding scalable Electronics taxonomy engine...');
-    const attributes = await this.upsertElectronicsAttributes();
-    const byPath = await this.upsertElectronicsTaxonomy();
-    const productTypes = await this.upsertElectronicsProductTypes(byPath, attributes);
-    const brands = await this.upsertElectronicsBrands();
+  /** Persist structured active-ingredient composition for a product. */
+  private async saveVerticalComposition(
+    productId: string,
+    defs: SeedProductIngredient[] | undefined,
+    ingredientNames: Set<string>,
+  ): Promise<void> {
+    await this.productIngredientRepo.delete({ productId });
+    if (!defs || defs.length === 0) return;
+    const rows: ProductIngredient[] = [];
+    for (let i = 0; i < defs.length; i++) {
+      const def = defs[i];
+      ingredientNames.add(def.ingredient);
+      const ingredient = await this.upsertIngredient(def.ingredient);
+      rows.push(
+        this.productIngredientRepo.create({
+          productId,
+          ingredientId: ingredient.id,
+          strengthValue: def.strengthValue ?? null,
+          strengthUnit: def.strengthUnit ?? null,
+          percentage: def.percentage ?? null,
+          sortOrder: i,
+        }),
+      );
+    }
+    if (rows.length > 0) {
+      await this.productIngredientRepo.save(rows);
+    }
+  }
+
+  /** Persist (or refresh) FEFO batches for a sellable variant. */
+  private async saveVerticalBatches(
+    variantId: string,
+    defs: SeedProductBatch[] | undefined,
+  ): Promise<void> {
+    if (!defs || defs.length === 0) return;
+    for (const def of defs) {
+      const payload = {
+        productVariantId: variantId,
+        batchNumber: def.batchNumber,
+        manufacturingDate: def.manufacturingDate ?? null,
+        expiryDate: def.expiryDate,
+        quantity: def.quantity,
+        reservedQuantity: 0,
+        supplier: def.supplier ?? null,
+        purchaseCost: null,
+        status: (def.status ??
+          (new Date(def.expiryDate) < new Date() ? BatchStatus.EXPIRED : BatchStatus.ACTIVE)) as BatchStatus,
+      };
+      const existing = await this.medicineBatchRepo.findOne({
+        where: { productVariantId: variantId, batchNumber: def.batchNumber },
+      });
+      if (!existing) {
+        await this.medicineBatchRepo.save(this.medicineBatchRepo.create(payload));
+      } else {
+        Object.assign(existing, payload);
+        await this.medicineBatchRepo.save(existing);
+      }
+    }
+  }
+
+  private async seedCatalogVerticals(): Promise<void> {
+    const electronics: SeedVertical = {
+      key: 'electronics',
+      root: ELECTRONICS_TAXONOMY,
+      attributes: ELECTRONICS_ATTRIBUTES,
+      brands: ELECTRONICS_BRANDS.map((name) => ({ name })),
+      products: ELECTRONICS_PRODUCTS,
+    };
+    await this.seedVerticalCatalog(electronics);
+    await this.seedVerticalCatalog(MEDICINE_VERTICAL);
+  }
+
+  private async seedVerticalCatalog(vertical: SeedVertical): Promise<void> {
+    this.logger.log(`Seeding ${vertical.key} catalog vertical...`);
+    const attributes = await this.upsertVerticalAttributes(vertical.attributes, vertical.key);
+    const byPath = await this.upsertVerticalTaxonomy(vertical.root, vertical.key);
+    const productTypes = await this.upsertVerticalProductTypes(
+      vertical.root,
+      byPath,
+      attributes,
+      vertical.key,
+    );
+    const brands = await this.upsertVerticalBrands(vertical.brands);
+    const manufacturers = vertical.manufacturers
+      ? await this.upsertVerticalManufacturers(vertical.manufacturers)
+      : new Map<string, Manufacturer>();
+    const ingredientNames = new Set<string>();
 
     const shops = await this.shopRepo.find({ where: { isActive: true }, order: { createdAt: 'ASC' } });
     if (shops.length === 0) {
-      this.logger.warn('No active shops found; skipping Electronics product seeding.');
+      this.logger.warn(`No active shops found; skipping ${vertical.key} product seeding.`);
       return;
     }
 
     let created = 0;
-    for (let index = 0; index < ELECTRONICS_PRODUCTS.length; index++) {
-      const def = ELECTRONICS_PRODUCTS[index];
+    for (let index = 0; index < vertical.products.length; index++) {
+      const def = vertical.products[index];
       const category = byPath.get(def.categoryPath);
       if (!category) {
         this.logger.warn(`Skipping ${def.slug}: category ${def.categoryPath} not found`);
@@ -1071,6 +1218,7 @@ export class SeederService {
       }
       const productType = productTypes.get(def.productTypeSlug) ?? null;
       const brand = brands.get(def.brand) ?? null;
+      const manufacturer = def.manufacturer ? (manufacturers.get(def.manufacturer) ?? null) : null;
 
       let product = await this.productRepo.findOne({ where: { slug: def.slug } });
       const payload = {
@@ -1078,6 +1226,8 @@ export class SeederService {
         subCategoryId: null,
         productTypeId: productType?.id ?? null,
         brandId: brand?.id ?? null,
+        manufacturerId: manufacturer?.id ?? null,
+        requiresPrescription: def.requiresPrescription ?? false,
         nameEn: def.nameEn,
         nameBn: def.nameBn,
         shortDescriptionEn: def.shortDescriptionEn,
@@ -1104,9 +1254,10 @@ export class SeederService {
         product = await this.productRepo.save(product);
       }
 
-      await this.saveElectronicsSpecs(product.id, def.specs, attributes);
+      await this.saveVerticalSpecs(product.id, def.specs, attributes);
+      await this.saveVerticalComposition(product.id, def.ingredients, ingredientNames);
 
-      const variantDefs =
+      const variantDefs: SeedVerticalVariant[] =
         def.variants && def.variants.length > 0
           ? def.variants
           : [
@@ -1117,6 +1268,7 @@ export class SeederService {
                 price: def.price,
                 compareAtPrice: def.compareAtPrice,
                 stock: def.stock,
+                batches: def.batches,
               },
             ];
 
@@ -1139,6 +1291,9 @@ export class SeederService {
           Object.assign(variant, variantPayload);
           variant = await this.variantRepo.save(variant);
         }
+
+        const variantBatches = variantDef.batches ?? (vIndex === 0 ? def.batches : undefined);
+        await this.saveVerticalBatches(variant.id, variantBatches);
 
         const shop = shops[index % shops.length];
         const price = variantDef.price ?? def.price;
@@ -1184,7 +1339,7 @@ export class SeederService {
     }
 
     this.logger.log(
-      `Electronics catalog ready: ${created} new products, ${productTypes.size} product types, ${attributes.size} attributes.`,
+      `${vertical.key} catalog ready: ${created} new products, ${productTypes.size} product types, ${attributes.size} attributes, ${ingredientNames.size} ingredients.`,
     );
   }
 

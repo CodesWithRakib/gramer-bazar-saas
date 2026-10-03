@@ -25,6 +25,16 @@ export class CreateProductDto {
   @IsUUID()
   brandId?: string;
 
+  @ApiPropertyOptional({ description: 'Manufacturer ID (pharmaceutical/legal producer)' })
+  @IsOptional()
+  @IsUUID()
+  manufacturerId?: string;
+
+  @ApiPropertyOptional({ description: 'Whether the product requires a prescription (Rx)', default: false })
+  @IsOptional()
+  @IsBoolean()
+  requiresPrescription?: boolean;
+
   @ApiProperty({ description: 'English name of the product', maxLength: 255 })
   @IsString()
   @IsNotEmpty()

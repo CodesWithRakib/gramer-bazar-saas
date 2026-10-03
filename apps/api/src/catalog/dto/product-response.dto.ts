@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductStatus } from '../enums/product-status.enum.js';
 import { CategoryResponseDto } from './category-response.dto.js';
 import { BrandResponseDto } from './brand-response.dto.js';
+import { ManufacturerResponseDto } from './manufacturer.dto.js';
 
 export class ProductImageResponseDto {
   @ApiProperty({ example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', description: 'Image UUID' })
@@ -146,6 +147,26 @@ export class ProductResponseDto {
     description: 'Brand details',
   })
   brand?: BrandResponseDto | null;
+
+  @ApiPropertyOptional({
+    example: 'd1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6b',
+    nullable: true,
+    description: 'Manufacturer UUID',
+  })
+  manufacturerId: string | null;
+
+  @ApiPropertyOptional({
+    type: () => ManufacturerResponseDto,
+    nullable: true,
+    description: 'Manufacturer details',
+  })
+  manufacturer?: ManufacturerResponseDto | null;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Whether the product requires a prescription (Rx)',
+  })
+  requiresPrescription: boolean;
 
   @ApiPropertyOptional({
     example: 'Naturally cultivated red potatoes from Dinajpur',

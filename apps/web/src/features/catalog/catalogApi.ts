@@ -182,6 +182,54 @@ export interface Brand {
   updatedAt: string;
 }
 
+export interface Manufacturer {
+  id: string;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  country?: string | null;
+  logo?: string | null;
+  website?: string | null;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ManufacturerUpsertInput {
+  nameEn: string;
+  nameBn: string;
+  country?: string | null;
+  logo?: string | null;
+  website?: string | null;
+  isActive?: boolean;
+}
+
+export interface Ingredient {
+  id: string;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  isPrescriptionOnly: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MedicineBatch {
+  id: string;
+  productVariantId: string;
+  batchNumber: string;
+  manufacturingDate?: string | null;
+  expiryDate: string;
+  quantity: number;
+  reservedQuantity: number;
+  supplier?: string | null;
+  purchaseCost?: number | null;
+  status: 'ACTIVE' | 'EXPIRED' | 'BLOCKED' | 'DEPLETED';
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProductImage {
   id: string;
   productId: string;
@@ -225,6 +273,9 @@ export interface Product {
   subCategory?: Category | null;
   brandId: string | null;
   brand?: Brand | null;
+  manufacturerId?: string | null;
+  manufacturer?: Manufacturer | null;
+  requiresPrescription?: boolean;
   sku?: string | null;
   barcode?: string | null;
   price: number | string;
@@ -262,6 +313,8 @@ export interface CreateProductDto {
   categoryId: string;
   subCategoryId?: string | null;
   brandId?: string | null;
+  manufacturerId?: string | null;
+  requiresPrescription?: boolean;
   productTypeId?: string | null;
   attributeValues?: Array<{
     attributeId?: string;
@@ -334,6 +387,8 @@ export interface SellerProduct {
       category: Category;
       subCategory?: Category | null;
       brand?: Brand | null;
+      manufacturer?: Manufacturer | null;
+      requiresPrescription?: boolean;
       productType?: ProductType | null;
       specGroups?: ProductSpecGroup[];
       averageRating?: number;
@@ -650,6 +705,46 @@ export const catalogApi = api
         }),
         invalidatesTags: ['Catalog'],
       }),
+      getManufacturers: builder.query<
+        Manufacturer[],
+        { search?: string; isActive?: boolean } | void
+      >({
+        query: (params) => ({ url: '/manufacturers', params: params ?? undefined }),
+        providesTags: ['Catalog'],
+      }),
+      createAdminManufacturer: builder.mutation<Manufacturer, ManufacturerUpsertInput>({
+        query: (body) => ({ url: '/manufacturers', method: 'POST', body }),
+        invalidatesTags: ['Catalog'],
+      }),
+      updateAdminManufacturer: builder.mutation<
+        Manufacturer,
+        { id: string; data: Partial<ManufacturerUpsertInput> }
+      >({
+        query: ({ id, data }) => ({
+          url: `/manufacturers/${id}`,
+          method: 'PATCH',
+          body: data,
+        }),
+        invalidatesTags: ['Catalog'],
+      }),
+      deleteAdminManufacturer: builder.mutation<void, string>({
+        query: (id) => ({ url: `/manufacturers/${id}`, method: 'DELETE' }),
+        invalidatesTags: ['Catalog'],
+      }),
+      getIngredients: builder.query<
+        Ingredient[],
+        { search?: string; isActive?: boolean } | void
+      >({
+        query: (params) => ({ url: '/ingredients', params: params ?? undefined }),
+        providesTags: ['Catalog'],
+      }),
+      getMedicineBatches: builder.query<
+        MedicineBatch[],
+        { productVariantId?: string; status?: string; search?: string } | void
+      >({
+        query: (params) => ({ url: '/medicine/batches', params: params ?? undefined }),
+        providesTags: ['Catalog'],
+      }),
       searchProducts: builder.query<SearchResponse, SearchParams>({
         query: (params) => {
           // Strip out undefined, null, or empty string values
@@ -803,6 +898,12 @@ export const {
   useGetCategoriesTreeQuery,
   useGetAdminCategoriesQuery,
   useGetAdminBrandsQuery,
+  useGetManufacturersQuery,
+  useCreateAdminManufacturerMutation,
+  useUpdateAdminManufacturerMutation,
+  useDeleteAdminManufacturerMutation,
+  useGetIngredientsQuery,
+  useGetMedicineBatchesQuery,
   useGetAdminProductsQuery,
   useSearchProductsQuery,
   useGetFeaturedProductsQuery,

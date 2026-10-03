@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Package, Tag, Building2, ClipboardList, Layers, SlidersHorizontal } from 'lucide-react';
+import { Package, Tag, Building2, Building, ClipboardList, Layers, SlidersHorizontal } from 'lucide-react';
 import DashboardHubOverview, { HubCardItem } from '@/components/dashboard/DashboardHubOverview';
 
 export interface ProductsHubViewProps {
@@ -87,6 +87,20 @@ export function ProductsHubView({
       href: `/${basePath}/products/brands`,
       badge: 'Directory',
       badgeBn: 'ব্র্যান্ড তালিকা',
+      badgeVariant: 'secondary',
+    },
+    {
+      id: 'manufacturers',
+      title: 'Manufacturers Directory',
+      titleBn: 'প্রস্তুতকারক তালিকা',
+      description:
+        'Manage verified pharmaceutical producers, legal manufacturing companies, countries of origin, and compliance details.',
+      descriptionBn:
+        'যাচাইকৃত ওষুধ ও স্বাস্থ্যপণ্য প্রস্তুতকারী কোম্পানি, উৎপাদনকারী প্রতিষ্ঠান এবং বিবরণ পরিচালনা করুন।',
+      icon: Building,
+      href: `/${basePath}/products/manufacturers`,
+      badge: 'Pharma / Producer',
+      badgeBn: 'প্রস্তুতকারক',
       badgeVariant: 'secondary',
     },
     {

@@ -103,7 +103,12 @@
     "new": "নতুন",
     "noProductsFound": "কোন পণ্য পাওয়া যায়নি",
     "relatedProducts": "সম্পর্কিত পণ্য",
-    "quickView": "এক নজরে দেখুন"
+    "quickView": "এক নজরে দেখুন",
+    "manufacturer": "প্রস্তুতকারক",
+    "requiresPrescription": "প্রেসক্রিপশন আবশ্যক",
+    "rxOnly": "আরএক্স",
+    "medicineAdvisory": "ঔষধ ব্যবহারের সাধারণ নিরাপত্তা পরামর্শ",
+    "medicineAdvisoryNotice": "রেজিস্টার্ড চিকিৎসকের নির্দেশনা অনুযায়ী সেবন করুন। প্রস্তাবিত মাত্রার অতিরিক্ত গ্রহণ করবেন না। সরাসরি আলো ও আর্দ্রতা থেকে দূরে, ঠাণ্ডা ও শুষ্ক স্থানে সংরক্ষণ করুন। শিশুদের নাগালের বাইরে রাখুন।"
   },
   "category": {
     "allCategories": "সকল ক্যাটাগরি",
@@ -203,6 +208,7 @@
   },
   "admin": {
     "brandManagement": "ব্র্যান্ড ব্যবস্থাপনা",
+    "manufacturerManagement": "প্রস্তুতকারক ডিরেক্টরি",
     "productManagement": "পণ্য ব্যবস্থাপনা",
     "categoryManagement": "ক্যাটাগরি ব্যবস্থাপনা",
     "shopManagement": "দোকান ব্যবস্থাপনা",
