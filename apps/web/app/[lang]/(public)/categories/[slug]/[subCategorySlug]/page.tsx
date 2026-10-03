@@ -15,6 +15,7 @@ import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 export default function SubCategoryDetailsPage({
   params,
@@ -49,10 +50,16 @@ export default function SubCategoryDetailsPage({
     ? Number(searchParams.get('minRating'))
     : undefined;
   const sort = searchParams.get('sort') || 'newest';
-  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = 20;
+
+  const [cursor, setCursor] = React.useState<string | undefined>(undefined);
+
+  React.useEffect(() => {
+    setCursor(undefined);
+  }, [brandId, minPrice, maxPrice, inStock, minRating, sort, limit]);
 
   // Search products filtered by categorySlug AND subCategorySlug
-  const { data: productsData, isLoading: isProductsLoading } = useSearchProductsQuery({
+  const { data: productsData, isLoading: isProductsLoading, isFetching } = useSearchProductsQuery({
     categorySlug: slug,
     subCategorySlug,
     brandId,
@@ -61,8 +68,8 @@ export default function SubCategoryDetailsPage({
     inStock,
     minRating,
     sort,
-    page,
-    limit: 20,
+    cursor,
+    limit,
   });
 
   const updateUrl = (key: string, value: string | number | null) => {
@@ -79,6 +86,20 @@ export default function SubCategoryDetailsPage({
   const meta = productsData?.meta;
   const isEmpty = productsData?.data?.length === 0;
   const siblingSubcategories = parentCategory?.children || [];
+
+  const observerRef = React.useRef<IntersectionObserver | null>(null);
+  const lastItemRef = React.useCallback((node: HTMLDivElement | null) => {
+    if (isProductsLoading || isFetching) return;
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && meta?.hasNextPage && meta.nextCursor) {
+        setCursor(meta.nextCursor);
+      }
+    });
+
+    if (node) observerRef.current.observe(node);
+  }, [isProductsLoading, isFetching, meta?.hasNextPage, meta?.nextCursor]);
 
   if (isTreeLoading) {
     return (
@@ -170,8 +191,8 @@ export default function SubCategoryDetailsPage({
                       ? 'লোড হচ্ছে...'
                       : 'Loading products...'
                     : isBn
-                      ? `${meta?.total || 0} টি পণ্য পাওয়া গেছে`
-                      : `${meta?.total || 0} products available`}
+                      ? 'পণ্য তালিকা'
+                      : 'Product Listing'}
                 </p>
               </div>
 
@@ -269,34 +290,24 @@ export default function SubCategoryDetailsPage({
             <>
               <ProductGrid
                 products={productsData?.data}
-                isLoading={isProductsLoading}
+                isLoading={isProductsLoading && !cursor}
                 lang={lang}
               />
 
-              {/* Server-side Pagination */}
-              {meta && meta.totalPages > 1 && (
-                <div className="mt-10 flex justify-center items-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => updateUrl('page', page - 1)}
-                  >
-                    <ChevronLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-                    {isBn ? 'পূর্ববর্তী' : 'Prev'}
-                  </Button>
-                  <span className="text-xs md:text-sm font-semibold text-muted-foreground">
-                    {page} / {meta.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= meta.totalPages}
-                    onClick={() => updateUrl('page', page + 1)}
-                  >
-                    {isBn ? 'পরবর্তী' : 'Next'}
-                    <ChevronRight className="w-4 h-4 ms-1 rtl:rotate-180" />
-                  </Button>
+              {/* Infinite Loading Trigger */}
+              {meta?.hasNextPage && (
+                <div ref={lastItemRef} className="w-full flex items-center justify-center py-8 mt-4">
+                  <div className="flex items-center gap-2 text-primary font-medium">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>{isBn ? 'আরও পণ্য লোড হচ্ছে...' : 'Loading more products...'}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* End of results indicator */}
+              {!meta?.hasNextPage && productsData?.data && productsData.data.length > 0 && (
+                <div className="w-full flex justify-center py-8 text-sm text-muted-foreground">
+                  {isBn ? 'সবগুলো পণ্য দেখানো হয়েছে।' : 'End of products.'}
                 </div>
               )}
             </>

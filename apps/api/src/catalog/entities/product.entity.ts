@@ -205,6 +205,12 @@ export class Product {
   })
   ingredients: Relation<ProductIngredient[]>;
 
+  @Column({ name: 'average_rating', type: 'decimal', precision: 3, scale: 2, default: 0 })
+  averageRating: number;
+
+  @Column({ name: 'total_reviews', type: 'int', default: 0 })
+  totalReviews: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

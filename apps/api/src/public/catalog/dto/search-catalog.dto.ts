@@ -1,13 +1,9 @@
 import { IsOptional, IsString, IsNumber, Min, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { CursorPaginationDto } from '../../../common/dto/pagination.dto.js';
 
-export class SearchCatalogDto {
-  @ApiPropertyOptional({ description: 'Search query (matches nameEn, nameBn)' })
-  @IsOptional()
-  @IsString()
-  q?: string;
-
+export class SearchCatalogDto extends CursorPaginationDto {
   @ApiPropertyOptional({ description: 'Filter by Category ID' })
   @IsOptional()
   @IsUUID()
@@ -41,20 +37,6 @@ export class SearchCatalogDto {
   @IsNumber()
   @Min(0)
   maxPrice?: number;
-
-  @ApiPropertyOptional({ description: 'Page number', default: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  page: number = 1;
-
-  @ApiPropertyOptional({ description: 'Items per page', default: 20 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  limit: number = 20;
 
   @ApiPropertyOptional({ description: 'Filter by Brand ID' })
   @IsOptional()
@@ -99,5 +81,5 @@ export class SearchCatalogDto {
   })
   @IsOptional()
   @IsString()
-  sort: string = 'newest';
+  sort?: string = 'newest';
 }

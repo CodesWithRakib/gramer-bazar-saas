@@ -63,6 +63,7 @@ import { Broadcast } from '../broadcast/entities/broadcast.entity.js';
 import { BroadcastRecipient } from '../broadcast/entities/broadcast-recipient.entity.js';
 import { SeederController } from './seeder.controller.js';
 import { SeederService } from './seeder.service.js';
+import { PerformanceSeederService } from './performance-seeder.service.js';
 
 @Module({
   imports: [
@@ -129,7 +130,7 @@ import { SeederService } from './seeder.service.js';
     ]),
   ],
   controllers: [SeederController],
-  providers: [SeederService],
-  exports: [SeederService],
+  providers: [SeederService, PerformanceSeederService],
+  exports: [SeederService, PerformanceSeederService],
 })
 export class SeederModule {}

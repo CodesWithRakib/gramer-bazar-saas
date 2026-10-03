@@ -18,26 +18,35 @@ export class ApiResponseDto<T = any> {
 }
 
 export class PaginationMetaDto {
-  @ApiProperty({ example: 100, description: 'Total number of items found' })
-  total: number;
+  @ApiPropertyOptional({ example: 'offset', description: 'Pagination type (offset or cursor)' })
+  type?: string;
 
-  @ApiProperty({ example: 1, description: 'Current page number' })
-  page: number;
+  @ApiPropertyOptional({ example: 100, description: 'Total number of items found (Offset only)' })
+  total?: number;
+
+  @ApiPropertyOptional({ example: 1, description: 'Current page number (Offset only)' })
+  page?: number;
 
   @ApiProperty({ example: 20, description: 'Items per page limit' })
   limit: number;
 
-  @ApiProperty({ example: 5, description: 'Total number of pages' })
-  totalPages: number;
+  @ApiPropertyOptional({ example: 5, description: 'Total number of pages (Offset only)' })
+  totalPages?: number;
 
-  @ApiPropertyOptional({ example: true, description: 'Whether there is a next page available' })
-  hasNextPage?: boolean;
+  @ApiProperty({ example: true, description: 'Whether there is a next page available' })
+  hasNextPage: boolean;
 
   @ApiPropertyOptional({
     example: false,
     description: 'Whether there is a previous page available',
   })
   hasPreviousPage?: boolean;
+
+  @ApiPropertyOptional({ example: 'eyJpZCI6IjEyMyJ9', description: 'Next page cursor (Cursor only)' })
+  nextCursor?: string | null;
+
+  @ApiPropertyOptional({ example: 'eyJpZCI6IjQ1NiJ9', description: 'Previous page cursor (Cursor only)' })
+  previousCursor?: string | null;
 }
 
 export class ApiErrorResponseDto {

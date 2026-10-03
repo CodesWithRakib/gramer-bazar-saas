@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, use } from 'react';
+import React, { Suspense, use, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -13,9 +13,8 @@ import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { Button } from '@/components/ui/button';
 import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
 import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
-import { MarketplacePagination } from '@/components/catalog/MarketplacePagination';
 import { formatNumber } from '@/lib/format';
-import { ChevronLeft, ChevronRight, Home, SlidersHorizontal, X, Package } from 'lucide-react';
+import { Home, SlidersHorizontal, X, Package, Loader2 } from 'lucide-react';
 
 function ProductsPageContent({ lang }: { lang: string }) {
   const router = useRouter();
@@ -36,8 +35,27 @@ function ProductsPageContent({ lang }: { lang: string }) {
   const minRating = searchParams.get('minRating')
     ? Number(searchParams.get('minRating'))
     : undefined;
-  const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = parseInt(searchParams.get('limit') || '24', 10);
+
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
+
+  // Reset cursor whenever filters change
+  useEffect(() => {
+    setCursor(undefined);
+  }, [
+    q,
+    categoryId,
+    categorySlug,
+    subCategoryId,
+    subCategorySlug,
+    brandId,
+    sort,
+    minPrice,
+    maxPrice,
+    inStock,
+    minRating,
+    limit,
+  ]);
 
   const { data: categories } = useGetPublicCategoriesQuery();
   const { data: brands } = useGetPublicBrandsQuery();
@@ -45,6 +63,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
   const {
     data: searchResults,
     isLoading,
+    isFetching,
     isError,
     refetch,
   } = useSearchProductsQuery({
@@ -59,7 +78,7 @@ function ProductsPageContent({ lang }: { lang: string }) {
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     inStock,
     minRating,
-    page,
+    cursor,
     limit,
   });
 
@@ -81,28 +100,25 @@ function ProductsPageContent({ lang }: { lang: string }) {
   };
 
   const isEmpty = searchResults?.data?.length === 0;
-  const meta = searchResults?.meta;
+  const meta = searchResults?.meta; // Properly typed now
 
-  // Real active values from API meta or fallback to searchParams
-  const activePage = meta?.page !== undefined ? Number(meta.page) : page;
-  const activeLimit = meta?.limit !== undefined ? Number(meta.limit) : limit;
-  const activeTotal = meta?.total !== undefined ? Number(meta.total) : 0;
-  const activeTotalPages =
-    meta?.totalPages !== undefined
-      ? Number(meta.totalPages)
-      : Math.ceil(activeTotal / activeLimit) || 1;
+  // Setup Intersection Observer for infinite scrolling
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastItemRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetching) return;
+      if (observerRef.current) observerRef.current.disconnect();
 
-  // Build clean page URL for native Next.js link navigation
-  const createPageUrl = (targetPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (targetPage > 1) {
-      params.set('page', targetPage.toString());
-    } else {
-      params.delete('page');
-    }
-    const qs = params.toString();
-    return qs ? `${pathname}?${qs}` : pathname;
-  };
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && meta?.hasNextPage && meta.nextCursor) {
+          setCursor(meta.nextCursor);
+        }
+      });
+
+      if (node) observerRef.current.observe(node);
+    },
+    [isLoading, isFetching, meta?.hasNextPage, meta?.nextCursor]
+  );
 
   // Selected category & brand labels for badge display
   const selectedCategory = categories?.find((c) => c.id === categoryId || c.slug === categorySlug);
@@ -158,19 +174,19 @@ function ProductsPageContent({ lang }: { lang: string }) {
           </p>
         </div>
 
-        {/* Total Count Pill */}
-        {meta && (
+        {/* Products Loaded Pill */}
+        {searchResults?.data && (
           <div className="shrink-0">
             <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-muted/70 border border-border/80 text-xs sm:text-sm font-bold text-foreground shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>
-                {isLoading
+                {isLoading && !cursor
                   ? isBn
                     ? 'লোড হচ্ছে...'
                     : 'Loading...'
                   : isBn
-                    ? `মোট ${formatNumber(meta.total, lang)} টি পণ্য পাওয়া গেছে`
-                    : `${meta.total} products available`}
+                    ? `${formatNumber(searchResults.data.length, lang)} টি পণ্য দেখাচ্ছে`
+                    : `Showing ${searchResults.data.length} products`}
               </span>
             </div>
           </div>
@@ -191,30 +207,20 @@ function ProductsPageContent({ lang }: { lang: string }) {
               <div className="md:hidden">
                 <ProductFilterSidebar lang={lang} isMobile />
               </div>
-              {meta && activeTotal > 0 && (
+              {searchResults?.data && searchResults.data.length > 0 && (
                 <div className="text-xs text-muted-foreground hidden sm:block font-medium">
                   {isBn ? (
                     <>
-                      মোট{' '}
-                      <strong className="text-foreground">{formatNumber(activeTotal, lang)}</strong>{' '}
-                      টি পণ্যের মধ্যে{' '}
                       <strong className="text-foreground">
-                        {formatNumber(
-                          Math.min((activePage - 1) * activeLimit + 1, activeTotal),
-                          lang
-                        )}
-                        –{formatNumber(Math.min(activePage * activeLimit, activeTotal), lang)}
+                        {formatNumber(searchResults.data.length, lang)}
                       </strong>{' '}
-                      দেখানো হচ্ছে
+                      টি পণ্য দেখাচ্ছে
                     </>
                   ) : (
                     <>
                       Showing{' '}
-                      <strong className="text-foreground">
-                        {Math.min((activePage - 1) * activeLimit + 1, activeTotal)}–
-                        {Math.min(activePage * activeLimit, activeTotal)}
-                      </strong>{' '}
-                      of <strong className="text-foreground">{activeTotal}</strong> products
+                      <strong className="text-foreground">{searchResults.data.length}</strong>{' '}
+                      products
                     </>
                   )}
                 </div>
@@ -381,22 +387,33 @@ function ProductsPageContent({ lang }: { lang: string }) {
             </div>
           ) : (
             <>
-              <ProductGrid products={searchResults?.data} isLoading={isLoading} lang={lang} />
+              <ProductGrid
+                products={searchResults?.data}
+                isLoading={isLoading && !cursor}
+                lang={lang}
+              />
 
-              {/* Enhanced Marketplace Pagination */}
-              {meta && (
-                <div className="mt-8 pt-2">
-                  <MarketplacePagination
-                    currentPage={activePage}
-                    totalPages={activeTotalPages}
-                    totalItems={activeTotal}
-                    itemsPerPage={activeLimit}
-                    lang={lang}
-                    buildHref={createPageUrl}
-                    onPageChange={(newPage) => updateUrl('page', newPage > 1 ? newPage : null)}
-                    onLimitChange={(newLimit) => updateUrl('limit', newLimit)}
-                    limitOptions={[24, 48, 72]}
-                  />
+              {/* Infinite Loading Trigger */}
+              {meta?.hasNextPage && (
+                <div
+                  ref={lastItemRef}
+                  className="w-full flex items-center justify-center py-8 mt-4"
+                >
+                  {isFetching ? (
+                    <div className="flex items-center gap-2 text-primary font-medium">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>{isBn ? 'আরও পণ্য লোড হচ্ছে...' : 'Loading more products...'}</span>
+                    </div>
+                  ) : (
+                    <div className="h-10"></div>
+                  )}
+                </div>
+              )}
+
+              {/* End of results indicator */}
+              {!meta?.hasNextPage && searchResults?.data && searchResults.data.length > 0 && (
+                <div className="w-full flex justify-center py-8 text-sm text-muted-foreground">
+                  {isBn ? 'সবগুলো পণ্য দেখানো হয়েছে।' : 'End of products.'}
                 </div>
               )}
             </>

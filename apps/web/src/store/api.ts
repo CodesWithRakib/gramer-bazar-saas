@@ -170,7 +170,16 @@ const customBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryEr
     'success' in result.data &&
     'data' in result.data
   ) {
-    result.data = (result.data as { data: unknown }).data;
+    const rawResult = result.data as Record<string, unknown>;
+    const innerData = rawResult.data as Record<string, unknown>;
+    
+    // If the backend interceptor placed meta at the root alongside data
+    if ('meta' in rawResult && (!innerData || !('meta' in innerData))) {
+      result.data = { data: innerData, meta: rawResult.meta };
+    } else {
+      // Otherwise it's already inside innerData (e.g., { data: [...], meta: {...} })
+      result.data = innerData;
+    }
   }
 
   return result;

@@ -63,7 +63,10 @@ export class OrdersService {
 
       // Attach inventory to products
       for (const product of dbProducts) {
-        product.inventory = inventories.find((i) => i.sellerProductId === product.id) as any;
+        const inventory = inventories.find((i) => i.sellerProductId === product.id);
+        if (inventory) {
+          product.inventory = inventory;
+        }
       }
 
       if (dbProducts.length !== itemIds.length) {
@@ -492,7 +495,10 @@ export class OrdersService {
             lock: { mode: 'pessimistic_write' },
           });
           for (const product of dbProducts) {
-            product.inventory = inventories.find((i) => i.sellerProductId === product.id) as any;
+            const inventory = inventories.find((i) => i.sellerProductId === product.id);
+            if (inventory) {
+              product.inventory = inventory;
+            }
           }
 
           const inventoryUpdates: Inventory[] = [];

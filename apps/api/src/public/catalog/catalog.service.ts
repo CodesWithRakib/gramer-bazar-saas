@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
@@ -9,6 +9,7 @@ import {
 } from '../../catalog/product-types/product-types.service.js';
 import { ProductAttributeValuesService } from '../../catalog/products/product-attribute-values.service.js';
 import { SearchCatalogDto } from './dto/search-catalog.dto.js';
+import { PaginationUtils } from '../../common/utils/pagination.util.js';
 
 @Injectable()
 export class CatalogService {
@@ -59,8 +60,8 @@ export class CatalogService {
       subCategoryId,
       minPrice,
       maxPrice,
-      page = 1,
-      limit = 20,
+      cursor,
+      limit = 30,
       sort = 'newest',
     } = searchDto;
 
@@ -149,54 +150,96 @@ export class CatalogService {
     }
 
     if (searchDto.minRating !== undefined && searchDto.minRating > 0) {
-      // Aggregate is computed from approved reviews; products has no stored
-      // averageRating column, so this must stay an EXISTS subquery.
-      query.andWhere(
-        `EXISTS (
-           SELECT 1 FROM reviews r
-           WHERE r.product_id = p.id AND r.is_approved = true
-           GROUP BY r.product_id
-           HAVING AVG(r.rating) >= :minRating
-         )`,
-        { minRating: searchDto.minRating },
-      );
+      query.andWhere('p.averageRating >= :minRating', { minRating: searchDto.minRating });
     }
 
     if (searchDto.inStock) {
       query.andWhere('inv.quantity > 0');
     }
 
+    // ----------------------------------------------------
+    // CURSOR & SORTING LOGIC
+    // ----------------------------------------------------
+    
+    let cursorPayload: any = null;
+    if (cursor) {
+      cursorPayload = PaginationUtils.decodeCursor(cursor);
+      if (cursorPayload.sort !== sort) {
+        throw new BadRequestException('Cursor is incompatible with the requested sort');
+      }
+    }
+
     switch (sort) {
       case 'price_asc':
-        query.orderBy('sp.price', 'ASC');
+        if (cursorPayload) {
+          query.andWhere('(sp.price > :price OR (sp.price = :price AND sp.id < :id))', {
+            price: cursorPayload.price,
+            id: cursorPayload.id,
+          });
+        }
+        query.orderBy('sp.price', 'ASC').addOrderBy('sp.id', 'DESC');
         break;
       case 'price_desc':
-        query.orderBy('sp.price', 'DESC');
+        if (cursorPayload) {
+          query.andWhere('(sp.price < :price OR (sp.price = :price AND sp.id < :id))', {
+            price: cursorPayload.price,
+            id: cursorPayload.id,
+          });
+        }
+        query.orderBy('sp.price', 'DESC').addOrderBy('sp.id', 'DESC');
         break;
       case 'name_asc':
-        query.orderBy('p.nameEn', 'ASC');
+        if (cursorPayload) {
+          query.andWhere('(p.nameEn > :name OR (p.nameEn = :name AND sp.id < :id))', {
+            name: cursorPayload.name,
+            id: cursorPayload.id,
+          });
+        }
+        query.orderBy('p.nameEn', 'ASC').addOrderBy('sp.id', 'DESC');
         break;
       case 'newest':
       default:
-        query.orderBy('sp.createdAt', 'DESC');
+        if (cursorPayload) {
+          query.andWhere('(sp.createdAt < :createdAt OR (sp.createdAt = :createdAt AND sp.id < :id))', {
+            createdAt: new Date(cursorPayload.createdAt),
+            id: cursorPayload.id,
+          });
+        }
+        query.orderBy('sp.createdAt', 'DESC').addOrderBy('sp.id', 'DESC');
         break;
     }
 
-    const [items, total] = await query
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+    const limitPlusOne = limit + 1;
+    const items = await query.take(limitPlusOne).getMany();
 
-    await this.populateProductsMetadata(items);
+    const hasNextPage = items.length > limit;
+    const slicedItems = hasNextPage ? items.slice(0, limit) : items;
+    
+    let nextCursorPayload = null;
+    if (hasNextPage) {
+      const lastItem = slicedItems[slicedItems.length - 1];
+      nextCursorPayload = { sort, id: lastItem.id } as Record<string, any>;
+      
+      switch (sort) {
+        case 'price_asc':
+        case 'price_desc':
+          nextCursorPayload.price = Number(lastItem.price);
+          break;
+        case 'name_asc':
+          nextCursorPayload.name = lastItem.productVariant.product.nameEn;
+          break;
+        case 'newest':
+        default:
+          nextCursorPayload.createdAt = lastItem.createdAt.toISOString();
+          break;
+      }
+    }
+
+    await this.populateProductsMetadata(slicedItems);
 
     return {
-      data: items,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      data: slicedItems,
+      meta: PaginationUtils.buildCursorMeta(items, limit, nextCursorPayload),
     };
   }
 
@@ -275,7 +318,7 @@ export class CatalogService {
       await this.populateProductsMetadata(featuredItems);
       return {
         data: featuredItems,
-        meta: { total: featuredItems.length, page: 1, limit, totalPages: 1 },
+        meta: PaginationUtils.buildOffsetMeta(featuredItems.length, 1, limit),
       };
     }
 
@@ -307,7 +350,7 @@ export class CatalogService {
 
     return {
       data: popularItems,
-      meta: { total: popularItems.length, page: 1, limit, totalPages: 1 },
+      meta: PaginationUtils.buildOffsetMeta(popularItems.length, 1, limit),
     };
   }
 
@@ -334,7 +377,7 @@ export class CatalogService {
 
     return {
       data: recentItems,
-      meta: { total: recentItems.length, page: 1, limit, totalPages: 1 },
+      meta: PaginationUtils.buildOffsetMeta(recentItems.length, 1, limit),
     };
   }
 

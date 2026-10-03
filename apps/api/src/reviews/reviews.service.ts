@@ -91,6 +91,7 @@ export class ReviewsService {
     });
 
     await this.reviewRepo.save(review);
+    await this.recalculateProductRating(productId);
     return review;
   }
 
@@ -145,6 +146,24 @@ export class ReviewsService {
 
     review.isApproved = isApproved;
     await this.reviewRepo.save(review);
+    await this.recalculateProductRating(review.productId);
     return review;
+  }
+
+  private async recalculateProductRating(productId: string) {
+    await this.dataSource.query(
+      `
+      UPDATE products
+      SET 
+        total_reviews = (
+          SELECT COUNT(*) FROM reviews WHERE product_id = $1 AND is_approved = true
+        ),
+        average_rating = (
+          SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = $1 AND is_approved = true
+        )
+      WHERE id = $1;
+      `,
+      [productId]
+    );
   }
 }

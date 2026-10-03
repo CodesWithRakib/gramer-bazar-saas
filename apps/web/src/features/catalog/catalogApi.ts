@@ -1,11 +1,6 @@
+import { PaginatedResponse, CursorPaginationMeta, OffsetPaginationMeta, OffsetPaginationMeta as PaginationMeta } from '@gramer-bazar/types';
+export type { PaginationMeta };
 import { api } from '../../store/api';
-
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
 
 export type AttributeDataType =
   | 'TEXT'
@@ -409,16 +404,7 @@ export interface SellerProduct {
   };
 }
 
-export interface SearchResponse {
-  data: SellerProduct[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
+export type SearchResponse = PaginatedResponse<SellerProduct, CursorPaginationMeta>;
 export interface SearchParams {
   q?: string;
   categoryId?: string;
@@ -435,7 +421,7 @@ export interface SearchParams {
   maxPrice?: number;
   inStock?: boolean;
   minRating?: number;
-  page?: number;
+  cursor?: string;
   limit?: number;
   sort?: string;
 }
@@ -760,6 +746,23 @@ export const catalogApi = api
           };
         },
         providesTags: ['Catalog'],
+        serializeQueryArgs: ({ queryArgs }) => {
+          const { cursor, ...rest } = queryArgs;
+          return { ...rest };
+        },
+        merge: (currentCache, newItems, { arg }) => {
+          if (arg.cursor) {
+            const existingIds = new Set(currentCache.data.map(item => item.id));
+            const distinctNewItems = newItems.data.filter(item => !existingIds.has(item.id));
+            currentCache.data.push(...distinctNewItems);
+            currentCache.meta = newItems.meta;
+          } else {
+            return newItems;
+          }
+        },
+        forceRefetch({ currentArg, previousArg }) {
+          return currentArg?.cursor !== previousArg?.cursor;
+        },
       }),
       getFeaturedProducts: builder.query<SearchResponse, void>({
         query: () => '/public/catalog/featured',

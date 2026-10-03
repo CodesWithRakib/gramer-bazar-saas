@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
 import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
-import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, X, Loader2 } from 'lucide-react';
+import { formatNumber } from '@/lib/format';
 
 function SearchPageContent({ lang }: { lang: string }) {
   const router = useRouter();
@@ -32,7 +33,14 @@ function SearchPageContent({ lang }: { lang: string }) {
   const minRating = searchParams.get('minRating')
     ? Number(searchParams.get('minRating'))
     : undefined;
-  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = 20;
+
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
+
+  // Reset cursor whenever filters change
+  React.useEffect(() => {
+    setCursor(undefined);
+  }, [q, categoryId, categorySlug, brandId, sort, minPrice, maxPrice, inStock, minRating, limit]);
 
   const { data: categories } = useGetPublicCategoriesQuery();
   const { data: brands } = useGetPublicBrandsQuery();
@@ -47,6 +55,7 @@ function SearchPageContent({ lang }: { lang: string }) {
   const {
     data: searchResults,
     isLoading: isSearchLoading,
+    isFetching,
     isError,
     refetch,
   } = useSearchProductsQuery({
@@ -59,8 +68,8 @@ function SearchPageContent({ lang }: { lang: string }) {
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     inStock,
     minRating,
-    page,
-    limit: 20,
+    cursor,
+    limit,
   });
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -75,11 +84,26 @@ function SearchPageContent({ lang }: { lang: string }) {
     } else {
       params.delete(key);
     }
+    params.delete('page');
     router.push(`${pathname}?${params.toString()}`);
   };
 
   const isEmpty = searchResults?.data?.length === 0;
   const meta = searchResults?.meta;
+
+  const observerRef = React.useRef<IntersectionObserver | null>(null);
+  const lastItemRef = React.useCallback((node: HTMLDivElement | null) => {
+    if (isSearchLoading || isFetching) return;
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && meta?.hasNextPage && meta.nextCursor) {
+        setCursor(meta.nextCursor);
+      }
+    });
+
+    if (node) observerRef.current.observe(node);
+  }, [isSearchLoading, isFetching, meta?.hasNextPage, meta?.nextCursor]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -103,13 +127,13 @@ function SearchPageContent({ lang }: { lang: string }) {
                     : 'All Products'}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                {isSearchLoading
+                {isSearchLoading && !cursor
                   ? isBn
                     ? 'খোঁজা হচ্ছে...'
                     : 'Searching...'
                   : isBn
-                    ? `${searchResults?.meta.total || 0} টি পণ্য পাওয়া গেছে`
-                    : `${searchResults?.meta.total || 0} products found`}
+                    ? `${formatNumber(searchResults?.data?.length || 0, lang)} টি পণ্য পাওয়া গেছে`
+                    : `${searchResults?.data?.length || 0} products found`}
               </p>
             </div>
 
@@ -242,31 +266,22 @@ function SearchPageContent({ lang }: { lang: string }) {
             </div>
           ) : (
             <>
-              <ProductGrid products={searchResults?.data} isLoading={isSearchLoading} lang={lang} />
+              <ProductGrid products={searchResults?.data} isLoading={isSearchLoading && !cursor} lang={lang} />
 
-              {meta && meta.totalPages > 1 && (
-                <div className="mt-8 flex justify-center items-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => updateUrl('page', page - 1)}
-                  >
-                    <ChevronLeft className="me-1 h-4 w-4 rtl:rotate-180" />
-                    {isBn ? 'পূর্ববর্তী' : 'Prev'}
-                  </Button>
-                  <span className="text-sm font-medium">
-                    {page} / {meta.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= meta.totalPages}
-                    onClick={() => updateUrl('page', page + 1)}
-                  >
-                    {isBn ? 'পরবর্তী' : 'Next'}
-                    <ChevronRight className="ms-1 h-4 w-4 rtl:rotate-180" />
-                  </Button>
+              {/* Infinite Loading Trigger */}
+              {meta?.hasNextPage && (
+                <div ref={lastItemRef} className="w-full flex items-center justify-center py-8 mt-4">
+                  <div className="flex items-center gap-2 text-primary font-medium">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>{isBn ? 'আরও পণ্য লোড হচ্ছে...' : 'Loading more products...'}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* End of results indicator */}
+              {!meta?.hasNextPage && searchResults?.data && searchResults.data.length > 0 && (
+                <div className="w-full flex justify-center py-8 text-sm text-muted-foreground">
+                  {isBn ? 'সবগুলো পণ্য দেখানো হয়েছে।' : 'End of products.'}
                 </div>
               )}
             </>

@@ -33,12 +33,21 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, GlobalResponse
           return data;
         }
 
+        let payloadData = data;
+        let payloadMeta = undefined;
+
+        if (data && typeof data === 'object' && 'data' in data && 'meta' in data) {
+          payloadData = data.data;
+          payloadMeta = data.meta;
+        }
+
         return {
           success: true,
           statusCode: response.statusCode,
           path: request.url,
           timestamp: new Date().toISOString(),
-          data,
+          data: payloadData,
+          ...(payloadMeta !== undefined ? { meta: { ...payloadMeta, pagination: payloadMeta } } : {}),
         };
       }),
     );
