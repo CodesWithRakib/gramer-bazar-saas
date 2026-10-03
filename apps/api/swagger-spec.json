@@ -24467,8 +24467,9 @@
         "parameters": [
           {
             "name": "x-seed-secret",
-            "required": true,
+            "required": false,
             "in": "header",
+            "description": "Secret token to authorize seeding in production (optional if ALLOW_PRODUCTION_SEED=true is set in Render).",
             "schema": {
               "type": "string"
             }

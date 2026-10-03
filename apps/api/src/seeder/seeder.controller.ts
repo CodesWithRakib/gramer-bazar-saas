@@ -8,7 +8,7 @@ import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiHeader } from '@nestjs/swagger';
 import { SeederService } from './seeder.service.js';
 import {
   ApiStandardResponse,
@@ -30,6 +30,12 @@ export class SeederController {
     summary: 'Seed database with sample data',
     description:
       'Populates database with full sample users, categories, products, shops, inventory, orders, reviews, and broadcasts.',
+  })
+  @ApiHeader({
+    name: 'x-seed-secret',
+    required: false,
+    description:
+      'Secret token to authorize seeding in production (optional if ALLOW_PRODUCTION_SEED=true is set in Render).',
   })
   @ApiStandardResponse({ type: SeederResponseDto, description: 'Seeder completed successfully' })
   async seedDatabase(@Headers('x-seed-secret') seedSecretHeader?: string) {
