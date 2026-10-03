@@ -248,6 +248,28 @@ function getCategoryTheme(
     };
   }
 
+  // Home & Kitchen, Appliances & Furniture
+  if (
+    combined.includes('home') ||
+    combined.includes('kitchen') ||
+    combined.includes('cookware') ||
+    combined.includes('furniture') ||
+    combined.includes('appliance') ||
+    combined.includes('bedding') ||
+    combined.includes('lighting') ||
+    combined.includes('হোম') ||
+    combined.includes('কিচেন') ||
+    combined.includes('আসবাব')
+  ) {
+    return {
+      type: 'home',
+      label: isBn ? 'হোম ও কিচেন' : 'Home & Kitchen',
+      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
+      accentBorder: 'hover:border-amber-500/50',
+      icon: 'utensils',
+    };
+  }
+
   return {
     type: 'general',
     label: '',

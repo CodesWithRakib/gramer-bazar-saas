@@ -45,6 +45,7 @@ import { MEDICINE_VERTICAL } from './data/medicine-taxonomy.data.js';
 import { GROCERY_VERTICAL } from './data/grocery-taxonomy.data.js';
 import { FASHION_VERTICAL } from './data/fashion-taxonomy.data.js';
 import { COSMETICS_VERTICAL } from './data/cosmetics-taxonomy.data.js';
+import { HOME_KITCHEN_VERTICAL } from './data/home-kitchen-taxonomy.data.js';
 import { slugify } from '../common/utils/slug.js';
 import { ProductStatus } from '../catalog/enums/product-status.enum.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
@@ -1462,6 +1463,7 @@ export class SeederService {
     await this.seedVerticalCatalog(GROCERY_VERTICAL);
     await this.seedVerticalCatalog(FASHION_VERTICAL);
     await this.seedVerticalCatalog(COSMETICS_VERTICAL);
+    await this.seedVerticalCatalog(HOME_KITCHEN_VERTICAL);
   }
 
   private async seedVerticalCatalog(vertical: SeedVertical): Promise<void> {

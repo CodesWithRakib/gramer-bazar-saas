@@ -211,6 +211,15 @@ export function ProductDetailsClient({
     categoryPath.includes('fragrance') ||
     categoryPath.includes('beauty') ||
     categoryPath.includes('personal-care');
+  const isHomeKitchen =
+    categoryPath.includes('home') ||
+    categoryPath.includes('kitchen') ||
+    categoryPath.includes('furniture') ||
+    categoryPath.includes('appliances') ||
+    categoryPath.includes('bedding') ||
+    categoryPath.includes('cookware') ||
+    categoryPath.includes('decor') ||
+    categoryPath.includes('lighting');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -247,7 +256,18 @@ export function ProductDetailsClient({
   const benefitSpec = getSpec('cosmetics-benefit');
   const scentSpec = getSpec('cosmetics-scent-family');
 
-  // Multi-variant parsing for Fashion (Color × Size) and Cosmetics (Shade × Volume)
+  // Home & Kitchen Specs
+  const homeMaterialSpec = getSpec('home-material');
+  const homeCapacitySpec = getSpec('home-capacity');
+  const homePowerSpec = getSpec('home-power');
+  const homeEnergySpec = getSpec('home-energy-rating');
+  const homeWarrantySpec = getSpec('home-warranty');
+  const homeRoomSpec = getSpec('home-room');
+  const homeDimensionsSpec = getSpec('home-dimensions');
+  const homeAssemblySpec = getSpec('home-assembly');
+  const homePackSizeSpec = getSpec('home-pack-size');
+
+  // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), and Home (Color × Capacity / Pack Size)
   const COLOR_HEX_MAP: Record<string, string> = {
     black: '#1a1a1a',
     white: '#ffffff',
@@ -264,6 +284,12 @@ export function ProductDetailsClient({
     navy: '#1a237e',
     maroon: '#800000',
     beige: '#d7c4a3',
+    // Home & Kitchen Colors
+    silver: '#c0c0c0',
+    'navy blue': '#1a237e',
+    'natural wood': '#d7c4a3',
+    'walnut brown': '#5c4033',
+    gold: '#d4af37',
     // Cosmetics Shades & Hex Swatches
     '01 ivory': '#f6ebd9',
     ivory: '#f6ebd9',
@@ -303,6 +329,12 @@ export function ProductDetailsClient({
     navy: 'নেভি ব্লু',
     maroon: 'মেরুন',
     beige: 'বেইজ',
+    // Home & Kitchen Colors Bangla
+    silver: 'সিলভার',
+    'navy blue': 'নেভি ব্লু',
+    'natural wood': 'ন্যাচারাল উড',
+    'walnut brown': 'ওয়ালনাট ব্রাউন',
+    gold: 'গোল্ডেন',
     // Cosmetics Shades Bangla
     '01 ivory': '০১ আইভরি',
     ivory: 'আইভরি',
@@ -329,7 +361,7 @@ export function ProductDetailsClient({
   const parsedVariants = products.map((p, idx) => {
     const v = p.productVariant;
     const attrs = ((v as any).attributes || {}) as Record<string, any>;
-    let color = attrs['fashion-color'] || attrs['cosmetics-shade'];
+    let color = attrs['fashion-color'] || attrs['cosmetics-shade'] || attrs['home-color'];
     let size =
       attrs['fashion-size-clothing'] ||
       attrs['fashion-size-numeric'] ||
@@ -337,7 +369,11 @@ export function ProductDetailsClient({
       attrs['fashion-size-shoe-eu'] ||
       attrs['fashion-size-shoe-uk'] ||
       attrs['fashion-size-shoe-us'] ||
-      attrs['cosmetics-volume'];
+      attrs['cosmetics-volume'] ||
+      attrs['home-capacity'] ||
+      attrs['home-pack-size'] ||
+      attrs['home-bed-size'] ||
+      attrs['home-dimensions'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
       const parts = v.nameEn.split('/').map((s) => s.trim());
@@ -908,6 +944,37 @@ export function ProductDetailsClient({
                     {isBn ? claimsSpec.displayValueBn : claimsSpec.displayValueEn}
                   </span>
                 )}
+
+                {/* Home & Kitchen Badges */}
+                {homeWarrantySpec && homeWarrantySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? `ওয়ারেন্টি: ${homeWarrantySpec.displayValueBn}` : `Warranty: ${homeWarrantySpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {homePowerSpec && homePowerSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{homePowerSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {homeEnergySpec && homeEnergySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>{homeEnergySpec.displayValueEn}</span>
+                  </span>
+                )}
+                {homeMaterialSpec && homeMaterialSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? `উপাদান: ${homeMaterialSpec.displayValueBn}` : `Material: ${homeMaterialSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {homeAssemblySpec && homeAssemblySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20">
+                    {isBn ? homeAssemblySpec.displayValueBn : homeAssemblySpec.displayValueEn}
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1050,12 +1117,18 @@ export function ProductDetailsClient({
                     </div>
                   )}
 
-                  {/* Fashion Size / Cosmetics Volume Selector Pills */}
+                  {/* Fashion Size / Cosmetics Volume / Home Capacity Selector Pills */}
                   {hasSizeAxis && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                          <span>{isCosmetics ? (isBn ? 'ভলিউম (Volume):' : 'Volume:') : (isBn ? 'সাইজ (Size):' : 'Size:')}</span>
+                          <span>
+                            {isCosmetics
+                              ? (isBn ? 'ভলিউম (Volume):' : 'Volume:')
+                              : isHomeKitchen
+                                ? (isBn ? 'ক্যাপাসিটি / সাইজ (Capacity / Size):' : 'Capacity / Size:')
+                                : (isBn ? 'সাইজ (Size):' : 'Size:')}
+                          </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
                         </span>
                         {isFashion && (
@@ -1314,6 +1387,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'নতুন স্কিনকেয়ার বা কসমেটিক্স ব্যবহারের পূর্বে কব্জি বা কানের পেছনে সামান্য পরিমাণ লাগিয়ে ২৪ ঘণ্টার প্যাচ টেস্ট (Patch Test) করার পরামর্শ দেওয়া হচ্ছে। সরাসরি সূর্যালোক থেকে দূরে শীতল স্থানে সংরক্ষণ করুন।'
                       : 'We recommend performing a 24-hour patch test behind the ear or inside wrist before first application. Discontinue use if irritation occurs. Store in a cool, dry place away from direct sunlight.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Home & Kitchen Appliance & Furniture Care Advisory */}
+              {isHomeKitchen && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-amber-950 dark:text-amber-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>{isBn ? 'হোম ও কিচেন ওয়ারেন্টি এবং ডেলিভারি নির্দেশিকা' : 'Home & Kitchen Warranty & Installation Guide'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'বৈদ্যুতিক যন্ত্রপাতির অফিসিয়াল ওয়ারেন্টি সুবিধা পেতে ক্যাশ মেমো ও ওয়ারেন্টি কার্ড সংরক্ষণ করুন। ভঙ্গুর কাচ বা ভারী আসবাবপত্রের ক্ষেত্রে আনপ্যাকিংয়ের সময় ডেলিভারি রাইডারের উপস্থিতিতে পণ্যটি যাচাই করে নিন।'
+                      : 'Please retain the invoice and warranty card to claim official manufacturer warranty on appliances. For heavy furniture and fragile glassware, kindly inspect the package upon doorstep delivery.'}
                   </p>
                 </div>
               )}
