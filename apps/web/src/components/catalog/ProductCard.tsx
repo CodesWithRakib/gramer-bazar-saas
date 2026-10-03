@@ -28,6 +28,7 @@ import {
   Activity,
   Gamepad2,
   PawPrint,
+  Wrench,
 } from 'lucide-react';
 import type { SellerProduct } from '@/features/catalog/catalogApi';
 import { RootState } from '@/store/store';
@@ -53,6 +54,42 @@ function getCategoryTheme(
   isBn: boolean
 ) {
   const combined = `${categorySlug} ${subCategorySlug} ${productName}`.toLowerCase();
+
+  // Tools & Hardware
+  if (
+    combined.includes('tools-hardware') ||
+    combined.includes('power-tools') ||
+    combined.includes('hand-tools') ||
+    combined.includes('workshop-garage') ||
+    combined.includes('hardware-fasteners') ||
+    combined.includes('electrical-supplies') ||
+    combined.includes('plumbing-sanitary') ||
+    combined.includes('drill') ||
+    combined.includes('grinder') ||
+    combined.includes('wrench') ||
+    combined.includes('pliers') ||
+    combined.includes('hammer') ||
+    combined.includes('fastener') ||
+    combined.includes('screwdriver') ||
+    combined.includes('bosch') ||
+    combined.includes('makita') ||
+    combined.includes('dewalt') ||
+    combined.includes('stanley') ||
+    combined.includes('ingco') ||
+    combined.includes('যন্ত্রপাতি') ||
+    combined.includes('হার্ডওয়্যার') ||
+    combined.includes('হার্ডওয়্যার') ||
+    combined.includes('ড্রিল') ||
+    combined.includes('হাতুড়ি')
+  ) {
+    return {
+      type: 'tools',
+      label: isBn ? 'যন্ত্রপাতি' : 'Tools & Hardware',
+      badgeClass: 'bg-amber-600/10 text-amber-700 dark:text-amber-300 border-amber-600/20',
+      accentBorder: 'hover:border-amber-600/50',
+      icon: 'wrench',
+    };
+  }
 
   // Pet Supplies & Animals
   if (
@@ -639,6 +676,8 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         return <Gamepad2 className="w-2.5 h-2.5" />;
       case 'paw':
         return <PawPrint className="w-2.5 h-2.5" />;
+      case 'wrench':
+        return <Wrench className="w-2.5 h-2.5" />;
       default:
         return <Sparkles className="w-2.5 h-2.5" />;
     }

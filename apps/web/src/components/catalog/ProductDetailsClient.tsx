@@ -281,6 +281,28 @@ export function ProductDetailsClient({
     categoryPath.includes('litter') ||
     categoryPath.includes('rabbit') ||
     categoryPath.includes('hamster');
+  const isTools =
+    categoryPath.includes('tools-hardware') ||
+    categoryPath.includes('power-tools') ||
+    categoryPath.includes('hand-tools') ||
+    categoryPath.includes('workshop-garage') ||
+    categoryPath.includes('hardware-fasteners') ||
+    categoryPath.includes('electrical-supplies') ||
+    categoryPath.includes('plumbing-sanitary') ||
+    categoryPath.includes('paint-decorating') ||
+    categoryPath.includes('safety-ppe') ||
+    categoryPath.includes('building-construction') ||
+    categoryPath.includes('garden-outdoor') ||
+    categoryPath.includes('measuring-leveling') ||
+    categoryPath.includes('drill') ||
+    categoryPath.includes('grinder') ||
+    categoryPath.includes('wrench') ||
+    categoryPath.includes('pliers') ||
+    categoryPath.includes('fastener') ||
+    categoryPath.includes('screw') ||
+    categoryPath.includes('bolt') ||
+    categoryPath.includes('ladder') ||
+    categoryPath.includes('vise');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -436,6 +458,31 @@ export function ProductDetailsClient({
   const petVoltageSpec = getSpec('pet-voltage');
   const petWarrantySpec = getSpec('pet-warranty');
   const petOriginSpec = getSpec('pet-country-of-origin');
+
+  // Tools & Hardware Specs
+  const toolsPowerSourceSpec = getSpec('tools-power-source');
+  const toolsVoltageSpec = getSpec('tools-voltage');
+  const toolsWattageSpec = getSpec('tools-wattage');
+  const toolsBatteryCapacitySpec = getSpec('tools-battery-capacity');
+  const toolsSpeedRpmSpec = getSpec('tools-no-load-speed-rpm');
+  const toolsTorqueSpec = getSpec('tools-max-torque-nm');
+  const toolsChuckSpec = getSpec('tools-chuck-size');
+  const toolsDiscSpec = getSpec('tools-disc-diameter-mm');
+  const toolsBladeSpec = getSpec('tools-blade-diameter-mm');
+  const toolsDriveSizeSpec = getSpec('tools-drive-size');
+  const toolsMaterialSpec = getSpec('tools-material');
+  const toolsMeasurementRangeSpec = getSpec('tools-measurement-range');
+  const toolsFastenerDiameterSpec = getSpec('tools-fastener-diameter');
+  const toolsFastenerLengthSpec = getSpec('tools-fastener-length');
+  const toolsThreadTypeSpec = getSpec('tools-thread-type');
+  const toolsPackQuantitySpec = getSpec('tools-pack-quantity');
+  const toolsElectricalCurrentSpec = getSpec('tools-electrical-rated-current');
+  const toolsPipeDiameterSpec = getSpec('tools-pipe-diameter');
+  const toolsPaintFinishSpec = getSpec('tools-paint-finish');
+  const toolsPaintVolumeSpec = getSpec('tools-paint-volume');
+  const toolsSafetyCertSpec = getSpec('tools-safety-certification');
+  const toolsWarrantySpec = getSpec('tools-warranty');
+  const toolsOriginSpec = getSpec('tools-country-of-origin');
 
   // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, Baby, and Automotive (Pack / Volume / Viscosity / Tire / Battery)
   const COLOR_HEX_MAP: Record<string, string> = {
@@ -595,6 +642,9 @@ export function ProductDetailsClient({
       attrs['pet-pack-size'] ||
       attrs['pet-flavor'] ||
       attrs['pet-size'] ||
+      attrs['tools-pack-quantity'] ||
+      attrs['tools-fastener-length'] ||
+      attrs['tools-paint-volume'] ||
       attrs['size'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
@@ -1415,6 +1465,59 @@ export function ProductDetailsClient({
                     <span>{isBn ? `ওয়ারেন্টি: ${petWarrantySpec.displayValueBn}` : `Warranty: ${petWarrantySpec.displayValueEn}`}</span>
                   </span>
                 )}
+
+                {/* Tools & Hardware Badges */}
+                {toolsPowerSourceSpec && toolsPowerSourceSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? toolsPowerSourceSpec.displayValueBn : toolsPowerSourceSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {toolsVoltageSpec && toolsVoltageSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-700 dark:text-orange-300 border border-orange-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? `ভোল্টেজ: ${toolsVoltageSpec.displayValueBn}` : `Voltage: ${toolsVoltageSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {toolsWattageSpec && toolsWattageSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border border-yellow-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? `${toolsWattageSpec.displayValueBn} ওয়াট` : `${toolsWattageSpec.displayValueEn}W`}</span>
+                  </span>
+                )}
+                {toolsSpeedRpmSpec && toolsSpeedRpmSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                    {isBn ? `${toolsSpeedRpmSpec.displayValueBn} RPM` : `${toolsSpeedRpmSpec.displayValueEn} RPM`}
+                  </span>
+                )}
+                {toolsTorqueSpec && toolsTorqueSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
+                    {isBn ? `টর্ক: ${toolsTorqueSpec.displayValueBn} Nm` : `Torque: ${toolsTorqueSpec.displayValueEn} Nm`}
+                  </span>
+                )}
+                {toolsChuckSpec && toolsChuckSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-700 dark:text-slate-300 border border-slate-500/20">
+                    {isBn ? `চক: ${toolsChuckSpec.displayValueBn}` : `Chuck: ${toolsChuckSpec.displayValueEn}`}
+                  </span>
+                )}
+                {toolsMaterialSpec && toolsMaterialSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-gray-500/10 text-gray-700 dark:text-gray-300 border border-gray-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? toolsMaterialSpec.displayValueBn : toolsMaterialSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {toolsSafetyCertSpec && toolsSafetyCertSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? toolsSafetyCertSpec.displayValueBn : toolsSafetyCertSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {toolsWarrantySpec && toolsWarrantySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? `ওয়ারেন্টি: ${toolsWarrantySpec.displayValueBn}` : `Warranty: ${toolsWarrantySpec.displayValueEn}`}</span>
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1579,6 +1682,8 @@ export function ProductDetailsClient({
                                           ? (toyPiecesSpec ? (isBn ? 'পিস সংখ্যা / প্যাক (Pieces / Pack):' : 'Pieces / Pack:') : toyStemAreaSpec ? (isBn ? 'মডেল / এডিশন (Model / Edition):' : 'Model / Edition:') : (isBn ? 'মডেল / সাইজ (Model / Size):' : 'Model / Size:'))
                                           : isPets
                                             ? (petFoodTypeSpec ? (isBn ? 'ওজন / প্যাক (Weight / Pack):' : 'Weight / Pack:') : petLitterTypeSpec ? (isBn ? 'সুগন্ধি / সাইজ (Scent / Size):' : 'Scent / Size:') : (isBn ? 'সাইজ / প্যাক (Size / Pack):' : 'Size / Pack:'))
+                                          : isTools
+                                            ? (toolsPowerSourceSpec ? (isBn ? 'কিট কনফিগারেশন / প্যাক (Kit / Pack):' : 'Kit Option / Pack:') : toolsFastenerDiameterSpec ? (isBn ? 'দৈর্ঘ্য / সাইজ (Size / Length):' : 'Size / Length:') : toolsPaintVolumeSpec ? (isBn ? 'পরিমাণ (Volume):' : 'Volume:') : (isBn ? 'সাইজ / অপশন (Option / Size):' : 'Option / Size:'))
                                           : (isBn ? 'সাইজ (Size):' : 'Size:')}
                           </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
@@ -1944,6 +2049,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'গ্রামের বাজার-এ সরবরাহকৃত সকল পেট ফুড ও ট্রিটস ১০০% আসল, নিবন্ধিত আমদানিকারক ও ব্র্যান্ডের অফিসিয়াল ব্যাচ থেকে সংগৃহীত। খাবারের নতুন ব্র্যান্ড শুরুর ক্ষেত্রে ৭ থেকে ১০ দিনের ট্রানজিশন রুটিন অনুসরণ করুন এবং সবসময় পর্যাপ্ত পরিষ্কার খাবার পানি সরবরাহ করুন। কোনো গুরুতর অসুস্থতায় নিকটস্থ নিবন্ধিত ভেটেরিনারি চিকিৎসকের পরামর্শ নিন।'
                       : 'All pet nutrition, foods, and treats on Gramer Bazar are 100% genuine and sourced from certified regional distributors with verified batch traceability. When transitioning your pet to a new diet, introduce the new food gradually over 7 to 10 days alongside plenty of fresh water. Consult a licensed veterinarian for specialized medical diets.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Tools & Hardware Industrial Quality & Safety Advisory */}
+              {isTools && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-amber-950 dark:text-amber-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>{isBn ? 'শিল্পমান ও হার্ডওয়্যার নিরাপত্তা নিশ্চয়তা' : 'Industrial Standards & Electrical Safety Guarantee'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'গ্রামের বাজার-এ সরবরাহকৃত সকল পাওয়ার টুলস, হ্যান্ড টুলস, ইলেকট্রিক্যাল ওয়্যারিং ও ফাস্টেনার ১০০% আসল এবং শিল্পমান অনুযায়ী পরীক্ষিত। ড্রিল, গ্রাইন্ডার বা কাটিং যন্ত্রপাতি ব্যবহারের সময় উপযুক্ত সেফটি গগলস, গ্লাভস ও পিপিই পরিধান করুন। বৈদ্যুতিক ওয়্যারিংয়ের ক্ষেত্রে দক্ষ ও লাইসেন্সপ্রাপ্ত ইলেকট্রিশিয়ানের পরামর্শ নিন।'
+                      : 'All power tools, hand tools, electrical wiring, and hardware on Gramer Bazar are 100% genuine and verified against strict industrial safety standards. Always wear certified eye protection, heavy-duty gloves, and PPE when operating rotary, cutting, or high-torque machinery. Ensure electrical installations are performed by licensed professionals.'}
                   </p>
                 </div>
               )}

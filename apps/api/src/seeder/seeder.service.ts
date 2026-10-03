@@ -52,6 +52,7 @@ import { SPORTS_VERTICAL } from './data/sports-taxonomy.data.js';
 import { BOOKS_VERTICAL } from './data/books-taxonomy.data.js';
 import { TOYS_VERTICAL } from './data/toys-taxonomy.data.js';
 import { PET_VERTICAL } from './data/pet-taxonomy.data.js';
+import { TOOLS_VERTICAL } from './data/tools-taxonomy.data.js';
 import { slugify } from '../common/utils/slug.js';
 import { ProductStatus } from '../catalog/enums/product-status.enum.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
@@ -1476,6 +1477,7 @@ export class SeederService {
     await this.seedVerticalCatalog(BOOKS_VERTICAL);
     await this.seedVerticalCatalog(TOYS_VERTICAL);
     await this.seedVerticalCatalog(PET_VERTICAL);
+    await this.seedVerticalCatalog(TOOLS_VERTICAL);
   }
 
   private async seedVerticalCatalog(vertical: SeedVertical): Promise<void> {
