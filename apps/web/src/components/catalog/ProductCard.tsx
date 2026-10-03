@@ -210,6 +210,28 @@ function getCategoryTheme(
     };
   }
 
+  // Automotive & Motor Parts
+  if (
+    combined.includes('auto') ||
+    combined.includes('car') ||
+    combined.includes('motorcycle') ||
+    combined.includes('brake') ||
+    combined.includes('tire') ||
+    combined.includes('গাড়ি') ||
+    combined.includes('বাইক') ||
+    combined.includes('টায়ার') ||
+    combined.includes('ইঞ্জিন') ||
+    combined.includes('পার্টস')
+  ) {
+    return {
+      type: 'automotive',
+      label: isBn ? 'অটোমোটিভ' : 'Automotive',
+      badgeClass: 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/20',
+      accentBorder: 'hover:border-slate-500/50',
+      icon: 'shieldCheck',
+    };
+  }
+
   // Fashion & Apparel
   if (
     combined.includes('cloth') ||

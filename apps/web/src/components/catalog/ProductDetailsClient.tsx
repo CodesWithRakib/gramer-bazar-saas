@@ -227,6 +227,14 @@ export function ProductDetailsClient({
     categoryPath.includes('nursery') ||
     categoryPath.includes('stroller') ||
     categoryPath.includes('toy');
+  const isAutomotive =
+    categoryPath.includes('automotive') ||
+    categoryPath.includes('auto') ||
+    categoryPath.includes('car') ||
+    categoryPath.includes('motorcycle') ||
+    categoryPath.includes('tire') ||
+    categoryPath.includes('brake') ||
+    categoryPath.includes('engine');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -287,7 +295,22 @@ export function ProductDetailsClient({
   const babyFootwearSizeSpec = getSpec('baby-footwear-size');
   const babyOriginSpec = getSpec('baby-country-of-origin');
 
-  // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, and Baby (Color × Size / Pack / Volume)
+  // Automotive Specs & Vehicle Fitment
+  const autoVehicleTypeSpec = getSpec('auto-vehicle-type');
+  const autoCompatibleMakeSpec = getSpec('auto-compatible-make');
+  const autoCompatibleModelSpec = getSpec('auto-compatible-model');
+  const autoFitmentTypeSpec = getSpec('auto-fitment-type');
+  const autoOemSpec = getSpec('auto-oem-classification');
+  const autoPositionSpec = getSpec('auto-position');
+  const autoViscositySpec = getSpec('auto-oil-viscosity');
+  const autoVolumeSpec = getSpec('auto-volume');
+  const autoTireSizeSpec = getSpec('auto-tire-size');
+  const autoBatteryCapacitySpec = getSpec('auto-battery-capacity');
+  const autoPackSpec = getSpec('auto-pack-size');
+  const autoWarrantySpec = getSpec('auto-warranty');
+  const autoOriginSpec = getSpec('auto-country-of-origin');
+
+  // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, Baby, and Automotive (Pack / Volume / Viscosity / Tire / Battery)
   const COLOR_HEX_MAP: Record<string, string> = {
     black: '#1a1a1a',
     white: '#ffffff',
@@ -422,7 +445,12 @@ export function ProductDetailsClient({
       attrs['baby-age-group'] ||
       attrs['baby-pack-size'] ||
       attrs['baby-volume'] ||
-      attrs['baby-footwear-size'];
+      attrs['baby-footwear-size'] ||
+      attrs['auto-volume'] ||
+      attrs['auto-tire-size'] ||
+      attrs['auto-battery-capacity'] ||
+      attrs['auto-pack-size'] ||
+      attrs['auto-oil-viscosity'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
       const parts = v.nameEn.split('/').map((s) => s.trim());
@@ -1056,6 +1084,37 @@ export function ProductDetailsClient({
                     <span>{isBn ? `উপাদান: ${babyMaterialSpec.displayValueBn}` : `Material: ${babyMaterialSpec.displayValueEn}`}</span>
                   </span>
                 )}
+
+                {/* Automotive & Vehicle Fitment Badges */}
+                {autoCompatibleModelSpec && autoCompatibleModelSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    <span>{isBn ? `উপযোগী: ${autoCompatibleModelSpec.displayValueBn}` : `Fitment: ${autoCompatibleModelSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {autoFitmentTypeSpec && autoFitmentTypeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? autoFitmentTypeSpec.displayValueBn : autoFitmentTypeSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {autoOemSpec && autoOemSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? autoOemSpec.displayValueBn : autoOemSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {autoPositionSpec && autoPositionSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                    {isBn ? `পজিশন: ${autoPositionSpec.displayValueBn}` : `Position: ${autoPositionSpec.displayValueEn}`}
+                  </span>
+                )}
+                {autoWarrantySpec && autoWarrantySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? `ওয়ারেন্টি: ${autoWarrantySpec.displayValueBn}` : `Warranty: ${autoWarrantySpec.displayValueEn}`}</span>
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1210,7 +1269,9 @@ export function ProductDetailsClient({
                                 ? (isBn ? 'ক্যাপাসিটি / সাইজ (Capacity / Size):' : 'Capacity / Size:')
                                 : isBabyKids
                                   ? (babyDiaperSizeSpec ? (isBn ? 'ডায়াপার সাইজ (Diaper Size):' : 'Diaper Size:') : (isBn ? 'বয়স / সাইজ (Age / Size):' : 'Age / Size:'))
-                                  : (isBn ? 'সাইজ (Size):' : 'Size:')}
+                                  : isAutomotive
+                                    ? (autoViscositySpec ? (isBn ? 'সান্দ্রতা / গ্রেড (Viscosity):' : 'Viscosity Grade:') : autoTireSizeSpec ? (isBn ? 'টায়ার সাইজ (Tire Size):' : 'Tire Size:') : autoBatteryCapacitySpec ? (isBn ? 'ধারণক্ষমতা (Capacity):' : 'Battery Capacity:') : autoVolumeSpec ? (isBn ? 'পরিমাণ (Volume):' : 'Volume:') : (isBn ? 'প্যাক / অপশন (Option):' : 'Option:'))
+                                    : (isBn ? 'সাইজ (Size):' : 'Size:')}
                           </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
                         </span>
@@ -1500,6 +1561,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'শিশুদের খেলনা ও স্ট্রোলার ব্যবহারের সময় সর্বদা বয়স্কদের প্রত্যক্ষ নজরদারি বজায় রাখুন। ছোট যন্ত্রাংশ শিশুদের গিলে ফেলার ঝুঁকি তৈরি করতে পারে। স্কিনকেয়ার ও বেবি ফুড ব্যবহারের ক্ষেত্রে প্যাকেটের গায়ে উল্লেখিত প্রস্তুত ও মেয়াদোত্তীর্ণের তারিখ এবং সংরক্ষণ নির্দেশিকা মেনে চলুন।'
                       : 'Always ensure adult supervision during toy play, feeding, and stroller use. Keep small parts away from infants to prevent choking hazards. For baby skincare and infant food, please review allergen labels, expiry dates, and proper hygiene guidelines on the package.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Automotive Fitment & Technical Installation Advisory */}
+              {isAutomotive && (
+                <div className="bg-slate-500/10 border border-slate-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-slate-950 dark:text-slate-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-300">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-slate-600 dark:text-slate-400" />
+                    <span>{isBn ? 'গাড়ির ফিটমেন্ট ও টেকনিক্যাল ইনস্টলেশন পরামর্শ' : 'Vehicle Fitment & Technical Installation Advisory'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'অর্ডার করার পূর্বে আপনার গাড়ির মেক, মডেল এবং ম্যানুফ্যাকচারিং সাল স্পেসিফিকেশনের সাথে মিলিয়ে নিন। ব্রেক প্যাড, স্পার্ক প্লাগ ও ইলেকট্রিক্যাল যন্ত্রাংশ দক্ষ মেকানিক বা সার্টিফাইড অটোমোটিভ টেকনিশিয়ান দ্বারা ইনস্টল করার পরামর্শ দেওয়া হচ্ছে। অফিসিয়াল ওয়ারেন্টির জন্য ইনভয়েস ও ওয়ারেন্টি কার্ড সংরক্ষণ করুন।'
+                      : 'Please verify vehicle make, model, and year compatibility against product specifications before ordering. Critical components such as brake pads, spark plugs, and electrical wiring should be installed by a certified automotive technician. Retain your invoice and warranty slip for manufacturer guarantee.'}
                   </p>
                 </div>
               )}
