@@ -25,6 +25,8 @@ import {
   Ruler,
   Check,
   Trophy,
+  BookOpen,
+  Bookmark,
 } from 'lucide-react';
 import { FashionSizeChartModal } from '@/components/catalog/FashionSizeChartModal';
 import { Button } from '@/components/ui/button';
@@ -248,6 +250,17 @@ export function ProductDetailsClient({
     categoryPath.includes('treadmill') ||
     categoryPath.includes('dumbbell') ||
     categoryPath.includes('boxing');
+  const isBooks =
+    categoryPath.includes('book') ||
+    categoryPath.includes('stationery') ||
+    categoryPath.includes('novel') ||
+    categoryPath.includes('academic') ||
+    categoryPath.includes('pen') ||
+    categoryPath.includes('paper') ||
+    categoryPath.includes('notebook') ||
+    categoryPath.includes('pencil') ||
+    categoryPath.includes('geometry') ||
+    categoryPath.includes('paint');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -336,6 +349,21 @@ export function ProductDetailsClient({
   const sportsPackSpec = getSpec('sports-pack-size');
   const sportsWarrantySpec = getSpec('sports-warranty');
   const sportsOriginSpec = getSpec('sports-country-of-origin');
+
+  // Books & Stationery Specs
+  const bookAuthorSpec = getSpec('book-author');
+  const bookPublisherSpec = getSpec('book-publisher');
+  const bookIsbnSpec = getSpec('book-isbn');
+  const bookLanguageSpec = getSpec('book-language');
+  const bookFormatSpec = getSpec('book-format');
+  const bookEditionSpec = getSpec('book-edition');
+  const bookPagesSpec = getSpec('book-pages');
+  const bookGenreSpec = getSpec('book-genre');
+  const bookPaperSizeSpec = getSpec('book-paper-size');
+  const bookPaperGsmSpec = getSpec('book-paper-gsm');
+  const bookPaperTypeSpec = getSpec('book-paper-type');
+  const bookPackSpec = getSpec('book-pack-size');
+  const bookInkColorSpec = getSpec('book-ink-color');
 
   // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, Baby, and Automotive (Pack / Volume / Viscosity / Tire / Battery)
   const COLOR_HEX_MAP: Record<string, string> = {
@@ -482,7 +510,12 @@ export function ProductDetailsClient({
       attrs['sports-weight-capacity'] ||
       attrs['sports-glove-size'] ||
       attrs['sports-footwear-size'] ||
-      attrs['sports-pack-size'];
+      attrs['sports-pack-size'] ||
+      attrs['book-format'] ||
+      attrs['book-paper-size'] ||
+      attrs['book-paper-gsm'] ||
+      attrs['book-pack-size'] ||
+      attrs['book-ink-color'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
       const parts = v.nameEn.split('/').map((s) => s.trim());
@@ -1173,6 +1206,36 @@ export function ProductDetailsClient({
                     <span>{isBn ? `ওয়ারেন্টি: ${sportsWarrantySpec.displayValueBn}` : `Warranty: ${sportsWarrantySpec.displayValueEn}`}</span>
                   </span>
                 )}
+
+                {/* Books & Stationery Badges */}
+                {bookAuthorSpec && bookAuthorSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <BookOpen className="h-3 w-3" />
+                    <span>{isBn ? `লেখক: ${bookAuthorSpec.displayValueBn}` : `Author: ${bookAuthorSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {bookPublisherSpec && bookPublisherSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-700 dark:text-orange-300 border border-orange-500/20 flex items-center gap-1">
+                    <Bookmark className="h-3 w-3" />
+                    <span>{isBn ? `প্রকাশনী: ${bookPublisherSpec.displayValueBn}` : `Publisher: ${bookPublisherSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {bookFormatSpec && bookFormatSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? `বাঁধাই: ${bookFormatSpec.displayValueBn}` : `Binding: ${bookFormatSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {bookIsbnSpec && bookIsbnSpec.displayValueEn !== 'Not Specified' && bookIsbnSpec.displayValueEn !== 'Not Applicable' && (
+                  <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/60">
+                    ISBN: {bookIsbnSpec.displayValueEn}
+                  </span>
+                )}
+                {bookLanguageSpec && bookLanguageSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                    {isBn ? `ভাষা: ${bookLanguageSpec.displayValueBn}` : `Language: ${bookLanguageSpec.displayValueEn}`}
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1331,7 +1394,9 @@ export function ProductDetailsClient({
                                     ? (autoViscositySpec ? (isBn ? 'সান্দ্রতা / গ্রেড (Viscosity):' : 'Viscosity Grade:') : autoTireSizeSpec ? (isBn ? 'টায়ার সাইজ (Tire Size):' : 'Tire Size:') : autoBatteryCapacitySpec ? (isBn ? 'ধারণক্ষমতা (Capacity):' : 'Battery Capacity:') : autoVolumeSpec ? (isBn ? 'পরিমাণ (Volume):' : 'Volume:') : (isBn ? 'প্যাক / অপশন (Option):' : 'Option:'))
                                     : isSports
                                       ? (sportsWeightSpec ? (isBn ? 'ওজন / ক্যাপাসিটি (Weight):' : 'Weight / Capacity:') : sportsGloveSizeSpec ? (isBn ? 'গ্লাভস সাইজ (Glove Size):' : 'Glove Size:') : sportsFootwearSizeSpec ? (isBn ? 'জুতার সাইজ (Shoe Size):' : 'Shoe Size:') : sportsPackSpec ? (isBn ? 'প্যাক সাইজ (Pack Size):' : 'Pack Size:') : (isBn ? 'সাইজ (Size):' : 'Size:'))
-                                      : (isBn ? 'সাইজ (Size):' : 'Size:')}
+                                      : isBooks
+                                        ? (bookFormatSpec ? (isBn ? 'বাঁধাই / সংস্করণ (Binding):' : 'Binding / Format:') : bookPaperSizeSpec ? (isBn ? 'কাগজের মাপ (Paper Size):' : 'Paper Size:') : bookInkColorSpec ? (isBn ? 'কালির রং / প্যাক (Ink / Pack):' : 'Ink / Pack:') : bookPackSpec ? (isBn ? 'প্যাক সংখ্যা (Pack Size):' : 'Pack Size:') : (isBn ? 'সাইজ (Size):' : 'Size:'))
+                                        : (isBn ? 'সাইজ (Size):' : 'Size:')}
                           </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
                         </span>
@@ -1651,6 +1716,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'শরীরচর্চা বা খেলাধুলার পূর্বে যথাযথ ওয়ার্ম-আপ করুন এবং সুরক্ষামূলক গিয়ার (হেলমেট, গার্ড, প্যাড) পরিধান করুন। মোটরচালিত ট্রেডমিল ও জিম ইকুইপমেন্ট ব্যবহারের সময় প্রস্তাবিত সর্বোচ্চ ওজন সীমা মেনে চলুন। র‍্যাকেট ও ব্যাটের ক্ষেত্রে স্ট্রিং বা গ্রিপের নিয়মিত যত্ন নিন।'
                       : 'Always warm up properly before athletic activities and wear certified protective gear (helmets, guards, pads). Observe maximum user weight limits on motorized treadmills and gym equipment. Maintain proper racket string tension and grip hygiene to prevent sports injury.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Book Reading & Genuine Print Quality Advisory */}
+              {isBooks && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-amber-950 dark:text-amber-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400">
+                    <BookOpen className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>{isBn ? 'আসল বই ও প্রকাশনা মান নিশ্চয়তা' : 'Original Print & Publishing Quality Guarantee'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'গ্রামের বাজার-এ সরবরাহকৃত সকল বই সরাসরি অনুমোদিত প্রকাশনী ও স্বত্বাধিকারীদের কাছ থেকে সংগৃহীত ১০০% আসল প্রিন্ট। কোনো প্রকার পাইরেটেড বা অননুমোদিত ফটোকপি বই বিক্রি করা হয় না। পৃষ্ঠা বা বাঁধাই সংক্রান্ত ত্রুটি থাকলে দ্রুত রিপ্লেসমেন্ট সুবিধা প্রযোজ্য।'
+                      : 'All books on Gramer Bazar are 100% genuine original print editions sourced directly from authorized publishing houses and copyright holders. We strictly prohibit pirated or unauthorized photocopies. In case of missing pages or binding defects, instant replacement is guaranteed.'}
                   </p>
                 </div>
               )}

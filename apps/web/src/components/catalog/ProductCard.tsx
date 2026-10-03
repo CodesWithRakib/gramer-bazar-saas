@@ -259,6 +259,31 @@ function getCategoryTheme(
     };
   }
 
+  // Books & Stationery
+  if (
+    combined.includes('book') ||
+    combined.includes('stationery') ||
+    combined.includes('novel') ||
+    combined.includes('author') ||
+    combined.includes('writer') ||
+    combined.includes('publisher') ||
+    combined.includes('academic') ||
+    combined.includes('খাতা') ||
+    combined.includes('বই') ||
+    combined.includes('উপন্যাস') ||
+    combined.includes('কলম') ||
+    combined.includes('পেন্সিল') ||
+    combined.includes('কাগজ')
+  ) {
+    return {
+      type: 'books',
+      label: isBn ? 'বই ও স্টেশনারি' : 'Books & Stationery',
+      badgeClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
+      accentBorder: 'hover:border-amber-500/50',
+      icon: 'sparkles',
+    };
+  }
+
   // Fashion & Apparel
   if (
     combined.includes('cloth') ||
