@@ -16,11 +16,14 @@ import { Shop } from '../../shops/entities/shop.entity.js';
 import { ProductStatus } from '../enums/product-status.enum.js';
 import { ProductVariant } from './product-variant.entity.js';
 import { ProductImage } from './product-image.entity.js';
+import { ProductType } from './product-type.entity.js';
+import { ProductAttributeValue } from './product-attribute-value.entity.js';
 
 @Entity('products')
 @Index('idx_products_category_id', ['categoryId'])
 @Index('idx_products_sub_category_id', ['subCategoryId'])
 @Index('idx_products_brand_id', ['brandId'])
+@Index('idx_products_product_type_id', ['productTypeId'])
 @Index('idx_products_is_featured', ['isFeatured'])
 @Index('idx_products_is_active', ['isActive'])
 @Index('idx_products_status', ['status'])
@@ -55,6 +58,13 @@ export class Product {
   @ManyToOne(() => Category, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'sub_category_id' })
   subCategory: Relation<Category> | null;
+
+  @Column({ name: 'product_type_id', type: 'uuid', nullable: true })
+  productTypeId: string | null;
+
+  @ManyToOne(() => ProductType, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'product_type_id' })
+  productType: Relation<ProductType> | null;
 
   @Column({ name: 'brand_id', type: 'uuid', nullable: true })
   brandId: string | null;
@@ -157,6 +167,11 @@ export class Product {
     cascade: true,
   })
   variants: Relation<ProductVariant>[];
+
+  @OneToMany(() => ProductAttributeValue, (value) => value.product, {
+    cascade: true,
+  })
+  attributeValues: Relation<ProductAttributeValue>[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

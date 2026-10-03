@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Package, Tag, Building2, ClipboardList } from 'lucide-react';
+import { Package, Tag, Building2, ClipboardList, Layers, SlidersHorizontal } from 'lucide-react';
 import DashboardHubOverview, { HubCardItem } from '@/components/dashboard/DashboardHubOverview';
 
 export interface ProductsHubViewProps {
@@ -46,6 +46,34 @@ export function ProductsHubView({
       badge: 'Taxonomy',
       badgeBn: 'শ্রেণিবিভাগ',
       badgeVariant: 'secondary',
+    },
+    {
+      id: 'product-types',
+      title: 'Product Types',
+      titleBn: 'প্রোডাক্ট টাইপ',
+      description:
+        'Define the concrete product types inside each category (Processor, Monitor, Router…) and the attributes they use.',
+      descriptionBn:
+        'প্রতিটি ক্যাটাগরির ভিতরের প্রোডাক্ট টাইপ (প্রসেসর, মনিটর, রাউটার…) ও তাদের অ্যাট্রিবিউট নির্ধারণ করুন।',
+      icon: Layers,
+      href: `/${basePath}/products/product-types`,
+      badge: 'Product Type',
+      badgeBn: 'পণ্যের ধরন',
+      badgeVariant: 'default',
+    },
+    {
+      id: 'attributes',
+      title: 'Attribute Engine',
+      titleBn: 'অ্যাট্রিবিউট ইঞ্জিন',
+      description:
+        'Manage reusable attributes, data types, selectable options, and which ones power filters and variants.',
+      descriptionBn:
+        'পুনরায় ব্যবহারযোগ্য অ্যাট্রিবিউট, ডেটা টাইপ, অপশন এবং ফিল্টার/ভ্যারিয়েন্ট নিয়ন্ত্রণ করুন।',
+      icon: SlidersHorizontal,
+      href: `/${basePath}/products/attributes`,
+      badge: 'Spec Schema',
+      badgeBn: 'স্পেক স্কিমা',
+      badgeVariant: 'default',
     },
     {
       id: 'brands',

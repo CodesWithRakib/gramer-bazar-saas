@@ -61,6 +61,7 @@ import { ImpersonationSessions1791000000000 } from './migrations/1791000000000-I
 import { NotificationsUpgrade1791100000000 } from './migrations/1791100000000-NotificationsUpgrade.js';
 import { BroadcastSystem1791200000000 } from './migrations/1791200000000-BroadcastSystem.js';
 import { DisputeSystemUpgrade1791300000000 } from './migrations/1791300000000-DisputeSystemUpgrade.js';
+import { ScalableCatalogTaxonomy1791400000000 } from './migrations/1791400000000-ScalableCatalogTaxonomy.js';
 import { BroadcastModule } from './broadcast/broadcast.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -106,6 +107,7 @@ import { ScheduleModule } from '@nestjs/schedule';
             NotificationsUpgrade1791100000000,
             BroadcastSystem1791200000000,
             DisputeSystemUpgrade1791300000000,
+            ScalableCatalogTaxonomy1791400000000,
           ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,

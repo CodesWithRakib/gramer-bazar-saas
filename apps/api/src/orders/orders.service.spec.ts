@@ -89,6 +89,14 @@ describe('OrdersService', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    // `clearAllMocks` retains implementations set inside earlier tests (e.g. the
+    // `givenFindOne` helper), which leaks a stale findOne response into later
+    // cases. Reset the transaction-manager spies so each test declares its own.
+    manager.findOne.mockReset();
+    manager.find.mockReset();
+    manager.save.mockReset();
+    manager.count.mockReset();
+    manager.insert.mockReset();
     await createService();
   });
 
@@ -230,11 +238,15 @@ describe('OrdersService', () => {
         items: [{ sellerProductId: 'sp-1', quantity: 3 }],
       };
       manager.findOne.mockResolvedValueOnce(order);
-      manager.find.mockImplementationOnce(async (_entity, criteria) => {
-        // Sanity-check the service only touches its own items
-        expect((criteria?.where as { id: string }).id).toBeDefined();
-        return [product];
-      });
+      // The service loads seller products and then their inventory rows under a
+      // write lock; queue one response for each lookup.
+      manager.find
+        .mockImplementationOnce(async (_entity, criteria) => {
+          // Sanity-check the service only touches its own items
+          expect((criteria?.where as { id: string }).id).toBeDefined();
+          return [product];
+        })
+        .mockResolvedValueOnce([product.inventory]); // inventories
       manager.save.mockImplementation(async (_entity, value) => value);
 
       const result = (await service.cancelOrder('user-1', 'o-1')) as {
@@ -272,6 +284,7 @@ describe('OrdersService', () => {
         items: [{ sellerProductId: 'sp-1', quantity: 3 }],
       });
       manager.find.mockResolvedValueOnce([product]);
+      manager.find.mockResolvedValueOnce([]); // no inventory rows to restore
       manager.save.mockImplementation(async (_entity, value) => value);
 
       const result = (await service.cancelOrder('user-1', 'o-1')) as {

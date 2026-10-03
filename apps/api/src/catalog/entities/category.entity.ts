@@ -8,10 +8,14 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
   type Relation,
 } from 'typeorm';
 
 @Entity('categories')
+@Index('idx_categories_parent_id', ['parentId'])
+@Index('idx_categories_path', ['path'])
+@Index('idx_categories_is_active', ['isActive'])
 export class Category {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -43,6 +47,20 @@ export class Category {
 
   @Column({ type: 'varchar', nullable: true })
   image: string | null;
+
+  /**
+   * Depth from the root node (root = 0). Maintained by the categories service
+   * so deep taxonomies stay queryable without recursive CTEs per request.
+   */
+  @Column({ name: 'level', type: 'int', default: 0 })
+  level: number;
+
+  /**
+   * Materialized lineage of slugs, e.g. "electronics/computers-pc/pc-components".
+   * Indexed for fast prefix-based subtree and breadcrumb lookups at any depth.
+   */
+  @Column({ name: 'path', type: 'varchar', length: 1000, nullable: true })
+  path: string | null;
 
   @Column({ name: 'description_en', type: 'text', nullable: true })
   descriptionEn: string | null;

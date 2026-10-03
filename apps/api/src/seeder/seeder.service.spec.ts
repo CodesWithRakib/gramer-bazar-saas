@@ -13,6 +13,11 @@ import { Brand } from '../catalog/entities/brand.entity.js';
 import { Product } from '../catalog/entities/product.entity.js';
 import { ProductVariant } from '../catalog/entities/product-variant.entity.js';
 import { ProductImage } from '../catalog/entities/product-image.entity.js';
+import { ProductType } from '../catalog/entities/product-type.entity.js';
+import { Attribute } from '../catalog/entities/attribute.entity.js';
+import { AttributeOption } from '../catalog/entities/attribute-option.entity.js';
+import { ProductTypeAttribute } from '../catalog/entities/product-type-attribute.entity.js';
+import { ProductAttributeValue } from '../catalog/entities/product-attribute-value.entity.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Review } from '../reviews/entities/review.entity.js';
@@ -84,6 +89,11 @@ describe('SeederService - seedUsersAndShops', () => {
         { provide: getRepositoryToken(Product), useValue: makeRepo() },
         { provide: getRepositoryToken(ProductVariant), useValue: makeRepo() },
         { provide: getRepositoryToken(ProductImage), useValue: makeRepo() },
+        { provide: getRepositoryToken(ProductType), useValue: makeRepo() },
+        { provide: getRepositoryToken(Attribute), useValue: makeRepo() },
+        { provide: getRepositoryToken(AttributeOption), useValue: makeRepo() },
+        { provide: getRepositoryToken(ProductTypeAttribute), useValue: makeRepo() },
+        { provide: getRepositoryToken(ProductAttributeValue), useValue: makeRepo() },
         { provide: getRepositoryToken(SellerProduct), useValue: makeRepo() },
         { provide: getRepositoryToken(Inventory), useValue: makeRepo() },
         { provide: getRepositoryToken(Review), useValue: makeRepo() },

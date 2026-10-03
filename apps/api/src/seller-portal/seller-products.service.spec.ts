@@ -13,6 +13,7 @@ import { ProductImage } from '../catalog/entities/product-image.entity.js';
 import { Category } from '../catalog/entities/category.entity.js';
 import { Brand } from '../catalog/entities/brand.entity.js';
 import { ProductImageService } from '../catalog/products/product-image.service.js';
+import { ProductAttributeValuesService } from '../catalog/products/product-attribute-values.service.js';
 
 describe('SellerProductsService', () => {
   let service: SellerProductsService;
@@ -75,6 +76,10 @@ describe('SellerProductsService', () => {
         { provide: getRepositoryToken(Category), useValue: categoryRepository },
         { provide: getRepositoryToken(Brand), useValue: brandRepository },
         { provide: ProductImageService, useValue: productImageService },
+        {
+          provide: ProductAttributeValuesService,
+          useValue: { saveValues: vi.fn(), getSpecGroups: vi.fn().mockResolvedValue([]) },
+        },
         { provide: DataSource, useValue: { query: vi.fn(), transaction: vi.fn() } },
       ],
     }).compile();

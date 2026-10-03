@@ -13,6 +13,22 @@ import { Brand } from '../catalog/entities/brand.entity.js';
 import { Product } from '../catalog/entities/product.entity.js';
 import { ProductVariant } from '../catalog/entities/product-variant.entity.js';
 import { ProductImage } from '../catalog/entities/product-image.entity.js';
+import { ProductType } from '../catalog/entities/product-type.entity.js';
+import { Attribute } from '../catalog/entities/attribute.entity.js';
+import { AttributeOption } from '../catalog/entities/attribute-option.entity.js';
+import { ProductTypeAttribute } from '../catalog/entities/product-type-attribute.entity.js';
+import { ProductAttributeValue } from '../catalog/entities/product-attribute-value.entity.js';
+import { AttributeDataType } from '../catalog/enums/attribute-data-type.enum.js';
+import {
+  ELECTRONICS_ATTRIBUTES,
+  ELECTRONICS_BRANDS,
+  ELECTRONICS_PRODUCTS,
+  ELECTRONICS_TAXONOMY,
+  SeedAttribute,
+  SeedElectronicsProduct,
+  SeedTaxonomyNode,
+} from './data/electronics-taxonomy.data.js';
+import { slugify } from '../common/utils/slug.js';
 import { ProductStatus } from '../catalog/enums/product-status.enum.js';
 import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
@@ -110,6 +126,13 @@ export class SeederService {
     @InjectRepository(Product) private productRepo: Repository<Product>,
     @InjectRepository(ProductVariant) private variantRepo: Repository<ProductVariant>,
     @InjectRepository(ProductImage) private imageRepo: Repository<ProductImage>,
+    @InjectRepository(ProductType) private productTypeRepo: Repository<ProductType>,
+    @InjectRepository(Attribute) private attributeRepo: Repository<Attribute>,
+    @InjectRepository(AttributeOption) private attributeOptionRepo: Repository<AttributeOption>,
+    @InjectRepository(ProductTypeAttribute)
+    private productTypeAttributeRepo: Repository<ProductTypeAttribute>,
+    @InjectRepository(ProductAttributeValue)
+    private productAttributeValueRepo: Repository<ProductAttributeValue>,
     @InjectRepository(SellerProduct) private sellerProductRepo: Repository<SellerProduct>,
     @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
     @InjectRepository(Review) private reviewRepo: Repository<Review>,
@@ -166,6 +189,7 @@ export class SeederService {
     const shops = await this.seedShops(users.sellers);
     const catalog = await this.seedCatalog();
     await this.seedCategoryBrands(catalog.categories);
+    await this.seedElectronicsCatalog();
     const sellerProducts = await this.seedInventory(
       shops,
       catalog.products,
@@ -804,6 +828,364 @@ export class SeederService {
       products: allProducts,
       productVariants: allVariants,
     };
+  }
+
+  // ==========================================================================
+  //  Electronics vertical slice (taxonomy engine demonstration)
+  // ==========================================================================
+
+  private async upsertElectronicsAttributes(): Promise<Map<string, Attribute>> {
+    const map = new Map<string, Attribute>();
+    for (let i = 0; i < ELECTRONICS_ATTRIBUTES.length; i++) {
+      const def = ELECTRONICS_ATTRIBUTES[i];
+      let attribute = await this.attributeRepo.findOne({ where: { slug: def.slug } });
+      if (!attribute) {
+        attribute = await this.attributeRepo.save(
+          this.attributeRepo.create({
+            slug: def.slug,
+            nameEn: def.nameEn,
+            nameBn: def.nameBn,
+            dataType: def.dataType,
+            unit: def.unit ?? null,
+            isFilterable: def.isFilterable ?? true,
+            isVariantAxis: def.isVariantAxis ?? false,
+            sortOrder: i,
+            isActive: true,
+          }),
+        );
+      } else {
+        Object.assign(attribute, {
+          nameEn: def.nameEn,
+          nameBn: def.nameBn,
+          dataType: def.dataType,
+          unit: def.unit ?? null,
+          isFilterable: def.isFilterable ?? true,
+          isVariantAxis: def.isVariantAxis ?? false,
+          sortOrder: i,
+          isActive: true,
+        });
+        attribute = await this.attributeRepo.save(attribute);
+      }
+
+      const options = def.options ?? [];
+      for (let j = 0; j < options.length; j++) {
+        const option = options[j];
+        const optionSlug = slugify(option.value, 'option', 120);
+        const existing = await this.attributeOptionRepo.findOne({
+          where: { attributeId: attribute.id, slug: optionSlug },
+        });
+        if (!existing) {
+          await this.attributeOptionRepo.save(
+            this.attributeOptionRepo.create({
+              attributeId: attribute.id,
+              value: option.value,
+              valueBn: option.valueBn ?? null,
+              slug: optionSlug,
+              sortOrder: j,
+              isActive: true,
+            }),
+          );
+        }
+      }
+      map.set(def.slug, attribute);
+    }
+    this.logger.log(`Electronics attributes ready (${map.size}).`);
+    return map;
+  }
+
+  private async upsertElectronicsTaxonomy(): Promise<Map<string, Category>> {
+    const byPath = new Map<string, Category>();
+    const walk = async (
+      node: SeedTaxonomyNode,
+      parent: Category | null,
+      parentPath: string | null,
+    ): Promise<void> => {
+      const path = parentPath ? `${parentPath}/${node.slug}` : node.slug;
+      let category = await this.categoryRepo.findOne({ where: { slug: node.slug } });
+      const payload = {
+        parentId: parent?.id ?? null,
+        nameEn: node.nameEn,
+        nameBn: node.nameBn,
+        icon: node.icon ?? category?.icon ?? null,
+        descriptionEn: node.descriptionEn ?? category?.descriptionEn ?? null,
+        descriptionBn: node.descriptionBn ?? category?.descriptionBn ?? null,
+        level: parent ? (parent.level ?? 0) + 1 : 0,
+        path,
+        isActive: true,
+      };
+      if (!category) {
+        category = await this.categoryRepo.save(
+          this.categoryRepo.create({ slug: node.slug, ...payload }),
+        );
+      } else {
+        Object.assign(category, payload);
+        category = await this.categoryRepo.save(category);
+      }
+      byPath.set(path, category);
+      for (const child of node.children ?? []) {
+        await walk(child, category, path);
+      }
+    };
+    await walk(ELECTRONICS_TAXONOMY, null, null);
+    this.logger.log(`Electronics taxonomy ready (${byPath.size} categories).`);
+    return byPath;
+  }
+
+  private async upsertElectronicsProductTypes(
+    byPath: Map<string, Category>,
+    attributes: Map<string, Attribute>,
+  ): Promise<Map<string, ProductType>> {
+    const map = new Map<string, ProductType>();
+    const walk = async (node: SeedTaxonomyNode, path: string): Promise<void> => {
+      const category = byPath.get(path);
+      const productTypes = node.productTypes ?? [];
+      if (category) {
+        for (let i = 0; i < productTypes.length; i++) {
+          const def = productTypes[i];
+          let productType = await this.productTypeRepo.findOne({ where: { slug: def.slug } });
+          const payload = {
+            categoryId: category.id,
+            nameEn: def.nameEn ?? node.nameEn,
+            nameBn: def.nameBn ?? node.nameBn,
+            sortOrder: i,
+            isActive: true,
+          };
+          if (!productType) {
+            productType = await this.productTypeRepo.save(
+              this.productTypeRepo.create({ slug: def.slug, ...payload }),
+            );
+          } else {
+            Object.assign(productType, payload);
+            productType = await this.productTypeRepo.save(productType);
+          }
+
+          await this.productTypeAttributeRepo.delete({ productTypeId: productType.id });
+          const rows = def.attributes
+            .filter((slug) => attributes.has(slug))
+            .map((slug, index) =>
+              this.productTypeAttributeRepo.create({
+                productTypeId: productType.id,
+                attributeId: attributes.get(slug)!.id,
+                isRequired: false,
+                isFilterable: true,
+                sortOrder: index,
+              }),
+            );
+          if (rows.length > 0) {
+            await this.productTypeAttributeRepo.save(rows);
+          }
+          map.set(def.slug, productType);
+        }
+      }
+      for (const child of node.children ?? []) {
+        await walk(child, `${path}/${child.slug}`);
+      }
+    };
+    await walk(ELECTRONICS_TAXONOMY, ELECTRONICS_TAXONOMY.slug);
+    this.logger.log(`Electronics product types ready (${map.size}).`);
+    return map;
+  }
+
+  private async upsertElectronicsBrands(): Promise<Map<string, Brand>> {
+    const map = new Map<string, Brand>();
+    for (const name of ELECTRONICS_BRANDS) {
+      const slug = slugify(name, 'brand', 120);
+      let brand = await this.brandRepo.findOne({ where: { slug } });
+      if (!brand) {
+        brand = await this.brandRepo.save(
+          this.brandRepo.create({ nameEn: name, nameBn: name, slug, isActive: true }),
+        );
+      }
+      map.set(name, brand);
+    }
+    return map;
+  }
+
+  private async saveElectronicsSpecs(
+    productId: string,
+    specs: SeedElectronicsProduct['specs'],
+    attributes: Map<string, Attribute>,
+  ): Promise<void> {
+    await this.productAttributeValueRepo.delete({ productId });
+    if (!specs) return;
+    const rows: ProductAttributeValue[] = [];
+    for (const [slug, value] of Object.entries(specs)) {
+      const attribute = attributes.get(slug);
+      if (!attribute) continue;
+      const isSelect =
+        attribute.dataType === AttributeDataType.SELECT ||
+        attribute.dataType === AttributeDataType.MULTI_SELECT ||
+        attribute.dataType === AttributeDataType.RANGE;
+      let optionId: string | null = null;
+      if (isSelect) {
+        const optionSlug = slugify(String(value), 'option', 120);
+        const option = await this.attributeOptionRepo.findOne({
+          where: { attributeId: attribute.id, slug: optionSlug },
+        });
+        optionId = option?.id ?? null;
+      }
+      rows.push(
+        this.productAttributeValueRepo.create({
+          productId,
+          attributeId: attribute.id,
+          optionId,
+          valueText:
+            attribute.dataType === AttributeDataType.TEXT && typeof value === 'string'
+              ? value
+              : null,
+          valueNumber:
+            (attribute.dataType === AttributeDataType.NUMBER ||
+              attribute.dataType === AttributeDataType.RANGE) &&
+            typeof value === 'number'
+              ? value
+              : null,
+          valueBoolean: attribute.dataType === AttributeDataType.BOOLEAN ? Boolean(value) : null,
+        }),
+      );
+    }
+    if (rows.length > 0) {
+      await this.productAttributeValueRepo.save(rows);
+    }
+  }
+
+  private async seedElectronicsCatalog(): Promise<void> {
+    this.logger.log('Seeding scalable Electronics taxonomy engine...');
+    const attributes = await this.upsertElectronicsAttributes();
+    const byPath = await this.upsertElectronicsTaxonomy();
+    const productTypes = await this.upsertElectronicsProductTypes(byPath, attributes);
+    const brands = await this.upsertElectronicsBrands();
+
+    const shops = await this.shopRepo.find({ where: { isActive: true }, order: { createdAt: 'ASC' } });
+    if (shops.length === 0) {
+      this.logger.warn('No active shops found; skipping Electronics product seeding.');
+      return;
+    }
+
+    let created = 0;
+    for (let index = 0; index < ELECTRONICS_PRODUCTS.length; index++) {
+      const def = ELECTRONICS_PRODUCTS[index];
+      const category = byPath.get(def.categoryPath);
+      if (!category) {
+        this.logger.warn(`Skipping ${def.slug}: category ${def.categoryPath} not found`);
+        continue;
+      }
+      const productType = productTypes.get(def.productTypeSlug) ?? null;
+      const brand = brands.get(def.brand) ?? null;
+
+      let product = await this.productRepo.findOne({ where: { slug: def.slug } });
+      const payload = {
+        categoryId: category.id,
+        subCategoryId: null,
+        productTypeId: productType?.id ?? null,
+        brandId: brand?.id ?? null,
+        nameEn: def.nameEn,
+        nameBn: def.nameBn,
+        shortDescriptionEn: def.shortDescriptionEn,
+        shortDescriptionBn: def.shortDescriptionBn,
+        descriptionEn: def.descriptionEn ?? def.shortDescriptionEn,
+        descriptionBn: def.descriptionBn ?? def.shortDescriptionBn,
+        sku: def.sku,
+        price: def.price,
+        compareAtPrice: def.compareAtPrice ?? null,
+        stock: def.stock,
+        unit: def.unit ?? 'piece',
+        status: ProductStatus.PUBLISHED,
+        isFeatured: def.isFeatured ?? false,
+        isActive: true,
+        source: 'seed',
+      };
+      if (!product) {
+        product = await this.productRepo.save(
+          this.productRepo.create({ slug: def.slug, ...payload }),
+        );
+        created++;
+      } else {
+        Object.assign(product, payload);
+        product = await this.productRepo.save(product);
+      }
+
+      await this.saveElectronicsSpecs(product.id, def.specs, attributes);
+
+      const variantDefs =
+        def.variants && def.variants.length > 0
+          ? def.variants
+          : [
+              {
+                nameEn: 'Default',
+                nameBn: 'ডিফল্ট',
+                sku: def.sku,
+                price: def.price,
+                compareAtPrice: def.compareAtPrice,
+                stock: def.stock,
+              },
+            ];
+
+      for (let vIndex = 0; vIndex < variantDefs.length; vIndex++) {
+        const variantDef = variantDefs[vIndex];
+        let variant = await this.variantRepo.findOne({ where: { sku: variantDef.sku } });
+        const variantPayload = {
+          productId: product.id,
+          nameEn: variantDef.nameEn,
+          nameBn: variantDef.nameBn,
+          images: [] as string[],
+          attributes: variantDef.attributes ?? null,
+          isActive: true,
+        };
+        if (!variant) {
+          variant = await this.variantRepo.save(
+            this.variantRepo.create({ sku: variantDef.sku, ...variantPayload }),
+          );
+        } else {
+          Object.assign(variant, variantPayload);
+          variant = await this.variantRepo.save(variant);
+        }
+
+        const shop = shops[index % shops.length];
+        const price = variantDef.price ?? def.price;
+        const compareAtPrice = variantDef.compareAtPrice ?? def.compareAtPrice ?? null;
+        const stock = variantDef.stock ?? def.stock;
+
+        let sellerProduct = await this.sellerProductRepo.findOne({
+          where: { shopId: shop.id, productVariantId: variant.id },
+        });
+        if (!sellerProduct) {
+          sellerProduct = await this.sellerProductRepo.save(
+            this.sellerProductRepo.create({
+              shopId: shop.id,
+              productVariantId: variant.id,
+              price,
+              discountPrice: compareAtPrice,
+              sellerSku: variant.sku,
+              isActive: true,
+              isRegulatedApproved: true,
+            }),
+          );
+        } else {
+          Object.assign(sellerProduct, { price, discountPrice: compareAtPrice, isActive: true });
+          sellerProduct = await this.sellerProductRepo.save(sellerProduct);
+        }
+
+        const inventory = await this.inventoryRepo.findOne({
+          where: { sellerProductId: sellerProduct.id },
+        });
+        if (!inventory) {
+          await this.inventoryRepo.save(
+            this.inventoryRepo.create({
+              sellerProductId: sellerProduct.id,
+              quantity: stock,
+              lowStockThreshold: 5,
+            }),
+          );
+        } else {
+          inventory.quantity = stock;
+          await this.inventoryRepo.save(inventory);
+        }
+      }
+    }
+
+    this.logger.log(
+      `Electronics catalog ready: ${created} new products, ${productTypes.size} product types, ${attributes.size} attributes.`,
+    );
   }
 
   async seedInventory(

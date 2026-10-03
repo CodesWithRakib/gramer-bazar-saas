@@ -149,6 +149,7 @@ export class ImpersonationController {
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiStandardResponse({ description: 'Paginated impersonation history for the target user' })
   @ApiCommonErrors([401, 403])
   async targetHistory(
     @Param('userId', ParseUUIDPipe) userId: string,
@@ -177,6 +178,7 @@ export class ImpersonationController {
   @ApiQuery({ name: 'targetRole', required: false, type: String })
   @ApiQuery({ name: 'targetUserId', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiStandardResponse({ description: 'Paginated impersonation session audit list' })
   @ApiCommonErrors([401, 403])
   async sessions(
     @Query('page') page = 1,

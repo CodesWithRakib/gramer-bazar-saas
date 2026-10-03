@@ -61,6 +61,26 @@ export class SearchCatalogDto {
   @IsUUID()
   brandId?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by Product Type ID' })
+  @IsOptional()
+  @IsUUID()
+  productTypeId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter by materialized category path prefix, e.g. electronics/computers-pc',
+  })
+  @IsOptional()
+  @IsString()
+  categoryPath?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Dynamic attribute filters as a JSON object, e.g. {"socket":["am5"],"panel-type":["ips"]}',
+  })
+  @IsOptional()
+  @IsString()
+  attributes?: string;
+
   @ApiPropertyOptional({ description: 'Minimum average rating' })
   @IsOptional()
   @Type(() => Number)

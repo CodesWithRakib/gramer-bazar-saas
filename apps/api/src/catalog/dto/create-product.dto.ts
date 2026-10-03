@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsString,
   IsNotEmpty,
   IsOptional,
@@ -6,9 +7,12 @@ import {
   MaxLength,
   IsEnum,
   IsUUID,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductStatus } from '../enums/product-status.enum.js';
+import { ProductAttributeValueInputDto } from './attribute.dto.js';
 
 export class CreateProductDto {
   @ApiProperty({ description: 'Category ID' })
@@ -52,6 +56,21 @@ export class CreateProductDto {
   @IsOptional()
   @IsUUID()
   subCategoryId?: string;
+
+  @ApiPropertyOptional({ description: 'Product Type ID (defines the attribute schema)' })
+  @IsOptional()
+  @IsUUID()
+  productTypeId?: string;
+
+  @ApiPropertyOptional({
+    type: [ProductAttributeValueInputDto],
+    description: 'Structured specification values for this product',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductAttributeValueInputDto)
+  attributeValues?: ProductAttributeValueInputDto[];
 
   @ApiPropertyOptional({ description: 'Short English description' })
   @IsOptional()

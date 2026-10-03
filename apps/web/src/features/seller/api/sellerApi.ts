@@ -131,6 +131,25 @@ export interface SellerProduct {
   brandId?: string | null;
   brandNameEn?: string | null;
   brandNameBn?: string | null;
+  productTypeId?: string | null;
+  specGroups?: Array<{
+    specGroup: string;
+    specs: Array<{
+      attributeId: string;
+      slug: string;
+      nameEn: string;
+      nameBn: string;
+      dataType: string;
+      unit: string | null;
+      valueText: string | null;
+      valueNumber: number | null;
+      valueBoolean: boolean | null;
+      optionId: string | null;
+      optionSlug: string | null;
+      displayValueEn: string;
+      displayValueBn: string;
+    }>;
+  }>;
   price: number;
   discountPrice: number | null;
   effectivePrice: number;
@@ -153,12 +172,24 @@ export interface SellerProductList {
   outOfStockCount: number;
 }
 
+export interface SellerAttributeValueInput {
+  attributeId?: string;
+  attributeSlug?: string;
+  optionId?: string;
+  optionSlug?: string;
+  valueText?: string;
+  valueNumber?: number;
+  valueBoolean?: boolean;
+}
+
 export interface CreateSellerProductPayload {
   nameEn: string;
   nameBn: string;
   categoryId: string;
   subCategoryId?: string;
   brandId?: string;
+  productTypeId?: string;
+  attributeValues?: SellerAttributeValueInput[];
   shortDescriptionEn?: string;
   shortDescriptionBn?: string;
   descriptionEn?: string;
@@ -189,6 +220,8 @@ export interface UpdateSellerProductPayload {
   descriptionEn?: string | null;
   descriptionBn?: string | null;
   unit?: string | null;
+  productTypeId?: string | null;
+  attributeValues?: SellerAttributeValueInput[];
 }
 
 export interface SellerProductQuery {

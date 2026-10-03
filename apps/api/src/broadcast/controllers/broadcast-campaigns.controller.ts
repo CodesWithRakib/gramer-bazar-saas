@@ -84,6 +84,7 @@ export class BroadcastCampaignsController {
   @Post(':id/test')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Send a test message through the active provider' })
+  @ApiStandardResponse({ description: 'Test send result' })
   @ApiCommonErrors([400, 401, 403, 404])
   test(
     @Param('id', ParseUUIDPipe) id: string,

@@ -5,6 +5,12 @@ import { Product } from '../entities/product.entity.js';
 import { ProductVariant } from '../entities/product-variant.entity.js';
 import { ProductImage } from '../entities/product-image.entity.js';
 import { Brand } from '../entities/brand.entity.js';
+import { ProductType } from '../entities/product-type.entity.js';
+import { Category } from '../entities/category.entity.js';
+import {
+  ProductAttributeValuesService,
+  ProductSpecGroup,
+} from './product-attribute-values.service.js';
 import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
 import { Shop } from '../../shops/entities/shop.entity.js';
 import { Inventory } from '../../inventory/entities/inventory.entity.js';
@@ -19,11 +25,17 @@ export interface ProductFilterOptions {
   categoryId?: string;
   subCategoryId?: string;
   brandId?: string;
+  productTypeId?: string;
   status?: ProductStatus;
   isActive?: boolean;
   isFeatured?: boolean;
   sort?: string;
 }
+
+/** Product entity enriched with resolved specs for detail responses. */
+export type ProductWithSpecs = Product & {
+  specGroups?: ProductSpecGroup[];
+};
 
 @Injectable()
 export class ProductsService {
@@ -44,7 +56,47 @@ export class ProductsService {
     private readonly shopsRepository: Repository<Shop>,
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
+    @InjectRepository(ProductType)
+    private readonly productTypesRepository: Repository<ProductType>,
+    private readonly attributeValuesService: ProductAttributeValuesService,
   ) {}
+
+  /**
+   * A product type is attached to a category node, but a product may live on
+   * that node or any descendant of it (e.g. product type "Laptop" with a
+   * "Gaming Laptop" child category). Compatibility is path-based so no
+   * hard-coded hierarchy depth is assumed.
+   */
+  private async validateProductType(productTypeId: string, categoryId: string): Promise<void> {
+    const productType = await this.productTypesRepository.findOne({
+      where: { id: productTypeId },
+      relations: ['category'],
+    });
+    if (!productType) {
+      throw new BadRequestException('Selected product type does not exist');
+    }
+    if (productType.categoryId === categoryId) return;
+
+    const category = await this.productsRepository.manager
+      .getRepository(Category)
+      .findOne({ where: { id: categoryId } });
+    if (!category) return;
+
+    const typePath = productType.category?.path ?? '';
+    const categoryPath = category.path ?? '';
+    const compatible =
+      !!typePath &&
+      !!categoryPath &&
+      (categoryPath === typePath ||
+        categoryPath.startsWith(`${typePath}/`) ||
+        typePath.startsWith(`${categoryPath}/`));
+
+    if (!compatible) {
+      throw new BadRequestException(
+        `Product type "${productType.nameEn}" is not available for the selected category`,
+      );
+    }
+  }
 
   private async validateBrandCategory(brandId: string, categoryId: string): Promise<void> {
     const brand = await this.brandsRepository.findOne({
@@ -65,16 +117,21 @@ export class ProductsService {
     if (createProductDto.brandId && createProductDto.categoryId) {
       await this.validateBrandCategory(createProductDto.brandId, createProductDto.categoryId);
     }
+    if (createProductDto.productTypeId && createProductDto.categoryId) {
+      await this.validateProductType(createProductDto.productTypeId, createProductDto.categoryId);
+    }
 
+    const { attributeValues, ...productData } = createProductDto;
     const product = this.productsRepository.create({
-      ...createProductDto,
-      status: createProductDto.status || ProductStatus.DRAFT,
-      stock: createProductDto.stock ?? 0,
-      isFeatured: createProductDto.isFeatured ?? false,
-      isActive: createProductDto.isActive ?? true,
+      ...productData,
+      status: productData.status || ProductStatus.DRAFT,
+      stock: productData.stock ?? 0,
+      isFeatured: productData.isFeatured ?? false,
+      isActive: productData.isActive ?? true,
     });
 
     const savedProduct = await this.productsRepository.save(product);
+    await this.attributeValuesService.saveValues(savedProduct.id, attributeValues);
 
     // Create default variant for this product
     const variantSku = savedProduct.sku || `${savedProduct.slug}-def`;
@@ -103,6 +160,7 @@ export class ProductsService {
       categoryId,
       subCategoryId,
       brandId,
+      productTypeId,
       status,
       isActive,
       isFeatured,
@@ -114,6 +172,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.subCategory', 'subCategory')
       .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.productType', 'productType')
       .leftJoinAndSelect('product.images', 'images')
       .leftJoinAndSelect('product.variants', 'variants');
 
@@ -136,6 +195,10 @@ export class ProductsService {
 
     if (brandId) {
       query.andWhere('product.brandId = :brandId', { brandId });
+    }
+
+    if (productTypeId) {
+      query.andWhere('product.productTypeId = :productTypeId', { productTypeId });
     }
 
     if (status) {
@@ -198,10 +261,10 @@ export class ProductsService {
     };
   }
 
-  async findOne(id: string): Promise<Product> {
+  async findOne(id: string): Promise<ProductWithSpecs> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'subCategory', 'brand', 'images', 'variants'],
+      relations: ['category', 'subCategory', 'brand', 'productType', 'images', 'variants'],
       order: {
         images: {
           isPrimary: 'DESC',
@@ -214,13 +277,15 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    return product;
+    const enriched = product as ProductWithSpecs;
+    enriched.specGroups = await this.attributeValuesService.getSpecGroups(product.id);
+    return enriched;
   }
 
-  async findBySlug(slug: string): Promise<Product> {
+  async findBySlug(slug: string): Promise<ProductWithSpecs> {
     const product = await this.productsRepository.findOne({
       where: { slug },
-      relations: ['category', 'subCategory', 'brand', 'images', 'variants'],
+      relations: ['category', 'subCategory', 'brand', 'productType', 'images', 'variants'],
       order: {
         images: {
           isPrimary: 'DESC',
@@ -233,7 +298,9 @@ export class ProductsService {
       throw new NotFoundException(`Product with slug ${slug} not found`);
     }
 
-    return product;
+    const enriched = product as ProductWithSpecs;
+    enriched.specGroups = await this.attributeValuesService.getSpecGroups(product.id);
+    return enriched;
   }
 
   async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
@@ -246,10 +313,22 @@ export class ProductsService {
     if (effectiveBrandId && effectiveCategoryId) {
       await this.validateBrandCategory(effectiveBrandId, effectiveCategoryId);
     }
+    const effectiveProductTypeId =
+      updateProductDto.productTypeId !== undefined
+        ? updateProductDto.productTypeId
+        : product.productTypeId;
+    if (effectiveProductTypeId && effectiveCategoryId) {
+      await this.validateProductType(effectiveProductTypeId, effectiveCategoryId);
+    }
 
-    Object.assign(product, updateProductDto);
+    const { attributeValues, ...productData } = updateProductDto;
+    Object.assign(product, productData);
 
     const saved = await this.productsRepository.save(product);
+
+    if (attributeValues !== undefined) {
+      await this.attributeValuesService.saveValues(id, attributeValues);
+    }
 
     // Update variant SKU and images if modified
     const defaultVariant = await this.variantsRepository.findOne({

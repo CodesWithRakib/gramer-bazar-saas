@@ -1,4 +1,4 @@
-import { Controller, Get, Param, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, HttpStatus, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service.js';
 import { CategoryResponseDto } from '../../catalog/dto/category-response.dto.js';
@@ -44,10 +44,29 @@ export class PublicCategoriesController {
     return this.categoriesService.findAllActive();
   }
 
+  @Get(':slug/product-types')
+  @ApiOperation({
+    summary: 'List active product types attached to a category',
+    description: 'Powers category-aware seller forms and product-type navigation.',
+  })
+  @ApiParam({ name: 'slug', type: String, example: 'pc-components' })
+  @ApiStandardResponse({
+    type: CategoryResponseDto,
+    isArray: true,
+    status: HttpStatus.OK,
+    description: 'Product types for the category',
+  })
+  @ApiCommonErrors([404, 500])
+  async getProductTypes(@Param('slug') slug: string) {
+    const category = await this.categoriesService.findBySlugOrFail(slug);
+    return category.productTypes;
+  }
+
   @Get(':slug')
   @ApiOperation({
     summary: 'Retrieve active category by slug',
-    description: 'Returns category details matching URL slug.',
+    description:
+      'Returns category details with ancestors (breadcrumb), children and product types.',
   })
   @ApiParam({ name: 'slug', type: String, example: 'fresh-vegetables' })
   @ApiStandardResponse({
@@ -56,7 +75,11 @@ export class PublicCategoriesController {
     description: 'Category details',
   })
   @ApiCommonErrors([404, 500])
-  findBySlug(@Param('slug') slug: string) {
-    return this.categoriesService.findBySlug(slug);
+  async findBySlug(@Param('slug') slug: string) {
+    const category = await this.categoriesService.findBySlug(slug);
+    if (!category) {
+      throw new NotFoundException(`Category with slug ${slug} not found`);
+    }
+    return category;
   }
 }

@@ -135,6 +135,9 @@ export function ProductDetailsClient({
   const shortDescription = isBn
     ? masterProduct.shortDescriptionBn
     : masterProduct.shortDescriptionEn;
+  // Structured specifications generated from the product type attribute schema.
+  const specGroups = masterProduct.specGroups ?? [];
+  const hasStructuredSpecs = specGroups.some((group) => group.specs.length > 0);
 
   // Resolve Price and Discount safely
   const rawPrice = Number(product.price);
@@ -442,6 +445,39 @@ export function ProductDetailsClient({
                   <h3 className="text-lg font-bold text-foreground">
                     {isBn ? 'পণ্যের বৈশিষ্ট্য ও তথ্য' : 'Product Specifications'}
                   </h3>
+                  {/* Attribute-driven grouped specs (Processor, Monitor, …) */}
+                  {hasStructuredSpecs && (
+                    <div className="space-y-4">
+                      {specGroups.map((group) => (
+                        <div
+                          key={group.specGroup}
+                          className="border border-border/70 rounded-2xl overflow-hidden divide-y divide-border/60"
+                        >
+                          <div className="px-3 py-2 bg-primary/5 text-xs md:text-sm font-bold text-foreground">
+                            {group.specGroup}
+                          </div>
+                          {group.specs.map((spec, index) => (
+                            <div
+                              key={spec.attributeId}
+                              className={
+                                index % 2 === 1
+                                  ? 'grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20'
+                                  : 'grid grid-cols-3 p-3 text-xs md:text-sm'
+                              }
+                            >
+                              <span className="font-semibold text-muted-foreground">
+                                {isBn ? spec.nameBn : spec.nameEn}
+                              </span>
+                              <span className="col-span-2 font-medium text-foreground">
+                                {isBn ? spec.displayValueBn : spec.displayValueEn}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="border border-border/70 rounded-2xl overflow-hidden divide-y divide-border/60">
                     <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
                       <span className="font-semibold text-muted-foreground">
@@ -499,16 +535,6 @@ export function ProductDetailsClient({
                           : isBn
                             ? `${stock} টি স্টকে আছে`
                             : `${stock} units available`}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 p-3 text-xs md:text-sm bg-muted/20">
-                      <span className="font-semibold text-muted-foreground">
-                        {isBn ? 'উৎপত্তি' : 'Origin'}
-                      </span>
-                      <span className="col-span-2 font-medium text-foreground">
-                        {isBn
-                          ? 'বাংলাদেশি গ্রামীণ খামার ও বাজার'
-                          : 'Local Rural Farms & Artisan Markets, Bangladesh'}
                       </span>
                     </div>
                   </div>

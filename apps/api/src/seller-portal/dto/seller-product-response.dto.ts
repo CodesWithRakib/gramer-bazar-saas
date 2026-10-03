@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import type { ProductSpecGroup } from '../../catalog/products/product-attribute-values.service.js';
 
 export class SellerProductImageDto {
   @ApiProperty({ description: 'Image UUID' })
@@ -101,6 +102,15 @@ export class SellerProductDetailDto {
 
   @ApiPropertyOptional({ type: String, nullable: true })
   brandNameBn?: string | null;
+
+  @ApiPropertyOptional({ nullable: true, description: 'Product type UUID' })
+  productTypeId?: string | null;
+
+  @ApiPropertyOptional({
+    description: 'Structured specification groups for this product',
+    type: 'array',
+  })
+  specGroups?: ProductSpecGroup[];
 
   @ApiProperty({ example: 120, description: 'Regular price in BDT' })
   price: number;

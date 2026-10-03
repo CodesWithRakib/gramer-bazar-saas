@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -33,11 +33,13 @@ import {
   useGetSellerCategoriesQuery,
   useGetSellerProductQuery,
   useUpdateSellerProductMutation,
+  type SellerCategoryOption,
 } from '@/features/seller';
+import { useGetPublicProductTypesQuery } from '@/features/catalog/catalogApi';
 import { SellerProductImageManager } from './SellerProductImageManager';
 
 const NO_BRAND = '__none__';
-const NO_SUBCATEGORY = '__none__';
+const NO_PRODUCT_TYPE = '__pt_none__';
 
 const productSchema = z
   .object({
@@ -46,6 +48,7 @@ const productSchema = z
     categoryId: z.string().min(1, 'Please choose a category'),
     subCategoryId: z.string().optional(),
     brandId: z.string().optional(),
+    productTypeId: z.string().optional(),
     shortDescriptionEn: z.string().max(500).optional(),
     shortDescriptionBn: z.string().max(500).optional(),
     descriptionEn: z.string().max(5000).optional(),
@@ -108,6 +111,7 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
       categoryId: product?.categoryId ?? '',
       subCategoryId: product?.subCategoryId ?? '',
       brandId: product?.brandId ?? '',
+      productTypeId: product?.productTypeId ?? '',
       shortDescriptionEn: product?.shortDescriptionEn ?? '',
       shortDescriptionBn: product?.shortDescriptionBn ?? '',
       descriptionEn: product?.descriptionEn ?? '',
@@ -132,14 +136,85 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
   const watchedPrice = Number(form.watch('price')) || 0;
   const watchedDiscount = Number(form.watch('discountPrice')) || 0;
 
-  const parentCategories = useMemo(
-    () => categories.filter((category) => !category.parentId),
-    [categories]
+  // Flatten the category list into an indented, arbitrarily deep picker.
+  const flatCategories = useMemo(() => {
+    const byParent = new Map<string, SellerCategoryOption[]>();
+    for (const category of categories) {
+      const key = category.parentId ?? '__root__';
+      const list = byParent.get(key) ?? [];
+      list.push(category);
+      byParent.set(key, list);
+    }
+    const out: Array<SellerCategoryOption & { depth: number }> = [];
+    const walk = (parentKey: string, depth: number) => {
+      const list = (byParent.get(parentKey) ?? []).sort((a, b) => a.nameEn.localeCompare(b.nameEn));
+      for (const category of list) {
+        out.push({ ...category, depth });
+        walk(category.id, depth + 1);
+      }
+    };
+    walk('__root__', 0);
+    return out;
+  }, [categories]);
+
+  const { data: productTypes = [] } = useGetPublicProductTypesQuery(
+    { categoryId: selectedCategoryId, includeMappings: true },
+    { skip: !selectedCategoryId }
   );
-  const subCategories = useMemo(
-    () => categories.filter((category) => category.parentId === selectedCategoryId),
-    [categories, selectedCategoryId]
+  const watchedProductTypeId = form.watch('productTypeId') ?? '';
+  const selectedProductType = useMemo(
+    () => productTypes.find((pt) => pt.id === watchedProductTypeId) ?? null,
+    [productTypes, watchedProductTypeId]
   );
+  const attributeMappings = selectedProductType?.attributeMappings ?? [];
+
+  // Dynamic attribute values keyed by attribute id.
+  type AttributeStateValue = {
+    optionSlug?: string;
+    valueText?: string;
+    valueNumber?: string;
+    valueBoolean?: boolean;
+  };
+  const [attributeValues, setAttributeValues] = useState<Record<string, AttributeStateValue>>({});
+
+  // Prefill structured specs when editing an existing product.
+  const productSpecsKey = product?.specGroups ? JSON.stringify(product.specGroups) : '';
+  useEffect(() => {
+    if (!product?.specGroups) return;
+    const next: Record<string, AttributeStateValue> = {};
+    for (const group of product.specGroups) {
+      for (const spec of group.specs) {
+        next[spec.attributeId] = {
+          optionSlug: spec.optionSlug ?? undefined,
+          valueText: spec.valueText ?? undefined,
+          valueNumber: spec.valueNumber !== null ? String(spec.valueNumber) : undefined,
+          valueBoolean: spec.valueBoolean ?? undefined,
+        };
+      }
+    }
+    setAttributeValues(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productSpecsKey]);
+
+  const buildAttributeValuePayload = () =>
+    Object.entries(attributeValues)
+      .map(([attributeId, value]) => ({
+        attributeId,
+        optionSlug: value.optionSlug || undefined,
+        valueText: value.valueText?.trim() || undefined,
+        valueNumber:
+          value.valueNumber !== undefined && value.valueNumber !== ''
+            ? Number(value.valueNumber)
+            : undefined,
+        valueBoolean: value.valueBoolean,
+      }))
+      .filter(
+        (value) =>
+          value.optionSlug !== undefined ||
+          value.valueText !== undefined ||
+          value.valueNumber !== undefined ||
+          value.valueBoolean === true
+      );
 
   const onSubmit = async (values: ProductFormValues) => {
     const payload = {
@@ -148,6 +223,8 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
       categoryId: values.categoryId,
       subCategoryId: values.subCategoryId || undefined,
       brandId: values.brandId || undefined,
+      productTypeId: values.productTypeId || undefined,
+      attributeValues: buildAttributeValuePayload(),
       shortDescriptionEn: values.shortDescriptionEn?.trim() || undefined,
       shortDescriptionBn: values.shortDescriptionBn?.trim() || undefined,
       descriptionEn: values.descriptionEn?.trim() || undefined,
@@ -180,6 +257,8 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
               ...payload,
               subCategoryId: payload.subCategoryId ?? null,
               brandId: payload.brandId ?? null,
+              productTypeId: payload.productTypeId ?? null,
+              attributeValues: buildAttributeValuePayload(),
             };
 
         await updateProduct({ id: listingId, data: listingPayload }).unwrap();
@@ -352,38 +431,12 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {parentCategories.map((category) => (
+                  {flatCategories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.icon ? `${category.icon} ` : ''}
-                      {isBn ? category.nameBn : category.nameEn}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <Field
-              label={isBn ? 'সাব-ক্যাটাগরি' : 'Sub-category'}
-              hint={isBn ? 'ঐচ্ছিক' : 'Optional'}
-            >
-              <Select
-                value={form.watch('subCategoryId') || NO_SUBCATEGORY}
-                disabled={catalogLocked || subCategories.length === 0}
-                onValueChange={(value) =>
-                  form.setValue('subCategoryId', value === NO_SUBCATEGORY ? '' : value)
-                }
-              >
-                <SelectTrigger
-                  className="w-full"
-                  aria-label={isBn ? 'সাব-ক্যাটাগরি' : 'Sub-category'}
-                >
-                  <SelectValue placeholder={isBn ? 'নির্বাচন করুন' : 'Select'} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_SUBCATEGORY}>{isBn ? 'প্রযোজ্য নয়' : 'None'}</SelectItem>
-                  {subCategories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {isBn ? category.nameBn : category.nameEn}
+                      <span style={{ paddingInlineStart: category.depth * 12 }}>
+                        {category.icon ? `${category.icon} ` : ''}
+                        {isBn ? category.nameBn : category.nameEn}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -415,6 +468,177 @@ export function SellerProductForm({ lang, listingId }: SellerProductFormProps) {
             </Field>
           </CardContent>
         </Card>
+
+        {/* ------------------------------------- product type & attributes */}
+        {selectedCategoryId && (
+          <Card className="shadow-none">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base">
+                {isBn ? 'প্রোডাক্ট টাইপ ও স্পেসিফিকেশন' : 'Product type & specifications'}
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {isBn
+                  ? 'নির্বাচিত ক্যাটাগরি অনুযায়ী প্রযোজ্য ক্ষেত্রগুলো স্বয়ংক্রিয়ভাবে দেখানো হয়েছে'
+                  : 'Fields are generated automatically from the selected category’s product type'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {productTypes.length > 0 ? (
+                <Field label={isBn ? 'প্রোডাক্ট টাইপ' : 'Product type'}>
+                  <Select
+                    value={watchedProductTypeId || NO_PRODUCT_TYPE}
+                    disabled={catalogLocked}
+                    onValueChange={(value) => {
+                      const next = value === NO_PRODUCT_TYPE ? '' : value;
+                      form.setValue('productTypeId', next);
+                      setAttributeValues({});
+                    }}
+                  >
+                    <SelectTrigger
+                      className="w-full"
+                      aria-label={isBn ? 'প্রোডাক্ট টাইপ' : 'Product type'}
+                    >
+                      <SelectValue placeholder={isBn ? 'নির্বাচন করুন' : 'Select'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_PRODUCT_TYPE}>
+                        {isBn ? 'প্রযোজ্য নয়' : 'None'}
+                      </SelectItem>
+                      {productTypes.map((pt) => (
+                        <SelectItem key={pt.id} value={pt.id}>
+                          {isBn ? pt.nameBn : pt.nameEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              ) : (
+                <p className="text-muted-foreground text-xs">
+                  {isBn
+                    ? 'এই ক্যাটাগরির জন্য কোনো প্রোডাক্ট টাইপ নেই।'
+                    : 'No product types are defined for this category.'}
+                </p>
+              )}
+
+              {attributeMappings.length > 0 && (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {attributeMappings.map((mapping) => {
+                    const attribute = mapping.attribute;
+                    if (!attribute) return null;
+                    const value = attributeValues[attribute.id] ?? {};
+                    const isSelect =
+                      attribute.dataType === 'SELECT' ||
+                      attribute.dataType === 'MULTI_SELECT' ||
+                      attribute.dataType === 'RANGE';
+                    if (isSelect) {
+                      return (
+                        <Field
+                          key={attribute.id}
+                          label={isBn ? attribute.nameBn : attribute.nameEn}
+                        >
+                          <Select
+                            value={value.optionSlug || NO_PRODUCT_TYPE}
+                            disabled={catalogLocked}
+                            onValueChange={(selected) =>
+                              setAttributeValues((prev) => ({
+                                ...prev,
+                                [attribute.id]: {
+                                  ...prev[attribute.id],
+                                  optionSlug: selected === NO_PRODUCT_TYPE ? undefined : selected,
+                                },
+                              }))
+                            }
+                          >
+                            <SelectTrigger
+                              className="w-full"
+                              aria-label={isBn ? attribute.nameBn : attribute.nameEn}
+                            >
+                              <SelectValue placeholder={isBn ? 'নির্বাচন করুন' : 'Select'} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={NO_PRODUCT_TYPE}>
+                                {isBn ? 'প্রযোজ্য নয়' : 'None'}
+                              </SelectItem>
+                              {(attribute.options ?? []).map((option) => (
+                                <SelectItem key={option.id} value={option.slug}>
+                                  {isBn && option.valueBn ? option.valueBn : option.value}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </Field>
+                      );
+                    }
+                    if (attribute.dataType === 'NUMBER') {
+                      return (
+                        <Field
+                          key={attribute.id}
+                          label={isBn ? attribute.nameBn : attribute.nameEn}
+                          hint={attribute.unit ?? undefined}
+                        >
+                          <Input
+                            type="number"
+                            step="any"
+                            disabled={catalogLocked}
+                            value={value.valueNumber ?? ''}
+                            onChange={(e) =>
+                              setAttributeValues((prev) => ({
+                                ...prev,
+                                [attribute.id]: {
+                                  ...prev[attribute.id],
+                                  valueNumber: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        </Field>
+                      );
+                    }
+                    if (attribute.dataType === 'BOOLEAN') {
+                      return (
+                        <Field
+                          key={attribute.id}
+                          label={isBn ? attribute.nameBn : attribute.nameEn}
+                        >
+                          <div className="flex h-10 items-center">
+                            <Switch
+                              checked={value.valueBoolean ?? false}
+                              disabled={catalogLocked}
+                              onCheckedChange={(checked) =>
+                                setAttributeValues((prev) => ({
+                                  ...prev,
+                                  [attribute.id]: { ...prev[attribute.id], valueBoolean: checked },
+                                }))
+                              }
+                            />
+                          </div>
+                        </Field>
+                      );
+                    }
+                    return (
+                      <Field
+                        key={attribute.id}
+                        label={isBn ? attribute.nameBn : attribute.nameEn}
+                        hint={attribute.unit ?? undefined}
+                      >
+                        <Input
+                          disabled={catalogLocked}
+                          value={value.valueText ?? ''}
+                          onChange={(e) =>
+                            setAttributeValues((prev) => ({
+                              ...prev,
+                              [attribute.id]: { ...prev[attribute.id], valueText: e.target.value },
+                            }))
+                          }
+                        />
+                      </Field>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* -------------------------------------------------- descriptions */}
         <Card className="shadow-none">

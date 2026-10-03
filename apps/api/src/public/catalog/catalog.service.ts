@@ -3,6 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SellerProduct } from '../../inventory/entities/seller-product.entity.js';
 import { Brand } from '../../catalog/entities/brand.entity.js';
+import {
+  CatalogFilterInput,
+  ProductTypesService,
+} from '../../catalog/product-types/product-types.service.js';
+import { ProductAttributeValuesService } from '../../catalog/products/product-attribute-values.service.js';
 import { SearchCatalogDto } from './dto/search-catalog.dto.js';
 
 @Injectable()
@@ -12,7 +17,33 @@ export class CatalogService {
     private readonly sellerProductRepo: Repository<SellerProduct>,
     @InjectRepository(Brand)
     private readonly brandRepo: Repository<Brand>,
+    private readonly productTypesService: ProductTypesService,
+    private readonly attributeValuesService: ProductAttributeValuesService,
   ) {}
+
+  /** Dynamic filter facets derived entirely from the product type schema. */
+  async getFacets(filter: CatalogFilterInput) {
+    return this.productTypesService.getFacets(filter);
+  }
+
+  private parseAttributeFilters(raw?: string): Record<string, string[]> | undefined {
+    if (!raw) return undefined;
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const normalized: Record<string, string[]> = {};
+      for (const [key, value] of Object.entries(parsed)) {
+        if (Array.isArray(value)) {
+          const values = value.map((item) => String(item)).filter((item) => item.length > 0);
+          if (values.length > 0) normalized[key] = values;
+        } else if (value !== null && value !== undefined && value !== '') {
+          normalized[key] = [String(value)];
+        }
+      }
+      return normalized;
+    } catch {
+      return undefined;
+    }
+  }
 
   async getBrands() {
     return this.brandRepo.find({
@@ -50,14 +81,31 @@ export class CatalogService {
 
     if (q) {
       query.andWhere(
-        '(p.nameEn ILIKE :q OR p.nameBn ILIKE :q OR pv.nameEn ILIKE :q OR pv.nameBn ILIKE :q OR p.slug ILIKE :q)',
+        '(p.nameEn ILIKE :q OR p.nameBn ILIKE :q OR pv.nameEn ILIKE :q OR pv.nameBn ILIKE :q OR p.slug ILIKE :q OR EXISTS (SELECT 1 FROM product_attribute_values qav LEFT JOIN attribute_options qao ON qao.id = qav.option_id WHERE qav.product_id = p.id AND (qav.value_text ILIKE :q OR qao.value ILIKE :q OR qao.value_bn ILIKE :q)))',
         { q: `%${q}%` },
       );
     }
 
+    // Category filter resolves the whole subtree via the materialized path, so
+    // any taxonomy depth works without extra relations.
     if (categoryId) {
-      query.andWhere('(p.categoryId = :categoryId OR p.subCategoryId = :categoryId)', {
-        categoryId,
+      query.andWhere(
+        `(p.categoryId = :categoryId OR p.subCategoryId = :categoryId OR p.categoryId IN (
+           WITH RECURSIVE descendants AS (
+             SELECT id FROM categories WHERE id = :categoryId
+             UNION ALL
+             SELECT c.id FROM categories c JOIN descendants d ON c.parent_id = d.id
+           )
+           SELECT id FROM descendants
+         ))`,
+        { categoryId },
+      );
+    }
+
+    if (searchDto.categoryPath) {
+      query.andWhere("(cat.path = :categoryPath OR cat.path LIKE :categoryPathPrefix)", {
+        categoryPath: searchDto.categoryPath,
+        categoryPathPrefix: `${searchDto.categoryPath}/%`,
       });
     }
 
@@ -77,6 +125,17 @@ export class CatalogService {
       });
     }
 
+    if (searchDto.productTypeId) {
+      query.andWhere('p.productTypeId = :productTypeId', {
+        productTypeId: searchDto.productTypeId,
+      });
+    }
+
+    const attributeFilters = this.parseAttributeFilters(searchDto.attributes);
+    if (attributeFilters) {
+      this.productTypesService.applyAttributeFilters(query, 'p', attributeFilters);
+    }
+
     if (minPrice !== undefined) {
       query.andWhere('sp.price >= :minPrice', { minPrice });
     }
@@ -90,9 +149,17 @@ export class CatalogService {
     }
 
     if (searchDto.minRating !== undefined && searchDto.minRating > 0) {
-      query.andWhere('p.averageRating >= :minRating', {
-        minRating: searchDto.minRating,
-      });
+      // Aggregate is computed from approved reviews; products has no stored
+      // averageRating column, so this must stay an EXISTS subquery.
+      query.andWhere(
+        `EXISTS (
+           SELECT 1 FROM reviews r
+           WHERE r.product_id = p.id AND r.is_approved = true
+           GROUP BY r.product_id
+           HAVING AVG(r.rating) >= :minRating
+         )`,
+        { minRating: searchDto.minRating },
+      );
     }
 
     if (searchDto.inStock) {
@@ -533,6 +600,7 @@ export class CatalogService {
       .leftJoinAndSelect('pv.product', 'p')
       .leftJoinAndSelect('p.category', 'cat')
       .leftJoinAndSelect('p.subCategory', 'subCat')
+      .leftJoinAndSelect('p.productType', 'productType')
       .leftJoinAndSelect('p.images', 'images')
       .leftJoinAndSelect('p.brand', 'b')
       .leftJoinAndSelect('sp.shop', 'shop')
@@ -597,6 +665,25 @@ export class CatalogService {
         }
       });
     }
+
+    // Attach structured, grouped specifications for the detail page.
+    const detailProductIds = [
+      ...new Set(items.map((i) => i.productVariant?.product?.id).filter((id): id is string => !!id)),
+    ];
+    const specEntries = await Promise.all(
+      detailProductIds.map(
+        async (id) => [id, await this.attributeValuesService.getSpecGroups(id)] as const,
+      ),
+    );
+    const specMap = new Map(specEntries);
+    items.forEach((item) => {
+      const product = item.productVariant?.product as unknown as
+        | Record<string, unknown>
+        | undefined;
+      if (product && typeof product.id === 'string') {
+        product.specGroups = specMap.get(product.id) ?? [];
+      }
+    });
 
     return items;
   }

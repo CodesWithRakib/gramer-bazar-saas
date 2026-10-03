@@ -16,6 +16,7 @@ import { SellerProduct } from '../inventory/entities/seller-product.entity.js';
 import { Inventory } from '../inventory/entities/inventory.entity.js';
 import { Shop } from '../shops/entities/shop.entity.js';
 import { ProductImageService } from '../catalog/products/product-image.service.js';
+import { ProductAttributeValuesService } from '../catalog/products/product-attribute-values.service.js';
 import { CreateSellerProductDto } from './dto/create-seller-product.dto.js';
 import { UpdateSellerProductDto } from './dto/update-seller-product.dto.js';
 import { SellerProductQueryDto } from './dto/seller-query.dto.js';
@@ -52,6 +53,7 @@ export class SellerProductsService {
     @InjectRepository(Shop)
     private readonly shopRepository: Repository<Shop>,
     private readonly productImageService: ProductImageService,
+    private readonly attributeValuesService: ProductAttributeValuesService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -222,6 +224,8 @@ export class SellerProductsService {
       brandId: product?.brandId ?? null,
       brandNameEn: brand?.nameEn ?? null,
       brandNameBn: brand?.nameBn ?? null,
+      productTypeId: product?.productTypeId ?? null,
+      specGroups: [],
       price,
       discountPrice,
       effectivePrice: discountPrice !== null && discountPrice > 0 ? discountPrice : price,
@@ -379,9 +383,10 @@ export class SellerProductsService {
 
   async getProduct(sellerId: string, listingId: string): Promise<SellerProductDetailDto> {
     const { shop, listing, product } = await this.loadOwnedListing(sellerId, listingId);
-    const [images, soldMap] = await Promise.all([
+    const [images, soldMap, specGroups] = await Promise.all([
       product ? this.imagesByProduct([product.id]) : Promise.resolve(new Map()),
       this.unitsSoldByListing([listing.id]),
+      product ? this.attributeValuesService.getSpecGroups(product.id) : Promise.resolve([]),
     ]);
 
     const row: ListingRow = {
@@ -393,12 +398,14 @@ export class SellerProductsService {
       brand: listing.productVariant?.product?.brand ?? null,
     };
 
-    return this.toDetailDto(
+    const detail = this.toDetailDto(
       row,
       product ? (images.get(product.id) ?? []) : [],
       soldMap.get(listing.id) ?? 0,
       shop.id,
     );
+    detail.specGroups = specGroups;
+    return detail;
   }
 
   async listCategories() {
@@ -442,12 +449,13 @@ export class SellerProductsService {
       }
     }
 
-    const listingId = await this.dataSource.transaction(async (manager) => {
+    const { listingId, productId } = await this.dataSource.transaction(async (manager) => {
       const product = manager.create(Product, {
         ownerShopId: shop.id,
         categoryId: dto.categoryId,
         subCategoryId: dto.subCategoryId ?? null,
         brandId: dto.brandId ?? null,
+        productTypeId: dto.productTypeId ?? null,
         nameEn: dto.nameEn.trim(),
         nameBn: dto.nameBn.trim(),
         slug: slugifyUnique(dto.nameEn, 'product', 90),
@@ -498,8 +506,12 @@ export class SellerProductsService {
       });
       await manager.save(Inventory, inventory);
 
-      return savedListing.id;
+      return { listingId: savedListing.id, productId: savedProduct.id };
     });
+
+    if (dto.attributeValues !== undefined) {
+      await this.attributeValuesService.saveValues(productId, dto.attributeValues);
+    }
 
     return this.getProduct(sellerId, listingId);
   }
@@ -529,13 +541,15 @@ export class SellerProductsService {
       'categoryId',
       'subCategoryId',
       'brandId',
+      'productTypeId',
       'shortDescriptionEn',
       'shortDescriptionBn',
       'descriptionEn',
       'descriptionBn',
       'unit',
     ] as const;
-    const touchesCatalog = catalogFields.some((key) => dto[key] !== undefined);
+    const touchesCatalog =
+      catalogFields.some((key) => dto[key] !== undefined) || dto.attributeValues !== undefined;
     if (touchesCatalog) {
       this.assertOwnsCatalogProduct(product, shop.id);
     }
@@ -582,6 +596,7 @@ export class SellerProductsService {
           if (dto.categoryId !== undefined) catalog.categoryId = dto.categoryId;
           if (dto.subCategoryId !== undefined) catalog.subCategoryId = dto.subCategoryId;
           if (dto.brandId !== undefined) catalog.brandId = dto.brandId;
+          if (dto.productTypeId !== undefined) catalog.productTypeId = dto.productTypeId;
           if (dto.shortDescriptionEn !== undefined)
             catalog.shortDescriptionEn = dto.shortDescriptionEn;
           if (dto.shortDescriptionBn !== undefined)
@@ -608,6 +623,10 @@ export class SellerProductsService {
         }
       }
     });
+
+    if (dto.attributeValues !== undefined && product) {
+      await this.attributeValuesService.saveValues(product.id, dto.attributeValues);
+    }
 
     return this.getProduct(sellerId, listingId);
   }

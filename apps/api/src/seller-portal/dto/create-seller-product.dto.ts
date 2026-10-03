@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsInt,
   IsNotEmpty,
@@ -9,8 +10,11 @@ import {
   Max,
   MaxLength,
   Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ProductAttributeValueInputDto } from '../../catalog/dto/attribute.dto.js';
 
 /**
  * Creates a new catalog product owned by the authenticated seller's shop:
@@ -43,6 +47,21 @@ export class CreateSellerProductDto {
   @IsOptional()
   @IsUUID()
   brandId?: string;
+
+  @ApiPropertyOptional({ description: 'Product type UUID defining the attribute schema' })
+  @IsOptional()
+  @IsUUID()
+  productTypeId?: string;
+
+  @ApiPropertyOptional({
+    type: [ProductAttributeValueInputDto],
+    description: 'Structured specification values for this product',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductAttributeValueInputDto)
+  attributeValues?: ProductAttributeValueInputDto[];
 
   @ApiPropertyOptional({ description: 'Short English description', maxLength: 500 })
   @IsOptional()

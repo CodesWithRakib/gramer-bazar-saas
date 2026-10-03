@@ -23,6 +23,7 @@ export class BroadcastAudienceController {
 
   @Get('segments')
   @ApiOperation({ summary: 'Audience segment counts and marketing consent overview' })
+  @ApiStandardResponse({ description: 'Audience segment counts' })
   @ApiCommonErrors([401, 403])
   segments() {
     return this.audienceService.getSegmentCounts();
@@ -30,6 +31,7 @@ export class BroadcastAudienceController {
 
   @Get('customers')
   @ApiOperation({ summary: 'Search customers for a SELECTED_CUSTOMERS audience' })
+  @ApiStandardResponse({ description: 'Matching customers' })
   @ApiCommonErrors([401, 403])
   customers(@Query() query: SearchCustomersDto) {
     return this.audienceService.searchCustomers(query.search, query.limit);

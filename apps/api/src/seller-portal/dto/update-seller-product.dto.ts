@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsInt,
   IsNumber,
@@ -8,8 +9,11 @@ import {
   Max,
   MaxLength,
   Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ProductAttributeValueInputDto } from '../../catalog/dto/attribute.dto.js';
 
 /**
  * Partial update for a seller listing. Listing-level fields (price, stock,
@@ -85,6 +89,21 @@ export class UpdateSellerProductDto {
   @IsOptional()
   @IsUUID()
   brandId?: string | null;
+
+  @ApiPropertyOptional({ nullable: true, description: 'Product type UUID (owner-only)' })
+  @IsOptional()
+  @IsUUID()
+  productTypeId?: string | null;
+
+  @ApiPropertyOptional({
+    type: [ProductAttributeValueInputDto],
+    description: 'Replaces the structured specification values (owner-only)',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductAttributeValueInputDto)
+  attributeValues?: ProductAttributeValueInputDto[];
 
   @ApiPropertyOptional({ maxLength: 500, nullable: true })
   @IsOptional()

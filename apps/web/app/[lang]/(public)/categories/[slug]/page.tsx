@@ -1,19 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { use } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  useGetPublicCategoryTreeQuery,
+  useGetPublicCategoryBySlugQuery,
   useSearchProductsQuery,
-  Category,
 } from '@/features/catalog/catalogApi';
 import { ProductGrid } from '@/components/catalog/ProductGrid';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { ChevronRight, Home, PackageSearch, ChevronLeft } from 'lucide-react';
 import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
 import { ProductSortSelect } from '@/components/catalog/ProductSortSelect';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { use } from 'react';
+import { MarketplacePagination } from '@/components/catalog/MarketplacePagination';
 import { cn } from '@/lib/utils';
 
 export default function CategoryDetailsPage({
@@ -23,35 +22,16 @@ export default function CategoryDetailsPage({
 }) {
   const { lang, slug } = use(params);
   const isBn = lang === 'bn';
-
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { data: tree, isLoading: isTreeLoading } = useGetPublicCategoryTreeQuery();
+  const {
+    data: category,
+    isLoading: isCategoryLoading,
+    isError: isCategoryError,
+  } = useGetPublicCategoryBySlugQuery(slug);
 
-  // Find matching category in root or children
-  let category: Category | null = null;
-  let rootCategory: Category | null = null;
-  if (tree) {
-    for (const root of tree) {
-      if (root.slug === slug) {
-        category = root;
-        rootCategory = root;
-        break;
-      }
-      const child = root.children?.find((c) => c.slug === slug);
-      if (child) {
-        category = child;
-        rootCategory = root;
-        break;
-      }
-    }
-  }
-
-  // Filters from URL
-  const subCategorySlugParam =
-    searchParams.get('subCategory') || searchParams.get('subCategorySlug') || undefined;
-  const subCategoryId = searchParams.get('subCategoryId') || undefined;
+  const productTypeId = searchParams.get('productTypeId') || undefined;
   const brandId = searchParams.get('brandId') || undefined;
   const minPrice = searchParams.get('minPrice');
   const maxPrice = searchParams.get('maxPrice');
@@ -59,17 +39,17 @@ export default function CategoryDetailsPage({
   const minRating = searchParams.get('minRating')
     ? Number(searchParams.get('minRating'))
     : undefined;
+  const attributes = searchParams.get('attributes') || undefined;
   const sort = searchParams.get('sort') || 'newest';
   const page = parseInt(searchParams.get('page') || '1', 10);
 
-  // Search products using the category ID / slug
   const { data: productsData, isLoading: isProductsLoading } = useSearchProductsQuery(
     {
-      categorySlug: category?.parentId ? undefined : slug,
-      categoryId: category?.parentId ? undefined : category?.id,
-      subCategoryId: category?.parentId ? category.id : subCategoryId,
-      subCategorySlug: subCategorySlugParam,
+      categoryPath: category?.path || undefined,
+      categoryId: category?.id,
+      productTypeId,
       brandId,
+      attributes,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       inStock,
@@ -81,22 +61,13 @@ export default function CategoryDetailsPage({
     { skip: !category?.id }
   );
 
-  const updateUrl = (key: string, value: string | number | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(key, value.toString());
-    } else {
-      params.delete(key);
-    }
-    params.delete('page');
-    router.push(`/${lang}/categories/${slug}?${params.toString()}`);
-  };
-
   const meta = productsData?.meta;
   const isEmpty = productsData?.data?.length === 0;
-  const subcategories = rootCategory?.children || [];
+  const children = category?.children ?? [];
+  const productTypes = category?.productTypes ?? [];
+  const breadcrumb = category?.breadcrumb ?? [];
 
-  if (isTreeLoading) {
+  if (isCategoryLoading) {
     return (
       <div className="container mx-auto px-4 py-16 text-center text-sm text-muted-foreground">
         {isBn ? 'ক্যাটাগরি লোড হচ্ছে...' : 'Loading category...'}
@@ -104,7 +75,7 @@ export default function CategoryDetailsPage({
     );
   }
 
-  if (!category) {
+  if (isCategoryError || !category) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
         <h1 className="text-2xl font-bold mb-4">
@@ -126,10 +97,10 @@ export default function CategoryDetailsPage({
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-10 max-w-7xl">
-      {/* Breadcrumb Navigation (Phase 15) */}
+      {/* Breadcrumb reflects the full materialized path at any depth */}
       <nav
         aria-label="Breadcrumb"
-        className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6"
+        className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground mb-6"
       >
         <Link
           href={`/${lang}`}
@@ -138,30 +109,36 @@ export default function CategoryDetailsPage({
           <Home className="h-3.5 w-3.5" />
           <span>{isBn ? 'হোম' : 'Home'}</span>
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
-        <Link href={`/${lang}/categories`} className="hover:text-primary transition-colors">
-          {isBn ? 'সকল ক্যাটাগরি' : 'All Categories'}
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
-        <span className="text-foreground font-semibold truncate">{categoryName}</span>
+        {breadcrumb.map((crumb) => (
+          <React.Fragment key={crumb.id}>
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 rtl:rotate-180" />
+            <Link
+              href={`/${lang}/categories/${crumb.slug}`}
+              className={cn(
+                'hover:text-primary transition-colors truncate',
+                crumb.slug === category.slug && 'text-foreground font-semibold'
+              )}
+            >
+              {isBn ? crumb.nameBn : crumb.nameEn}
+            </Link>
+          </React.Fragment>
+        ))}
       </nav>
 
       <div className="flex flex-col md:flex-row gap-6 lg:gap-8">
-        {/* Filters Sidebar (Phase 8 & 9) */}
         <div className="hidden md:block w-64 flex-shrink-0">
           <ProductFilterSidebar
             lang={lang}
-            categorySlug={slug}
-            subCategorySlug={subCategorySlugParam}
+            categoryId={category.id}
+            categoryPath={category.path ?? undefined}
           />
         </div>
 
         <div className="flex-1 min-w-0 space-y-6">
-          {/* Category Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-muted/20 p-5 rounded-2xl border border-border/60">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center p-2 text-3xl shrink-0 shadow-xs border border-primary/20">
-                {category.icon || '🥬'}
+                {category.icon || '📦'}
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
@@ -188,8 +165,8 @@ export default function CategoryDetailsPage({
               <div className="md:hidden">
                 <ProductFilterSidebar
                   lang={lang}
-                  categorySlug={slug}
-                  subCategorySlug={subCategorySlugParam}
+                  categoryId={category.id}
+                  categoryPath={category.path ?? undefined}
                   isMobile
                 />
               </div>
@@ -197,67 +174,78 @@ export default function CategoryDetailsPage({
             </div>
           </div>
 
-          {/* Subcategory Navigation Pills */}
-          {subcategories.length > 0 && !category.parentId && (
+          {/* Product types attached to this category — the attribute-driven layer */}
+          {productTypes.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                {isBn ? 'পণ্যের ধরন' : 'Product Types'}
+              </p>
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                <Link
+                  href={`/${lang}/categories/${category.slug}`}
+                  className={cn(
+                    'px-4 py-2 rounded-2xl text-xs md:text-sm font-semibold whitespace-nowrap transition-all border',
+                    !productTypeId
+                      ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                      : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border-border/80'
+                  )}
+                >
+                  {isBn ? 'সব ধরন' : 'All types'}
+                </Link>
+                {productTypes.map((pt) => {
+                  const isSelected = productTypeId === pt.id;
+                  const href = isSelected
+                    ? `/${lang}/categories/${category.slug}`
+                    : `/${lang}/categories/${category.slug}?productTypeId=${pt.id}`;
+                  return (
+                    <Link
+                      key={pt.id}
+                      href={href}
+                      className={cn(
+                        'px-4 py-2 rounded-2xl text-xs md:text-sm font-medium whitespace-nowrap transition-all border',
+                        isSelected
+                          ? 'bg-primary text-primary-foreground font-semibold border-primary shadow-sm'
+                          : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border-border/80'
+                      )}
+                    >
+                      {isBn ? pt.nameBn : pt.nameEn}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Child categories at any depth */}
+          {children.length > 0 && (
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
               <Link
                 href={`/${lang}/categories/${category.slug}`}
                 className={cn(
-                  'px-4 py-2 rounded-2xl text-xs md:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2',
-                  !subCategorySlugParam
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80'
+                  'px-4 py-2 rounded-2xl text-xs md:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 border',
+                  'bg-primary text-primary-foreground border-primary shadow-sm'
                 )}
               >
                 <span>{isBn ? `সব ${categoryName}` : `All ${categoryName}`}</span>
-                {category.productCount !== undefined && category.productCount > 0 && (
-                  <span
-                    className={cn(
-                      'text-[11px] px-2 py-0.5 rounded-full font-bold',
-                      !subCategorySlugParam
-                        ? 'bg-primary-foreground/20 text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
-                    )}
-                  >
-                    {category.productCount}
-                  </span>
-                )}
               </Link>
-
-              {subcategories.map((sub) => {
-                const isSelected = subCategorySlugParam === sub.slug;
-                return (
-                  <Link
-                    key={sub.id}
-                    href={`/${lang}/categories/${category.slug}/${sub.slug}`}
-                    className={cn(
-                      'px-4 py-2 rounded-2xl text-xs md:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2',
-                      isSelected
-                        ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
-                        : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80'
-                    )}
-                  >
-                    {sub.icon && <span className="text-sm">{sub.icon}</span>}
-                    <span>{isBn ? sub.nameBn : sub.nameEn}</span>
-                    {sub.productCount !== undefined && sub.productCount > 0 && (
-                      <span
-                        className={cn(
-                          'text-[11px] px-2 py-0.5 rounded-full font-bold',
-                          isSelected
-                            ? 'bg-primary-foreground/20 text-primary-foreground'
-                            : 'bg-muted text-muted-foreground'
-                        )}
-                      >
-                        {sub.productCount}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
+              {children.map((child) => (
+                <Link
+                  key={child.id}
+                  href={`/${lang}/categories/${child.slug}`}
+                  className="px-4 py-2 rounded-2xl text-xs md:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/80"
+                >
+                  {child.icon && <span className="text-sm">{child.icon}</span>}
+                  <span>{isBn ? child.nameBn : child.nameEn}</span>
+                  {child.productCount !== undefined && child.productCount > 0 && (
+                    <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-muted text-muted-foreground">
+                      {child.productCount}
+                    </span>
+                  )}
+                </Link>
+              ))}
             </div>
           )}
 
-          {/* Product Grid / Empty State (Phase 8, 21, 22) */}
           {isEmpty && !isProductsLoading ? (
             <div className="text-center py-16 px-4 bg-card rounded-2xl border border-dashed border-border/80">
               <PackageSearch className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
@@ -285,27 +273,42 @@ export default function CategoryDetailsPage({
                 lang={lang}
               />
 
-              {/* Server-side Pagination */}
               {meta && meta.totalPages > 1 && (
-                <div className="mt-10 flex justify-center items-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => updateUrl('page', page - 1)}
-                  >
+                <div className="mt-10">
+                  <MarketplacePagination
+                    currentPage={page}
+                    totalPages={meta.totalPages}
+                    totalItems={meta.total}
+                    itemsPerPage={meta.limit}
+                    lang={lang}
+                    buildHref={(targetPage) => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      if (targetPage > 1) params.set('page', String(targetPage));
+                      else params.delete('page');
+                      const qs = params.toString();
+                      return `/${lang}/categories/${slug}${qs ? `?${qs}` : ''}`;
+                    }}
+                    onPageChange={(nextPage) => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      if (nextPage > 1) params.set('page', String(nextPage));
+                      else params.delete('page');
+                      const qs = params.toString();
+                      router.push(`/${lang}/categories/${slug}${qs ? `?${qs}` : ''}`);
+                    }}
+                  />
+                </div>
+              )}
+
+              {meta && meta.totalPages <= 1 && meta.total > 0 && (
+                <div className="mt-8 flex items-center justify-center gap-3 text-xs text-muted-foreground">
+                  <Button variant="outline" size="sm" disabled>
                     <ChevronLeft className="w-4 h-4 me-1 rtl:rotate-180" />
                     {isBn ? 'পূর্ববর্তী' : 'Prev'}
                   </Button>
-                  <span className="text-xs md:text-sm font-semibold text-muted-foreground">
-                    {page} / {meta.totalPages}
+                  <span className="font-semibold">
+                    1 / 1
                   </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= meta.totalPages}
-                    onClick={() => updateUrl('page', page + 1)}
-                  >
+                  <Button variant="outline" size="sm" disabled>
                     {isBn ? 'পরবর্তী' : 'Next'}
                     <ChevronRight className="w-4 h-4 ms-1 rtl:rotate-180" />
                   </Button>

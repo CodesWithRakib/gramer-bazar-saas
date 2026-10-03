@@ -7,6 +7,146 @@ export interface PaginationMeta {
   totalPages: number;
 }
 
+export type AttributeDataType =
+  | 'TEXT'
+  | 'NUMBER'
+  | 'BOOLEAN'
+  | 'SELECT'
+  | 'MULTI_SELECT'
+  | 'RANGE'
+  | 'DATE';
+
+export interface ProductType {
+  id: string;
+  categoryId: string;
+  category?: Category;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  descriptionEn?: string | null;
+  descriptionBn?: string | null;
+  icon?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  attributeMappings?: ProductTypeAttributeMapping[];
+}
+
+export interface AttributeOption {
+  id: string;
+  attributeId: string;
+  value: string;
+  valueBn?: string | null;
+  slug: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface CatalogAttribute {
+  id: string;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  dataType: AttributeDataType;
+  unit?: string | null;
+  isFilterable: boolean;
+  isVariantAxis: boolean;
+  sortOrder: number;
+  isActive: boolean;
+  options?: AttributeOption[];
+}
+
+export interface AttributeOptionInput {
+  id?: string;
+  value: string;
+  valueBn?: string | null;
+  slug?: string | null;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+export interface AttributeUpsertInput {
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  dataType: AttributeDataType;
+  unit?: string | null;
+  isFilterable?: boolean;
+  isVariantAxis?: boolean;
+  sortOrder?: number;
+  isActive?: boolean;
+  options?: AttributeOptionInput[];
+}
+
+export interface ProductTypeAttributeMapping {
+  id?: string;
+  productTypeId?: string;
+  attributeId: string;
+  isRequired: boolean;
+  isFilterable: boolean;
+  specGroup?: string | null;
+  sortOrder: number;
+  attribute?: CatalogAttribute;
+}
+
+export interface FacetOption {
+  id: string;
+  slug: string;
+  value: string;
+  valueBn: string | null;
+  count: number;
+}
+
+export interface FacetGroup {
+  attributeId: string;
+  slug: string;
+  nameEn: string;
+  nameBn: string;
+  dataType: AttributeDataType;
+  unit: string | null;
+  options: FacetOption[];
+  min?: number;
+  max?: number;
+}
+
+export interface CatalogFacets {
+  productTypeId: string | null;
+  productTypeIds: string[];
+  groups: FacetGroup[];
+  priceRange: { min: number; max: number } | null;
+  brands: Array<{ id: string; slug: string; nameEn: string; nameBn: string; count: number }>;
+  inStockCount: number;
+  totalCount: number;
+}
+
+export interface ProductSpec {
+  attributeId: string;
+  slug: string;
+  nameEn: string;
+  nameBn: string;
+  dataType: AttributeDataType;
+  unit: string | null;
+  valueText: string | null;
+  valueNumber: number | null;
+  valueBoolean: boolean | null;
+  optionId: string | null;
+  optionSlug: string | null;
+  displayValueEn: string;
+  displayValueBn: string;
+}
+
+export interface ProductSpecGroup {
+  specGroup: string;
+  specs: ProductSpec[];
+}
+
+export interface CategoryBreadcrumb {
+  id: string;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  path: string | null;
+}
+
 export interface Category {
   id: string;
   parentId?: string | null;
@@ -18,12 +158,16 @@ export interface Category {
   descriptionEn?: string | null;
   descriptionBn?: string | null;
   sortOrder?: number;
+  level?: number;
+  path?: string | null;
   isRegulated: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
   productCount?: number;
   children?: Category[];
+  productTypes?: ProductType[];
+  breadcrumb?: CategoryBreadcrumb[];
 }
 
 export interface Brand {
@@ -95,8 +239,11 @@ export interface Product {
   sourceUrl?: string | null;
   sourcePrice?: number | string | null;
   sourceCurrency?: string | null;
+  productTypeId?: string | null;
+  productType?: ProductType | null;
   images: ProductImage[];
   variants?: ProductVariant[];
+  specGroups?: ProductSpecGroup[];
   totalStock?: number;
   isAvailable?: boolean;
   averageRating?: number;
@@ -115,6 +262,16 @@ export interface CreateProductDto {
   categoryId: string;
   subCategoryId?: string | null;
   brandId?: string | null;
+  productTypeId?: string | null;
+  attributeValues?: Array<{
+    attributeId?: string;
+    attributeSlug?: string;
+    optionId?: string;
+    optionSlug?: string;
+    valueText?: string;
+    valueNumber?: number;
+    valueBoolean?: boolean;
+  }>;
   sku?: string | null;
   barcode?: string | null;
   price: number;
@@ -177,6 +334,8 @@ export interface SellerProduct {
       category: Category;
       subCategory?: Category | null;
       brand?: Brand | null;
+      productType?: ProductType | null;
+      specGroups?: ProductSpecGroup[];
       averageRating?: number;
       totalReviews?: number;
     };
@@ -206,9 +365,13 @@ export interface SearchParams {
   q?: string;
   categoryId?: string;
   categorySlug?: string;
+  categoryPath?: string;
   subCategoryId?: string;
   subCategorySlug?: string;
   brandId?: string;
+  productTypeId?: string;
+  /** JSON string map of attribute slug -> selected values. */
+  attributes?: string;
   sellerId?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -217,6 +380,17 @@ export interface SearchParams {
   page?: number;
   limit?: number;
   sort?: string;
+}
+
+export interface FacetQueryParams {
+  categoryId?: string;
+  categoryPath?: string;
+  productTypeId?: string;
+  brandId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  attributes?: string;
 }
 
 export interface CategorySection {
@@ -288,7 +462,7 @@ export interface HomepageData {
 }
 
 export const catalogApi = api
-  .enhanceEndpoints({ addTagTypes: ['Catalog', 'Category'] })
+  .enhanceEndpoints({ addTagTypes: ['Catalog', 'Category', 'Attribute', 'ProductType'] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getHomepageData: builder.query<HomepageData, void>({
@@ -310,6 +484,87 @@ export const catalogApi = api
       getCategorySections: builder.query<CategorySection[], void>({
         query: () => '/public/catalog/category-sections',
         providesTags: ['Catalog', 'Category'],
+      }),
+      getPublicCategoryBySlug: builder.query<Category, string>({
+        query: (slug) => `/public/categories/${slug}`,
+        providesTags: ['Category'],
+      }),
+      getPublicProductTypes: builder.query<
+        ProductType[],
+        { categoryId?: string; categoryPath?: string; includeMappings?: boolean } | void
+      >({
+        query: (params) => ({
+          url: '/product-types',
+          params: params ?? undefined,
+        }),
+        providesTags: ['Category'],
+      }),
+      getCatalogFacets: builder.query<CatalogFacets, FacetQueryParams>({
+        query: (params) => {
+          const clean = Object.fromEntries(
+            Object.entries(params).filter(
+              ([, value]) => value !== undefined && value !== null && value !== ''
+            )
+          );
+          return { url: '/public/catalog/facets', params: clean };
+        },
+        providesTags: ['Catalog'],
+      }),
+      // ------------------------------------------------ admin taxonomy engine
+      getAdminAttributes: builder.query<
+        CatalogAttribute[],
+        { search?: string; isActive?: boolean } | void
+      >({
+        query: (params) => ({ url: '/attributes', params: params ?? undefined }),
+        providesTags: ['Attribute'],
+      }),
+      createAdminAttribute: builder.mutation<CatalogAttribute, AttributeUpsertInput>({
+        query: (body) => ({ url: '/attributes', method: 'POST', body }),
+        invalidatesTags: ['Attribute'],
+      }),
+      updateAdminAttribute: builder.mutation<
+        CatalogAttribute,
+        { id: string; data: Partial<AttributeUpsertInput> }
+      >({
+        query: ({ id, data }) => ({ url: `/attributes/${id}`, method: 'PATCH', body: data }),
+        invalidatesTags: ['Attribute'],
+      }),
+      deleteAdminAttribute: builder.mutation<void, string>({
+        query: (id) => ({ url: `/attributes/${id}`, method: 'DELETE' }),
+        invalidatesTags: ['Attribute'],
+      }),
+      getAdminProductTypes: builder.query<
+        ProductType[],
+        { categoryId?: string; categoryPath?: string; includeMappings?: boolean } | void
+      >({
+        query: (params) => ({ url: '/product-types', params: params ?? undefined }),
+        providesTags: ['ProductType'],
+      }),
+      createAdminProductType: builder.mutation<ProductType, Partial<ProductType> & { categoryId: string }>({
+        query: (body) => ({ url: '/product-types', method: 'POST', body }),
+        invalidatesTags: ['ProductType', 'Category'],
+      }),
+      updateAdminProductType: builder.mutation<
+        ProductType,
+        { id: string; data: Partial<ProductType> }
+      >({
+        query: ({ id, data }) => ({ url: `/product-types/${id}`, method: 'PATCH', body: data }),
+        invalidatesTags: ['ProductType', 'Category'],
+      }),
+      deleteAdminProductType: builder.mutation<void, string>({
+        query: (id) => ({ url: `/product-types/${id}`, method: 'DELETE' }),
+        invalidatesTags: ['ProductType', 'Category'],
+      }),
+      setProductTypeAttributes: builder.mutation<
+        ProductTypeAttributeMapping[],
+        { id: string; mappings: Array<Omit<ProductTypeAttributeMapping, 'attribute' | 'id' | 'productTypeId'>> }
+      >({
+        query: ({ id, mappings }) => ({
+          url: `/product-types/${id}/attributes`,
+          method: 'PUT',
+          body: { mappings },
+        }),
+        invalidatesTags: ['ProductType', 'Category'],
       }),
       getSearchSuggestions: builder.query<SearchSuggestions, string>({
         query: (q) => `/public/catalog/suggestions?q=${encodeURIComponent(q)}`,
@@ -529,6 +784,18 @@ export const {
   useGetPublicCategoriesQuery,
   useGetPublicCategoryTreeQuery,
   useGetCategorySectionsQuery,
+  useGetPublicCategoryBySlugQuery,
+  useGetPublicProductTypesQuery,
+  useGetCatalogFacetsQuery,
+  useGetAdminAttributesQuery,
+  useCreateAdminAttributeMutation,
+  useUpdateAdminAttributeMutation,
+  useDeleteAdminAttributeMutation,
+  useGetAdminProductTypesQuery,
+  useCreateAdminProductTypeMutation,
+  useUpdateAdminProductTypeMutation,
+  useDeleteAdminProductTypeMutation,
+  useSetProductTypeAttributesMutation,
   useGetSearchSuggestionsQuery,
   useGetPopularProductsQuery,
   useGetPublicBrandsQuery,

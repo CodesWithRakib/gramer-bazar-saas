@@ -153,6 +153,51 @@ export class PublicCatalogController {
     return this.catalogService.getBrands();
   }
 
+  @Get('facets')
+  @ApiOperation({
+    summary: 'Dynamic filter facets for a category or product type',
+    description:
+      'Returns filter groups, option counts, brand facets and price range generated from the product type attribute schema.',
+  })
+  @ApiQuery({ name: 'categoryId', required: false, type: String })
+  @ApiQuery({ name: 'categoryPath', required: false, type: String })
+  @ApiQuery({ name: 'productTypeId', required: false, type: String })
+  @ApiQuery({ name: 'brandId', required: false, type: String })
+  @ApiQuery({ name: 'minPrice', required: false, type: Number })
+  @ApiQuery({ name: 'maxPrice', required: false, type: Number })
+  @ApiQuery({ name: 'inStock', required: false, type: Boolean })
+  @ApiQuery({
+    name: 'attributes',
+    required: false,
+    type: String,
+    description: 'JSON map of attribute slug to selected values',
+  })
+  @ApiStandardResponse({ status: HttpStatus.OK, description: 'Facet groups and counts' })
+  @ApiCommonErrors([400, 500])
+  getFacets(
+    @Query('categoryId') categoryId?: string,
+    @Query('categoryPath') categoryPath?: string,
+    @Query('productTypeId') productTypeId?: string,
+    @Query('brandId') brandId?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('inStock') inStock?: string,
+    @Query('attributes') attributes?: string,
+  ) {
+    return this.catalogService.getFacets({
+      categoryId,
+      categoryPath,
+      productTypeId,
+      brandId,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      inStock: inStock === 'true',
+      attributeFilters: attributes
+        ? (JSON.parse(attributes) as Record<string, string[]>)
+        : undefined,
+    });
+  }
+
   @Get(':slug')
   @ApiOperation({
     summary: 'Retrieve product details by URL slug',

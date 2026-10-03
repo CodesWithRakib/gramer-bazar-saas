@@ -46,6 +46,12 @@ import {
 } from '@/features/catalog/catalogApi';
 import { CustomImage } from '@/components/ui/CustomImage';
 import { ImagePlus, Trash2, Star, RefreshCw } from 'lucide-react';
+import {
+  ProductAttributesSection,
+  buildAttributeValuesPayload,
+  attributeStateFromSpecGroups,
+  AttributeValueMap,
+} from './ProductAttributesSection';
 
 const COMMON_UNITS = [
   { value: 'kg', label: 'kg (Kilogram)' },
@@ -114,6 +120,9 @@ export function AddProductDialog() {
     },
   });
 
+  const [productTypeId, setProductTypeId] = useState('');
+  const [attributeValues, setAttributeValues] = useState<AttributeValueMap>({});
+
   const selectedCategoryId = form.watch('categoryId');
 
   // Subcategories belonging to selected category
@@ -144,10 +153,14 @@ export function AddProductDialog() {
             : values.subCategoryId,
         brandId: values.brandId === 'NONE' || !values.brandId ? undefined : values.brandId,
         compareAtPrice: values.compareAtPrice ? Number(values.compareAtPrice) : undefined,
+        productTypeId: productTypeId || undefined,
+        attributeValues: buildAttributeValuesPayload(attributeValues),
       }).unwrap();
       toast.success('Product created successfully in master catalog');
       setOpen(false);
       form.reset();
+      setProductTypeId('');
+      setAttributeValues({});
     } catch (error) {
       toast.error(getApiErrorMessage(error) || 'Failed to create product');
     }
@@ -378,6 +391,20 @@ export function AddProductDialog() {
                   )}
                 />
               </div>
+            </div>
+
+            {/* Product type & dynamic specifications */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground border-b pb-2">
+                Product Type &amp; Specifications
+              </h3>
+              <ProductAttributesSection
+                categoryId={selectedCategoryId}
+                productTypeId={productTypeId}
+                onProductTypeChange={setProductTypeId}
+                attributeValues={attributeValues}
+                onAttributeValuesChange={setAttributeValues}
+              />
             </div>
 
             {/* Section 3: Pricing & Unit */}
@@ -619,6 +646,11 @@ export function EditProductDialog({
     },
   });
 
+  const [productTypeId, setProductTypeId] = useState(product.productTypeId ?? '');
+  const [attributeValues, setAttributeValues] = useState<AttributeValueMap>(() =>
+    attributeStateFromSpecGroups(product.specGroups)
+  );
+
   const selectedCategoryId = form.watch('categoryId');
 
   const availableSubcategories = useMemo(() => {
@@ -650,6 +682,8 @@ export function EditProductDialog({
               : values.subCategoryId,
           brandId: values.brandId === 'NONE' || !values.brandId ? undefined : values.brandId,
           compareAtPrice: values.compareAtPrice ? Number(values.compareAtPrice) : undefined,
+          productTypeId: productTypeId || null,
+          attributeValues: buildAttributeValuesPayload(attributeValues),
         },
       }).unwrap();
       toast.success('Product updated successfully');
@@ -861,6 +895,19 @@ export function EditProductDialog({
                   )}
                 />
               </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground border-b pb-2">
+                Product Type &amp; Specifications
+              </h3>
+              <ProductAttributesSection
+                categoryId={selectedCategoryId}
+                productTypeId={productTypeId}
+                onProductTypeChange={setProductTypeId}
+                attributeValues={attributeValues}
+                onAttributeValuesChange={setAttributeValues}
+              />
             </div>
 
             <div className="space-y-4">
