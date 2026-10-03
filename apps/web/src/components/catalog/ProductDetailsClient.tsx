@@ -203,6 +203,14 @@ export function ProductDetailsClient({
     categoryPath.includes('kid') ||
     categoryPath.includes('shoe') ||
     categoryPath.includes('footwear');
+  const isCosmetics =
+    categoryPath.includes('cosmetics') ||
+    categoryPath.includes('skin-care') ||
+    categoryPath.includes('hair-care') ||
+    categoryPath.includes('makeup') ||
+    categoryPath.includes('fragrance') ||
+    categoryPath.includes('beauty') ||
+    categoryPath.includes('personal-care');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -230,7 +238,16 @@ export function ProductDetailsClient({
   const neckSpec = getSpec('fashion-neck-type');
   const careSpec = getSpec('fashion-care-instructions');
 
-  // Multi-variant parsing for Fashion (Color × Size)
+  // Cosmetics Specs
+  const spfSpec = getSpec('cosmetics-spf');
+  const skinTypeSpec = getSpec('cosmetics-skin-type');
+  const finishSpec = getSpec('cosmetics-finish');
+  const coverageSpec = getSpec('cosmetics-coverage');
+  const claimsSpec = getSpec('cosmetics-claims');
+  const benefitSpec = getSpec('cosmetics-benefit');
+  const scentSpec = getSpec('cosmetics-scent-family');
+
+  // Multi-variant parsing for Fashion (Color × Size) and Cosmetics (Shade × Volume)
   const COLOR_HEX_MAP: Record<string, string> = {
     black: '#1a1a1a',
     white: '#ffffff',
@@ -247,6 +264,27 @@ export function ProductDetailsClient({
     navy: '#1a237e',
     maroon: '#800000',
     beige: '#d7c4a3',
+    // Cosmetics Shades & Hex Swatches
+    '01 ivory': '#f6ebd9',
+    ivory: '#f6ebd9',
+    '02 natural ivory': '#f3e3ce',
+    'natural ivory': '#f3e3ce',
+    '03 classic nude': '#edd0b0',
+    'classic nude': '#edd0b0',
+    '04 natural beige': '#e4be96',
+    'natural beige': '#e4be96',
+    '05 pure beige': '#dfb48b',
+    'pure beige': '#dfb48b',
+    '06 sun beige': '#d7a57a',
+    'sun beige': '#d7a57a',
+    '07 warm honey': '#cb915f',
+    'warm honey': '#cb915f',
+    'ruby red': '#b31b2c',
+    'pink rose': '#d94e77',
+    'nude coral': '#d47a65',
+    'berry plum': '#7d2248',
+    'velvet crimson': '#8a1325',
+    'black onyx': '#1a1a1a',
   };
 
   const COLOR_BN_MAP: Record<string, string> = {
@@ -265,21 +303,43 @@ export function ProductDetailsClient({
     navy: 'নেভি ব্লু',
     maroon: 'মেরুন',
     beige: 'বেইজ',
+    // Cosmetics Shades Bangla
+    '01 ivory': '০১ আইভরি',
+    ivory: 'আইভরি',
+    '02 natural ivory': '০২ ন্যাচারাল আইভরি',
+    'natural ivory': 'ন্যাচারাল আইভরি',
+    '03 classic nude': '০৩ ক্লাসিক নুড',
+    'classic nude': 'ক্লাসিক নুড',
+    '04 natural beige': '০৪ ন্যাচারাল বেইজ',
+    'natural beige': 'ন্যাচারাল বেইজ',
+    '05 pure beige': '০৫ পিওর বেইজ',
+    'pure beige': 'পিওর বেইজ',
+    '06 sun beige': '০৬ সান বেইজ',
+    'sun beige': 'সান বেইজ',
+    '07 warm honey': '০৭ ওয়ার্ম হানি',
+    'warm honey': 'ওয়ার্ম হানি',
+    'ruby red': 'রুবি রেড',
+    'pink rose': 'পিংক রোজ',
+    'nude coral': 'নুড কোরাল',
+    'berry plum': 'বেরি প্লাম',
+    'velvet crimson': 'ভেলভেট ক্রিমসন',
+    'black onyx': 'ব্ল্যাক অনিক্স',
   };
 
   const parsedVariants = products.map((p, idx) => {
     const v = p.productVariant;
     const attrs = ((v as any).attributes || {}) as Record<string, any>;
-    let color = attrs['fashion-color'];
+    let color = attrs['fashion-color'] || attrs['cosmetics-shade'];
     let size =
       attrs['fashion-size-clothing'] ||
       attrs['fashion-size-numeric'] ||
       attrs['fashion-size-kids'] ||
       attrs['fashion-size-shoe-eu'] ||
       attrs['fashion-size-shoe-uk'] ||
-      attrs['fashion-size-shoe-us'];
+      attrs['fashion-size-shoe-us'] ||
+      attrs['cosmetics-volume'];
 
-    if (!color && v.nameEn && v.nameEn.includes('/')) {
+    if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
       const parts = v.nameEn.split('/').map((s) => s.trim());
       if (parts.length >= 2) {
         color = parts[0];
@@ -332,7 +392,7 @@ export function ProductDetailsClient({
 
   const handleSelectSize = (newSize: string) => {
     let match = parsedVariants.find(
-      (pv) => pv.color === activeColor && pv.size === newSize
+      (pv) => (hasColorAxis ? pv.color === activeColor : true) && pv.size === newSize
     );
     if (!match) {
       match = parsedVariants.find((pv) => pv.size === newSize);
@@ -819,6 +879,35 @@ export function ProductDetailsClient({
                     {isBn ? `ফিট: ${fitSpec.displayValueBn}` : `Fit: ${fitSpec.displayValueEn}`}
                   </span>
                 )}
+
+                {/* Cosmetics-Specific Badges */}
+                {spfSpec && spfSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>{spfSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {skinTypeSpec && skinTypeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 flex items-center gap-1">
+                    <Heart className="h-3 w-3" />
+                    <span>{isBn ? `ত্বক: ${skinTypeSpec.displayValueBn}` : `Skin: ${skinTypeSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {finishSpec && finishSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-500/20">
+                    {isBn ? `ফিনিশ: ${finishSpec.displayValueBn}` : `Finish: ${finishSpec.displayValueEn}`}
+                  </span>
+                )}
+                {coverageSpec && coverageSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-pink-500/10 text-pink-700 dark:text-pink-300 border border-pink-500/20">
+                    {isBn ? `কাভারেজ: ${coverageSpec.displayValueBn}` : `Coverage: ${coverageSpec.displayValueEn}`}
+                  </span>
+                )}
+                {claimsSpec && claimsSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                    {isBn ? claimsSpec.displayValueBn : claimsSpec.displayValueEn}
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -900,12 +989,12 @@ export function ProductDetailsClient({
               {/* Multi-Variant Selector (if multiple variants available) */}
               {products.length > 1 && (
                 <div className="mb-5 space-y-4">
-                  {/* Fashion Color Swatches */}
+                  {/* Fashion Color / Cosmetics Shade Swatches */}
                   {hasColorAxis && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                          <span>{isBn ? 'রঙ (Color):' : 'Color:'}</span>
+                          <span>{isCosmetics ? (isBn ? 'শেড (Shade):' : 'Shade:') : (isBn ? 'রঙ (Color):' : 'Color:')}</span>
                           <span className="text-primary normal-case font-extrabold">
                             {activeColor && isBn ? (COLOR_BN_MAP[activeColor.toLowerCase()] || activeColor) : activeColor}
                           </span>
@@ -915,7 +1004,15 @@ export function ProductDetailsClient({
                         {distinctColors.map((colorName) => {
                           const isSelected = activeColor === colorName;
                           const hex = COLOR_HEX_MAP[colorName.toLowerCase()] || '#6b7280';
-                          const isLight = hex.toLowerCase() === '#ffffff' || hex.toLowerCase() === '#fffdd0' || hex.toLowerCase() === '#d7c4a3';
+                          const hexLower = hex.toLowerCase();
+                          const isLight =
+                            hexLower === '#ffffff' ||
+                            hexLower === '#fffdd0' ||
+                            hexLower === '#d7c4a3' ||
+                            hexLower === '#f6ebd9' ||
+                            hexLower === '#f3e3ce' ||
+                            hexLower === '#edd0b0' ||
+                            hexLower === '#e4be96';
                           const colorStock = parsedVariants
                             .filter((pv) => pv.color === colorName)
                             .reduce((sum, cur) => sum + cur.stock, 0);
@@ -928,7 +1025,7 @@ export function ProductDetailsClient({
                               onClick={() => handleSelectColor(colorName)}
                               disabled={isColorOutOfStock}
                               title={`${colorName}${isColorOutOfStock ? ' (Out of Stock)' : ''}`}
-                              aria-label={`Select Color ${colorName}`}
+                              aria-label={`Select ${isCosmetics ? 'Shade' : 'Color'} ${colorName}`}
                               className={`group relative flex items-center justify-center h-9 w-9 rounded-full transition-all ${
                                 isSelected
                                   ? 'ring-2 ring-primary ring-offset-2 scale-110 shadow-sm'
@@ -953,24 +1050,26 @@ export function ProductDetailsClient({
                     </div>
                   )}
 
-                  {/* Fashion Size Selector Pills + Size Guide Modal Trigger */}
+                  {/* Fashion Size / Cosmetics Volume Selector Pills */}
                   {hasSizeAxis && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                          <span>{isBn ? 'সাইজ (Size):' : 'Size:'}</span>
+                          <span>{isCosmetics ? (isBn ? 'ভলিউম (Volume):' : 'Volume:') : (isBn ? 'সাইজ (Size):' : 'Size:')}</span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
                         </span>
-                        <FashionSizeChartModal
-                          lang={lang}
-                          categorySlug={category?.slug}
-                          productTypeName={masterProduct.productType?.nameEn}
-                        />
+                        {isFashion && (
+                          <FashionSizeChartModal
+                            lang={lang}
+                            categorySlug={category?.slug}
+                            productTypeName={masterProduct.productType?.nameEn}
+                          />
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         {distinctSizes.map((sizeName) => {
                           const sizeVariant = parsedVariants.find(
-                            (pv) => pv.color === activeColor && pv.size === sizeName
+                            (pv) => (hasColorAxis ? pv.color === activeColor : true) && pv.size === sizeName
                           );
                           const isSelected = activeSize === sizeName;
                           const isSizeOutOfStock = !sizeVariant || sizeVariant.isOutOfStock;
@@ -981,7 +1080,7 @@ export function ProductDetailsClient({
                               type="button"
                               disabled={isSizeOutOfStock}
                               onClick={() => handleSelectSize(sizeName)}
-                              aria-label={isSizeOutOfStock ? `Size ${sizeName} — Out of Stock` : `Size ${sizeName}`}
+                              aria-label={isSizeOutOfStock ? `${sizeName} — Out of Stock` : sizeName}
                               className={`min-w-11 h-9 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center select-none ${
                                 isSizeOutOfStock
                                   ? 'border-border/50 bg-muted/40 text-muted-foreground line-through opacity-50 cursor-not-allowed'
@@ -1200,6 +1299,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'সাইজে অমিল হলে ৭ দিনের মধ্যে সহজে সাইজ পরিবর্তন (Exchange) করার সুবিধা রয়েছে। অনুগ্রহ করে সাইজ চার্ট দেখে অর্ডার করুন।'
                       : 'Need a different size? Enjoy our hassle-free 7-day size exchange guarantee on all unworn apparel with original tags attached.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Cosmetics Safety & Dermatological Patch Test Advisory */}
+              {isCosmetics && (
+                <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-rose-950 dark:text-rose-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-rose-800 dark:text-rose-400">
+                    <Sparkles className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                    <span>{isBn ? 'প্রসাধন ও রূপচর্চা পণ্যের নির্দেশিকা' : 'Dermatological & Skin Safety Advisory'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'নতুন স্কিনকেয়ার বা কসমেটিক্স ব্যবহারের পূর্বে কব্জি বা কানের পেছনে সামান্য পরিমাণ লাগিয়ে ২৪ ঘণ্টার প্যাচ টেস্ট (Patch Test) করার পরামর্শ দেওয়া হচ্ছে। সরাসরি সূর্যালোক থেকে দূরে শীতল স্থানে সংরক্ষণ করুন।'
+                      : 'We recommend performing a 24-hour patch test behind the ear or inside wrist before first application. Discontinue use if irritation occurs. Store in a cool, dry place away from direct sunlight.'}
                   </p>
                 </div>
               )}

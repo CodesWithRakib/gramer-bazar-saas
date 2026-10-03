@@ -224,6 +224,30 @@ function getCategoryTheme(
     };
   }
 
+  // Cosmetics, Beauty & Personal Care
+  if (
+    combined.includes('cosmetic') ||
+    combined.includes('beauty') ||
+    combined.includes('skincare') ||
+    combined.includes('skin-care') ||
+    combined.includes('hair-care') ||
+    combined.includes('makeup') ||
+    combined.includes('fragrance') ||
+    combined.includes('perfume') ||
+    combined.includes('lipstick') ||
+    combined.includes('foundation') ||
+    combined.includes('প্রসাধন') ||
+    combined.includes('রূপচর্চা')
+  ) {
+    return {
+      type: 'cosmetics',
+      label: isBn ? 'প্রসাধন ও রূপচর্চা' : 'Beauty & Care',
+      badgeClass: 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20',
+      accentBorder: 'hover:border-rose-500/50',
+      icon: 'sparkles',
+    };
+  }
+
   return {
     type: 'general',
     label: '',
