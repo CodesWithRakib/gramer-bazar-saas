@@ -24,6 +24,7 @@ import {
   Leaf,
   Ruler,
   Check,
+  Trophy,
 } from 'lucide-react';
 import { FashionSizeChartModal } from '@/components/catalog/FashionSizeChartModal';
 import { Button } from '@/components/ui/button';
@@ -235,6 +236,18 @@ export function ProductDetailsClient({
     categoryPath.includes('tire') ||
     categoryPath.includes('brake') ||
     categoryPath.includes('engine');
+  const isSports =
+    categoryPath.includes('sport') ||
+    categoryPath.includes('fitness') ||
+    categoryPath.includes('gym') ||
+    categoryPath.includes('cricket') ||
+    categoryPath.includes('football') ||
+    categoryPath.includes('badminton') ||
+    categoryPath.includes('cycling') ||
+    categoryPath.includes('yoga') ||
+    categoryPath.includes('treadmill') ||
+    categoryPath.includes('dumbbell') ||
+    categoryPath.includes('boxing');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -309,6 +322,20 @@ export function ProductDetailsClient({
   const autoPackSpec = getSpec('auto-pack-size');
   const autoWarrantySpec = getSpec('auto-warranty');
   const autoOriginSpec = getSpec('auto-country-of-origin');
+
+  // Sports & Fitness Specs
+  const sportsTypeSpec = getSpec('sports-type');
+  const sportsActivitySpec = getSpec('sports-activity');
+  const sportsSkillSpec = getSpec('sports-skill-level');
+  const sportsGenderSpec = getSpec('sports-gender');
+  const sportsMaterialSpec = getSpec('sports-material');
+  const sportsSizeSpec = getSpec('sports-size');
+  const sportsWeightSpec = getSpec('sports-weight-capacity');
+  const sportsGloveSizeSpec = getSpec('sports-glove-size');
+  const sportsFootwearSizeSpec = getSpec('sports-footwear-size');
+  const sportsPackSpec = getSpec('sports-pack-size');
+  const sportsWarrantySpec = getSpec('sports-warranty');
+  const sportsOriginSpec = getSpec('sports-country-of-origin');
 
   // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, Baby, and Automotive (Pack / Volume / Viscosity / Tire / Battery)
   const COLOR_HEX_MAP: Record<string, string> = {
@@ -450,7 +477,12 @@ export function ProductDetailsClient({
       attrs['auto-tire-size'] ||
       attrs['auto-battery-capacity'] ||
       attrs['auto-pack-size'] ||
-      attrs['auto-oil-viscosity'];
+      attrs['auto-oil-viscosity'] ||
+      attrs['sports-size'] ||
+      attrs['sports-weight-capacity'] ||
+      attrs['sports-glove-size'] ||
+      attrs['sports-footwear-size'] ||
+      attrs['sports-pack-size'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
       const parts = v.nameEn.split('/').map((s) => s.trim());
@@ -1115,6 +1147,32 @@ export function ProductDetailsClient({
                     <span>{isBn ? `ওয়ারেন্টি: ${autoWarrantySpec.displayValueBn}` : `Warranty: ${autoWarrantySpec.displayValueEn}`}</span>
                   </span>
                 )}
+
+                {/* Sports & Fitness Badges */}
+                {sportsTypeSpec && sportsTypeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                    <Trophy className="h-3 w-3" />
+                    <span>{isBn ? sportsTypeSpec.displayValueBn : sportsTypeSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {sportsSkillSpec && sportsSkillSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>{isBn ? `লেভেল: ${sportsSkillSpec.displayValueBn}` : `Level: ${sportsSkillSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {sportsMaterialSpec && sportsMaterialSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? `উপাদান: ${sportsMaterialSpec.displayValueBn}` : `Material: ${sportsMaterialSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {sportsWarrantySpec && sportsWarrantySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? `ওয়ারেন্টি: ${sportsWarrantySpec.displayValueBn}` : `Warranty: ${sportsWarrantySpec.displayValueEn}`}</span>
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1271,7 +1329,9 @@ export function ProductDetailsClient({
                                   ? (babyDiaperSizeSpec ? (isBn ? 'ডায়াপার সাইজ (Diaper Size):' : 'Diaper Size:') : (isBn ? 'বয়স / সাইজ (Age / Size):' : 'Age / Size:'))
                                   : isAutomotive
                                     ? (autoViscositySpec ? (isBn ? 'সান্দ্রতা / গ্রেড (Viscosity):' : 'Viscosity Grade:') : autoTireSizeSpec ? (isBn ? 'টায়ার সাইজ (Tire Size):' : 'Tire Size:') : autoBatteryCapacitySpec ? (isBn ? 'ধারণক্ষমতা (Capacity):' : 'Battery Capacity:') : autoVolumeSpec ? (isBn ? 'পরিমাণ (Volume):' : 'Volume:') : (isBn ? 'প্যাক / অপশন (Option):' : 'Option:'))
-                                    : (isBn ? 'সাইজ (Size):' : 'Size:')}
+                                    : isSports
+                                      ? (sportsWeightSpec ? (isBn ? 'ওজন / ক্যাপাসিটি (Weight):' : 'Weight / Capacity:') : sportsGloveSizeSpec ? (isBn ? 'গ্লাভস সাইজ (Glove Size):' : 'Glove Size:') : sportsFootwearSizeSpec ? (isBn ? 'জুতার সাইজ (Shoe Size):' : 'Shoe Size:') : sportsPackSpec ? (isBn ? 'প্যাক সাইজ (Pack Size):' : 'Pack Size:') : (isBn ? 'সাইজ (Size):' : 'Size:'))
+                                      : (isBn ? 'সাইজ (Size):' : 'Size:')}
                           </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
                         </span>
@@ -1576,6 +1636,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'অর্ডার করার পূর্বে আপনার গাড়ির মেক, মডেল এবং ম্যানুফ্যাকচারিং সাল স্পেসিফিকেশনের সাথে মিলিয়ে নিন। ব্রেক প্যাড, স্পার্ক প্লাগ ও ইলেকট্রিক্যাল যন্ত্রাংশ দক্ষ মেকানিক বা সার্টিফাইড অটোমোটিভ টেকনিশিয়ান দ্বারা ইনস্টল করার পরামর্শ দেওয়া হচ্ছে। অফিসিয়াল ওয়ারেন্টির জন্য ইনভয়েস ও ওয়ারেন্টি কার্ড সংরক্ষণ করুন।'
                       : 'Please verify vehicle make, model, and year compatibility against product specifications before ordering. Critical components such as brake pads, spark plugs, and electrical wiring should be installed by a certified automotive technician. Retain your invoice and warranty slip for manufacturer guarantee.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Sports Equipment Safety & Ergonomics Advisory */}
+              {isSports && (
+                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-emerald-950 dark:text-emerald-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    <span>{isBn ? 'স্পোর্টস গিয়ার ও ফিটনেস ইকুইপমেন্ট ব্যবহার নির্দেশিকা' : 'Sports Equipment Safety & Ergonomic Advisory'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'শরীরচর্চা বা খেলাধুলার পূর্বে যথাযথ ওয়ার্ম-আপ করুন এবং সুরক্ষামূলক গিয়ার (হেলমেট, গার্ড, প্যাড) পরিধান করুন। মোটরচালিত ট্রেডমিল ও জিম ইকুইপমেন্ট ব্যবহারের সময় প্রস্তাবিত সর্বোচ্চ ওজন সীমা মেনে চলুন। র‍্যাকেট ও ব্যাটের ক্ষেত্রে স্ট্রিং বা গ্রিপের নিয়মিত যত্ন নিন।'
+                      : 'Always warm up properly before athletic activities and wear certified protective gear (helmets, guards, pads). Observe maximum user weight limits on motorized treadmills and gym equipment. Maintain proper racket string tension and grip hygiene to prevent sports injury.'}
                   </p>
                 </div>
               )}

@@ -232,6 +232,33 @@ function getCategoryTheme(
     };
   }
 
+  // Sports & Fitness Equipment
+  if (
+    combined.includes('sport') ||
+    combined.includes('fitness') ||
+    combined.includes('gym') ||
+    combined.includes('cricket') ||
+    combined.includes('football') ||
+    combined.includes('badminton') ||
+    combined.includes('cycling') ||
+    combined.includes('yoga') ||
+    combined.includes('treadmill') ||
+    combined.includes('dumbbell') ||
+    combined.includes('boxing') ||
+    combined.includes('খেলাধুলা') ||
+    combined.includes('ব্যাট') ||
+    combined.includes('র‍্যাকেট') ||
+    combined.includes('জার্সি')
+  ) {
+    return {
+      type: 'sports',
+      label: isBn ? 'খেলাধুলা ও ফিটনেস' : 'Sports & Fitness',
+      badgeClass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
+      accentBorder: 'hover:border-emerald-500/50',
+      icon: 'activity',
+    };
+  }
+
   // Fashion & Apparel
   if (
     combined.includes('cloth') ||
