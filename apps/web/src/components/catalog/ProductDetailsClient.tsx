@@ -224,12 +224,11 @@ export function ProductDetailsClient({
     categoryPath.includes('decor') ||
     categoryPath.includes('lighting');
   const isBabyKids =
-    categoryPath.includes('baby') ||
-    categoryPath.includes('kid') ||
     categoryPath.includes('diaper') ||
     categoryPath.includes('nursery') ||
     categoryPath.includes('stroller') ||
-    categoryPath.includes('toy');
+    (categoryPath.includes('baby-kids') && !categoryPath.includes('toys-games-hobbies')) ||
+    (categoryPath.includes('baby') && !categoryPath.includes('toys-games-hobbies'));
   const isAutomotive =
     categoryPath.includes('automotive') ||
     categoryPath.includes('auto') ||
@@ -261,6 +260,17 @@ export function ProductDetailsClient({
     categoryPath.includes('pencil') ||
     categoryPath.includes('geometry') ||
     categoryPath.includes('paint');
+  const isToys =
+    categoryPath.includes('toy') ||
+    categoryPath.includes('game') ||
+    categoryPath.includes('puzzle') ||
+    categoryPath.includes('drone') ||
+    categoryPath.includes('lego') ||
+    categoryPath.includes('doll') ||
+    categoryPath.includes('hobb') ||
+    categoryPath.includes('pretend') ||
+    categoryPath.includes('scooter') ||
+    categoryPath.includes('stem');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -364,6 +374,32 @@ export function ProductDetailsClient({
   const bookPaperTypeSpec = getSpec('book-paper-type');
   const bookPackSpec = getSpec('book-pack-size');
   const bookInkColorSpec = getSpec('book-ink-color');
+
+  // Toys, Games & Hobbies Specs
+  const toyAgeGroupSpec = getSpec('toys-age-group');
+  const toyMinAgeSpec = getSpec('toys-min-age-years');
+  const toyMaxAgeSpec = getSpec('toys-max-age-years');
+  const toyMaterialSpec = getSpec('toys-material');
+  const toySafetyWarningSpec = getSpec('toys-safety-warning');
+  const toyChokingHazardSpec = getSpec('toys-choking-hazard');
+  const toyAdultSupervisionSpec = getSpec('toys-adult-supervision');
+  const toySafetyCertSpec = getSpec('toys-safety-certification');
+  const toyBatteryReqSpec = getSpec('toys-battery-required');
+  const toyBatteryTypeSpec = getSpec('toys-battery-type');
+  const toyLearningAreaSpec = getSpec('toys-learning-area');
+  const toyStemAreaSpec = getSpec('toys-stem-area');
+  const toyPiecesSpec = getSpec('toys-pieces');
+  const toyRcControlSpec = getSpec('toys-rc-control-type');
+  const toyRcRangeSpec = getSpec('toys-rc-range-meters');
+  const toyMaxSpeedSpec = getSpec('toys-max-speed-kmh');
+  const toyGamePlayersSpec = getSpec('toys-game-players');
+  const toyPlaytimeSpec = getSpec('toys-game-playtime-mins');
+  const toyGameTypeSpec = getSpec('toys-game-type');
+  const toyPuzzleTypeSpec = getSpec('toys-puzzle-type');
+  const toyPuzzlePiecesSpec = getSpec('toys-puzzle-pieces');
+  const toyMaxWeightSpec = getSpec('toys-max-weight-capacity-kg');
+  const toyWarrantySpec = getSpec('toys-warranty');
+  const toyOriginSpec = getSpec('toys-country-of-origin');
 
   // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, Baby, and Automotive (Pack / Volume / Viscosity / Tire / Battery)
   const COLOR_HEX_MAP: Record<string, string> = {
@@ -483,7 +519,8 @@ export function ProductDetailsClient({
       attrs['fashion-color'] ||
       attrs['cosmetics-shade'] ||
       attrs['home-color'] ||
-      attrs['baby-color'];
+      attrs['baby-color'] ||
+      attrs['color'];
     let size =
       attrs['fashion-size-clothing'] ||
       attrs['fashion-size-numeric'] ||
@@ -515,7 +552,10 @@ export function ProductDetailsClient({
       attrs['book-paper-size'] ||
       attrs['book-paper-gsm'] ||
       attrs['book-pack-size'] ||
-      attrs['book-ink-color'];
+      attrs['book-ink-color'] ||
+      attrs['toys-character'] ||
+      attrs['toys-pack-size'] ||
+      attrs['size'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
       const parts = v.nameEn.split('/').map((s) => s.trim());
@@ -1236,6 +1276,56 @@ export function ProductDetailsClient({
                     {isBn ? `ভাষা: ${bookLanguageSpec.displayValueBn}` : `Language: ${bookLanguageSpec.displayValueEn}`}
                   </span>
                 )}
+
+                {/* Toys, Games & Hobbies Badges */}
+                {toyAgeGroupSpec && toyAgeGroupSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>{isBn ? `বয়স: ${toyAgeGroupSpec.displayValueBn}` : `Age: ${toyAgeGroupSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {toyChokingHazardSpec && toyChokingHazardSpec.displayValueEn === 'true' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+                    <span>{isBn ? 'সতর্কতা: ছোট পার্টস' : 'Choking Hazard (Small Parts)'}</span>
+                  </span>
+                )}
+                {toyStemAreaSpec && toyStemAreaSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? `স্টেম: ${toyStemAreaSpec.displayValueBn}` : `STEM: ${toyStemAreaSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {toyGamePlayersSpec && toyGamePlayersSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
+                    <Trophy className="h-3 w-3" />
+                    <span>{isBn ? `খেলোয়াড়: ${toyGamePlayersSpec.displayValueBn}` : `Players: ${toyGamePlayersSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {toyRcRangeSpec && toyRcRangeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? `কন্ট্রোল রেঞ্জ: ${toyRcRangeSpec.displayValueBn} মি.` : `Range: ${toyRcRangeSpec.displayValueEn}m`}</span>
+                  </span>
+                )}
+                {toyPiecesSpec && toyPiecesSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? `পিস: ${toyPiecesSpec.displayValueBn}` : `Pieces: ${toyPiecesSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {toySafetyCertSpec && toySafetyCertSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? toySafetyCertSpec.displayValueBn : toySafetyCertSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {toyWarrantySpec && toyWarrantySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? `ওয়ারেন্টি: ${toyWarrantySpec.displayValueBn}` : `Warranty: ${toyWarrantySpec.displayValueEn}`}</span>
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1396,7 +1486,9 @@ export function ProductDetailsClient({
                                       ? (sportsWeightSpec ? (isBn ? 'ওজন / ক্যাপাসিটি (Weight):' : 'Weight / Capacity:') : sportsGloveSizeSpec ? (isBn ? 'গ্লাভস সাইজ (Glove Size):' : 'Glove Size:') : sportsFootwearSizeSpec ? (isBn ? 'জুতার সাইজ (Shoe Size):' : 'Shoe Size:') : sportsPackSpec ? (isBn ? 'প্যাক সাইজ (Pack Size):' : 'Pack Size:') : (isBn ? 'সাইজ (Size):' : 'Size:'))
                                       : isBooks
                                         ? (bookFormatSpec ? (isBn ? 'বাঁধাই / সংস্করণ (Binding):' : 'Binding / Format:') : bookPaperSizeSpec ? (isBn ? 'কাগজের মাপ (Paper Size):' : 'Paper Size:') : bookInkColorSpec ? (isBn ? 'কালির রং / প্যাক (Ink / Pack):' : 'Ink / Pack:') : bookPackSpec ? (isBn ? 'প্যাক সংখ্যা (Pack Size):' : 'Pack Size:') : (isBn ? 'সাইজ (Size):' : 'Size:'))
-                                        : (isBn ? 'সাইজ (Size):' : 'Size:')}
+                                        : isToys
+                                          ? (toyPiecesSpec ? (isBn ? 'পিস সংখ্যা / প্যাক (Pieces / Pack):' : 'Pieces / Pack:') : toyStemAreaSpec ? (isBn ? 'মডেল / এডিশন (Model / Edition):' : 'Model / Edition:') : (isBn ? 'মডেল / সাইজ (Model / Size):' : 'Model / Size:'))
+                                          : (isBn ? 'সাইজ (Size):' : 'Size:')}
                           </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
                         </span>
@@ -1731,6 +1823,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'গ্রামের বাজার-এ সরবরাহকৃত সকল বই সরাসরি অনুমোদিত প্রকাশনী ও স্বত্বাধিকারীদের কাছ থেকে সংগৃহীত ১০০% আসল প্রিন্ট। কোনো প্রকার পাইরেটেড বা অননুমোদিত ফটোকপি বই বিক্রি করা হয় না। পৃষ্ঠা বা বাঁধাই সংক্রান্ত ত্রুটি থাকলে দ্রুত রিপ্লেসমেন্ট সুবিধা প্রযোজ্য।'
                       : 'All books on Gramer Bazar are 100% genuine original print editions sourced directly from authorized publishing houses and copyright holders. We strictly prohibit pirated or unauthorized photocopies. In case of missing pages or binding defects, instant replacement is guaranteed.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Toys Child Safety Standards & Non-Toxic Materials Advisory */}
+              {isToys && (
+                <div className="bg-violet-500/10 border border-violet-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-violet-950 dark:text-violet-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-violet-800 dark:text-violet-400">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
+                    <span>{isBn ? 'শিশু সুরক্ষা ও খেলনার গুণমান নিশ্চয়তা' : 'Child Safety Standards & Non-Toxic Quality Guarantee'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'গ্রামের বাজার-এ সরবরাহকৃত শিশুদের সকল খেলনা ১০০% বিপিএ-মুক্ত, পরিবেশবান্ধব ও আন্তর্জাতিক শিশু সুরক্ষা মান (EN71 / ASTM F963) অনুযায়ী প্রস্তুতকৃত। ছোট যন্ত্রাংশ বা ব্যাটারিযুক্ত খেলনা ব্যবহারের ক্ষেত্রে প্রস্তাবিত বয়স সীমা মেনে চলুন এবং ৩ বছরের নিচের শিশুদের ক্ষেত্রে অভিভাবকের প্রত্যক্ষ তত্ত্বাবধান বজায় রাখুন।'
+                      : 'All toys on Gramer Bazar adhere to rigorous child safety certifications (EN71 / ASTM F963) and are fabricated from 100% BPA-free, lead-safe, and non-toxic materials. Please observe the recommended age grade. Adult supervision is recommended for toys containing small parts, sharp gears, or high-speed RC propellers.'}
                   </p>
                 </div>
               )}

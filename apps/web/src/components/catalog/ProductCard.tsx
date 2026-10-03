@@ -26,6 +26,7 @@ import {
   Shirt,
   Utensils,
   Activity,
+  Gamepad2,
 } from 'lucide-react';
 import type { SellerProduct } from '@/features/catalog/catalogApi';
 import { RootState } from '@/store/store';
@@ -188,6 +189,33 @@ function getCategoryTheme(
     };
   }
 
+  // Toys, Games & Hobbies
+  if (
+    combined.includes('toys-games-hobbies') ||
+    combined.includes('rc-') ||
+    combined.includes('lego') ||
+    combined.includes('board-game') ||
+    combined.includes('puzzle') ||
+    combined.includes('drone') ||
+    combined.includes('action figure') ||
+    combined.includes('doll') ||
+    combined.includes('stem') ||
+    combined.includes('hobb') ||
+    combined.includes('খেলনা') ||
+    combined.includes('গেম') ||
+    combined.includes('পাজল') ||
+    combined.includes('পুতুল') ||
+    combined.includes('রিমোট কন্ট্রোল')
+  ) {
+    return {
+      type: 'toys',
+      label: isBn ? 'খেলনা ও গেমস' : 'Toys & Games',
+      badgeClass: 'bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/20',
+      accentBorder: 'hover:border-violet-500/50',
+      icon: 'gamepad',
+    };
+  }
+
   // Baby & Kids
   if (
     combined.includes('baby') ||
@@ -196,8 +224,6 @@ function getCategoryTheme(
     combined.includes('বাচ্চা') ||
     combined.includes('diaper') ||
     combined.includes('ডায়াপার') ||
-    combined.includes('toy') ||
-    combined.includes('খেলনা') ||
     combined.includes('stroller') ||
     combined.includes('nursery')
   ) {
@@ -577,6 +603,8 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         return <Activity className="w-2.5 h-2.5" />;
       case 'heart':
         return <Heart className="w-2.5 h-2.5" />;
+      case 'gamepad':
+        return <Gamepad2 className="w-2.5 h-2.5" />;
       default:
         return <Sparkles className="w-2.5 h-2.5" />;
     }
