@@ -27,6 +27,7 @@ import {
   Utensils,
   Activity,
   Gamepad2,
+  PawPrint,
 } from 'lucide-react';
 import type { SellerProduct } from '@/features/catalog/catalogApi';
 import { RootState } from '@/store/store';
@@ -52,6 +53,37 @@ function getCategoryTheme(
   isBn: boolean
 ) {
   const combined = `${categorySlug} ${subCategorySlug} ${productName}`.toLowerCase();
+
+  // Pet Supplies & Animals
+  if (
+    combined.includes('pet-supplies') ||
+    combined.includes('pet-food') ||
+    combined.includes('dog') ||
+    combined.includes('cat-') ||
+    combined.includes('cat litter') ||
+    combined.includes('aquarium') ||
+    combined.includes('pedigree') ||
+    combined.includes('whiskas') ||
+    combined.includes('me-o') ||
+    combined.includes('royal canin') ||
+    combined.includes('drools') ||
+    combined.includes('tetra') ||
+    combined.includes('sobo') ||
+    combined.includes('পোষা') ||
+    combined.includes('কুকুর') ||
+    combined.includes('বিড়াল') ||
+    combined.includes('বিড়াল') ||
+    combined.includes('পাখির খাবার') ||
+    combined.includes('মাছের খাবার')
+  ) {
+    return {
+      type: 'pets',
+      label: isBn ? 'পোষা প্রাণী' : 'Pet Supplies',
+      badgeClass: 'bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/20',
+      accentBorder: 'hover:border-teal-500/50',
+      icon: 'paw',
+    };
+  }
 
   // Fish & Seafood
   if (
@@ -605,6 +637,8 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         return <Heart className="w-2.5 h-2.5" />;
       case 'gamepad':
         return <Gamepad2 className="w-2.5 h-2.5" />;
+      case 'paw':
+        return <PawPrint className="w-2.5 h-2.5" />;
       default:
         return <Sparkles className="w-2.5 h-2.5" />;
     }

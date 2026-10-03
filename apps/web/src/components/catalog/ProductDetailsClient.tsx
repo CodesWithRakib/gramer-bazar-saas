@@ -271,6 +271,16 @@ export function ProductDetailsClient({
     categoryPath.includes('pretend') ||
     categoryPath.includes('scooter') ||
     categoryPath.includes('stem');
+  const isPets =
+    categoryPath.includes('pet') ||
+    categoryPath.includes('dog') ||
+    categoryPath.includes('cat-') ||
+    categoryPath.includes('bird') ||
+    categoryPath.includes('aquarium') ||
+    categoryPath.includes('fish-food') ||
+    categoryPath.includes('litter') ||
+    categoryPath.includes('rabbit') ||
+    categoryPath.includes('hamster');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -401,6 +411,32 @@ export function ProductDetailsClient({
   const toyWarrantySpec = getSpec('toys-warranty');
   const toyOriginSpec = getSpec('toys-country-of-origin');
 
+  // Pet Supplies Specs
+  const petTypeSpec = getSpec('pet-type');
+  const petFoodTypeSpec = getSpec('pet-food-type');
+  const petLifeStageSpec = getSpec('pet-life-stage');
+  const petBreedSizeSpec = getSpec('pet-breed-size');
+  const petFlavorSpec = getSpec('pet-flavor');
+  const petProteinSpec = getSpec('pet-protein-percentage');
+  const petIngredientsSpec = getSpec('pet-main-ingredients');
+  const petStorageSpec = getSpec('pet-storage-instructions');
+  const petFeedingSpec = getSpec('pet-feeding-instructions');
+  const petLitterTypeSpec = getSpec('pet-litter-type');
+  const petLitterClumpingSpec = getSpec('pet-litter-clumping');
+  const petScentSpec = getSpec('pet-scent');
+  const petMaterialSpec = getSpec('pet-material');
+  const petSizeSpec = getSpec('pet-size');
+  const petNeckGirthSpec = getSpec('pet-neck-size-cm');
+  const petChestGirthSpec = getSpec('pet-chest-size-cm');
+  const petLeashLengthSpec = getSpec('pet-leash-length-meters');
+  const petCarrierMaxWeightSpec = getSpec('pet-carrier-max-weight-kg');
+  const petTankCapacitySpec = getSpec('pet-tank-capacity-liters');
+  const petFilterFlowRateSpec = getSpec('pet-filter-flow-rate-lph');
+  const petPowerWattSpec = getSpec('pet-power-watt');
+  const petVoltageSpec = getSpec('pet-voltage');
+  const petWarrantySpec = getSpec('pet-warranty');
+  const petOriginSpec = getSpec('pet-country-of-origin');
+
   // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, Baby, and Automotive (Pack / Volume / Viscosity / Tire / Battery)
   const COLOR_HEX_MAP: Record<string, string> = {
     black: '#1a1a1a',
@@ -520,6 +556,7 @@ export function ProductDetailsClient({
       attrs['cosmetics-shade'] ||
       attrs['home-color'] ||
       attrs['baby-color'] ||
+      attrs['pet-scent'] ||
       attrs['color'];
     let size =
       attrs['fashion-size-clothing'] ||
@@ -555,6 +592,9 @@ export function ProductDetailsClient({
       attrs['book-ink-color'] ||
       attrs['toys-character'] ||
       attrs['toys-pack-size'] ||
+      attrs['pet-pack-size'] ||
+      attrs['pet-flavor'] ||
+      attrs['pet-size'] ||
       attrs['size'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
@@ -1326,6 +1366,55 @@ export function ProductDetailsClient({
                     <span>{isBn ? `ওয়ারেন্টি: ${toyWarrantySpec.displayValueBn}` : `Warranty: ${toyWarrantySpec.displayValueEn}`}</span>
                   </span>
                 )}
+
+                {/* Pet Supplies Badges */}
+                {petTypeSpec && petTypeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-500/15 text-teal-700 dark:text-teal-300 border border-teal-500/30 flex items-center gap-1">
+                    <Heart className="h-3 w-3" />
+                    <span>{isBn ? `পোষা প্রাণী: ${petTypeSpec.displayValueBn}` : `Pet: ${petTypeSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {petLifeStageSpec && petLifeStageSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>{isBn ? `পর্যায়: ${petLifeStageSpec.displayValueBn}` : `Stage: ${petLifeStageSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {petFoodTypeSpec && petFoodTypeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? petFoodTypeSpec.displayValueBn : petFoodTypeSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {petProteinSpec && petProteinSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? `প্রোটিন: ${petProteinSpec.displayValueBn}%` : `Protein: ${petProteinSpec.displayValueEn}%`}</span>
+                  </span>
+                )}
+                {petFlavorSpec && petFlavorSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-700 dark:text-orange-300 border border-orange-500/20">
+                    {isBn ? `ফ্লেভার: ${petFlavorSpec.displayValueBn}` : `Flavor: ${petFlavorSpec.displayValueEn}`}
+                  </span>
+                )}
+                {petLitterTypeSpec && petLitterTypeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? petLitterTypeSpec.displayValueBn : petLitterTypeSpec.displayValueEn}</span>
+                  </span>
+                )}
+                {petTankCapacitySpec && petTankCapacitySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    <span>{isBn ? `ট্যাংক: ${petTankCapacitySpec.displayValueBn} লিটার` : `Tank: ${petTankCapacitySpec.displayValueEn}L`}</span>
+                  </span>
+                )}
+                {petWarrantySpec && petWarrantySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? `ওয়ারেন্টি: ${petWarrantySpec.displayValueBn}` : `Warranty: ${petWarrantySpec.displayValueEn}`}</span>
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1488,6 +1577,8 @@ export function ProductDetailsClient({
                                         ? (bookFormatSpec ? (isBn ? 'বাঁধাই / সংস্করণ (Binding):' : 'Binding / Format:') : bookPaperSizeSpec ? (isBn ? 'কাগজের মাপ (Paper Size):' : 'Paper Size:') : bookInkColorSpec ? (isBn ? 'কালির রং / প্যাক (Ink / Pack):' : 'Ink / Pack:') : bookPackSpec ? (isBn ? 'প্যাক সংখ্যা (Pack Size):' : 'Pack Size:') : (isBn ? 'সাইজ (Size):' : 'Size:'))
                                         : isToys
                                           ? (toyPiecesSpec ? (isBn ? 'পিস সংখ্যা / প্যাক (Pieces / Pack):' : 'Pieces / Pack:') : toyStemAreaSpec ? (isBn ? 'মডেল / এডিশন (Model / Edition):' : 'Model / Edition:') : (isBn ? 'মডেল / সাইজ (Model / Size):' : 'Model / Size:'))
+                                          : isPets
+                                            ? (petFoodTypeSpec ? (isBn ? 'ওজন / প্যাক (Weight / Pack):' : 'Weight / Pack:') : petLitterTypeSpec ? (isBn ? 'সুগন্ধি / সাইজ (Scent / Size):' : 'Scent / Size:') : (isBn ? 'সাইজ / প্যাক (Size / Pack):' : 'Size / Pack:'))
                                           : (isBn ? 'সাইজ (Size):' : 'Size:')}
                           </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
@@ -1838,6 +1929,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'গ্রামের বাজার-এ সরবরাহকৃত শিশুদের সকল খেলনা ১০০% বিপিএ-মুক্ত, পরিবেশবান্ধব ও আন্তর্জাতিক শিশু সুরক্ষা মান (EN71 / ASTM F963) অনুযায়ী প্রস্তুতকৃত। ছোট যন্ত্রাংশ বা ব্যাটারিযুক্ত খেলনা ব্যবহারের ক্ষেত্রে প্রস্তাবিত বয়স সীমা মেনে চলুন এবং ৩ বছরের নিচের শিশুদের ক্ষেত্রে অভিভাবকের প্রত্যক্ষ তত্ত্বাবধান বজায় রাখুন।'
                       : 'All toys on Gramer Bazar adhere to rigorous child safety certifications (EN71 / ASTM F963) and are fabricated from 100% BPA-free, lead-safe, and non-toxic materials. Please observe the recommended age grade. Adult supervision is recommended for toys containing small parts, sharp gears, or high-speed RC propellers.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Pet Nutrition & Veterinary Care Quality Advisory */}
+              {isPets && (
+                <div className="bg-teal-500/10 border border-teal-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-teal-950 dark:text-teal-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-teal-800 dark:text-teal-400">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-teal-600 dark:text-teal-400" />
+                    <span>{isBn ? 'পোষা প্রাণীর পুষ্টি ও সুস্থতা নিশ্চয়তা' : 'Pet Nutrition & Veterinary Care Quality Guarantee'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'গ্রামের বাজার-এ সরবরাহকৃত সকল পেট ফুড ও ট্রিটস ১০০% আসল, নিবন্ধিত আমদানিকারক ও ব্র্যান্ডের অফিসিয়াল ব্যাচ থেকে সংগৃহীত। খাবারের নতুন ব্র্যান্ড শুরুর ক্ষেত্রে ৭ থেকে ১০ দিনের ট্রানজিশন রুটিন অনুসরণ করুন এবং সবসময় পর্যাপ্ত পরিষ্কার খাবার পানি সরবরাহ করুন। কোনো গুরুতর অসুস্থতায় নিকটস্থ নিবন্ধিত ভেটেরিনারি চিকিৎসকের পরামর্শ নিন।'
+                      : 'All pet nutrition, foods, and treats on Gramer Bazar are 100% genuine and sourced from certified regional distributors with verified batch traceability. When transitioning your pet to a new diet, introduce the new food gradually over 7 to 10 days alongside plenty of fresh water. Consult a licensed veterinarian for specialized medical diets.'}
                   </p>
                 </div>
               )}
