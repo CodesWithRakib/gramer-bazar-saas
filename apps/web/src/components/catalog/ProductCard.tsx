@@ -188,6 +188,28 @@ function getCategoryTheme(
     };
   }
 
+  // Baby & Kids
+  if (
+    combined.includes('baby') ||
+    combined.includes('kid') ||
+    combined.includes('শিশু') ||
+    combined.includes('বাচ্চা') ||
+    combined.includes('diaper') ||
+    combined.includes('ডায়াপার') ||
+    combined.includes('toy') ||
+    combined.includes('খেলনা') ||
+    combined.includes('stroller') ||
+    combined.includes('nursery')
+  ) {
+    return {
+      type: 'baby',
+      label: isBn ? 'শিশু ও কিডস' : 'Baby & Kids',
+      badgeClass: 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20',
+      accentBorder: 'hover:border-sky-500/50',
+      icon: 'heart',
+    };
+  }
+
   // Fashion & Apparel
   if (
     combined.includes('cloth') ||
@@ -479,6 +501,8 @@ export function ProductCard({ product, lang, flashSaleDiscountPrice }: ProductCa
         return <Zap className="w-2.5 h-2.5" />;
       case 'activity':
         return <Activity className="w-2.5 h-2.5" />;
+      case 'heart':
+        return <Heart className="w-2.5 h-2.5" />;
       default:
         return <Sparkles className="w-2.5 h-2.5" />;
     }

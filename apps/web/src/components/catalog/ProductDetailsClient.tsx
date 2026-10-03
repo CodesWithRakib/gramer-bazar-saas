@@ -220,6 +220,13 @@ export function ProductDetailsClient({
     categoryPath.includes('cookware') ||
     categoryPath.includes('decor') ||
     categoryPath.includes('lighting');
+  const isBabyKids =
+    categoryPath.includes('baby') ||
+    categoryPath.includes('kid') ||
+    categoryPath.includes('diaper') ||
+    categoryPath.includes('nursery') ||
+    categoryPath.includes('stroller') ||
+    categoryPath.includes('toy');
 
   // Attribute helper
   const getSpec = (slug: string) => {
@@ -267,7 +274,20 @@ export function ProductDetailsClient({
   const homeAssemblySpec = getSpec('home-assembly');
   const homePackSizeSpec = getSpec('home-pack-size');
 
-  // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), and Home (Color × Capacity / Pack Size)
+  // Baby & Kids Specs
+  const babyAgeSpec = getSpec('baby-age-group');
+  const babyDiaperSizeSpec = getSpec('baby-diaper-size');
+  const babyWeightSpec = getSpec('baby-weight-range');
+  const babyGenderSpec = getSpec('baby-gender');
+  const babyMaterialSpec = getSpec('baby-material');
+  const babyPackSpec = getSpec('baby-pack-size');
+  const babySafetySpec = getSpec('baby-safety-claims');
+  const babyWarningSpec = getSpec('baby-warning');
+  const babyVolumeSpec = getSpec('baby-volume');
+  const babyFootwearSizeSpec = getSpec('baby-footwear-size');
+  const babyOriginSpec = getSpec('baby-country-of-origin');
+
+  // Multi-variant parsing for Fashion (Color × Size), Cosmetics (Shade × Volume), Home, and Baby (Color × Size / Pack / Volume)
   const COLOR_HEX_MAP: Record<string, string> = {
     black: '#1a1a1a',
     white: '#ffffff',
@@ -311,6 +331,16 @@ export function ProductDetailsClient({
     'berry plum': '#7d2248',
     'velvet crimson': '#8a1325',
     'black onyx': '#1a1a1a',
+    // Baby & Kids Colors
+    'pastel pink': '#f472b6',
+    'sky blue': '#38bdf8',
+    'mint green': '#4ade80',
+    'sunny yellow': '#facc15',
+    'pure white': '#ffffff',
+    'soft grey': '#9ca3af',
+    'vibrant red': '#ef4444',
+    'lavender purple': '#c084fc',
+    'peach coral': '#fb923c',
   };
 
   const COLOR_BN_MAP: Record<string, string> = {
@@ -356,12 +386,26 @@ export function ProductDetailsClient({
     'berry plum': 'বেরি প্লাম',
     'velvet crimson': 'ভেলভেট ক্রিমসন',
     'black onyx': 'ব্ল্যাক অনিক্স',
+    // Baby & Kids Colors Bangla
+    'pastel pink': 'প্যাস্টেল পিংক',
+    'sky blue': 'স্কাই ব্লু',
+    'mint green': 'মিন্ট গ্রিন',
+    'sunny yellow': 'সানি ইয়েলো',
+    'pure white': 'পিওর হোয়াইট',
+    'soft grey': 'সফট গ্রে',
+    'vibrant red': 'ভাইব্র্যান্ট রেড',
+    'lavender purple': 'ল্যাভেন্ডার পার্পল',
+    'peach coral': 'পিচ কোরাল',
   };
 
   const parsedVariants = products.map((p, idx) => {
     const v = p.productVariant;
     const attrs = ((v as any).attributes || {}) as Record<string, any>;
-    let color = attrs['fashion-color'] || attrs['cosmetics-shade'] || attrs['home-color'];
+    let color =
+      attrs['fashion-color'] ||
+      attrs['cosmetics-shade'] ||
+      attrs['home-color'] ||
+      attrs['baby-color'];
     let size =
       attrs['fashion-size-clothing'] ||
       attrs['fashion-size-numeric'] ||
@@ -373,7 +417,12 @@ export function ProductDetailsClient({
       attrs['home-capacity'] ||
       attrs['home-pack-size'] ||
       attrs['home-bed-size'] ||
-      attrs['home-dimensions'];
+      attrs['home-dimensions'] ||
+      attrs['baby-diaper-size'] ||
+      attrs['baby-age-group'] ||
+      attrs['baby-pack-size'] ||
+      attrs['baby-volume'] ||
+      attrs['baby-footwear-size'];
 
     if (!color && !size && v.nameEn && v.nameEn.includes('/')) {
       const parts = v.nameEn.split('/').map((s) => s.trim());
@@ -975,6 +1024,38 @@ export function ProductDetailsClient({
                     {isBn ? homeAssemblySpec.displayValueBn : homeAssemblySpec.displayValueEn}
                   </span>
                 )}
+
+                {/* Baby & Kids Badges */}
+                {babySafetySpec && babySafetySpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span>{isBn ? babySafetySpec.displayValueBn : babySafetySpec.displayValueEn}</span>
+                  </span>
+                )}
+                {babyAgeSpec && babyAgeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>{isBn ? `বয়স: ${babyAgeSpec.displayValueBn}` : `Age: ${babyAgeSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {babyDiaperSizeSpec && babyDiaperSizeSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                    <Layers className="h-3 w-3" />
+                    <span>{isBn ? `সাইজ: ${babyDiaperSizeSpec.displayValueBn}` : `Size: ${babyDiaperSizeSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {babyWeightSpec && babyWeightSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 flex items-center gap-1">
+                    <Info className="h-3 w-3" />
+                    <span>{isBn ? `ওজন: ${babyWeightSpec.displayValueBn}` : `Weight: ${babyWeightSpec.displayValueEn}`}</span>
+                  </span>
+                )}
+                {babyMaterialSpec && babyMaterialSpec.displayValueEn !== 'Not Specified' && (
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20 flex items-center gap-1">
+                    <Leaf className="h-3 w-3" />
+                    <span>{isBn ? `উপাদান: ${babyMaterialSpec.displayValueBn}` : `Material: ${babyMaterialSpec.displayValueEn}`}</span>
+                  </span>
+                )}
               </div>
 
               {/* Main Product Title */}
@@ -1127,7 +1208,9 @@ export function ProductDetailsClient({
                               ? (isBn ? 'ভলিউম (Volume):' : 'Volume:')
                               : isHomeKitchen
                                 ? (isBn ? 'ক্যাপাসিটি / সাইজ (Capacity / Size):' : 'Capacity / Size:')
-                                : (isBn ? 'সাইজ (Size):' : 'Size:')}
+                                : isBabyKids
+                                  ? (babyDiaperSizeSpec ? (isBn ? 'ডায়াপার সাইজ (Diaper Size):' : 'Diaper Size:') : (isBn ? 'বয়স / সাইজ (Age / Size):' : 'Age / Size:'))
+                                  : (isBn ? 'সাইজ (Size):' : 'Size:')}
                           </span>
                           <span className="text-primary normal-case font-extrabold">{activeSize}</span>
                         </span>
@@ -1402,6 +1485,21 @@ export function ProductDetailsClient({
                     {isBn
                       ? 'বৈদ্যুতিক যন্ত্রপাতির অফিসিয়াল ওয়ারেন্টি সুবিধা পেতে ক্যাশ মেমো ও ওয়ারেন্টি কার্ড সংরক্ষণ করুন। ভঙ্গুর কাচ বা ভারী আসবাবপত্রের ক্ষেত্রে আনপ্যাকিংয়ের সময় ডেলিভারি রাইডারের উপস্থিতিতে পণ্যটি যাচাই করে নিন।'
                       : 'Please retain the invoice and warranty card to claim official manufacturer warranty on appliances. For heavy furniture and fragile glassware, kindly inspect the package upon doorstep delivery.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Baby & Kids Care & Safety Advisory */}
+              {isBabyKids && (
+                <div className="bg-sky-500/10 border border-sky-500/30 rounded-2xl p-4 text-xs space-y-1.5 text-sky-950 dark:text-sky-200 mt-5">
+                  <div className="flex items-center gap-1.5 font-bold text-sky-800 dark:text-sky-400">
+                    <Heart className="h-4 w-4 shrink-0 text-sky-600 dark:text-sky-400" />
+                    <span>{isBn ? 'শিশুর যত্ন ও পণ্য ব্যবহারের নিরাপত্তা নির্দেশিকা' : 'Baby Care & Child Safety Advisory'}</span>
+                  </div>
+                  <p className="leading-relaxed opacity-90">
+                    {isBn
+                      ? 'শিশুদের খেলনা ও স্ট্রোলার ব্যবহারের সময় সর্বদা বয়স্কদের প্রত্যক্ষ নজরদারি বজায় রাখুন। ছোট যন্ত্রাংশ শিশুদের গিলে ফেলার ঝুঁকি তৈরি করতে পারে। স্কিনকেয়ার ও বেবি ফুড ব্যবহারের ক্ষেত্রে প্যাকেটের গায়ে উল্লেখিত প্রস্তুত ও মেয়াদোত্তীর্ণের তারিখ এবং সংরক্ষণ নির্দেশিকা মেনে চলুন।'
+                      : 'Always ensure adult supervision during toy play, feeding, and stroller use. Keep small parts away from infants to prevent choking hazards. For baby skincare and infant food, please review allergen labels, expiry dates, and proper hygiene guidelines on the package.'}
                   </p>
                 </div>
               )}
