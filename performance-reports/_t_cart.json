@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-10-04T05:39:36.299Z",
+  "baseUrl": "http://localhost:4005",
+  "concurrency": 10,
+  "durationSeconds": 8,
+  "warmupSeconds": 2,
+  "note": "Measured on a local production-mode NestJS instance (NODE_ENV=production, TypeORM query logging off, in-memory cache). Throttling raised on the benchmark instance only.",
+  "totalElapsedMs": 11732,
+  "results": [
+    {
+      "group": "Customer",
+      "name": "POST public/cart/validate",
+      "method": "POST",
+      "route": "/api/v1/public/cart/validate",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 8,
+      "coldMs": 18,
+      "payloadBytes": 508,
+      "requests": {
+        "total": 3672,
+        "success2xx": 3672,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 459
+      },
+      "latencyMs": {
+        "avg": 21.29,
+        "min": 18,
+        "max": 28,
+        "p50": 21,
+        "p99": 25
+      },
+      "throughputKbps": 746.75,
+      "errorRate": 0
+    }
+  ]
+}

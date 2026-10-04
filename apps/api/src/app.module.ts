@@ -68,6 +68,7 @@ import { SeedAnnouncementTemplates1791200000000 } from './migrations/17912000000
 import { FixDisputeStatusEnum1791600000000 } from './migrations/1791600000000-FixDisputeStatusEnum.js';
 import { FashionColorSwatches1791700000000 } from './migrations/1791700000000-FashionColorSwatches.js';
 import { SearchAndPaginationIndexes1792000000000 } from './migrations/1792000000000-SearchAndPaginationIndexes.js';
+import { RestorePerformanceIndexes1793000000000 } from './migrations/1793000000000-RestorePerformanceIndexes.js';
 import { BroadcastModule } from './broadcast/broadcast.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -91,9 +92,11 @@ import { ScheduleModule } from '@nestjs/schedule';
         const dbUrl = configService.get<string>('database.url');
         const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
         const isSsl = nodeEnv === 'production' && !dbUrl?.includes('localhost') && !dbUrl?.includes('127.0.0.1');
-        const syncEnabled =
-          configService.get<string>('DB_SYNCHRONIZE') === 'true' ||
-          (nodeEnv !== 'production' && configService.get<string>('DB_SYNCHRONIZE') !== 'false');
+        // Schema sync is opt-in. Previously it defaulted to ON outside production,
+        // and TypeORM's synchronizer drops indexes that are not declared in entity
+        // metadata — which silently deleted the indexes created by
+        // SearchAndPaginationIndexes. Schema is now owned by migrations only.
+        const syncEnabled = configService.get<string>('DB_SYNCHRONIZE') === 'true';
         const migrationsRun =
           configService.get<string>('MIGRATIONS_RUN') === 'true' ||
           configService.get<string>('MIGRATION') === 'true' ||
@@ -126,6 +129,7 @@ import { ScheduleModule } from '@nestjs/schedule';
             FixDisputeStatusEnum1791600000000,
             FashionColorSwatches1791700000000,
             SearchAndPaginationIndexes1792000000000,
+            RestorePerformanceIndexes1793000000000,
           ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,

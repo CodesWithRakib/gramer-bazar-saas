@@ -1,0 +1,1355 @@
+{
+  "generatedAt": "2026-10-04T05:48:52.765Z",
+  "baseUrl": "http://localhost:4005",
+  "concurrency": 10,
+  "durationSeconds": 6,
+  "warmupSeconds": 2,
+  "note": "Measured on a local production-mode NestJS instance (NODE_ENV=production, TypeORM query logging off, in-memory cache). Throttling raised on the benchmark instance only.",
+  "totalElapsedMs": 455160,
+  "results": [
+    {
+      "group": "Public",
+      "name": "health",
+      "method": "GET",
+      "route": "/health",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 6,
+      "payloadBytes": 248,
+      "requests": {
+        "total": 10320,
+        "success2xx": 10320,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 1720
+      },
+      "latencyMs": {
+        "avg": 5.3,
+        "min": 3,
+        "max": 17,
+        "p50": 5,
+        "p95": 9,
+        "p99": 10
+      },
+      "throughputKbps": 2351.33,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "locations/divisions",
+      "method": "GET",
+      "route": "/api/v1/locations/divisions",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 8,
+      "payloadBytes": 2044,
+      "requests": {
+        "total": 6181,
+        "success2xx": 6181,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 1030.17
+      },
+      "latencyMs": {
+        "avg": 9.22,
+        "min": 7,
+        "max": 17,
+        "p50": 9,
+        "p95": 13,
+        "p99": 14
+      },
+      "throughputKbps": 3217.33,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search newest",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/search?limit=24&sort=newest",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 264,
+      "payloadBytes": 81994,
+      "requests": {
+        "total": 117,
+        "success2xx": 117,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 19.5
+      },
+      "latencyMs": {
+        "avg": 485.18,
+        "min": 273,
+        "max": 786,
+        "p50": 465,
+        "p95": 766,
+        "p99": 769
+      },
+      "throughputKbps": 1583.42,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search price_asc",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/search?limit=24&sort=price_asc",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 321,
+      "payloadBytes": 117889,
+      "requests": {
+        "total": 145,
+        "success2xx": 145,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 24.17
+      },
+      "latencyMs": {
+        "avg": 403.06,
+        "min": 226,
+        "max": 619,
+        "p50": 395,
+        "p95": 575,
+        "p99": 591
+      },
+      "throughputKbps": 2809.33,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search name_asc",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/search?limit=24&sort=name_asc",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 1683,
+      "payloadBytes": 113743,
+      "requests": {
+        "total": 5,
+        "success2xx": 5,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 0.84
+      },
+      "latencyMs": {
+        "avg": 4718.2,
+        "min": 3982,
+        "max": 5467,
+        "p50": 4898,
+        "p95": 5467,
+        "p99": 5467
+      },
+      "throughputKbps": 93.51,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search q=laptop",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/search?limit=24&q=laptop",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 1177,
+      "payloadBytes": 82516,
+      "requests": {
+        "total": 104,
+        "success2xx": 104,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 17.34
+      },
+      "latencyMs": {
+        "avg": 555.9,
+        "min": 266,
+        "max": 1050,
+        "p50": 507,
+        "p95": 943,
+        "p99": 948
+      },
+      "throughputKbps": 1416.29,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/featured",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/featured?limit=8",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 412,
+      "payloadBytes": 35199,
+      "requests": {
+        "total": 73,
+        "success2xx": 73,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 12.17
+      },
+      "latencyMs": {
+        "avg": 775.95,
+        "min": 370,
+        "max": 1504,
+        "p50": 658,
+        "p95": 1486,
+        "p99": 1504
+      },
+      "throughputKbps": 432.09,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/popular",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/popular?limit=8",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 391,
+      "payloadBytes": 27564,
+      "requests": {
+        "total": 112,
+        "success2xx": 112,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 18.67
+      },
+      "latencyMs": {
+        "avg": 510.12,
+        "min": 296,
+        "max": 932,
+        "p50": 477,
+        "p95": 870,
+        "p99": 923
+      },
+      "throughputKbps": 523.44,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/brands",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/brands",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 208,
+      "payloadBytes": 855688,
+      "requests": {
+        "total": 70,
+        "success2xx": 70,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 11.67
+      },
+      "latencyMs": {
+        "avg": 815.66,
+        "min": 609,
+        "max": 1438,
+        "p50": 769,
+        "p95": 1366,
+        "p99": 1438
+      },
+      "throughputKbps": 9761.17,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/suggestions q=lap",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/suggestions?q=lap",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 728,
+      "payloadBytes": 1736,
+      "requests": {
+        "total": 1352,
+        "success2xx": 1352,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 225.34
+      },
+      "latencyMs": {
+        "avg": 43.87,
+        "min": 35,
+        "max": 73,
+        "p50": 43,
+        "p95": 53,
+        "p99": 66
+      },
+      "throughputKbps": 636,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "banners/public",
+      "method": "GET",
+      "route": "/api/v1/banners/public",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 23,
+      "payloadBytes": 2085,
+      "requests": {
+        "total": 4960,
+        "success2xx": 4960,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 826.67
+      },
+      "latencyMs": {
+        "avg": 11.61,
+        "min": 7,
+        "max": 28,
+        "p50": 11,
+        "p95": 18,
+        "p99": 20
+      },
+      "throughputKbps": 2615,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "flash-sales/active",
+      "method": "GET",
+      "route": "/api/v1/flash-sales/active",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 23,
+      "payloadBytes": 31321,
+      "requests": {
+        "total": 1191,
+        "success2xx": 1191,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 198.5
+      },
+      "latencyMs": {
+        "avg": 49.75,
+        "min": 42,
+        "max": 84,
+        "p50": 49,
+        "p95": 61,
+        "p99": 79
+      },
+      "throughputKbps": 6294.67,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/:slug (details)",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/wireless-headphones-80b6-87751-9129",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 221,
+      "payloadBytes": 10585,
+      "requests": {
+        "total": 90,
+        "success2xx": 90,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 15
+      },
+      "latencyMs": {
+        "avg": 629.58,
+        "min": 398,
+        "max": 1089,
+        "p50": 593,
+        "p95": 938,
+        "p99": 1089
+      },
+      "throughputKbps": 172.01,
+      "errorRate": 0
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/:slug/related",
+      "method": "GET",
+      "route": "/api/v1/public/catalog/wireless-headphones-80b6-87751-9129/related",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 117,
+      "payloadBytes": 158,
+      "requests": {
+        "total": 420,
+        "success2xx": 420,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 70
+      },
+      "latencyMs": {
+        "avg": 141.75,
+        "min": 42,
+        "max": 376,
+        "p50": 130,
+        "p95": 290,
+        "p99": 315
+      },
+      "throughputKbps": 89.55,
+      "errorRate": 0
+    },
+    {
+      "group": "Auth",
+      "name": "POST auth/login (customer)",
+      "method": "POST",
+      "route": "/api/v1/auth/login",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 321,
+      "payloadBytes": 1052,
+      "requests": {
+        "total": 28,
+        "success2xx": 28,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 4.67
+      },
+      "latencyMs": {
+        "avg": 1919.9,
+        "min": 1426,
+        "max": 3098,
+        "p50": 1588,
+        "p95": 3098,
+        "p99": 3098
+      },
+      "throughputKbps": 13.17,
+      "errorRate": 0
+    },
+    {
+      "group": "Auth",
+      "name": "GET auth/me (customer)",
+      "method": "GET",
+      "route": "/api/v1/auth/me",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 489,
+      "payloadBytes": 746,
+      "requests": {
+        "total": 2650,
+        "success2xx": 2650,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 441.67
+      },
+      "latencyMs": {
+        "avg": 22.12,
+        "min": 18,
+        "max": 46,
+        "p50": 22,
+        "p95": 29,
+        "p99": 33
+      },
+      "throughputKbps": 819.08,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "GET orders (mine)",
+      "method": "GET",
+      "route": "/api/v1/orders",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 37,
+      "payloadBytes": 115155,
+      "requests": {
+        "total": 494,
+        "success2xx": 494,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 82.34
+      },
+      "latencyMs": {
+        "avg": 120.44,
+        "min": 97,
+        "max": 218,
+        "p50": 118,
+        "p95": 146,
+        "p99": 185
+      },
+      "throughputKbps": 9352,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "GET orders/:id",
+      "method": "GET",
+      "route": "/api/v1/orders/19729d17-2b59-43f6-81d7-131680c70673",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 105,
+      "payloadBytes": 4895,
+      "requests": {
+        "total": 1082,
+        "success2xx": 1082,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 180.34
+      },
+      "latencyMs": {
+        "avg": 55.11,
+        "min": 47,
+        "max": 126,
+        "p50": 54,
+        "p95": 63,
+        "p99": 94
+      },
+      "throughputKbps": 1065.63,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "GET addresses",
+      "method": "GET",
+      "route": "/api/v1/addresses",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 46,
+      "payloadBytes": 626,
+      "requests": {
+        "total": 1678,
+        "success2xx": 1678,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 279.67
+      },
+      "latencyMs": {
+        "avg": 35.22,
+        "min": 29,
+        "max": 67,
+        "p50": 35,
+        "p95": 41,
+        "p99": 43
+      },
+      "throughputKbps": 485.83,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "GET wishlists",
+      "method": "GET",
+      "route": "/api/v1/wishlists",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 226,
+      "payloadBytes": 10290,
+      "requests": {
+        "total": 87,
+        "success2xx": 87,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 14.5
+      },
+      "latencyMs": {
+        "avg": 661.25,
+        "min": 402,
+        "max": 923,
+        "p50": 653,
+        "p95": 889,
+        "p99": 923
+      },
+      "throughputKbps": 162.08,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "GET notifications",
+      "method": "GET",
+      "route": "/api/v1/notifications?page=1&limit=20",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 158,
+      "payloadBytes": 10917,
+      "requests": {
+        "total": 1621,
+        "success2xx": 1621,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 270.17
+      },
+      "latencyMs": {
+        "avg": 36.57,
+        "min": 31,
+        "max": 62,
+        "p50": 36,
+        "p95": 44,
+        "p99": 47
+      },
+      "throughputKbps": 3185,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "GET notifications/unread-count",
+      "method": "GET",
+      "route": "/api/v1/notifications/unread-count",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 12,
+      "payloadBytes": 136,
+      "requests": {
+        "total": 2095,
+        "success2xx": 2095,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 349.17
+      },
+      "latencyMs": {
+        "avg": 28.09,
+        "min": 23,
+        "max": 40,
+        "p50": 28,
+        "p95": 34,
+        "p99": 35
+      },
+      "throughputKbps": 439.21,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "GET reviews/product/:pid",
+      "method": "GET",
+      "route": "/api/v1/reviews/product/5fe1f55b-1b1a-402b-a3d7-9c36b524e52c",
+      "auth": "customer",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 181,
+      "payloadBytes": 4123,
+      "requests": {
+        "total": 99,
+        "success2xx": 99,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 16.5
+      },
+      "latencyMs": {
+        "avg": 575.98,
+        "min": 329,
+        "max": 1174,
+        "p50": 557,
+        "p95": 1147,
+        "p99": 1174
+      },
+      "throughputKbps": 85.04,
+      "errorRate": 0
+    },
+    {
+      "group": "Customer",
+      "name": "POST public/cart/validate",
+      "method": "POST",
+      "route": "/api/v1/public/cart/validate",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 105,
+      "payloadBytes": 508,
+      "requests": {
+        "total": 2662,
+        "success2xx": 2662,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 443.67
+      },
+      "latencyMs": {
+        "avg": 22.02,
+        "min": 17,
+        "max": 63,
+        "p50": 21,
+        "p95": 36,
+        "p99": 45
+      },
+      "throughputKbps": 721.83,
+      "errorRate": 0
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/dashboard",
+      "method": "GET",
+      "route": "/api/v1/seller-portal/dashboard",
+      "auth": "seller",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 68,
+      "payloadBytes": 4316,
+      "requests": {
+        "total": 483,
+        "success2xx": 483,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 80.5
+      },
+      "latencyMs": {
+        "avg": 123.4,
+        "min": 64,
+        "max": 305,
+        "p50": 118,
+        "p95": 202,
+        "p99": 236
+      },
+      "throughputKbps": 430.06,
+      "errorRate": 0
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/products",
+      "method": "GET",
+      "route": "/api/v1/seller-portal/products?page=1&limit=20",
+      "auth": "seller",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 45,
+      "payloadBytes": 32651,
+      "requests": {
+        "total": 470,
+        "success2xx": 470,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 78.34
+      },
+      "latencyMs": {
+        "avg": 126.43,
+        "min": 102,
+        "max": 238,
+        "p50": 119,
+        "p95": 209,
+        "p99": 218
+      },
+      "throughputKbps": 2586,
+      "errorRate": 0
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/orders",
+      "method": "GET",
+      "route": "/api/v1/seller-portal/orders?page=1&limit=20",
+      "auth": "seller",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 39,
+      "payloadBytes": 2873,
+      "requests": {
+        "total": 941,
+        "success2xx": 941,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 156.84
+      },
+      "latencyMs": {
+        "avg": 63,
+        "min": 46,
+        "max": 202,
+        "p50": 60,
+        "p95": 99,
+        "p99": 166
+      },
+      "throughputKbps": 616.83,
+      "errorRate": 0
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/orders/:id",
+      "method": "GET",
+      "route": "/api/v1/seller-portal/orders/149f029b-61f7-4f02-afbe-386d43f408c0",
+      "auth": "seller",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 59,
+      "payloadBytes": 1722,
+      "requests": {
+        "total": 590,
+        "success2xx": 590,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 98.34
+      },
+      "latencyMs": {
+        "avg": 101.19,
+        "min": 83,
+        "max": 164,
+        "p50": 98,
+        "p95": 136,
+        "p99": 161
+      },
+      "throughputKbps": 276.18,
+      "errorRate": 0
+    },
+    {
+      "group": "Seller",
+      "name": "GET wallets/my-wallet",
+      "method": "GET",
+      "route": "/api/v1/wallets/my-wallet",
+      "auth": "seller",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 66,
+      "payloadBytes": 374,
+      "requests": {
+        "total": 1429,
+        "success2xx": 1429,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 238.17
+      },
+      "latencyMs": {
+        "avg": 41.61,
+        "min": 32,
+        "max": 73,
+        "p50": 41,
+        "p95": 53,
+        "p99": 58
+      },
+      "throughputKbps": 355.13,
+      "errorRate": 0
+    },
+    {
+      "group": "Rider",
+      "name": "GET deliveries/rider/assigned",
+      "method": "GET",
+      "route": "/api/v1/deliveries/rider/assigned",
+      "auth": "rider",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 54,
+      "payloadBytes": 52985,
+      "requests": {
+        "total": 541,
+        "success2xx": 541,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 90.17
+      },
+      "latencyMs": {
+        "avg": 109.95,
+        "min": 87,
+        "max": 194,
+        "p50": 106,
+        "p95": 163,
+        "p99": 173
+      },
+      "throughputKbps": 4768.67,
+      "errorRate": 0
+    },
+    {
+      "group": "Rider",
+      "name": "GET deliveries/rider/:id",
+      "method": "GET",
+      "route": "/api/v1/deliveries/rider/6584568e-6dd7-4bcc-8ca9-e27834f55689",
+      "auth": "rider",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 84,
+      "payloadBytes": 5799,
+      "requests": {
+        "total": 552,
+        "success2xx": 552,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 92
+      },
+      "latencyMs": {
+        "avg": 107.85,
+        "min": 85,
+        "max": 158,
+        "p50": 104,
+        "p95": 138,
+        "p99": 150
+      },
+      "throughputKbps": 624.75,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/analytics/dashboard",
+      "method": "GET",
+      "route": "/api/v1/admin/analytics/dashboard",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 158,
+      "payloadBytes": 1266,
+      "requests": {
+        "total": 155,
+        "success2xx": 155,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 25.84
+      },
+      "latencyMs": {
+        "avg": 372.68,
+        "min": 175,
+        "max": 735,
+        "p50": 369,
+        "p95": 631,
+        "p99": 725
+      },
+      "throughputKbps": 61.04,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/analytics/demand",
+      "method": "GET",
+      "route": "/api/v1/admin/analytics/demand",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 1991,
+      "payloadBytes": 1192,
+      "requests": {
+        "total": 0,
+        "success2xx": 0,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 0
+      },
+      "latencyMs": {
+        "avg": 0,
+        "min": 0,
+        "max": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0
+      },
+      "throughputKbps": 0,
+      "errorRate": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET users (paginated)",
+      "method": "GET",
+      "route": "/api/v1/users?page=1&limit=20",
+      "auth": "admin",
+      "skipped": true,
+      "skipReason": "cold request exceeded 20s timeout",
+      "coldMs": 20000,
+      "payloadBytes": null,
+      "requests": {
+        "total": 0,
+        "success2xx": 0,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 0
+      },
+      "latencyMs": {
+        "avg": null,
+        "min": null,
+        "max": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "throughputKbps": null,
+      "errorRate": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET orders/admin/all",
+      "method": "GET",
+      "route": "/api/v1/orders/admin/all?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 9988,
+      "payloadBytes": 24039,
+      "requests": {
+        "total": 0,
+        "success2xx": 0,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 0
+      },
+      "latencyMs": {
+        "avg": 0,
+        "min": 0,
+        "max": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0
+      },
+      "throughputKbps": 0,
+      "errorRate": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET products (admin)",
+      "method": "GET",
+      "route": "/api/v1/products?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 965,
+      "payloadBytes": 43643,
+      "requests": {
+        "total": 20,
+        "success2xx": 20,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 3.34
+      },
+      "latencyMs": {
+        "avg": 2477.6,
+        "min": 1320,
+        "max": 4150,
+        "p50": 2504,
+        "p95": 4150,
+        "p99": 4150
+      },
+      "throughputKbps": 145.78,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET deliveries/admin",
+      "method": "GET",
+      "route": "/api/v1/deliveries/admin?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 81,
+      "payloadBytes": 34312,
+      "requests": {
+        "total": 340,
+        "success2xx": 340,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 56.67
+      },
+      "latencyMs": {
+        "avg": 176.9,
+        "min": 152,
+        "max": 327,
+        "p50": 167,
+        "p95": 321,
+        "p99": 325
+      },
+      "throughputKbps": 1963.17,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/audit-logs",
+      "method": "GET",
+      "route": "/api/v1/admin/audit-logs?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 169,
+      "payloadBytes": 7037,
+      "requests": {
+        "total": 490,
+        "success2xx": 490,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 81.67
+      },
+      "latencyMs": {
+        "avg": 122.6,
+        "min": 111,
+        "max": 155,
+        "p50": 120,
+        "p95": 146,
+        "p99": 154
+      },
+      "throughputKbps": 653.58,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET reviews/admin",
+      "method": "GET",
+      "route": "/api/v1/reviews/admin?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 1396,
+      "payloadBytes": 30798,
+      "requests": {
+        "total": 2,
+        "success2xx": 2,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 0.34
+      },
+      "latencyMs": {
+        "avg": 5418,
+        "min": 4930,
+        "max": 5906,
+        "p50": 4930,
+        "p95": 5906,
+        "p99": 5906
+      },
+      "throughputKbps": 10.4,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/coupons",
+      "method": "GET",
+      "route": "/api/v1/admin/coupons?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 1467,
+      "payloadBytes": 2281,
+      "requests": {
+        "total": 477,
+        "success2xx": 477,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 79.5
+      },
+      "latencyMs": {
+        "avg": 125.65,
+        "min": 62,
+        "max": 248,
+        "p50": 116,
+        "p95": 198,
+        "p99": 223
+      },
+      "throughputKbps": 266.67,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/product-requests",
+      "method": "GET",
+      "route": "/api/v1/admin/product-requests?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 124,
+      "payloadBytes": 5835,
+      "requests": {
+        "total": 460,
+        "success2xx": 460,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 76.67
+      },
+      "latencyMs": {
+        "avg": 130.15,
+        "min": 111,
+        "max": 242,
+        "p50": 124,
+        "p95": 172,
+        "p99": 239
+      },
+      "throughputKbps": 523.4,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/settings",
+      "method": "GET",
+      "route": "/api/v1/admin/settings",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 80,
+      "payloadBytes": 418,
+      "requests": {
+        "total": 510,
+        "success2xx": 510,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 85
+      },
+      "latencyMs": {
+        "avg": 117.56,
+        "min": 80,
+        "max": 196,
+        "p50": 113,
+        "p95": 165,
+        "p99": 182
+      },
+      "throughputKbps": 130.41,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET payouts",
+      "method": "GET",
+      "route": "/api/v1/payouts",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 108,
+      "payloadBytes": 6601,
+      "requests": {
+        "total": 445,
+        "success2xx": 445,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 74.17
+      },
+      "latencyMs": {
+        "avg": 133.62,
+        "min": 113,
+        "max": 184,
+        "p50": 130,
+        "p95": 168,
+        "p99": 172
+      },
+      "throughputKbps": 561.75,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET categories (admin)",
+      "method": "GET",
+      "route": "/api/v1/categories?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 91,
+      "payloadBytes": 23828,
+      "requests": {
+        "total": 537,
+        "success2xx": 537,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 89.5
+      },
+      "latencyMs": {
+        "avg": 110.79,
+        "min": 67,
+        "max": 310,
+        "p50": 104,
+        "p95": 185,
+        "p99": 217
+      },
+      "throughputKbps": 2183.75,
+      "errorRate": 0
+    },
+    {
+      "group": "Admin",
+      "name": "GET brands (admin)",
+      "method": "GET",
+      "route": "/api/v1/brands?limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 6,
+      "coldMs": 199,
+      "payloadBytes": 953218,
+      "requests": {
+        "total": 44,
+        "success2xx": 44,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 7.34
+      },
+      "latencyMs": {
+        "avg": 1245.8,
+        "min": 861,
+        "max": 2226,
+        "p50": 1118,
+        "p95": 2120,
+        "p99": 2226
+      },
+      "throughputKbps": 6835,
+      "errorRate": 0
+    },
+    {
+      "group": "Public (slow)",
+      "name": "public/categories",
+      "method": "GET",
+      "route": "/api/v1/public/categories",
+      "auth": "public",
+      "skipped": true,
+      "skipReason": "cold request exceeded 20s timeout",
+      "coldMs": 20000,
+      "payloadBytes": null,
+      "requests": {
+        "total": 0,
+        "success2xx": 0,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 0
+      },
+      "latencyMs": {
+        "avg": null,
+        "min": null,
+        "max": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "throughputKbps": null,
+      "errorRate": null
+    },
+    {
+      "group": "Public (slow)",
+      "name": "public/categories/tree",
+      "method": "GET",
+      "route": "/api/v1/public/categories/tree",
+      "auth": "public",
+      "skipped": true,
+      "skipReason": "cold request exceeded 20s timeout",
+      "coldMs": 20000,
+      "payloadBytes": null,
+      "requests": {
+        "total": 0,
+        "success2xx": 0,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 0
+      },
+      "latencyMs": {
+        "avg": null,
+        "min": null,
+        "max": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "throughputKbps": null,
+      "errorRate": null
+    },
+    {
+      "group": "Mixed",
+      "name": "mixed public read traffic",
+      "method": "MIX",
+      "route": "62 weighted paths",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 10,
+      "coldMs": null,
+      "payloadBytes": null,
+      "requests": {
+        "total": 153,
+        "success2xx": 153,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 15.3
+      },
+      "latencyMs": {
+        "avg": 645.8,
+        "min": 150,
+        "max": 1604,
+        "p50": 601,
+        "p95": 1247,
+        "p99": 1511
+      },
+      "throughputKbps": 1246.76,
+      "errorRate": 0
+    }
+  ]
+}

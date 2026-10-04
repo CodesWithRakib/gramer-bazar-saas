@@ -1,0 +1,915 @@
+{
+  "phase": 2,
+  "generatedAt": "2026-10-04T07:41:22.131Z",
+  "title": "Gramer Bazar Backend Performance — Phase 2 (optimization) results",
+  "method": {
+    "database": "Isolated scratch copy (gramer_bazar_p2) restored from the dev DB via pg_dump/psql; dev DB never modified.",
+    "server": "Built API run in NODE_ENV=production against the scratch DB on :4005, DB_SYNCHRONIZE=false, MIGRATIONS_RUN=false, throttling disabled.",
+    "benchmark": "autocannon, concurrency 10, warmup 3s, duration 8s (identical harness to Phase 1 baseline).",
+    "sql": "EXPLAIN (ANALYZE, BUFFERS) of the same hot queries on the scratch DB."
+  },
+  "sqlExplain": [
+    {
+      "query": "categories_productCounts",
+      "beforeMs": 46218.159,
+      "afterMs": 38788.648,
+      "beforeNodes": [
+        "Seq Scan",
+        "Aggregate",
+        "Sort",
+        "Nested Loop",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ],
+      "afterNodes": [
+        "Seq Scan",
+        "Aggregate",
+        "Sort",
+        "Nested Loop",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "query": "reviews_by_product_approved",
+      "beforeMs": 96.206,
+      "afterMs": 1.636,
+      "beforeNodes": [
+        "Aggregate",
+        "Gather Merge",
+        "Sort",
+        "Seq Scan"
+      ],
+      "afterNodes": [
+        "Aggregate",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "query": "reviews_admin_order",
+      "beforeMs": 114.261,
+      "afterMs": 0.171,
+      "beforeNodes": [
+        "Limit",
+        "Gather Merge",
+        "Sort",
+        "Seq Scan"
+      ],
+      "afterNodes": [
+        "Limit",
+        "Index Scan"
+      ]
+    },
+    {
+      "query": "search_name_asc",
+      "beforeMs": 664.552,
+      "afterMs": 1.059,
+      "beforeNodes": [
+        "Limit",
+        "Incremental Sort",
+        "Nested Loop",
+        "Gather Merge",
+        "Sort",
+        "Hash Join",
+        "Seq Scan",
+        "Hash",
+        "Index Scan",
+        "Memoize"
+      ],
+      "afterNodes": [
+        "Limit",
+        "Incremental Sort",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "query": "search_price_asc",
+      "beforeMs": 9.629,
+      "afterMs": 3.574,
+      "beforeNodes": [
+        "Limit",
+        "Incremental Sort",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ],
+      "afterNodes": [
+        "Limit",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "query": "search_newest",
+      "beforeMs": 72.896,
+      "afterMs": 3.8,
+      "beforeNodes": [
+        "Limit",
+        "Nested Loop",
+        "Gather Merge",
+        "Incremental Sort",
+        "Index Scan",
+        "Memoize"
+      ],
+      "afterNodes": [
+        "Limit",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "query": "products_by_category",
+      "beforeMs": 0.041,
+      "afterMs": 0.037,
+      "beforeNodes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ],
+      "afterNodes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "query": "products_by_brand",
+      "beforeMs": 0.137,
+      "afterMs": 0.124,
+      "beforeNodes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ],
+      "afterNodes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "query": "trgm_name_en_search",
+      "beforeMs": 174.916,
+      "afterMs": 38.081,
+      "beforeNodes": [
+        "Seq Scan"
+      ],
+      "afterNodes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "query": "products_rating_sort",
+      "beforeMs": 84.055,
+      "afterMs": 0.125,
+      "beforeNodes": [
+        "Limit",
+        "Gather Merge",
+        "Sort",
+        "Seq Scan"
+      ],
+      "afterNodes": [
+        "Limit",
+        "Index Only Scan"
+      ]
+    }
+  ],
+  "queryRewrites": [
+    {
+      "query": "categories productCounts()",
+      "beforeMs": 40561.456,
+      "afterMs": 118.589,
+      "speedup": "~342x",
+      "note": "Original per-category correlated subquery vs the new set-based recursive rollup. Index alone only helped to ~38.8s (see table); the rewrite is what removes the cost. Counts verified byte-identical for all 9,700 categories."
+    }
+  ],
+  "endpointComparison": [
+    {
+      "group": "Admin",
+      "name": "GET reviews/admin",
+      "route": "/api/v1/reviews/admin?page=1&limit=20",
+      "beforeAvgMs": 5418,
+      "afterAvgMs": 1113.09,
+      "beforeP95Ms": 5906,
+      "afterP95Ms": 1962,
+      "beforeRps": 0.34,
+      "afterRps": 8.38,
+      "avgDeltaPct": -79.5,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search name_asc",
+      "route": "/api/v1/public/catalog/search?limit=24&sort=name_asc",
+      "beforeAvgMs": 4718.2,
+      "afterAvgMs": 137.21,
+      "beforeP95Ms": 5467,
+      "afterP95Ms": 161,
+      "beforeRps": 0.84,
+      "afterRps": 72.5,
+      "avgDeltaPct": -97.1,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET products (admin)",
+      "route": "/api/v1/products?page=1&limit=20",
+      "beforeAvgMs": 2477.6,
+      "afterAvgMs": 726.9,
+      "beforeP95Ms": 4150,
+      "afterP95Ms": 1201,
+      "beforeRps": 3.34,
+      "afterRps": 13.25,
+      "avgDeltaPct": -70.7,
+      "note": null
+    },
+    {
+      "group": "Auth",
+      "name": "POST auth/login (customer)",
+      "route": "/api/v1/auth/login",
+      "beforeAvgMs": 1919.9,
+      "afterAvgMs": 1858.62,
+      "beforeP95Ms": 3098,
+      "afterP95Ms": 2907,
+      "beforeRps": 4.67,
+      "afterRps": 4.88,
+      "avgDeltaPct": -3.2,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET brands (admin)",
+      "route": "/api/v1/brands?limit=20",
+      "beforeAvgMs": 1245.8,
+      "afterAvgMs": 1048.1,
+      "beforeP95Ms": 2120,
+      "afterP95Ms": 1833,
+      "beforeRps": 7.34,
+      "afterRps": 9,
+      "avgDeltaPct": -15.9,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/brands",
+      "route": "/api/v1/public/catalog/brands",
+      "beforeAvgMs": 815.66,
+      "afterAvgMs": 814.6,
+      "beforeP95Ms": 1366,
+      "afterP95Ms": 1341,
+      "beforeRps": 11.67,
+      "afterRps": 11.75,
+      "avgDeltaPct": -0.1,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/featured",
+      "route": "/api/v1/public/catalog/featured?limit=8",
+      "beforeAvgMs": 775.95,
+      "afterAvgMs": 80.69,
+      "beforeP95Ms": 1486,
+      "afterP95Ms": 94,
+      "beforeRps": 12.17,
+      "afterRps": 122.75,
+      "avgDeltaPct": -89.6,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "GET wishlists",
+      "route": "/api/v1/wishlists",
+      "beforeAvgMs": 661.25,
+      "afterAvgMs": 56.44,
+      "beforeP95Ms": 889,
+      "afterP95Ms": 69,
+      "beforeRps": 14.5,
+      "afterRps": 175,
+      "avgDeltaPct": -91.5,
+      "note": null
+    },
+    {
+      "group": "Mixed",
+      "name": "mixed public read traffic",
+      "route": "62 weighted paths",
+      "beforeAvgMs": 645.8,
+      "afterAvgMs": 117.39,
+      "beforeP95Ms": 1247,
+      "afterP95Ms": 395,
+      "beforeRps": 15.3,
+      "afterRps": 84.6,
+      "avgDeltaPct": -81.8,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/:slug (details)",
+      "route": "/api/v1/public/catalog/wireless-headphones-80b6-87751-9129",
+      "beforeAvgMs": 629.58,
+      "afterAvgMs": 48.88,
+      "beforeP95Ms": 938,
+      "afterP95Ms": 57,
+      "beforeRps": 15,
+      "afterRps": 202.38,
+      "avgDeltaPct": -92.2,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "GET reviews/product/:pid",
+      "route": "/api/v1/reviews/product/5fe1f55b-1b1a-402b-a3d7-9c36b524e52c",
+      "beforeAvgMs": 575.98,
+      "afterAvgMs": 31.22,
+      "beforeP95Ms": 1147,
+      "afterP95Ms": 38,
+      "beforeRps": 16.5,
+      "afterRps": 315.5,
+      "avgDeltaPct": -94.6,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search q=laptop",
+      "route": "/api/v1/public/catalog/search?limit=24&q=laptop",
+      "beforeAvgMs": 555.9,
+      "afterAvgMs": 157.27,
+      "beforeP95Ms": 943,
+      "afterP95Ms": 429,
+      "beforeRps": 17.34,
+      "afterRps": 63.13,
+      "avgDeltaPct": -71.7,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/popular",
+      "route": "/api/v1/public/catalog/popular?limit=8",
+      "beforeAvgMs": 510.12,
+      "afterAvgMs": 112.08,
+      "beforeP95Ms": 870,
+      "afterP95Ms": 286,
+      "beforeRps": 18.67,
+      "afterRps": 88.38,
+      "avgDeltaPct": -78,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search newest",
+      "route": "/api/v1/public/catalog/search?limit=24&sort=newest",
+      "beforeAvgMs": 485.18,
+      "afterAvgMs": 130.85,
+      "beforeP95Ms": 766,
+      "afterP95Ms": 170,
+      "beforeRps": 19.5,
+      "afterRps": 75.5,
+      "avgDeltaPct": -73,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/search price_asc",
+      "route": "/api/v1/public/catalog/search?limit=24&sort=price_asc",
+      "beforeAvgMs": 403.06,
+      "afterAvgMs": 144.16,
+      "beforeP95Ms": 575,
+      "afterP95Ms": 176,
+      "beforeRps": 24.17,
+      "afterRps": 69,
+      "avgDeltaPct": -64.2,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/analytics/dashboard",
+      "route": "/api/v1/admin/analytics/dashboard",
+      "beforeAvgMs": 372.68,
+      "afterAvgMs": 221.48,
+      "beforeP95Ms": 631,
+      "afterP95Ms": 355,
+      "beforeRps": 25.84,
+      "afterRps": 44.63,
+      "avgDeltaPct": -40.6,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET deliveries/admin",
+      "route": "/api/v1/deliveries/admin?page=1&limit=20",
+      "beforeAvgMs": 176.9,
+      "afterAvgMs": 154.1,
+      "beforeP95Ms": 321,
+      "afterP95Ms": 209,
+      "beforeRps": 56.67,
+      "afterRps": 64.38,
+      "avgDeltaPct": -12.9,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/:slug/related",
+      "route": "/api/v1/public/catalog/wireless-headphones-80b6-87751-9129/related",
+      "beforeAvgMs": 141.75,
+      "afterAvgMs": 21.78,
+      "beforeP95Ms": 290,
+      "afterP95Ms": 29,
+      "beforeRps": 70,
+      "afterRps": 448.5,
+      "avgDeltaPct": -84.6,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET payouts",
+      "route": "/api/v1/payouts",
+      "beforeAvgMs": 133.62,
+      "afterAvgMs": 117.62,
+      "beforeP95Ms": 168,
+      "afterP95Ms": 162,
+      "beforeRps": 74.17,
+      "afterRps": 85,
+      "avgDeltaPct": -12,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/product-requests",
+      "route": "/api/v1/admin/product-requests?page=1&limit=20",
+      "beforeAvgMs": 130.15,
+      "afterAvgMs": 125.78,
+      "beforeP95Ms": 172,
+      "afterP95Ms": 198,
+      "beforeRps": 76.67,
+      "afterRps": 78.75,
+      "avgDeltaPct": -3.4,
+      "note": null
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/products",
+      "route": "/api/v1/seller-portal/products?page=1&limit=20",
+      "beforeAvgMs": 126.43,
+      "afterAvgMs": 89.48,
+      "beforeP95Ms": 209,
+      "afterP95Ms": 108,
+      "beforeRps": 78.34,
+      "afterRps": 111.25,
+      "avgDeltaPct": -29.2,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/coupons",
+      "route": "/api/v1/admin/coupons?page=1&limit=20",
+      "beforeAvgMs": 125.65,
+      "afterAvgMs": 107.22,
+      "beforeP95Ms": 198,
+      "afterP95Ms": 124,
+      "beforeRps": 79.5,
+      "afterRps": 92.5,
+      "avgDeltaPct": -14.7,
+      "note": null
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/dashboard",
+      "route": "/api/v1/seller-portal/dashboard",
+      "beforeAvgMs": 123.4,
+      "afterAvgMs": 66.31,
+      "beforeP95Ms": 202,
+      "afterP95Ms": 88,
+      "beforeRps": 80.5,
+      "afterRps": 150,
+      "avgDeltaPct": -46.3,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/audit-logs",
+      "route": "/api/v1/admin/audit-logs?page=1&limit=20",
+      "beforeAvgMs": 122.6,
+      "afterAvgMs": 133.54,
+      "beforeP95Ms": 146,
+      "afterP95Ms": 217,
+      "beforeRps": 81.67,
+      "afterRps": 74.63,
+      "avgDeltaPct": 8.9,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "GET orders (mine)",
+      "route": "/api/v1/orders",
+      "beforeAvgMs": 120.44,
+      "afterAvgMs": 122.26,
+      "beforeP95Ms": 146,
+      "afterP95Ms": 139,
+      "beforeRps": 82.34,
+      "afterRps": 81.25,
+      "avgDeltaPct": 1.5,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/settings",
+      "route": "/api/v1/admin/settings",
+      "beforeAvgMs": 117.56,
+      "afterAvgMs": 102.1,
+      "beforeP95Ms": 165,
+      "afterP95Ms": 165,
+      "beforeRps": 85,
+      "afterRps": 97.13,
+      "avgDeltaPct": -13.2,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET categories (admin)",
+      "route": "/api/v1/categories?page=1&limit=20",
+      "beforeAvgMs": 110.79,
+      "afterAvgMs": 81.91,
+      "beforeP95Ms": 185,
+      "afterP95Ms": 152,
+      "beforeRps": 89.5,
+      "afterRps": 121,
+      "avgDeltaPct": -26.1,
+      "note": null
+    },
+    {
+      "group": "Rider",
+      "name": "GET deliveries/rider/assigned",
+      "route": "/api/v1/deliveries/rider/assigned",
+      "beforeAvgMs": 109.95,
+      "afterAvgMs": 112.45,
+      "beforeP95Ms": 163,
+      "afterP95Ms": 256,
+      "beforeRps": 90.17,
+      "afterRps": 87.63,
+      "avgDeltaPct": 2.3,
+      "note": null
+    },
+    {
+      "group": "Rider",
+      "name": "GET deliveries/rider/:id",
+      "route": "/api/v1/deliveries/rider/6584568e-6dd7-4bcc-8ca9-e27834f55689",
+      "beforeAvgMs": 107.85,
+      "afterAvgMs": 94.63,
+      "beforeP95Ms": 138,
+      "afterP95Ms": 145,
+      "beforeRps": 92,
+      "afterRps": 104.63,
+      "avgDeltaPct": -12.3,
+      "note": null
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/orders/:id",
+      "route": "/api/v1/seller-portal/orders/149f029b-61f7-4f02-afbe-386d43f408c0",
+      "beforeAvgMs": 101.19,
+      "afterAvgMs": 68.24,
+      "beforeP95Ms": 136,
+      "afterP95Ms": 84,
+      "beforeRps": 98.34,
+      "afterRps": 145,
+      "avgDeltaPct": -32.6,
+      "note": null
+    },
+    {
+      "group": "Seller",
+      "name": "GET seller-portal/orders",
+      "route": "/api/v1/seller-portal/orders?page=1&limit=20",
+      "beforeAvgMs": 63,
+      "afterAvgMs": 40.08,
+      "beforeP95Ms": 99,
+      "afterP95Ms": 50,
+      "beforeRps": 156.84,
+      "afterRps": 246.5,
+      "avgDeltaPct": -36.4,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "GET orders/:id",
+      "route": "/api/v1/orders/19729d17-2b59-43f6-81d7-131680c70673",
+      "beforeAvgMs": 55.11,
+      "afterAvgMs": 53.6,
+      "beforeP95Ms": 63,
+      "afterP95Ms": 64,
+      "beforeRps": 180.34,
+      "afterRps": 185,
+      "avgDeltaPct": -2.7,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "flash-sales/active",
+      "route": "/api/v1/flash-sales/active",
+      "beforeAvgMs": 49.75,
+      "afterAvgMs": 50.6,
+      "beforeP95Ms": 61,
+      "afterP95Ms": 59,
+      "beforeRps": 198.5,
+      "afterRps": 195.5,
+      "avgDeltaPct": 1.7,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "public/catalog/suggestions q=lap",
+      "route": "/api/v1/public/catalog/suggestions?q=lap",
+      "beforeAvgMs": 43.87,
+      "afterAvgMs": 42.59,
+      "beforeP95Ms": 53,
+      "afterP95Ms": 66,
+      "beforeRps": 225.34,
+      "afterRps": 231.75,
+      "avgDeltaPct": -2.9,
+      "note": null
+    },
+    {
+      "group": "Seller",
+      "name": "GET wallets/my-wallet",
+      "route": "/api/v1/wallets/my-wallet",
+      "beforeAvgMs": 41.61,
+      "afterAvgMs": 26.05,
+      "beforeP95Ms": 53,
+      "afterP95Ms": 34,
+      "beforeRps": 238.17,
+      "afterRps": 376.5,
+      "avgDeltaPct": -37.4,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "GET notifications",
+      "route": "/api/v1/notifications?page=1&limit=20",
+      "beforeAvgMs": 36.57,
+      "afterAvgMs": 38.54,
+      "beforeP95Ms": 44,
+      "afterP95Ms": 47,
+      "beforeRps": 270.17,
+      "afterRps": 256.25,
+      "avgDeltaPct": 5.4,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "GET addresses",
+      "route": "/api/v1/addresses",
+      "beforeAvgMs": 35.22,
+      "afterAvgMs": 34.39,
+      "beforeP95Ms": 41,
+      "afterP95Ms": 40,
+      "beforeRps": 279.67,
+      "afterRps": 286.5,
+      "avgDeltaPct": -2.4,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "GET notifications/unread-count",
+      "route": "/api/v1/notifications/unread-count",
+      "beforeAvgMs": 28.09,
+      "afterAvgMs": 26.26,
+      "beforeP95Ms": 34,
+      "afterP95Ms": 31,
+      "beforeRps": 349.17,
+      "afterRps": 374.13,
+      "avgDeltaPct": -6.5,
+      "note": null
+    },
+    {
+      "group": "Auth",
+      "name": "GET auth/me (customer)",
+      "route": "/api/v1/auth/me",
+      "beforeAvgMs": 22.12,
+      "afterAvgMs": 24.9,
+      "beforeP95Ms": 29,
+      "afterP95Ms": 30,
+      "beforeRps": 441.67,
+      "afterRps": 393.75,
+      "avgDeltaPct": 12.6,
+      "note": null
+    },
+    {
+      "group": "Customer",
+      "name": "POST public/cart/validate",
+      "route": "/api/v1/public/cart/validate",
+      "beforeAvgMs": 22.02,
+      "afterAvgMs": 20.54,
+      "beforeP95Ms": 36,
+      "afterP95Ms": 25,
+      "beforeRps": 443.67,
+      "afterRps": 474.38,
+      "avgDeltaPct": -6.7,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "banners/public",
+      "route": "/api/v1/banners/public",
+      "beforeAvgMs": 11.61,
+      "afterAvgMs": 10.53,
+      "beforeP95Ms": 18,
+      "afterP95Ms": 15,
+      "beforeRps": 826.67,
+      "afterRps": 906.13,
+      "avgDeltaPct": -9.3,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "locations/divisions",
+      "route": "/api/v1/locations/divisions",
+      "beforeAvgMs": 9.22,
+      "afterAvgMs": 7.91,
+      "beforeP95Ms": 13,
+      "afterP95Ms": 13,
+      "beforeRps": 1030.17,
+      "afterRps": 1192,
+      "avgDeltaPct": -14.2,
+      "note": null
+    },
+    {
+      "group": "Public",
+      "name": "health",
+      "route": "/health",
+      "beforeAvgMs": 5.3,
+      "afterAvgMs": 2.79,
+      "beforeP95Ms": 9,
+      "afterP95Ms": 6,
+      "beforeRps": 1720,
+      "afterRps": 3049.25,
+      "avgDeltaPct": -47.4,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET admin/analytics/demand",
+      "route": "/api/v1/admin/analytics/demand",
+      "beforeAvgMs": 0,
+      "afterAvgMs": 149.56,
+      "beforeP95Ms": 0,
+      "afterP95Ms": 224,
+      "beforeRps": 0,
+      "afterRps": 66.25,
+      "avgDeltaPct": null,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET orders/admin/all",
+      "route": "/api/v1/orders/admin/all?page=1&limit=20",
+      "beforeAvgMs": 0,
+      "afterAvgMs": 200.17,
+      "beforeP95Ms": 0,
+      "afterP95Ms": 573,
+      "beforeRps": 0,
+      "afterRps": 50,
+      "avgDeltaPct": null,
+      "note": null
+    },
+    {
+      "group": "Admin",
+      "name": "GET users (paginated)",
+      "route": "/api/v1/users?page=1&limit=20",
+      "beforeAvgMs": null,
+      "afterAvgMs": 183.93,
+      "beforeP95Ms": null,
+      "afterP95Ms": 277,
+      "beforeRps": 0,
+      "afterRps": 53.88,
+      "avgDeltaPct": null,
+      "note": "Phase 1 skipped (cold timeout)"
+    },
+    {
+      "group": "Public (slow)",
+      "name": "public/categories",
+      "route": "/api/v1/public/categories",
+      "beforeAvgMs": null,
+      "afterAvgMs": 4603.75,
+      "beforeP95Ms": null,
+      "afterP95Ms": 7065,
+      "beforeRps": 0,
+      "afterRps": 1.5,
+      "avgDeltaPct": null,
+      "note": "Phase 1 skipped (cold timeout)"
+    },
+    {
+      "group": "Public (slow)",
+      "name": "public/categories/tree",
+      "route": "/api/v1/public/categories/tree",
+      "beforeAvgMs": null,
+      "afterAvgMs": 5511.1,
+      "beforeP95Ms": null,
+      "afterP95Ms": 7304,
+      "beforeRps": 0,
+      "afterRps": 1.38,
+      "avgDeltaPct": null,
+      "note": "Phase 1 skipped (cold timeout)"
+    }
+  ],
+  "mixedWorkload": {
+    "group": "Mixed",
+    "name": "mixed public read traffic",
+    "route": "62 weighted paths",
+    "beforeAvgMs": 645.8,
+    "afterAvgMs": 117.39,
+    "beforeP95Ms": 1247,
+    "afterP95Ms": 395,
+    "beforeRps": 15.3,
+    "afterRps": 84.6,
+    "avgDeltaPct": -81.8,
+    "note": null
+  },
+  "additionalMeasurements": [
+    {
+      "name": "public/catalog/homepage",
+      "before": "58.8s (after a first batching pass; not in Phase 1 set)",
+      "after": "8.0s",
+      "note": "Remaining cost is the featured-shops query (~5.3s), out of scope"
+    },
+    {
+      "name": "public/catalog/category-sections (all roots)",
+      "before": "52.3s",
+      "after": "50.2s",
+      "note": "Fetches 52 sections; unchanged by default to preserve output"
+    },
+    {
+      "name": "public/catalog/category-sections?limit=4",
+      "before": "52.3s",
+      "after": "0.68s",
+      "note": "New optional limit; homepage now uses limit=4"
+    },
+    {
+      "name": "public/categories / tree (single cold request)",
+      "before": ">20s timeout",
+      "after": "0.8s (DB) / ~4.6s under C=10",
+      "note": "DB query fixed; 5.5 MB unpaginated payload is now the bottleneck"
+    },
+    {
+      "name": "GET /admin/analytics/demand",
+      "before": "HTTP 500 every call (~1.6s to fail)",
+      "after": "HTTP 200, 0.27s cold / 150ms avg under load",
+      "note": "Fixed broken column reference"
+    }
+  ],
+  "tests": {
+    "files": "65 passed (65)",
+    "tests": "284 passed (284)",
+    "previousFailure": "src/reviews/reviews.service.spec.ts (3 tests) — fixed by updating the stale DataSource.transaction mock"
+  },
+  "coverage": {
+    "statementsPct": 51.31,
+    "statements": "4172/8131",
+    "functionsPct": 34.87,
+    "functions": "440/1262",
+    "branchesPct": 28.06,
+    "branches": "1309/4665"
+  },
+  "changes": [
+    {
+      "id": "A",
+      "file": "apps/api/src/migrations/1793000000000-RestorePerformanceIndexes.ts (new)",
+      "summary": "Idempotent migration recreating the 10 lost indexes + adds reviews(product_id,is_approved,created_at), reviews(created_at), reviews(user_id,product_id), products(name_en), product_variants(product_id). Registered in app.module.ts."
+    },
+    {
+      "id": "A2",
+      "file": "apps/api/src/app.module.ts",
+      "summary": "Schema sync is now opt-in (DB_SYNCHRONIZE=true only). Previously synchronize defaulted on outside production and dropped migration-managed indexes."
+    },
+    {
+      "id": "B",
+      "file": "apps/api/src/public/categories/categories.service.ts",
+      "summary": "productCounts() rewritten as a single set-based recursive rollup (was a per-category correlated subquery), plus a 60s in-process cache. Byte-identical counts verified for all 9,700 categories."
+    },
+    {
+      "id": "C",
+      "file": "apps/api/src/analytics/analytics.service.ts",
+      "summary": "GET /admin/analytics/demand: request.productName -> request.requestedProductName (column did not exist)."
+    },
+    {
+      "id": "D",
+      "file": "apps/api/src/public/catalog/catalog.service.ts + catalog.controller.ts",
+      "summary": "getCategorySections() batches item/rating/sub-category fetches (one LATERAL + one hydration) and accepts an optional ?limit; homepage requests only the 4 sections it renders."
+    },
+    {
+      "id": "E",
+      "file": "apps/api/src/settings/settings.service.ts",
+      "summary": "getSettings() cached (5s TTL) with immediate invalidation on update; removes a per-request DB query from the global MaintenanceGuard."
+    },
+    {
+      "id": "F",
+      "file": "apps/api/src/reviews/reviews.service.spec.ts",
+      "summary": "Spec mock updated to provide DataSource.transaction manager, matching current service behavior."
+    }
+  ],
+  "limitations": [
+    "All latency figures are from a single local Windows workstation; they are before/after comparisons, not production predictions.",
+    "Node heap / event-loop / GC internals remain unmeasurable with the available tooling.",
+    "The scratch DB was restored from the dev DB, so the seeded category `path` quirks are present; product counts intentionally preserve the legacy semantics.",
+    "public/categories is now DB-fast but returns a 5.5 MB unpaginated payload (separate issue)."
+  ]
+}

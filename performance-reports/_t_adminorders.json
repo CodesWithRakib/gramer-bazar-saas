@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-10-04T05:52:33.537Z",
+  "baseUrl": "http://localhost:4005",
+  "concurrency": 10,
+  "durationSeconds": 8,
+  "warmupSeconds": 2,
+  "note": "Measured on a local production-mode NestJS instance (NODE_ENV=production, TypeORM query logging off, in-memory cache). Throttling raised on the benchmark instance only.",
+  "totalElapsedMs": 12069,
+  "results": [
+    {
+      "group": "Admin",
+      "name": "GET orders/admin/all",
+      "method": "GET",
+      "route": "/api/v1/orders/admin/all?page=1&limit=20",
+      "auth": "admin",
+      "concurrency": 10,
+      "durationSeconds": 8,
+      "coldMs": 25,
+      "payloadBytes": 24039,
+      "requests": {
+        "total": 470,
+        "success2xx": 470,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 58.75
+      },
+      "latencyMs": {
+        "avg": 169.49,
+        "min": 134,
+        "max": 248,
+        "p50": 166,
+        "p95": 240,
+        "p99": 246
+      },
+      "throughputKbps": 1445.75,
+      "errorRate": 0
+    }
+  ]
+}

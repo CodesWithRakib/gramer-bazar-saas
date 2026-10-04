@@ -1,0 +1,109 @@
+{
+  "label": "after",
+  "db": "gramer_bazar_p2",
+  "generatedAt": "2026-10-04T06:53:19.367Z",
+  "queries": [
+    {
+      "key": "categories_productCounts",
+      "planningMs": 20.403,
+      "executionMs": 38788.648,
+      "nodeTypes": [
+        "Seq Scan",
+        "Aggregate",
+        "Sort",
+        "Nested Loop",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "reviews_by_product_approved",
+      "planningMs": 1.109,
+      "executionMs": 1.636,
+      "nodeTypes": [
+        "Aggregate",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "reviews_admin_order",
+      "planningMs": 0.212,
+      "executionMs": 0.171,
+      "nodeTypes": [
+        "Limit",
+        "Index Scan"
+      ]
+    },
+    {
+      "key": "search_name_asc",
+      "planningMs": 45.045,
+      "executionMs": 1.059,
+      "nodeTypes": [
+        "Limit",
+        "Incremental Sort",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "key": "search_price_asc",
+      "planningMs": 1.124,
+      "executionMs": 3.574,
+      "nodeTypes": [
+        "Limit",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "key": "search_newest",
+      "planningMs": 1.203,
+      "executionMs": 3.8,
+      "nodeTypes": [
+        "Limit",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "key": "products_by_category",
+      "planningMs": 0.229,
+      "executionMs": 0.037,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "products_by_brand",
+      "planningMs": 0.222,
+      "executionMs": 0.124,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "trgm_name_en_search",
+      "planningMs": 1.066,
+      "executionMs": 38.081,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "products_rating_sort",
+      "planningMs": 0.316,
+      "executionMs": 0.125,
+      "nodeTypes": [
+        "Limit",
+        "Index Only Scan"
+      ]
+    }
+  ]
+}

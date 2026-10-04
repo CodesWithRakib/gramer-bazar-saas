@@ -1,0 +1,1168 @@
+{
+  "serverVersion": "18.6",
+  "databaseSize": "460 MB",
+  "activeConnections": 3,
+  "settings": {
+    "max_connections": "100",
+    "shared_buffers": "128MB",
+    "work_mem": "4MB",
+    "effective_cache_size": "4GB"
+  },
+  "rowCounts": {
+    "users": 32642,
+    "user_roles": 49,
+    "roles": 5,
+    "permissions": 78,
+    "shops": 3255,
+    "products": 196159,
+    "product_variants": 196259,
+    "seller_products": 392496,
+    "inventories": "N/A (42P01)",
+    "categories": 9700,
+    "brands": 3283,
+    "orders": 125,
+    "order_items": 184,
+    "reviews": 728295,
+    "notifications": 233,
+    "conversations": 17,
+    "messages": 97,
+    "coupons": 5,
+    "flash_sales": 1,
+    "disputes": 7,
+    "payouts": "N/A (42P01)",
+    "wallets": 23,
+    "wallet_transactions": 37,
+    "deliveries": 67,
+    "addresses": 42,
+    "product_views": "N/A (42P01)",
+    "audit_logs": 22,
+    "banners": 5,
+    "announcements": 0,
+    "flash_sale_products": "N/A (42P01)",
+    "product_requests": 6
+  },
+  "largestTables": [
+    {
+      "table": "reviews",
+      "total_size": "123 MB",
+      "live_rows": "728295"
+    },
+    {
+      "table": "seller_products",
+      "total_size": "87 MB",
+      "live_rows": "392496"
+    },
+    {
+      "table": "products",
+      "total_size": "80 MB",
+      "live_rows": "196159"
+    },
+    {
+      "table": "product_variants",
+      "total_size": "67 MB",
+      "live_rows": "195437"
+    },
+    {
+      "table": "inventory",
+      "total_size": "67 MB",
+      "live_rows": "392496"
+    },
+    {
+      "table": "users",
+      "total_size": "7896 kB",
+      "live_rows": "32642"
+    },
+    {
+      "table": "categories",
+      "total_size": "6872 kB",
+      "live_rows": "9700"
+    },
+    {
+      "table": "shops",
+      "total_size": "1152 kB",
+      "live_rows": "3255"
+    },
+    {
+      "table": "brands",
+      "total_size": "904 kB",
+      "live_rows": "3283"
+    },
+    {
+      "table": "areas",
+      "total_size": "864 kB",
+      "live_rows": "4540"
+    },
+    {
+      "table": "unions",
+      "total_size": "728 kB",
+      "live_rows": "4540"
+    },
+    {
+      "table": "product_type_attributes",
+      "total_size": "416 kB",
+      "live_rows": "1057"
+    },
+    {
+      "table": "product_attribute_values",
+      "total_size": "360 kB",
+      "live_rows": "669"
+    },
+    {
+      "table": "notifications",
+      "total_size": "312 kB",
+      "live_rows": "233"
+    },
+    {
+      "table": "attribute_options",
+      "total_size": "224 kB",
+      "live_rows": "649"
+    },
+    {
+      "table": "messages",
+      "total_size": "160 kB",
+      "live_rows": "97"
+    },
+    {
+      "table": "demand_events",
+      "total_size": "160 kB",
+      "live_rows": "83"
+    },
+    {
+      "table": "upazilas",
+      "total_size": "128 kB",
+      "live_rows": "494"
+    },
+    {
+      "table": "deliveries",
+      "total_size": "128 kB",
+      "live_rows": "67"
+    },
+    {
+      "table": "broadcast_recipients",
+      "total_size": "128 kB",
+      "live_rows": "18"
+    },
+    {
+      "table": "orders",
+      "total_size": "120 kB",
+      "live_rows": "125"
+    },
+    {
+      "table": "product_types",
+      "total_size": "112 kB",
+      "live_rows": "96"
+    },
+    {
+      "table": "conversations",
+      "total_size": "112 kB",
+      "live_rows": "17"
+    },
+    {
+      "table": "product_ingredients",
+      "total_size": "104 kB",
+      "live_rows": "9"
+    },
+    {
+      "table": "payments",
+      "total_size": "104 kB",
+      "live_rows": "70"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "addresses",
+      "indexname": "PK_745d8f43d3af10ab8247465e450",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_745d8f43d3af10ab8247465e450\" ON public.addresses USING btree (id)"
+    },
+    {
+      "tablename": "announcement_templates",
+      "indexname": "PK_68ad7037ac4199207d06d8006f3",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_68ad7037ac4199207d06d8006f3\" ON public.announcement_templates USING btree (id)"
+    },
+    {
+      "tablename": "announcements",
+      "indexname": "PK_b3ad760876ff2e19d58e05dc8b0",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_b3ad760876ff2e19d58e05dc8b0\" ON public.announcements USING btree (id)"
+    },
+    {
+      "tablename": "areas",
+      "indexname": "PK_5110493f6342f34c978c084d0d6",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_5110493f6342f34c978c084d0d6\" ON public.areas USING btree (id)"
+    },
+    {
+      "tablename": "attribute_options",
+      "indexname": "PK_attribute_options",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_attribute_options\" ON public.attribute_options USING btree (id)"
+    },
+    {
+      "tablename": "attribute_options",
+      "indexname": "UQ_attribute_options_attribute_slug",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_attribute_options_attribute_slug\" ON public.attribute_options USING btree (attribute_id, slug)"
+    },
+    {
+      "tablename": "attribute_options",
+      "indexname": "idx_attribute_options_attribute_id",
+      "indexdef": "CREATE INDEX idx_attribute_options_attribute_id ON public.attribute_options USING btree (attribute_id)"
+    },
+    {
+      "tablename": "attributes",
+      "indexname": "PK_attributes",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_attributes\" ON public.attributes USING btree (id)"
+    },
+    {
+      "tablename": "attributes",
+      "indexname": "UQ_attributes_slug",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_attributes_slug\" ON public.attributes USING btree (slug)"
+    },
+    {
+      "tablename": "audit_logs",
+      "indexname": "IDX_177183f29f438c488b5e8510cd",
+      "indexdef": "CREATE INDEX \"IDX_177183f29f438c488b5e8510cd\" ON public.audit_logs USING btree (actor_id)"
+    },
+    {
+      "tablename": "audit_logs",
+      "indexname": "IDX_cee5459245f652b75eb2759b4c",
+      "indexdef": "CREATE INDEX \"IDX_cee5459245f652b75eb2759b4c\" ON public.audit_logs USING btree (action)"
+    },
+    {
+      "tablename": "audit_logs",
+      "indexname": "PK_1bb179d048bbc581caa3b013439",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_1bb179d048bbc581caa3b013439\" ON public.audit_logs USING btree (id)"
+    },
+    {
+      "tablename": "banners",
+      "indexname": "PK_e9b186b959296fcb940790d31c3",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_e9b186b959296fcb940790d31c3\" ON public.banners USING btree (id)"
+    },
+    {
+      "tablename": "brands",
+      "indexname": "PK_b0c437120b624da1034a81fc561",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_b0c437120b624da1034a81fc561\" ON public.brands USING btree (id)"
+    },
+    {
+      "tablename": "brands",
+      "indexname": "UQ_b15428f362be2200922952dc268",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_b15428f362be2200922952dc268\" ON public.brands USING btree (slug)"
+    },
+    {
+      "tablename": "broadcast_recipients",
+      "indexname": "PK_4fabbca9ec6b6ef1f2a85a785e9",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_4fabbca9ec6b6ef1f2a85a785e9\" ON public.broadcast_recipients USING btree (id)"
+    },
+    {
+      "tablename": "broadcast_recipients",
+      "indexname": "idx_broadcast_recipients_broadcast_status",
+      "indexdef": "CREATE INDEX idx_broadcast_recipients_broadcast_status ON public.broadcast_recipients USING btree (broadcast_id, status)"
+    },
+    {
+      "tablename": "broadcast_recipients",
+      "indexname": "idx_broadcast_recipients_customer",
+      "indexdef": "CREATE INDEX idx_broadcast_recipients_customer ON public.broadcast_recipients USING btree (customer_id)"
+    },
+    {
+      "tablename": "broadcast_recipients",
+      "indexname": "idx_broadcast_recipients_next_retry",
+      "indexdef": "CREATE INDEX idx_broadcast_recipients_next_retry ON public.broadcast_recipients USING btree (next_retry_at)"
+    },
+    {
+      "tablename": "broadcast_recipients",
+      "indexname": "uq_broadcast_recipients_broadcast_customer",
+      "indexdef": "CREATE UNIQUE INDEX uq_broadcast_recipients_broadcast_customer ON public.broadcast_recipients USING btree (broadcast_id, customer_id)"
+    },
+    {
+      "tablename": "broadcast_templates",
+      "indexname": "PK_7cbff3e3698c4e865801335767f",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_7cbff3e3698c4e865801335767f\" ON public.broadcast_templates USING btree (id)"
+    },
+    {
+      "tablename": "broadcast_templates",
+      "indexname": "idx_broadcast_templates_category",
+      "indexdef": "CREATE INDEX idx_broadcast_templates_category ON public.broadcast_templates USING btree (category)"
+    },
+    {
+      "tablename": "broadcast_templates",
+      "indexname": "idx_broadcast_templates_status",
+      "indexdef": "CREATE INDEX idx_broadcast_templates_status ON public.broadcast_templates USING btree (status)"
+    },
+    {
+      "tablename": "broadcasts",
+      "indexname": "PK_b0586900034d0726bbdcb1b21b2",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_b0586900034d0726bbdcb1b21b2\" ON public.broadcasts USING btree (id)"
+    },
+    {
+      "tablename": "broadcasts",
+      "indexname": "idx_broadcasts_created_at",
+      "indexdef": "CREATE INDEX idx_broadcasts_created_at ON public.broadcasts USING btree (created_at)"
+    },
+    {
+      "tablename": "broadcasts",
+      "indexname": "idx_broadcasts_scheduled_at",
+      "indexdef": "CREATE INDEX idx_broadcasts_scheduled_at ON public.broadcasts USING btree (scheduled_at)"
+    },
+    {
+      "tablename": "broadcasts",
+      "indexname": "idx_broadcasts_status",
+      "indexdef": "CREATE INDEX idx_broadcasts_status ON public.broadcasts USING btree (status)"
+    },
+    {
+      "tablename": "categories",
+      "indexname": "PK_24dbc6126a28ff948da33e97d3b",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_24dbc6126a28ff948da33e97d3b\" ON public.categories USING btree (id)"
+    },
+    {
+      "tablename": "categories",
+      "indexname": "UQ_420d9f679d41281f282f5bc7d09",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_420d9f679d41281f282f5bc7d09\" ON public.categories USING btree (slug)"
+    },
+    {
+      "tablename": "categories",
+      "indexname": "idx_categories_is_active",
+      "indexdef": "CREATE INDEX idx_categories_is_active ON public.categories USING btree (is_active)"
+    },
+    {
+      "tablename": "categories",
+      "indexname": "idx_categories_parent_id",
+      "indexdef": "CREATE INDEX idx_categories_parent_id ON public.categories USING btree (parent_id)"
+    },
+    {
+      "tablename": "categories",
+      "indexname": "idx_categories_path",
+      "indexdef": "CREATE INDEX idx_categories_path ON public.categories USING btree (path)"
+    },
+    {
+      "tablename": "category_brands",
+      "indexname": "IDX_0f2577d3e847475ecf0f9aefdb",
+      "indexdef": "CREATE INDEX \"IDX_0f2577d3e847475ecf0f9aefdb\" ON public.category_brands USING btree (category_id)"
+    },
+    {
+      "tablename": "category_brands",
+      "indexname": "IDX_dcb5e8a55a4180e383aafdb193",
+      "indexdef": "CREATE INDEX \"IDX_dcb5e8a55a4180e383aafdb193\" ON public.category_brands USING btree (brand_id)"
+    },
+    {
+      "tablename": "category_brands",
+      "indexname": "PK_3b12319bad97cae378c4f521387",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_3b12319bad97cae378c4f521387\" ON public.category_brands USING btree (brand_id, category_id)"
+    },
+    {
+      "tablename": "conversation_participants",
+      "indexname": "IDX_1559e8a16b828f2e836a231280",
+      "indexdef": "CREATE INDEX \"IDX_1559e8a16b828f2e836a231280\" ON public.conversation_participants USING btree (conversation_id)"
+    },
+    {
+      "tablename": "conversation_participants",
+      "indexname": "IDX_377d4041a495b81ee1a85ae026",
+      "indexdef": "CREATE INDEX \"IDX_377d4041a495b81ee1a85ae026\" ON public.conversation_participants USING btree (user_id)"
+    },
+    {
+      "tablename": "conversation_participants",
+      "indexname": "PK_fdcd6405d74e797f10fa8360338",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_fdcd6405d74e797f10fa8360338\" ON public.conversation_participants USING btree (conversation_id, user_id)"
+    },
+    {
+      "tablename": "conversations",
+      "indexname": "PK_ee34f4f7ced4ec8681f26bf04ef",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_ee34f4f7ced4ec8681f26bf04ef\" ON public.conversations USING btree (id)"
+    },
+    {
+      "tablename": "conversations",
+      "indexname": "idx_conversations_canonical_key",
+      "indexdef": "CREATE UNIQUE INDEX idx_conversations_canonical_key ON public.conversations USING btree (canonical_key) WHERE (canonical_key IS NOT NULL)"
+    },
+    {
+      "tablename": "conversations",
+      "indexname": "idx_conversations_type_status",
+      "indexdef": "CREATE INDEX idx_conversations_type_status ON public.conversations USING btree (type, status)"
+    },
+    {
+      "tablename": "conversations",
+      "indexname": "idx_conversations_updated_at",
+      "indexdef": "CREATE INDEX idx_conversations_updated_at ON public.conversations USING btree (\"updatedAt\" DESC)"
+    },
+    {
+      "tablename": "countries",
+      "indexname": "PK_b2d7006793e8697ab3ae2deff18",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_b2d7006793e8697ab3ae2deff18\" ON public.countries USING btree (id)"
+    },
+    {
+      "tablename": "coupon_usages",
+      "indexname": "PK_01ff9a1cac559c4ae2e4179d0a3",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_01ff9a1cac559c4ae2e4179d0a3\" ON public.coupon_usages USING btree (id)"
+    },
+    {
+      "tablename": "coupons",
+      "indexname": "PK_d7ea8864a0150183770f3e9a8cb",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_d7ea8864a0150183770f3e9a8cb\" ON public.coupons USING btree (id)"
+    },
+    {
+      "tablename": "coupons",
+      "indexname": "UQ_e025109230e82925843f2a14c48",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_e025109230e82925843f2a14c48\" ON public.coupons USING btree (code)"
+    },
+    {
+      "tablename": "customer_marketing_preferences",
+      "indexname": "PK_2a10e5aab3816e4d0ee9faacfe8",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_2a10e5aab3816e4d0ee9faacfe8\" ON public.customer_marketing_preferences USING btree (id)"
+    },
+    {
+      "tablename": "customer_marketing_preferences",
+      "indexname": "UQ_6f0631ab48ab3edeedbdeca3558",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_6f0631ab48ab3edeedbdeca3558\" ON public.customer_marketing_preferences USING btree (user_id)"
+    },
+    {
+      "tablename": "customer_marketing_preferences",
+      "indexname": "idx_customer_marketing_preferences_user",
+      "indexdef": "CREATE UNIQUE INDEX idx_customer_marketing_preferences_user ON public.customer_marketing_preferences USING btree (user_id)"
+    },
+    {
+      "tablename": "deliveries",
+      "indexname": "PK_a6ef225c5c5f0974e503bfb731f",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_a6ef225c5c5f0974e503bfb731f\" ON public.deliveries USING btree (id)"
+    },
+    {
+      "tablename": "deliveries",
+      "indexname": "UQ_789dba7900f6d25550280ad3b93",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_789dba7900f6d25550280ad3b93\" ON public.deliveries USING btree (order_id)"
+    },
+    {
+      "tablename": "deliveries",
+      "indexname": "idx_deliveries_created_at",
+      "indexdef": "CREATE INDEX idx_deliveries_created_at ON public.deliveries USING btree (created_at)"
+    },
+    {
+      "tablename": "deliveries",
+      "indexname": "idx_deliveries_rider_id",
+      "indexdef": "CREATE INDEX idx_deliveries_rider_id ON public.deliveries USING btree (rider_id)"
+    },
+    {
+      "tablename": "deliveries",
+      "indexname": "idx_deliveries_status",
+      "indexdef": "CREATE INDEX idx_deliveries_status ON public.deliveries USING btree (status)"
+    },
+    {
+      "tablename": "delivery_status_history",
+      "indexname": "PK_6d5a3b1c231e2e87c93d6a7cb44",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_6d5a3b1c231e2e87c93d6a7cb44\" ON public.delivery_status_history USING btree (id)"
+    },
+    {
+      "tablename": "demand_events",
+      "indexname": "IDX_013ab4bb41831e4684f2f498a6",
+      "indexdef": "CREATE INDEX \"IDX_013ab4bb41831e4684f2f498a6\" ON public.demand_events USING btree (\"eventType\")"
+    },
+    {
+      "tablename": "demand_events",
+      "indexname": "IDX_814d79bca04105047c96ae13b8",
+      "indexdef": "CREATE INDEX \"IDX_814d79bca04105047c96ae13b8\" ON public.demand_events USING btree (\"userId\")"
+    },
+    {
+      "tablename": "demand_events",
+      "indexname": "IDX_a92777f7512b1712b617dfccad",
+      "indexdef": "CREATE INDEX \"IDX_a92777f7512b1712b617dfccad\" ON public.demand_events USING btree (\"productId\")"
+    },
+    {
+      "tablename": "demand_events",
+      "indexname": "IDX_c13f2e6f1db742e645b919721a",
+      "indexdef": "CREATE INDEX \"IDX_c13f2e6f1db742e645b919721a\" ON public.demand_events USING btree (\"productRequestId\")"
+    },
+    {
+      "tablename": "demand_events",
+      "indexname": "IDX_e21c5e12c69727386fb27500dd",
+      "indexdef": "CREATE INDEX \"IDX_e21c5e12c69727386fb27500dd\" ON public.demand_events USING btree (created_at)"
+    },
+    {
+      "tablename": "demand_events",
+      "indexname": "IDX_e3f54c991749da6667c10b9ec9",
+      "indexdef": "CREATE INDEX \"IDX_e3f54c991749da6667c10b9ec9\" ON public.demand_events USING btree (\"categoryId\")"
+    },
+    {
+      "tablename": "demand_events",
+      "indexname": "PK_edc6dec8416aeb8dd466a059c68",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_edc6dec8416aeb8dd466a059c68\" ON public.demand_events USING btree (id)"
+    },
+    {
+      "tablename": "dispute_internal_notes",
+      "indexname": "PK_5c06aa8cfc48457b07f568b237d",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_5c06aa8cfc48457b07f568b237d\" ON public.dispute_internal_notes USING btree (id)"
+    },
+    {
+      "tablename": "dispute_messages",
+      "indexname": "PK_8826f78d556a1846f8cbad5ed05",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_8826f78d556a1846f8cbad5ed05\" ON public.dispute_messages USING btree (id)"
+    },
+    {
+      "tablename": "disputes",
+      "indexname": "PK_3c97580d01c1a4b0b345c42a107",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_3c97580d01c1a4b0b345c42a107\" ON public.disputes USING btree (id)"
+    },
+    {
+      "tablename": "districts",
+      "indexname": "PK_972a72ff4e3bea5c7f43a2b98af",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_972a72ff4e3bea5c7f43a2b98af\" ON public.districts USING btree (id)"
+    },
+    {
+      "tablename": "divisions",
+      "indexname": "PK_c1f864477b3fd0954564108ed96",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_c1f864477b3fd0954564108ed96\" ON public.divisions USING btree (id)"
+    },
+    {
+      "tablename": "flash_sale_items",
+      "indexname": "PK_f7be2cbf28d0924336b0d91369a",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_f7be2cbf28d0924336b0d91369a\" ON public.flash_sale_items USING btree (id)"
+    },
+    {
+      "tablename": "flash_sales",
+      "indexname": "PK_70299593044ffcba05cc30b97dc",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_70299593044ffcba05cc30b97dc\" ON public.flash_sales USING btree (id)"
+    },
+    {
+      "tablename": "impersonation_sessions",
+      "indexname": "PK_b735433f13b4dd6f03bd6bf2879",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_b735433f13b4dd6f03bd6bf2879\" ON public.impersonation_sessions USING btree (id)"
+    },
+    {
+      "tablename": "impersonation_sessions",
+      "indexname": "idx_impersonation_actor",
+      "indexdef": "CREATE INDEX idx_impersonation_actor ON public.impersonation_sessions USING btree (actor_user_id, status)"
+    },
+    {
+      "tablename": "impersonation_sessions",
+      "indexname": "idx_impersonation_target",
+      "indexdef": "CREATE INDEX idx_impersonation_target ON public.impersonation_sessions USING btree (target_user_id)"
+    },
+    {
+      "tablename": "import_logs",
+      "indexname": "PK_605638f3d14c87ce06601313f0e",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_605638f3d14c87ce06601313f0e\" ON public.import_logs USING btree (id)"
+    },
+    {
+      "tablename": "ingredients",
+      "indexname": "PK_9240185c8a5507251c9f15e0649",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_9240185c8a5507251c9f15e0649\" ON public.ingredients USING btree (id)"
+    },
+    {
+      "tablename": "ingredients",
+      "indexname": "UQ_85c50d1d5f69b9e727a8657003f",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_85c50d1d5f69b9e727a8657003f\" ON public.ingredients USING btree (slug)"
+    },
+    {
+      "tablename": "ingredients",
+      "indexname": "idx_ingredients_is_active",
+      "indexdef": "CREATE INDEX idx_ingredients_is_active ON public.ingredients USING btree (is_active)"
+    },
+    {
+      "tablename": "inventory",
+      "indexname": "PK_82aa5da437c5bbfb80703b08309",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_82aa5da437c5bbfb80703b08309\" ON public.inventory USING btree (id)"
+    },
+    {
+      "tablename": "inventory",
+      "indexname": "REL_89d3fb68538d89f1c1a6517ebe",
+      "indexdef": "CREATE UNIQUE INDEX \"REL_89d3fb68538d89f1c1a6517ebe\" ON public.inventory USING btree (seller_product_id)"
+    },
+    {
+      "tablename": "manufacturers",
+      "indexname": "PK_138520de32c379a48e703441975",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_138520de32c379a48e703441975\" ON public.manufacturers USING btree (id)"
+    },
+    {
+      "tablename": "manufacturers",
+      "indexname": "UQ_b8857dc48c6a430f9e9257d9865",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_b8857dc48c6a430f9e9257d9865\" ON public.manufacturers USING btree (slug)"
+    },
+    {
+      "tablename": "manufacturers",
+      "indexname": "idx_manufacturers_is_active",
+      "indexdef": "CREATE INDEX idx_manufacturers_is_active ON public.manufacturers USING btree (is_active)"
+    },
+    {
+      "tablename": "medicine_batches",
+      "indexname": "PK_793d7718d0d83c16956b370c8bb",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_793d7718d0d83c16956b370c8bb\" ON public.medicine_batches USING btree (id)"
+    },
+    {
+      "tablename": "medicine_batches",
+      "indexname": "UQ_medicine_batches_variant_number",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_medicine_batches_variant_number\" ON public.medicine_batches USING btree (product_variant_id, batch_number)"
+    },
+    {
+      "tablename": "medicine_batches",
+      "indexname": "idx_medicine_batches_expiry_date",
+      "indexdef": "CREATE INDEX idx_medicine_batches_expiry_date ON public.medicine_batches USING btree (expiry_date)"
+    },
+    {
+      "tablename": "medicine_batches",
+      "indexname": "idx_medicine_batches_status",
+      "indexdef": "CREATE INDEX idx_medicine_batches_status ON public.medicine_batches USING btree (status)"
+    },
+    {
+      "tablename": "medicine_batches",
+      "indexname": "idx_medicine_batches_variant_id",
+      "indexdef": "CREATE INDEX idx_medicine_batches_variant_id ON public.medicine_batches USING btree (product_variant_id)"
+    },
+    {
+      "tablename": "messages",
+      "indexname": "PK_18325f38ae6de43878487eff986",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_18325f38ae6de43878487eff986\" ON public.messages USING btree (id)"
+    },
+    {
+      "tablename": "messages",
+      "indexname": "idx_messages_client_id",
+      "indexdef": "CREATE UNIQUE INDEX idx_messages_client_id ON public.messages USING btree (conversation_id, client_message_id) WHERE (client_message_id IS NOT NULL)"
+    },
+    {
+      "tablename": "messages",
+      "indexname": "idx_messages_conversation_created",
+      "indexdef": "CREATE INDEX idx_messages_conversation_created ON public.messages USING btree (conversation_id, \"createdAt\" DESC)"
+    },
+    {
+      "tablename": "messages",
+      "indexname": "idx_messages_unread",
+      "indexdef": "CREATE INDEX idx_messages_unread ON public.messages USING btree (conversation_id, sender_id, \"isRead\") WHERE (\"isRead\" = false)"
+    },
+    {
+      "tablename": "migrations",
+      "indexname": "PK_8c82d7f526340ab734260ea46be",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_8c82d7f526340ab734260ea46be\" ON public.migrations USING btree (id)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "IDX_0f57a0c3adbbfd460935b7b046",
+      "indexdef": "CREATE INDEX \"IDX_0f57a0c3adbbfd460935b7b046\" ON public.notifications USING btree (user_id, is_read, created_at)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "IDX_310667f935698fcd8cb319113a",
+      "indexdef": "CREATE INDEX \"IDX_310667f935698fcd8cb319113a\" ON public.notifications USING btree (user_id, created_at)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "PK_6a72c3c0f683f6462415e653c3a",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_6a72c3c0f683f6462415e653c3a\" ON public.notifications USING btree (id)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "idx_notifications_user_created",
+      "indexdef": "CREATE INDEX idx_notifications_user_created ON public.notifications USING btree (user_id, created_at)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "idx_notifications_user_unread",
+      "indexdef": "CREATE INDEX idx_notifications_user_unread ON public.notifications USING btree (user_id, is_read, created_at)"
+    },
+    {
+      "tablename": "order_items",
+      "indexname": "PK_005269d8574e6fac0493715c308",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_005269d8574e6fac0493715c308\" ON public.order_items USING btree (id)"
+    },
+    {
+      "tablename": "order_items",
+      "indexname": "idx_order_items_order_id",
+      "indexdef": "CREATE INDEX idx_order_items_order_id ON public.order_items USING btree (order_id)"
+    },
+    {
+      "tablename": "order_items",
+      "indexname": "idx_order_items_seller_product_id",
+      "indexdef": "CREATE INDEX idx_order_items_seller_product_id ON public.order_items USING btree (seller_product_id)"
+    },
+    {
+      "tablename": "order_status_history",
+      "indexname": "PK_e6c66d853f155531985fc4f6ec8",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_e6c66d853f155531985fc4f6ec8\" ON public.order_status_history USING btree (id)"
+    },
+    {
+      "tablename": "orders",
+      "indexname": "PK_710e2d4957aa5878dfe94e4ac2f",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_710e2d4957aa5878dfe94e4ac2f\" ON public.orders USING btree (id)"
+    },
+    {
+      "tablename": "orders",
+      "indexname": "idx_orders_created_at",
+      "indexdef": "CREATE INDEX idx_orders_created_at ON public.orders USING btree (created_at)"
+    },
+    {
+      "tablename": "orders",
+      "indexname": "idx_orders_status",
+      "indexdef": "CREATE INDEX idx_orders_status ON public.orders USING btree (status)"
+    },
+    {
+      "tablename": "orders",
+      "indexname": "idx_orders_user_id",
+      "indexdef": "CREATE INDEX idx_orders_user_id ON public.orders USING btree (user_id)"
+    },
+    {
+      "tablename": "otps",
+      "indexname": "IDX_33206384cc0a56e1d8d0a0cc47",
+      "indexdef": "CREATE INDEX \"IDX_33206384cc0a56e1d8d0a0cc47\" ON public.otps USING btree (phone)"
+    },
+    {
+      "tablename": "otps",
+      "indexname": "PK_91fef5ed60605b854a2115d2410",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_91fef5ed60605b854a2115d2410\" ON public.otps USING btree (id)"
+    },
+    {
+      "tablename": "payments",
+      "indexname": "IDX_3c324ca49dabde7ffc0ef64675",
+      "indexdef": "CREATE UNIQUE INDEX \"IDX_3c324ca49dabde7ffc0ef64675\" ON public.payments USING btree (transaction_id)"
+    },
+    {
+      "tablename": "payments",
+      "indexname": "IDX_427785468fb7d2733f59e7d7d3",
+      "indexdef": "CREATE INDEX \"IDX_427785468fb7d2733f59e7d7d3\" ON public.payments USING btree (user_id)"
+    },
+    {
+      "tablename": "payments",
+      "indexname": "IDX_b2f7b823a21562eeca20e72b00",
+      "indexdef": "CREATE INDEX \"IDX_b2f7b823a21562eeca20e72b00\" ON public.payments USING btree (order_id)"
+    },
+    {
+      "tablename": "payments",
+      "indexname": "PK_197ab7af18c93fbb0c9b28b4a59",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_197ab7af18c93fbb0c9b28b4a59\" ON public.payments USING btree (id)"
+    },
+    {
+      "tablename": "payments",
+      "indexname": "UQ_3c324ca49dabde7ffc0ef64675d",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_3c324ca49dabde7ffc0ef64675d\" ON public.payments USING btree (transaction_id)"
+    },
+    {
+      "tablename": "payout_requests",
+      "indexname": "PK_3a6acb302f56ad7dadda35c86b8",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_3a6acb302f56ad7dadda35c86b8\" ON public.payout_requests USING btree (id)"
+    },
+    {
+      "tablename": "payout_requests",
+      "indexname": "idx_payout_requests_rider_id",
+      "indexdef": "CREATE INDEX idx_payout_requests_rider_id ON public.payout_requests USING btree (rider_id)"
+    },
+    {
+      "tablename": "payout_requests",
+      "indexname": "idx_payout_requests_seller_id",
+      "indexdef": "CREATE INDEX idx_payout_requests_seller_id ON public.payout_requests USING btree (seller_id)"
+    },
+    {
+      "tablename": "permissions",
+      "indexname": "PK_920331560282b8bd21bb02290df",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_920331560282b8bd21bb02290df\" ON public.permissions USING btree (id)"
+    },
+    {
+      "tablename": "permissions",
+      "indexname": "UQ_48ce552495d14eae9b187bb6716",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_48ce552495d14eae9b187bb6716\" ON public.permissions USING btree (name)"
+    },
+    {
+      "tablename": "platform_settings",
+      "indexname": "PK_5d9031e30fac3ec3ec8b9602e17",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_5d9031e30fac3ec3ec8b9602e17\" ON public.platform_settings USING btree (key)"
+    },
+    {
+      "tablename": "product_attribute_values",
+      "indexname": "PK_product_attribute_values",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_product_attribute_values\" ON public.product_attribute_values USING btree (id)"
+    },
+    {
+      "tablename": "product_attribute_values",
+      "indexname": "UQ_product_attribute_values_pair",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_product_attribute_values_pair\" ON public.product_attribute_values USING btree (product_id, attribute_id)"
+    },
+    {
+      "tablename": "product_attribute_values",
+      "indexname": "idx_product_attribute_values_attribute_id",
+      "indexdef": "CREATE INDEX idx_product_attribute_values_attribute_id ON public.product_attribute_values USING btree (attribute_id)"
+    },
+    {
+      "tablename": "product_attribute_values",
+      "indexname": "idx_product_attribute_values_option_id",
+      "indexdef": "CREATE INDEX idx_product_attribute_values_option_id ON public.product_attribute_values USING btree (option_id)"
+    },
+    {
+      "tablename": "product_attribute_values",
+      "indexname": "idx_product_attribute_values_product_id",
+      "indexdef": "CREATE INDEX idx_product_attribute_values_product_id ON public.product_attribute_values USING btree (product_id)"
+    },
+    {
+      "tablename": "product_images",
+      "indexname": "PK_1974264ea7265989af8392f63a1",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_1974264ea7265989af8392f63a1\" ON public.product_images USING btree (id)"
+    },
+    {
+      "tablename": "product_ingredients",
+      "indexname": "PK_82b8cf241e3716a8d4682e79190",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_82b8cf241e3716a8d4682e79190\" ON public.product_ingredients USING btree (id)"
+    },
+    {
+      "tablename": "product_ingredients",
+      "indexname": "UQ_product_ingredients_pair",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_product_ingredients_pair\" ON public.product_ingredients USING btree (product_id, ingredient_id)"
+    },
+    {
+      "tablename": "product_ingredients",
+      "indexname": "idx_product_ingredients_ingredient_id",
+      "indexdef": "CREATE INDEX idx_product_ingredients_ingredient_id ON public.product_ingredients USING btree (ingredient_id)"
+    },
+    {
+      "tablename": "product_ingredients",
+      "indexname": "idx_product_ingredients_product_id",
+      "indexdef": "CREATE INDEX idx_product_ingredients_product_id ON public.product_ingredients USING btree (product_id)"
+    },
+    {
+      "tablename": "product_request_history",
+      "indexname": "PK_7b90286bf685f4534037e34ada7",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_7b90286bf685f4534037e34ada7\" ON public.product_request_history USING btree (id)"
+    },
+    {
+      "tablename": "product_requests",
+      "indexname": "PK_95548600cf27dcc824033dea8cd",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_95548600cf27dcc824033dea8cd\" ON public.product_requests USING btree (id)"
+    },
+    {
+      "tablename": "product_type_attributes",
+      "indexname": "PK_product_type_attributes",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_product_type_attributes\" ON public.product_type_attributes USING btree (id)"
+    },
+    {
+      "tablename": "product_type_attributes",
+      "indexname": "UQ_product_type_attributes_pair",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_product_type_attributes_pair\" ON public.product_type_attributes USING btree (product_type_id, attribute_id)"
+    },
+    {
+      "tablename": "product_type_attributes",
+      "indexname": "idx_product_type_attributes_attribute_id",
+      "indexdef": "CREATE INDEX idx_product_type_attributes_attribute_id ON public.product_type_attributes USING btree (attribute_id)"
+    },
+    {
+      "tablename": "product_type_attributes",
+      "indexname": "idx_product_type_attributes_product_type_id",
+      "indexdef": "CREATE INDEX idx_product_type_attributes_product_type_id ON public.product_type_attributes USING btree (product_type_id)"
+    },
+    {
+      "tablename": "product_types",
+      "indexname": "PK_product_types",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_product_types\" ON public.product_types USING btree (id)"
+    },
+    {
+      "tablename": "product_types",
+      "indexname": "UQ_product_types_slug",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_product_types_slug\" ON public.product_types USING btree (slug)"
+    },
+    {
+      "tablename": "product_types",
+      "indexname": "idx_product_types_category_id",
+      "indexdef": "CREATE INDEX idx_product_types_category_id ON public.product_types USING btree (category_id)"
+    },
+    {
+      "tablename": "product_types",
+      "indexname": "idx_product_types_is_active",
+      "indexdef": "CREATE INDEX idx_product_types_is_active ON public.product_types USING btree (is_active)"
+    },
+    {
+      "tablename": "product_variants",
+      "indexname": "PK_281e3f2c55652d6a22c0aa59fd7",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_281e3f2c55652d6a22c0aa59fd7\" ON public.product_variants USING btree (id)"
+    },
+    {
+      "tablename": "product_variants",
+      "indexname": "UQ_46f236f21640f9da218a063a866",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_46f236f21640f9da218a063a866\" ON public.product_variants USING btree (sku)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "PK_0806c755e0aca124e67c0cf6d7d",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_0806c755e0aca124e67c0cf6d7d\" ON public.products USING btree (id)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "UQ_464f927ae360106b783ed0b4106",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_464f927ae360106b783ed0b4106\" ON public.products USING btree (slug)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_brand_id",
+      "indexdef": "CREATE INDEX idx_products_brand_id ON public.products USING btree (brand_id)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_category_id",
+      "indexdef": "CREATE INDEX idx_products_category_id ON public.products USING btree (category_id)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_created_at",
+      "indexdef": "CREATE INDEX idx_products_created_at ON public.products USING btree (created_at)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_is_active",
+      "indexdef": "CREATE INDEX idx_products_is_active ON public.products USING btree (is_active)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_is_featured",
+      "indexdef": "CREATE INDEX idx_products_is_featured ON public.products USING btree (is_featured)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_manufacturer_id",
+      "indexdef": "CREATE INDEX idx_products_manufacturer_id ON public.products USING btree (manufacturer_id)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_owner_shop_id",
+      "indexdef": "CREATE INDEX idx_products_owner_shop_id ON public.products USING btree (owner_shop_id)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_product_type_id",
+      "indexdef": "CREATE INDEX idx_products_product_type_id ON public.products USING btree (product_type_id)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_requires_prescription",
+      "indexdef": "CREATE INDEX idx_products_requires_prescription ON public.products USING btree (requires_prescription)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_status",
+      "indexdef": "CREATE INDEX idx_products_status ON public.products USING btree (status)"
+    },
+    {
+      "tablename": "products",
+      "indexname": "idx_products_sub_category_id",
+      "indexdef": "CREATE INDEX idx_products_sub_category_id ON public.products USING btree (sub_category_id)"
+    },
+    {
+      "tablename": "refunds",
+      "indexname": "PK_5106efb01eeda7e49a78b869738",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_5106efb01eeda7e49a78b869738\" ON public.refunds USING btree (id)"
+    },
+    {
+      "tablename": "reviews",
+      "indexname": "PK_231ae565c273ee700b283f15c1d",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_231ae565c273ee700b283f15c1d\" ON public.reviews USING btree (id)"
+    },
+    {
+      "tablename": "rider_applications",
+      "indexname": "PK_28a54be5407d09e5cd8af23a46b",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_28a54be5407d09e5cd8af23a46b\" ON public.rider_applications USING btree (id)"
+    },
+    {
+      "tablename": "rider_applications",
+      "indexname": "idx_rider_applications_created_at",
+      "indexdef": "CREATE INDEX idx_rider_applications_created_at ON public.rider_applications USING btree (created_at)"
+    },
+    {
+      "tablename": "rider_applications",
+      "indexname": "idx_rider_applications_status",
+      "indexdef": "CREATE INDEX idx_rider_applications_status ON public.rider_applications USING btree (status)"
+    },
+    {
+      "tablename": "rider_earnings",
+      "indexname": "PK_36bb8dbcd5407f2ee6e698ded4b",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_36bb8dbcd5407f2ee6e698ded4b\" ON public.rider_earnings USING btree (id)"
+    },
+    {
+      "tablename": "rider_earnings",
+      "indexname": "UQ_5de873f3a6f8c35adc78addad3b",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_5de873f3a6f8c35adc78addad3b\" ON public.rider_earnings USING btree (delivery_id)"
+    },
+    {
+      "tablename": "rider_earnings",
+      "indexname": "idx_rider_earnings_created_at",
+      "indexdef": "CREATE INDEX idx_rider_earnings_created_at ON public.rider_earnings USING btree (created_at)"
+    },
+    {
+      "tablename": "rider_earnings",
+      "indexname": "idx_rider_earnings_rider_id",
+      "indexdef": "CREATE INDEX idx_rider_earnings_rider_id ON public.rider_earnings USING btree (rider_id)"
+    },
+    {
+      "tablename": "rider_earnings",
+      "indexname": "idx_rider_earnings_status",
+      "indexdef": "CREATE INDEX idx_rider_earnings_status ON public.rider_earnings USING btree (status)"
+    },
+    {
+      "tablename": "rider_profiles",
+      "indexname": "PK_bec1afad599cabe486f80dbcbf2",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_bec1afad599cabe486f80dbcbf2\" ON public.rider_profiles USING btree (id)"
+    },
+    {
+      "tablename": "rider_profiles",
+      "indexname": "UQ_eb61b4b5bcd3ad3a6c14f491dbb",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_eb61b4b5bcd3ad3a6c14f491dbb\" ON public.rider_profiles USING btree (user_id)"
+    },
+    {
+      "tablename": "rider_profiles",
+      "indexname": "idx_rider_profiles_availability",
+      "indexdef": "CREATE INDEX idx_rider_profiles_availability ON public.rider_profiles USING btree (availability)"
+    },
+    {
+      "tablename": "role_permissions",
+      "indexname": "IDX_17022daf3f885f7d35423e9971",
+      "indexdef": "CREATE INDEX \"IDX_17022daf3f885f7d35423e9971\" ON public.role_permissions USING btree (permission_id)"
+    },
+    {
+      "tablename": "role_permissions",
+      "indexname": "IDX_178199805b901ccd220ab7740e",
+      "indexdef": "CREATE INDEX \"IDX_178199805b901ccd220ab7740e\" ON public.role_permissions USING btree (role_id)"
+    },
+    {
+      "tablename": "role_permissions",
+      "indexname": "PK_25d24010f53bb80b78e412c9656",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_25d24010f53bb80b78e412c9656\" ON public.role_permissions USING btree (role_id, permission_id)"
+    },
+    {
+      "tablename": "roles",
+      "indexname": "PK_c1433d71a4838793a49dcad46ab",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_c1433d71a4838793a49dcad46ab\" ON public.roles USING btree (id)"
+    },
+    {
+      "tablename": "roles",
+      "indexname": "UQ_648e3f5447f725579d7d4ffdfb7",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_648e3f5447f725579d7d4ffdfb7\" ON public.roles USING btree (name)"
+    },
+    {
+      "tablename": "seller_applications",
+      "indexname": "PK_203be9b9b1f8ff560e8af1f90a5",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_203be9b9b1f8ff560e8af1f90a5\" ON public.seller_applications USING btree (id)"
+    },
+    {
+      "tablename": "seller_applications",
+      "indexname": "idx_seller_applications_created_at",
+      "indexdef": "CREATE INDEX idx_seller_applications_created_at ON public.seller_applications USING btree (created_at)"
+    },
+    {
+      "tablename": "seller_applications",
+      "indexname": "idx_seller_applications_status",
+      "indexdef": "CREATE INDEX idx_seller_applications_status ON public.seller_applications USING btree (status)"
+    },
+    {
+      "tablename": "seller_products",
+      "indexname": "PK_0efaba257e14cf3313664849ff9",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_0efaba257e14cf3313664849ff9\" ON public.seller_products USING btree (id)"
+    },
+    {
+      "tablename": "seller_products",
+      "indexname": "idx_seller_products_created_at",
+      "indexdef": "CREATE INDEX idx_seller_products_created_at ON public.seller_products USING btree (created_at)"
+    },
+    {
+      "tablename": "seller_products",
+      "indexname": "idx_seller_products_is_active",
+      "indexdef": "CREATE INDEX idx_seller_products_is_active ON public.seller_products USING btree (is_active)"
+    },
+    {
+      "tablename": "seller_products",
+      "indexname": "idx_seller_products_price",
+      "indexdef": "CREATE INDEX idx_seller_products_price ON public.seller_products USING btree (price)"
+    },
+    {
+      "tablename": "seller_products",
+      "indexname": "idx_seller_products_shop_id",
+      "indexdef": "CREATE INDEX idx_seller_products_shop_id ON public.seller_products USING btree (shop_id)"
+    },
+    {
+      "tablename": "seller_products",
+      "indexname": "idx_seller_products_variant_id",
+      "indexdef": "CREATE INDEX idx_seller_products_variant_id ON public.seller_products USING btree (product_variant_id)"
+    },
+    {
+      "tablename": "shops",
+      "indexname": "PK_3c6aaa6607d287de99815e60b96",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_3c6aaa6607d287de99815e60b96\" ON public.shops USING btree (id)"
+    },
+    {
+      "tablename": "shops",
+      "indexname": "UQ_8c28ec876676eeb1dcb65c01b7f",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_8c28ec876676eeb1dcb65c01b7f\" ON public.shops USING btree (slug)"
+    },
+    {
+      "tablename": "unions",
+      "indexname": "PK_97b35789dd5101a3e05e4f4eced",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_97b35789dd5101a3e05e4f4eced\" ON public.unions USING btree (id)"
+    },
+    {
+      "tablename": "upazilas",
+      "indexname": "PK_ab2d8d9c35677f393b9fc6d8ce7",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_ab2d8d9c35677f393b9fc6d8ce7\" ON public.upazilas USING btree (id)"
+    },
+    {
+      "tablename": "user_permissions",
+      "indexname": "IDX_3495bd31f1862d02931e8e8d2e",
+      "indexdef": "CREATE INDEX \"IDX_3495bd31f1862d02931e8e8d2e\" ON public.user_permissions USING btree (user_id)"
+    },
+    {
+      "tablename": "user_permissions",
+      "indexname": "IDX_8145f5fadacd311693c15e41f1",
+      "indexdef": "CREATE INDEX \"IDX_8145f5fadacd311693c15e41f1\" ON public.user_permissions USING btree (permission_id)"
+    },
+    {
+      "tablename": "user_permissions",
+      "indexname": "PK_a537c48b1f80e8626a71cb56589",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_a537c48b1f80e8626a71cb56589\" ON public.user_permissions USING btree (user_id, permission_id)"
+    },
+    {
+      "tablename": "user_roles",
+      "indexname": "IDX_87b8888186ca9769c960e92687",
+      "indexdef": "CREATE INDEX \"IDX_87b8888186ca9769c960e92687\" ON public.user_roles USING btree (user_id)"
+    },
+    {
+      "tablename": "user_roles",
+      "indexname": "IDX_b23c65e50a758245a33ee35fda",
+      "indexdef": "CREATE INDEX \"IDX_b23c65e50a758245a33ee35fda\" ON public.user_roles USING btree (role_id)"
+    },
+    {
+      "tablename": "user_roles",
+      "indexname": "PK_23ed6f04fe43066df08379fd034",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_23ed6f04fe43066df08379fd034\" ON public.user_roles USING btree (user_id, role_id)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "PK_a3ffb1c0c8416b9fc6f907b7433",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_a3ffb1c0c8416b9fc6f907b7433\" ON public.users USING btree (id)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "UQ_97672ac88f789774dd47f7c8be3",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_97672ac88f789774dd47f7c8be3\" ON public.users USING btree (email)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "UQ_a000cca60bcf04454e727699490",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_a000cca60bcf04454e727699490\" ON public.users USING btree (phone)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "idx_users_created_at",
+      "indexdef": "CREATE INDEX idx_users_created_at ON public.users USING btree (\"createdAt\")"
+    },
+    {
+      "tablename": "users",
+      "indexname": "idx_users_status",
+      "indexdef": "CREATE INDEX idx_users_status ON public.users USING btree (status)"
+    },
+    {
+      "tablename": "wallet_transactions",
+      "indexname": "PK_5120f131bde2cda940ec1a621db",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_5120f131bde2cda940ec1a621db\" ON public.wallet_transactions USING btree (id)"
+    },
+    {
+      "tablename": "wallets",
+      "indexname": "PK_8402e5df5a30a229380e83e4f7e",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_8402e5df5a30a229380e83e4f7e\" ON public.wallets USING btree (id)"
+    },
+    {
+      "tablename": "wallets",
+      "indexname": "UQ_92558c08091598f7a4439586cda",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_92558c08091598f7a4439586cda\" ON public.wallets USING btree (user_id)"
+    },
+    {
+      "tablename": "wishlist_items",
+      "indexname": "PK_0bd52924a97cda208ed2a07bd69",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_0bd52924a97cda208ed2a07bd69\" ON public.wishlist_items USING btree (id)"
+    },
+    {
+      "tablename": "wishlist_items",
+      "indexname": "UQ_e0584a3664156caa678765afadc",
+      "indexdef": "CREATE UNIQUE INDEX \"UQ_e0584a3664156caa678765afadc\" ON public.wishlist_items USING btree (user_id, product_id)"
+    }
+  ]
+}

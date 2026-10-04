@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-10-04T07:35:55.202Z",
+  "baseUrl": "http://localhost:4005",
+  "concurrency": 10,
+  "durationSeconds": 8,
+  "warmupSeconds": 3,
+  "note": "Measured on a local production-mode NestJS instance (NODE_ENV=production, TypeORM query logging off, in-memory cache). Throttling raised on the benchmark instance only.",
+  "totalElapsedMs": 28971,
+  "results": [
+    {
+      "group": "Public (slow)",
+      "name": "public/categories",
+      "method": "GET",
+      "route": "/api/v1/public/categories",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 8,
+      "coldMs": 983,
+      "payloadBytes": 5567640,
+      "requests": {
+        "total": 12,
+        "success2xx": 12,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 1.5
+      },
+      "latencyMs": {
+        "avg": 4603.75,
+        "min": 2019,
+        "max": 7065,
+        "p50": 4471,
+        "p95": 7065,
+        "p99": 7065
+      },
+      "throughputKbps": 8157.25,
+      "errorRate": 0
+    },
+    {
+      "group": "Public (slow)",
+      "name": "public/categories/tree",
+      "method": "GET",
+      "route": "/api/v1/public/categories/tree",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 8,
+      "coldMs": 3869,
+      "payloadBytes": 5908838,
+      "requests": {
+        "total": 11,
+        "success2xx": 11,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 1.38
+      },
+      "latencyMs": {
+        "avg": 5511.1,
+        "min": 3697,
+        "max": 7304,
+        "p50": 5577,
+        "p95": 7304,
+        "p99": 7304
+      },
+      "throughputKbps": 7937.5,
+      "errorRate": 0
+    }
+  ]
+}

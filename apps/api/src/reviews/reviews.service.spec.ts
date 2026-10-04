@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Review } from './entities/review.entity.js';
@@ -8,19 +8,54 @@ import { ReviewsService } from './reviews.service.js';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
-
-  const reviewRepo = {
-    findOne: vi.fn(),
-    create: vi.fn((x) => x),
-    save: vi.fn(),
-    createQueryBuilder: vi.fn(),
+  let reviewRepo: {
+    findOne: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    save: ReturnType<typeof vi.fn>;
+    createQueryBuilder: ReturnType<typeof vi.fn>;
   };
-  const dataSource = {
-    query: vi.fn(),
+  let manager: {
+    create: ReturnType<typeof vi.fn>;
+    save: ReturnType<typeof vi.fn>;
+    findOne: ReturnType<typeof vi.fn>;
+    remove: ReturnType<typeof vi.fn>;
+    createQueryBuilder: ReturnType<typeof vi.fn>;
+    query: ReturnType<typeof vi.fn>;
+  };
+  let dataSource: {
+    query: ReturnType<typeof vi.fn>;
+    transaction: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    reviewRepo = {
+      findOne: vi.fn(),
+      create: vi.fn((x) => x),
+      save: vi.fn(),
+      createQueryBuilder: vi.fn(),
+    };
+
+    // ReviewsService performs writes inside DataSource.transaction(), so the
+    // manager (not the repository) is what create/save are called on.
+    manager = {
+      create: vi.fn((_entity, obj) => obj),
+      save: vi.fn(),
+      findOne: vi.fn(),
+      remove: vi.fn(),
+      // recalculateProductReviewAggregate locks the product row; returning null
+      // short-circuits before its aggregate queries run.
+      createQueryBuilder: vi.fn(() => ({
+        where: vi.fn().mockReturnThis(),
+        setLock: vi.fn().mockReturnThis(),
+        getOne: vi.fn().mockResolvedValue(null),
+      })),
+      query: vi.fn(),
+    };
+
+    dataSource = {
+      query: vi.fn(),
+      transaction: vi.fn(async (cb: (m: typeof manager) => Promise<unknown>) => cb(manager)),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -41,12 +76,12 @@ describe('ReviewsService', () => {
     it('creates an auto-approved review for a verified purchase', async () => {
       reviewRepo.findOne.mockResolvedValue(null); // no duplicate
       dataSource.query.mockResolvedValue([{ id: 'o1' }]); // purchase found
-      reviewRepo.save.mockImplementation(async (r) => ({ ...r, id: 'rev1' }));
+      manager.save.mockImplementation(async (r) => ({ ...r, id: 'rev1' }));
 
       const result = await service.addReview('u1', 'p1', 5, 'Great rice');
 
       expect(result.isApproved).toBe(true);
-      expect(reviewRepo.create).toHaveBeenCalledWith({
+      expect(manager.create).toHaveBeenCalledWith(Review, {
         userId: 'u1',
         productId: 'p1',
         rating: 5,
@@ -54,6 +89,7 @@ describe('ReviewsService', () => {
         images: undefined,
         isApproved: true,
       });
+      expect(manager.save).toHaveBeenCalled();
     });
 
     it('rejects a duplicate review by the same user', async () => {
@@ -61,6 +97,7 @@ describe('ReviewsService', () => {
 
       await expect(service.addReview('u1', 'p1', 5)).rejects.toThrow(/already reviewed/);
       expect(dataSource.query).not.toHaveBeenCalled();
+      expect(dataSource.transaction).not.toHaveBeenCalled();
     });
 
     it('rejects a review without a delivered purchase of that product', async () => {
@@ -68,24 +105,24 @@ describe('ReviewsService', () => {
       dataSource.query.mockResolvedValue([]); // no purchase
 
       await expect(service.addReview('u1', 'p1', 5)).rejects.toThrow(/legitimately purchased/);
-      expect(reviewRepo.save).not.toHaveBeenCalled();
+      expect(manager.save).not.toHaveBeenCalled();
     });
   });
 
   describe('moderateReview', () => {
     it('updates the approval flag', async () => {
       const review = { id: 'rev1', isApproved: true };
-      reviewRepo.findOne.mockResolvedValue(review);
-      reviewRepo.save.mockImplementation(async (r) => r);
+      manager.findOne.mockResolvedValue(review);
+      manager.save.mockImplementation(async (r) => r);
 
       const result = await service.moderateReview('rev1', false);
 
       expect(result.isApproved).toBe(false);
-      expect(reviewRepo.save).toHaveBeenCalledWith(review);
+      expect(manager.save).toHaveBeenCalledWith(review);
     });
 
     it('throws when the review does not exist', async () => {
-      reviewRepo.findOne.mockResolvedValue(null);
+      manager.findOne.mockResolvedValue(null);
 
       await expect(service.moderateReview('ghost', true)).rejects.toThrow(NotFoundException);
     });

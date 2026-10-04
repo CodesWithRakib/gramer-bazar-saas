@@ -39,6 +39,18 @@ const DEFAULTS = {
 
 @Injectable()
 export class SettingsService {
+  /**
+   * In-process cache for the full settings map.
+   *
+   * `getSettings()` is called by the global MaintenanceGuard on virtually every
+   * request, so an uncached `find()` here costs one DB round-trip per request.
+   * The TTL is deliberately short, and `updateSettings()` invalidates the cache
+   * immediately, so an admin toggling maintenance mode sees it take effect at
+   * once on the instance handling the update.
+   */
+  private cachedSettings: { at: number; value: PlatformSettings } | null = null;
+  private static readonly CACHE_TTL_MS = 5000;
+
   constructor(
     @InjectRepository(PlatformSetting)
     private readonly settingRepository: Repository<PlatformSetting>,
@@ -46,6 +58,11 @@ export class SettingsService {
   ) {}
 
   async getSettings(): Promise<PlatformSettings> {
+    const now = Date.now();
+    if (this.cachedSettings && now - this.cachedSettings.at < SettingsService.CACHE_TTL_MS) {
+      return this.cachedSettings.value;
+    }
+
     const rows = await this.settingRepository.find();
     const stored = new Map(rows.map((row) => [row.key, row.value]));
 
@@ -60,7 +77,7 @@ export class SettingsService {
       this.configService.get<string>('API_URL') ||
       'http://localhost:4000';
 
-    return {
+    const settings: PlatformSettings = {
       platformName: stored.get(KEYS.platformName) ?? DEFAULTS.platformName,
       supportEmail: stored.get(KEYS.supportEmail) ?? DEFAULTS.supportEmail,
       supportPhone: stored.get(KEYS.supportPhone) ?? DEFAULTS.supportPhone,
@@ -74,6 +91,9 @@ export class SettingsService {
       sslczPublicUrl: stored.get(KEYS.sslczPublicUrl) ?? envPublicUrl,
       hasSslczPassword: Boolean(stored.get(KEYS.sslczStorePassword) || envPassword),
     };
+
+    this.cachedSettings = { at: now, value: settings };
+    return settings;
   }
 
   async updateSettings(dto: UpdateSettingsDto): Promise<PlatformSettings> {
@@ -108,6 +128,8 @@ export class SettingsService {
       );
     }
 
+    // Invalidate immediately so the change is visible on the next request.
+    this.cachedSettings = null;
     return this.getSettings();
   }
 

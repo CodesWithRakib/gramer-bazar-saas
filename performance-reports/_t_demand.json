@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-10-04T05:52:54.146Z",
+  "baseUrl": "http://localhost:4005",
+  "concurrency": 1,
+  "durationSeconds": 15,
+  "warmupSeconds": 0,
+  "note": "Measured on a local production-mode NestJS instance (NODE_ENV=production, TypeORM query logging off, in-memory cache). Throttling raised on the benchmark instance only.",
+  "totalElapsedMs": 20005,
+  "results": [
+    {
+      "group": "Admin",
+      "name": "GET admin/analytics/demand",
+      "method": "GET",
+      "route": "/api/v1/admin/analytics/demand",
+      "auth": "admin",
+      "concurrency": 1,
+      "durationSeconds": 15,
+      "coldMs": 1872,
+      "payloadBytes": 1192,
+      "requests": {
+        "total": 9,
+        "success2xx": 0,
+        "failed": 9,
+        "timeouts": 0,
+        "rps": 0.6
+      },
+      "latencyMs": {
+        "avg": 1633.12,
+        "min": 1386,
+        "max": 2095,
+        "p50": 1579,
+        "p95": 2095,
+        "p99": 2095
+      },
+      "throughputKbps": 1.39,
+      "errorRate": 100
+    }
+  ]
+}

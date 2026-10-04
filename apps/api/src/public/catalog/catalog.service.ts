@@ -518,8 +518,9 @@ export class CatalogService {
       LIMIT 2
     `);
 
-    // 7. Category Sections (top shelves)
-    const categorySections = await this.getCategorySections();
+    // 7. Category Sections (top shelves) — the homepage only renders the first 4,
+    //    so only fetch those instead of every root category.
+    const categorySections = await this.getCategorySections(4);
 
     const data = {
       categories,
@@ -600,7 +601,8 @@ export class CatalogService {
     };
   }
 
-  async getCategorySections() {
+  async getCategorySections(limit?: number) {
+    const rootLimit = limit !== undefined ? `LIMIT ${Math.max(0, Math.floor(Number(limit)))}` : '';
     const rootCategories = await this.sellerProductRepo.manager.query(`
       SELECT c.id, c.name_en as "nameEn", c.name_bn as "nameBn", c.slug, c.icon, c.image,
              c.description_en as "descriptionEn", c.description_bn as "descriptionBn",
@@ -611,98 +613,155 @@ export class CatalogService {
       GROUP BY c.id, c.name_en, c.name_bn, c.slug, c.icon, c.image, c.description_en, c.description_bn, c.sort_order
       HAVING COUNT(DISTINCT p.id) > 0
       ORDER BY c.sort_order ASC, c.name_en ASC
+      ${rootLimit}
     `);
 
-    const sections = [];
-    for (const cat of rootCategories) {
-      const items = await this.sellerProductRepo
-        .createQueryBuilder('sp')
-        .leftJoinAndSelect('sp.productVariant', 'pv')
-        .leftJoinAndSelect('pv.product', 'p')
-        .leftJoinAndSelect('p.category', 'cat')
-        .leftJoinAndSelect('p.subCategory', 'subCat')
-        .leftJoinAndSelect('p.images', 'images')
-        .leftJoinAndSelect('p.brand', 'b')
-        .leftJoinAndSelect('sp.shop', 'shop')
-        .leftJoinAndSelect('sp.inventory', 'inv')
-        .where('sp.isActive = :isActive', { isActive: true })
-        .andWhere('pv.isActive = :isActive', { isActive: true })
-        .andWhere('p.isActive = :isActive', { isActive: true })
-        .andWhere(
-          '(p.categoryId = :catId OR p.subCategoryId IN (SELECT id FROM categories WHERE parent_id = :catId))',
-          { catId: cat.id },
-        )
-        .orderBy('sp.createdAt', 'DESC')
-        .take(8)
-        .getMany();
+    if (rootCategories.length === 0) {
+      return [];
+    }
 
-      if (items.length > 0) {
-        items.forEach((item) => {
-          if (
-            item.productVariant &&
-            (!item.productVariant.images || item.productVariant.images.length === 0)
-          ) {
-            const pImages = item.productVariant.product?.images;
-            if (pImages && pImages.length > 0) {
-              item.productVariant.images = pImages
-                .sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0))
-                .map((img) => img.url);
-            }
+    // Pick the top 8 products for every section in ONE query with a LATERAL
+    // sub-select (previously one 8-join query per category), then hydrate all
+    // of them in a single query below.
+    const catIds: string[] = rootCategories.map((c: any) => c.id);
+    const idRows: Array<{ catId: string; spId: string }> = await this.sellerProductRepo.manager.query(
+      `
+      SELECT r.cat_id AS "catId", x.sp_id AS "spId"
+      FROM unnest($1::uuid[]) WITH ORDINALITY AS r(cat_id, ord)
+      JOIN LATERAL (
+        SELECT sp.id AS sp_id
+        FROM seller_products sp
+        JOIN product_variants pv ON pv.id = sp.product_variant_id
+        JOIN products p ON p.id = pv.product_id
+        WHERE sp.is_active = true AND pv.is_active = true AND p.is_active = true
+          AND (p.category_id = r.cat_id OR p.sub_category_id IN (SELECT id FROM categories WHERE parent_id = r.cat_id))
+        ORDER BY sp.created_at DESC
+        LIMIT 8
+      ) x ON true
+      ORDER BY r.ord
+    `,
+      [catIds],
+    );
+
+    const spIds = [...new Set(idRows.map((r) => r.spId))];
+    const hydrated = spIds.length
+      ? await this.sellerProductRepo
+          .createQueryBuilder('sp')
+          .leftJoinAndSelect('sp.productVariant', 'pv')
+          .leftJoinAndSelect('pv.product', 'p')
+          .leftJoinAndSelect('p.category', 'cat')
+          .leftJoinAndSelect('p.subCategory', 'subCat')
+          .leftJoinAndSelect('p.images', 'images')
+          .leftJoinAndSelect('p.brand', 'b')
+          .leftJoinAndSelect('sp.shop', 'shop')
+          .leftJoinAndSelect('sp.inventory', 'inv')
+          .where('sp.id IN (:...ids)', { ids: spIds })
+          .getMany()
+      : [];
+
+    const itemById = new Map(hydrated.map((i) => [i.id, i]));
+    const itemsByCat = new Map<string, any[]>();
+    // idRows is ordered per category (newest first) because of the LATERAL ORDER BY.
+    for (const row of idRows) {
+      const item = itemById.get(row.spId);
+      if (!item) continue;
+      const list = itemsByCat.get(row.catId) ?? [];
+      list.push(item);
+      itemsByCat.set(row.catId, list);
+    }
+
+    const sectionsWithItems: Array<{ cat: any; items: SellerProduct[] }> = rootCategories
+      .filter((c: any) => (itemsByCat.get(c.id)?.length ?? 0) > 0)
+      .map((c: any) => ({ cat: c, items: itemsByCat.get(c.id) as SellerProduct[] }));
+
+    if (sectionsWithItems.length === 0) {
+      return [];
+    }
+
+    // Apply the product-image fallback once per hydrated item.
+    for (const section of sectionsWithItems) {
+      section.items.forEach((item) => {
+        if (
+          item.productVariant &&
+          (!item.productVariant.images || item.productVariant.images.length === 0)
+        ) {
+          const pImages = item.productVariant.product?.images;
+          if (pImages && pImages.length > 0) {
+            item.productVariant.images = pImages
+              .sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0))
+              .map((img) => img.url);
           }
-        });
-
-        const productIds = items.map((i) => i.productVariant?.product?.id).filter(Boolean);
-        if (productIds.length > 0) {
-          const ratings = await this.sellerProductRepo.manager.query(
-            `
-            SELECT product_id, COUNT(id)::int as total_reviews, COALESCE(AVG(rating), 0)::float as average_rating
-            FROM reviews
-            WHERE product_id = ANY($1) AND is_approved = true
-            GROUP BY product_id
-          `,
-            [productIds],
-          );
-
-          const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>(
-            ratings.map(
-              (r: { product_id: string; total_reviews: number; average_rating: number }) => [
-                r.product_id,
-                r,
-              ],
-            ),
-          );
-
-          items.forEach((item) => {
-            if (item.productVariant?.product) {
-              const ratingData = ratingsMap.get(item.productVariant.product.id);
-              const p = item.productVariant.product as unknown as Record<string, unknown>;
-              p.totalReviews = ratingData?.total_reviews || 0;
-              p.averageRating = ratingData?.average_rating || 0;
-            }
-          });
         }
+      });
+    }
 
-        const subCategories = await this.sellerProductRepo.manager.query(
-          `
-          SELECT c.id, c.name_en as "nameEn", c.name_bn as "nameBn", c.slug, COUNT(DISTINCT p.id)::int as "productCount"
-          FROM categories c
-          LEFT JOIN products p ON p.sub_category_id = c.id
-          WHERE c.parent_id = $1 AND c.is_active = true
-          GROUP BY c.id, c.name_en, c.name_bn, c.slug, c.sort_order
-          ORDER BY c.sort_order ASC, c.name_en ASC
-        `,
-          [cat.id],
-        );
+    // ── Batched ratings for every product across every section (1 query) ──
+    const allProductIds = [
+      ...new Set(
+        sectionsWithItems
+          .flatMap((s) => s.items.map((i) => i.productVariant?.product?.id))
+          .filter(Boolean),
+      ),
+    ] as string[];
 
-        sections.push({
-          category: {
-            ...cat,
-            subCategories,
-          },
-          products: items,
-        });
+    const ratingsMap = new Map<string, { total_reviews: number; average_rating: number }>();
+    if (allProductIds.length > 0) {
+      const ratings = await this.sellerProductRepo.manager.query(
+        `
+        SELECT product_id, COUNT(id)::int as total_reviews, COALESCE(AVG(rating), 0)::float as average_rating
+        FROM reviews
+        WHERE product_id = ANY($1) AND is_approved = true
+        GROUP BY product_id
+      `,
+        [allProductIds],
+      );
+      for (const r of ratings) {
+        ratingsMap.set(r.product_id, r);
       }
     }
+
+    // ── Batched sub-categories for every section (1 query) ──
+    const rootIds = sectionsWithItems.map((s) => s.cat.id);
+    const subCatRows: Array<Record<string, unknown> & { parentId: string }> =
+      await this.sellerProductRepo.manager.query(
+        `
+        SELECT c.parent_id as "parentId", c.id, c.name_en as "nameEn", c.name_bn as "nameBn", c.slug,
+               COUNT(DISTINCT p.id)::int as "productCount"
+        FROM categories c
+        LEFT JOIN products p ON p.sub_category_id = c.id
+        WHERE c.parent_id = ANY($1) AND c.is_active = true
+        GROUP BY c.parent_id, c.id, c.name_en, c.name_bn, c.slug, c.sort_order
+        ORDER BY c.sort_order ASC, c.name_en ASC
+      `,
+        [rootIds],
+      );
+
+    const subCategoriesByRoot = new Map<string, Array<Record<string, unknown>>>();
+    for (const row of subCatRows) {
+      const { parentId, ...rest } = row;
+      const list = subCategoriesByRoot.get(parentId) ?? [];
+      list.push(rest);
+      subCategoriesByRoot.set(parentId, list);
+    }
+
+    const sections = sectionsWithItems.map(({ cat, items }) => {
+      items.forEach((item) => {
+        if (item.productVariant?.product) {
+          const ratingData = ratingsMap.get(item.productVariant.product.id);
+          const p = item.productVariant.product as unknown as Record<string, unknown>;
+          p.totalReviews = ratingData?.total_reviews || 0;
+          p.averageRating = ratingData?.average_rating || 0;
+        }
+      });
+
+      return {
+        category: {
+          ...cat,
+          subCategories: subCategoriesByRoot.get(cat.id) ?? [],
+        },
+        products: items,
+      };
+    });
 
     return sections;
   }

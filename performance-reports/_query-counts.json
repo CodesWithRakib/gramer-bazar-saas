@@ -1,0 +1,240 @@
+{
+  "generatedAt": "2026-10-04T06:02:38.977Z",
+  "baseUrl": "http://localhost:4006",
+  "results": [
+    {
+      "label": "GET /health (public, no auth)",
+      "path": "/health",
+      "method": "GET",
+      "status": 200,
+      "queries": 1,
+      "failedQueries": 0,
+      "ms": 19
+    },
+    {
+      "label": "GET /public/catalog/search newest",
+      "path": "/api/v1/public/catalog/search?limit=24&sort=newest",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 261
+    },
+    {
+      "label": "GET /public/catalog/featured",
+      "path": "/api/v1/public/catalog/featured?limit=8",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 285
+    },
+    {
+      "label": "GET /public/catalog/brands",
+      "path": "/api/v1/public/catalog/brands",
+      "method": "GET",
+      "status": 200,
+      "queries": 2,
+      "failedQueries": 0,
+      "ms": 146
+    },
+    {
+      "label": "GET /public/catalog/:slug",
+      "path": "/api/v1/public/catalog/wireless-headphones-80b6-87751-9129",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 301
+    },
+    {
+      "label": "GET /auth/me (customer)",
+      "path": "/api/v1/auth/me",
+      "method": "GET",
+      "status": 200,
+      "queries": 2,
+      "failedQueries": 0,
+      "ms": 25
+    },
+    {
+      "label": "GET /orders (customer)",
+      "path": "/api/v1/orders",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 65
+    },
+    {
+      "label": "GET /notifications (customer)",
+      "path": "/api/v1/notifications?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 5,
+      "failedQueries": 0,
+      "ms": 36
+    },
+    {
+      "label": "GET /wishlists (customer)",
+      "path": "/api/v1/wishlists",
+      "method": "GET",
+      "status": 200,
+      "queries": 6,
+      "failedQueries": 0,
+      "ms": 223
+    },
+    {
+      "label": "GET /reviews/product/:pid",
+      "path": "/api/v1/reviews/product/5fe1f55b-1b1a-402b-a3d7-9c36b524e52c",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 255
+    },
+    {
+      "label": "GET /seller-portal/dashboard",
+      "path": "/api/v1/seller-portal/dashboard",
+      "method": "GET",
+      "status": 200,
+      "queries": 18,
+      "failedQueries": 0,
+      "ms": 124
+    },
+    {
+      "label": "GET /seller-portal/products",
+      "path": "/api/v1/seller-portal/products?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 10,
+      "failedQueries": 0,
+      "ms": 92
+    },
+    {
+      "label": "GET /seller-portal/orders",
+      "path": "/api/v1/seller-portal/orders?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 6,
+      "failedQueries": 0,
+      "ms": 71
+    },
+    {
+      "label": "GET /seller-products (1st = miss)",
+      "path": "/api/v1/seller-products?page=1&limit=20",
+      "method": "GET",
+      "status": 404,
+      "queries": 0,
+      "failedQueries": 0,
+      "ms": 20
+    },
+    {
+      "label": "GET /seller-products (2nd = hit)",
+      "path": "/api/v1/seller-products?page=1&limit=20",
+      "method": "GET",
+      "status": 404,
+      "queries": 0,
+      "failedQueries": 0,
+      "ms": 17
+    },
+    {
+      "label": "GET /deliveries/rider/assigned",
+      "path": "/api/v1/deliveries/rider/assigned",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 41
+    },
+    {
+      "label": "GET /admin/analytics/dashboard",
+      "path": "/api/v1/admin/analytics/dashboard",
+      "method": "GET",
+      "status": 200,
+      "queries": 18,
+      "failedQueries": 0,
+      "ms": 203
+    },
+    {
+      "label": "GET /users?page=1&limit=20",
+      "path": "/api/v1/users?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 6,
+      "failedQueries": 0,
+      "ms": 60
+    },
+    {
+      "label": "GET /orders/admin/all?page=1&limit=20",
+      "path": "/api/v1/orders/admin/all?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 6,
+      "failedQueries": 0,
+      "ms": 43
+    },
+    {
+      "label": "GET /products?page=1&limit=20 (admin)",
+      "path": "/api/v1/products?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 515
+    },
+    {
+      "label": "GET /deliveries/admin?page=1&limit=20",
+      "path": "/api/v1/deliveries/admin?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 6,
+      "failedQueries": 0,
+      "ms": 48
+    },
+    {
+      "label": "GET /reviews/admin?page=1&limit=20",
+      "path": "/api/v1/reviews/admin?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 6,
+      "failedQueries": 0,
+      "ms": 1168
+    },
+    {
+      "label": "GET /categories?page=1&limit=20 (admin)",
+      "path": "/api/v1/categories?page=1&limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 58
+    },
+    {
+      "label": "GET /brands?limit=20 (admin)",
+      "path": "/api/v1/brands?limit=20",
+      "method": "GET",
+      "status": 200,
+      "queries": 2,
+      "failedQueries": 0,
+      "ms": 181
+    },
+    {
+      "label": "GET /admin/settings",
+      "path": "/api/v1/admin/settings",
+      "method": "GET",
+      "status": 200,
+      "queries": 4,
+      "failedQueries": 0,
+      "ms": 36
+    },
+    {
+      "label": "POST /auth/login",
+      "path": "/api/v1/auth/login",
+      "method": "POST",
+      "status": 200,
+      "queries": 10,
+      "failedQueries": 0,
+      "ms": 192
+    }
+  ]
+}

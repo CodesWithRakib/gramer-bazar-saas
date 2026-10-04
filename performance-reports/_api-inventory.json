@@ -1,0 +1,4741 @@
+{
+  "totalOperations": 368,
+  "counts": {
+    "Public": 78,
+    "Authenticated (customer/general)": 148,
+    "Authentication": 12,
+    "Admin": 55,
+    "Payment": 5,
+    "Payment (callback)": 8,
+    "Notification": 3,
+    "Seller": 29,
+    "Rider": 12,
+    "Super Admin": 18
+  },
+  "byCategory": {
+    "Public": [
+      {
+        "method": "GET",
+        "path": "/",
+        "tags": [
+          "System"
+        ],
+        "security": "public",
+        "summary": "System root landing page or JSON metadata",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/hello",
+        "tags": [
+          "System"
+        ],
+        "security": "public",
+        "summary": "Hello ping check",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/docs",
+        "tags": [
+          "System"
+        ],
+        "security": "public",
+        "summary": "Redirect to Swagger OpenAPI documentation",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "tags": [
+          "System"
+        ],
+        "security": "public",
+        "summary": "Liveness and health check probe",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/dev/otp/{phone}",
+        "tags": [
+          "Dev / Seeder"
+        ],
+        "security": "public",
+        "summary": "Retrieve latest active OTP for automated testing",
+        "queryParams": [],
+        "pathParams": [
+          "phone"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/locations/countries",
+        "tags": [
+          "Locations"
+        ],
+        "security": "public",
+        "summary": "List all operational countries",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/locations/divisions",
+        "tags": [
+          "Locations"
+        ],
+        "security": "public",
+        "summary": "List administrative divisions",
+        "queryParams": [
+          "countryId"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/locations/districts",
+        "tags": [
+          "Locations"
+        ],
+        "security": "public",
+        "summary": "List districts by division",
+        "queryParams": [
+          "divisionId"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/locations/upazilas",
+        "tags": [
+          "Locations"
+        ],
+        "security": "public",
+        "summary": "List upazilas by district",
+        "queryParams": [
+          "districtId"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/locations/unions",
+        "tags": [
+          "Locations"
+        ],
+        "security": "public",
+        "summary": "List unions by upazila",
+        "queryParams": [
+          "upazilaId"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/locations/areas",
+        "tags": [
+          "Locations"
+        ],
+        "security": "public",
+        "summary": "List hyperlocal delivery areas / villages",
+        "queryParams": [
+          "unionId"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/categories",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "public",
+        "summary": "List categories with optional filters",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "parentId",
+          "rootsOnly"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/categories",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "public",
+        "summary": "List categories with optional filters",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "parentId",
+          "rootsOnly"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/categories/tree",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "public",
+        "summary": "Retrieve complete hierarchical category tree",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/categories/tree",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "public",
+        "summary": "Retrieve complete hierarchical category tree",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/categories/{id}",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "public",
+        "summary": "Retrieve single category by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/categories/{id}",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "public",
+        "summary": "Retrieve single category by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/brands",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "public",
+        "summary": "List all brands with pagination and category filtering",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "categoryId",
+          "isActive"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/brands",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "public",
+        "summary": "List all brands with pagination and category filtering",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "categoryId",
+          "isActive"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/brands/by-category/{categoryId}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "public",
+        "summary": "List active brands affiliated with a specific category",
+        "queryParams": [],
+        "pathParams": [
+          "categoryId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/brands/by-category/{categoryId}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "public",
+        "summary": "List active brands affiliated with a specific category",
+        "queryParams": [],
+        "pathParams": [
+          "categoryId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/brands/{id}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "public",
+        "summary": "Retrieve single brand by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/brands/{id}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "public",
+        "summary": "Retrieve single brand by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/products",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "public",
+        "summary": "Search and filter global master catalog products",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "categoryId",
+          "subCategoryId",
+          "brandId",
+          "status",
+          "isActive",
+          "isFeatured",
+          "sort"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/products/{id}",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "public",
+        "summary": "Retrieve single product by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-variants",
+        "tags": [
+          "Catalog - Variants"
+        ],
+        "security": "public",
+        "summary": "List all global product variants",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-variants/{id}",
+        "tags": [
+          "Catalog - Variants"
+        ],
+        "security": "public",
+        "summary": "Retrieve single product variant by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/attributes",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "public",
+        "summary": "List catalog attributes",
+        "queryParams": [
+          "search",
+          "isActive",
+          "dataType"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/attributes",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "public",
+        "summary": "List catalog attributes",
+        "queryParams": [
+          "search",
+          "isActive",
+          "dataType"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/attributes/{id}",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "public",
+        "summary": "Retrieve a catalog attribute with options",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/attributes/{id}",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "public",
+        "summary": "Retrieve a catalog attribute with options",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/product-types",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "List catalog product types",
+        "queryParams": [
+          "categoryId",
+          "categoryPath",
+          "search",
+          "isActive",
+          "includeMappings"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-types",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "List catalog product types",
+        "queryParams": [
+          "categoryId",
+          "categoryPath",
+          "search",
+          "isActive",
+          "includeMappings"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/product-types/facets",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "Dynamic filter facets for a category or product type",
+        "queryParams": [
+          "categoryId",
+          "categoryPath",
+          "productTypeId",
+          "brandId",
+          "minPrice",
+          "maxPrice",
+          "inStock",
+          "attributes"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-types/facets",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "Dynamic filter facets for a category or product type",
+        "queryParams": [
+          "categoryId",
+          "categoryPath",
+          "productTypeId",
+          "brandId",
+          "minPrice",
+          "maxPrice",
+          "inStock",
+          "attributes"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/product-types/{id}",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "Retrieve a product type with its attribute mappings",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-types/{id}",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "Retrieve a product type with its attribute mappings",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/product-types/{id}/attributes",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "List attribute mappings for a product type",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-types/{id}/attributes",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "public",
+        "summary": "List attribute mappings for a product type",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/manufacturers",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "public",
+        "summary": "List manufacturers (optionally filtered)",
+        "queryParams": [
+          "search",
+          "isActive"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/manufacturers",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "public",
+        "summary": "List manufacturers (optionally filtered)",
+        "queryParams": [
+          "search",
+          "isActive"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/manufacturers/{id}",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "public",
+        "summary": "Retrieve a manufacturer by id",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/manufacturers/{id}",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "public",
+        "summary": "Retrieve a manufacturer by id",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/ingredients",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "public",
+        "summary": "List active pharmaceutical ingredients (optionally filtered by search)",
+        "queryParams": [
+          "search",
+          "isActive"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/ingredients",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "public",
+        "summary": "List active pharmaceutical ingredients (optionally filtered by search)",
+        "queryParams": [
+          "search",
+          "isActive"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/ingredients/{id}",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "public",
+        "summary": "Get an ingredient by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/ingredients/{id}",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "public",
+        "summary": "Get an ingredient by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/shops",
+        "tags": [
+          "Shops"
+        ],
+        "security": "public",
+        "summary": "List all verified marketplace shops",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/shops/{id}",
+        "tags": [
+          "Shops"
+        ],
+        "security": "public",
+        "summary": "Retrieve vendor shop profile by UUID or slug",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/shops/{id}/products",
+        "tags": [
+          "Shops"
+        ],
+        "security": "public",
+        "summary": "Get paginated products for a shop with filters and category breakdown",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "categoryId",
+          "categorySlug",
+          "subCategoryId",
+          "brandId",
+          "minPrice",
+          "maxPrice",
+          "inStock",
+          "minRating",
+          "sort"
+        ],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/inventory/seller-products",
+        "tags": [
+          "Inventory - Seller Products"
+        ],
+        "security": "public",
+        "summary": "List all active seller product listings",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/inventory/seller-products/{id}",
+        "tags": [
+          "Inventory - Seller Products"
+        ],
+        "security": "public",
+        "summary": "Retrieve single seller product offer by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/inventory",
+        "tags": [
+          "Inventory - Stock"
+        ],
+        "security": "public",
+        "summary": "List all inventory balances",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/inventory/{id}",
+        "tags": [
+          "Inventory - Stock"
+        ],
+        "security": "public",
+        "summary": "Retrieve single inventory balance by UUID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/reviews/product/{productId}",
+        "tags": [
+          "Reviews"
+        ],
+        "security": "public",
+        "summary": "Retrieve approved reviews for a product",
+        "queryParams": [
+          "page",
+          "limit"
+        ],
+        "pathParams": [
+          "productId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/categories/tree",
+        "tags": [
+          "Public Categories"
+        ],
+        "security": "public",
+        "summary": "Retrieve active storefront category hierarchy",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/categories",
+        "tags": [
+          "Public Categories"
+        ],
+        "security": "public",
+        "summary": "List all active categories for storefront",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/categories/{slug}/product-types",
+        "tags": [
+          "Public Categories"
+        ],
+        "security": "public",
+        "summary": "List active product types attached to a category",
+        "queryParams": [],
+        "pathParams": [
+          "slug"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/categories/{slug}",
+        "tags": [
+          "Public Categories"
+        ],
+        "security": "public",
+        "summary": "Retrieve active category by slug",
+        "queryParams": [],
+        "pathParams": [
+          "slug"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/homepage",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Optimized homepage aggregated discovery data",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/recently-added",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Retrieve recently added storefront products",
+        "queryParams": [
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/search",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Search and filter storefront catalog products",
+        "queryParams": [
+          "q",
+          "categoryId",
+          "categorySlug",
+          "subCategoryId",
+          "subCategorySlug",
+          "minPrice",
+          "maxPrice",
+          "page",
+          "limit",
+          "brandId",
+          "productTypeId",
+          "categoryPath",
+          "attributes",
+          "minRating",
+          "inStock",
+          "sort"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/featured",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Retrieve featured showcase products for homepage",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/popular",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Retrieve trending / popular products for storefront",
+        "queryParams": [
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/suggestions",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Real-time search keyword suggestions",
+        "queryParams": [
+          "q"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/category-sections",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Homepage category product shelves",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/brands",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "List active storefront brands",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/facets",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Dynamic filter facets for a category or product type",
+        "queryParams": [
+          "categoryId",
+          "categoryPath",
+          "productTypeId",
+          "brandId",
+          "minPrice",
+          "maxPrice",
+          "inStock",
+          "attributes"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/{slug}",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Retrieve product details by URL slug",
+        "queryParams": [],
+        "pathParams": [
+          "slug"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/catalog/{slug}/related",
+        "tags": [
+          "Public Catalog"
+        ],
+        "security": "public",
+        "summary": "Retrieve related product recommendations",
+        "queryParams": [
+          "limit"
+        ],
+        "pathParams": [
+          "slug"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/public/cart/validate",
+        "tags": [
+          "Public Cart"
+        ],
+        "security": "public",
+        "summary": "Validate cart items against live seller price and stock",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/analytics/events/bulk",
+        "tags": [
+          "Analytics"
+        ],
+        "security": "public",
+        "summary": "Track bulk demand events",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/coupons/shop/{shopId}",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "public",
+        "summary": "Public: Get all active coupons for a shop",
+        "queryParams": [],
+        "pathParams": [
+          "shopId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/public/coupons",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "public",
+        "summary": "Public: Get all active marketplace & platform coupons",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/dev/seed",
+        "tags": [
+          "System"
+        ],
+        "security": "public",
+        "summary": "Seed database with sample data",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/banners/public",
+        "tags": [
+          "Banners (CMS)"
+        ],
+        "security": "public",
+        "summary": "Get all active banners (Public)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/flash-sales/active",
+        "tags": [
+          "Flash Sales"
+        ],
+        "security": "public",
+        "summary": "Customer: Get currently active flash sales",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/flash-sales/{id}",
+        "tags": [
+          "Flash Sales"
+        ],
+        "security": "public",
+        "summary": "Public: Get a flash sale by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      }
+    ],
+    "Authenticated (customer/general)": [
+      {
+        "method": "GET",
+        "path": "/api/v1/users",
+        "tags": [
+          "Users"
+        ],
+        "security": "JWT-auth",
+        "summary": "List users with pagination, role filter, and keyword search",
+        "queryParams": [
+          "search",
+          "role",
+          "limit",
+          "page"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/users",
+        "tags": [
+          "Users"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a new staff or user account directly",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/users/{id}",
+        "tags": [
+          "Users"
+        ],
+        "security": "JWT-auth",
+        "summary": "Retrieve a single user by identifier",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/users/{id}/status",
+        "tags": [
+          "Users"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update account lifecycle status",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/users/{id}/roles",
+        "tags": [
+          "Users"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update user assigned roles",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/addresses",
+        "tags": [
+          "Addresses"
+        ],
+        "security": "JWT-auth",
+        "summary": "Save a new delivery address",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/addresses",
+        "tags": [
+          "Addresses"
+        ],
+        "security": "JWT-auth",
+        "summary": "List all addresses for current user",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/addresses/{id}",
+        "tags": [
+          "Addresses"
+        ],
+        "security": "JWT-auth",
+        "summary": "Retrieve single address by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/addresses/{id}",
+        "tags": [
+          "Addresses"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update existing delivery address",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/addresses/{id}",
+        "tags": [
+          "Addresses"
+        ],
+        "security": "JWT-auth",
+        "summary": "Remove address from address book",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/catalog/categories",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a new catalog category (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/categories",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a new catalog category (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/catalog/categories/{id}",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update category details (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/catalog/categories/{id}",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a category (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/categories/{id}",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update category details (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/categories/{id}",
+        "tags": [
+          "Catalog - Categories"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a category (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/catalog/brands",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register a new brand in the catalog (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/brands",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register a new brand in the catalog (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/catalog/brands/{id}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update brand details (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/catalog/brands/{id}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a brand (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/brands/{id}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update brand details (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/brands/{id}",
+        "tags": [
+          "Catalog - Brands"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a brand (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/products",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a new global product in master catalog (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/products/{id}",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a global product (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/products/{id}",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a global product (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/products/{id}/images",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Upload images for product (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/products/{id}/images/{imageId}/primary",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Set primary image for a product (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id",
+          "imageId"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/products/{id}/images/reorder",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Reorder product images sequence (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/products/{id}/images/{imageId}",
+        "tags": [
+          "Catalog - Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete product image (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id",
+          "imageId"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/product-variants",
+        "tags": [
+          "Catalog - Variants"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a new global product variant (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/product-variants/{id}",
+        "tags": [
+          "Catalog - Variants"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a global product variant (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/product-variants/{id}",
+        "tags": [
+          "Catalog - Variants"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a global product variant (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/catalog/attributes",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a reusable catalog attribute (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/attributes",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a reusable catalog attribute (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/catalog/attributes/{id}",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a catalog attribute (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/catalog/attributes/{id}",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a catalog attribute (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/attributes/{id}",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a catalog attribute (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/attributes/{id}",
+        "tags": [
+          "Catalog - Attributes"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a catalog attribute (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/catalog/product-types",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a catalog product type (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/product-types",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a catalog product type (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/catalog/product-types/{id}",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a catalog product type (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/catalog/product-types/{id}",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a catalog product type (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/product-types/{id}",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a catalog product type (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/product-types/{id}",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a catalog product type (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/catalog/product-types/{id}/attributes",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Replace the attribute schema for a product type (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/product-types/{id}/attributes",
+        "tags": [
+          "Catalog - Product Types"
+        ],
+        "security": "JWT-auth",
+        "summary": "Replace the attribute schema for a product type (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/catalog/manufacturers",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register a pharmaceutical manufacturer (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/manufacturers",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register a pharmaceutical manufacturer (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/catalog/manufacturers/{id}",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a manufacturer (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/catalog/manufacturers/{id}",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete an unused manufacturer (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/manufacturers/{id}",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a manufacturer (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/manufacturers/{id}",
+        "tags": [
+          "Catalog - Manufacturers"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete an unused manufacturer (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/catalog/ingredients",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register an active ingredient (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/ingredients",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register an active ingredient (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/catalog/ingredients/{id}",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update an ingredient (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/catalog/ingredients/{id}",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete an ingredient (Admin only; blocked if in use)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/ingredients/{id}",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update an ingredient (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/ingredients/{id}",
+        "tags": [
+          "Catalog - Ingredients"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete an ingredient (Admin only; blocked if in use)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/catalog/medicine/batches",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register a new medicine batch (FEFO tracked)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/medicine/batches",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "List medicine batches with FEFO sorting",
+        "queryParams": [
+          "productVariantId",
+          "status",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/medicine/batches",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register a new medicine batch (FEFO tracked)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/medicine/batches",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "List medicine batches with FEFO sorting",
+        "queryParams": [
+          "productVariantId",
+          "status",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/catalog/medicine/batches/{id}",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get a medicine batch by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/catalog/medicine/batches/{id}",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update medicine batch stock, status or expiry",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/catalog/medicine/batches/{id}",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a medicine batch (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/medicine/batches/{id}",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get a medicine batch by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/medicine/batches/{id}",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update medicine batch stock, status or expiry",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/medicine/batches/{id}",
+        "tags": [
+          "Catalog - Medicine Batches"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a medicine batch (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shops",
+        "tags": [
+          "Shops"
+        ],
+        "security": "JWT-auth",
+        "summary": "Register a new vendor store / shop profile",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/shops/{id}",
+        "tags": [
+          "Shops"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update shop profile details",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/shops/{id}",
+        "tags": [
+          "Shops"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a shop profile (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/inventory/seller-products",
+        "tags": [
+          "Inventory - Seller Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a new seller product listing offer",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/inventory/seller-products/{id}",
+        "tags": [
+          "Inventory - Seller Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update a seller product offer",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/inventory/seller-products/{id}",
+        "tags": [
+          "Inventory - Seller Products"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a seller product offer",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/inventory",
+        "tags": [
+          "Inventory - Stock"
+        ],
+        "security": "JWT-auth",
+        "summary": "Initialize inventory stock record",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/inventory/{id}",
+        "tags": [
+          "Inventory - Stock"
+        ],
+        "security": "JWT-auth",
+        "summary": "Adjust inventory stock quantities and thresholds",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/inventory/{id}",
+        "tags": [
+          "Inventory - Stock"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete inventory record (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/reviews",
+        "tags": [
+          "Reviews"
+        ],
+        "security": "JWT-auth",
+        "summary": "Submit a product review (Customer only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/reviews/user",
+        "tags": [
+          "Reviews"
+        ],
+        "security": "JWT-auth",
+        "summary": "List own submitted reviews (Customer only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/reviews/admin",
+        "tags": [
+          "Reviews"
+        ],
+        "security": "JWT-auth",
+        "summary": "List all reviews for moderation (Admin only)",
+        "queryParams": [
+          "page",
+          "limit",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/orders/checkout",
+        "tags": [
+          "Orders"
+        ],
+        "security": "JWT-auth",
+        "summary": "Process checkout, deduct stock, and initiate order",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/orders",
+        "tags": [
+          "Orders"
+        ],
+        "security": "JWT-auth",
+        "summary": "List own orders for authenticated customer",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/orders/{id}",
+        "tags": [
+          "Orders"
+        ],
+        "security": "JWT-auth",
+        "summary": "Retrieve single order details",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/orders/{id}/cancel",
+        "tags": [
+          "Orders"
+        ],
+        "security": "JWT-auth",
+        "summary": "Cancel an order before dispatch",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/orders/{id}/transition",
+        "tags": [
+          "Orders"
+        ],
+        "security": "JWT-auth",
+        "summary": "Transition order state via authoritative state machine",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications",
+        "tags": [
+          "Notifications"
+        ],
+        "security": "bearer",
+        "summary": "Get current user notifications",
+        "queryParams": [
+          "page",
+          "limit",
+          "unreadOnly"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/product-requests",
+        "tags": [
+          "Product Requests"
+        ],
+        "security": "JWT-auth",
+        "summary": "Submit custom item procurement request (Customer)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-requests",
+        "tags": [
+          "Product Requests"
+        ],
+        "security": "JWT-auth",
+        "summary": "List own product requests (Customer)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/product-requests/{id}",
+        "tags": [
+          "Product Requests"
+        ],
+        "security": "JWT-auth",
+        "summary": "Retrieve single product request details (Customer)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/deliveries/admin",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get all deliveries",
+        "queryParams": [
+          "page",
+          "limit",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/deliveries/customer/{orderId}",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Customer: Get delivery tracking for an order",
+        "queryParams": [],
+        "pathParams": [
+          "orderId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/wishlists",
+        "tags": [
+          "Wishlists"
+        ],
+        "security": "bearer",
+        "summary": "Get current user wishlist",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/wishlists/{productId}",
+        "tags": [
+          "Wishlists"
+        ],
+        "security": "bearer",
+        "summary": "Add product to wishlist",
+        "queryParams": [],
+        "pathParams": [
+          "productId"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/wishlists/{productId}",
+        "tags": [
+          "Wishlists"
+        ],
+        "security": "bearer",
+        "summary": "Remove product from wishlist",
+        "queryParams": [],
+        "pathParams": [
+          "productId"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/coupons/validate",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Customer: Validate and preview coupon discount",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/chat/unread-count",
+        "tags": [
+          "Chat"
+        ],
+        "security": "bearer",
+        "summary": "Get unread message and conversation counts",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/chat/conversations",
+        "tags": [
+          "Chat"
+        ],
+        "security": "bearer",
+        "summary": "Get user conversations",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/conversations",
+        "tags": [
+          "Chat"
+        ],
+        "security": "bearer",
+        "summary": "Create or retrieve existing conversation",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/chat/conversations/{id}",
+        "tags": [
+          "Chat"
+        ],
+        "security": "bearer",
+        "summary": "Get single conversation details",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/chat/conversations/{id}/messages",
+        "tags": [
+          "Chat"
+        ],
+        "security": "bearer",
+        "summary": "Get conversation message history",
+        "queryParams": [
+          "limit",
+          "before"
+        ],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/conversations/{id}/messages",
+        "tags": [
+          "Chat"
+        ],
+        "security": "bearer",
+        "summary": "Send message in conversation",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/chat/conversations/{id}/read",
+        "tags": [
+          "Chat"
+        ],
+        "security": "bearer",
+        "summary": "Mark conversation messages as read",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/banners",
+        "tags": [
+          "Banners (CMS)"
+        ],
+        "security": "bearer",
+        "summary": "Create a new banner (Admin)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/banners",
+        "tags": [
+          "Banners (CMS)"
+        ],
+        "security": "bearer",
+        "summary": "Get all banners (Admin)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/banners/{id}",
+        "tags": [
+          "Banners (CMS)"
+        ],
+        "security": "bearer",
+        "summary": "Get a banner by ID (Admin)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/banners/{id}",
+        "tags": [
+          "Banners (CMS)"
+        ],
+        "security": "bearer",
+        "summary": "Update a banner (Admin)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/banners/{id}",
+        "tags": [
+          "Banners (CMS)"
+        ],
+        "security": "bearer",
+        "summary": "Delete a banner (Admin)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/wallets/my-wallet",
+        "tags": [
+          "Wallets (Seller)"
+        ],
+        "security": "bearer",
+        "summary": "Get current seller wallet balance",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/wallets/my-transactions",
+        "tags": [
+          "Wallets (Seller)"
+        ],
+        "security": "bearer",
+        "summary": "Get current seller wallet transactions ledger",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payouts/request",
+        "tags": [
+          "Payouts"
+        ],
+        "security": "bearer",
+        "summary": "Request a new payout (Seller)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payouts/my-requests",
+        "tags": [
+          "Payouts"
+        ],
+        "security": "bearer",
+        "summary": "Get all payout requests for current seller",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payouts/rider/request",
+        "tags": [
+          "Payouts"
+        ],
+        "security": "bearer",
+        "summary": "Request a new payout (Rider)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payouts/rider/my-requests",
+        "tags": [
+          "Payouts"
+        ],
+        "security": "bearer",
+        "summary": "Get all payout requests for current rider",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payouts",
+        "tags": [
+          "Payouts"
+        ],
+        "security": "bearer",
+        "summary": "Get all payout requests (Admin)",
+        "queryParams": [
+          "status"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/payouts/{id}/review",
+        "tags": [
+          "Payouts"
+        ],
+        "security": "bearer",
+        "summary": "Approve or reject a payout request (Admin)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/disputes/customer",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Customer: Raise a new dispute for an order",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/disputes/customer",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Customer: List my disputes",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/disputes/customer/{id}",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Customer: Get dispute details and conversation",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/disputes/customer/{id}/messages",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Customer: Add message to dispute",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/disputes/seller",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Seller: List disputes against my shop",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/disputes/seller/{id}",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Seller: Get dispute details",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/disputes/seller/{id}/messages",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Seller: Add message to dispute",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/disputes/admin",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Admin: List all marketplace disputes",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/flash-sales",
+        "tags": [
+          "Flash Sales"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Create a flash sale",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/flash-sales",
+        "tags": [
+          "Flash Sales"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get all flash sales",
+        "queryParams": [
+          "page",
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/flash-sales/{id}",
+        "tags": [
+          "Flash Sales"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Update a flash sale",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/flash-sales/{id}",
+        "tags": [
+          "Flash Sales"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Delete a flash sale",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/applications/seller",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Submit a new seller application",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/applications/seller/me",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Get current user seller application status",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/applications/rider",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Submit a new rider application",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/applications/rider/me",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Get current user rider application status",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/announcements",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Create a new announcement or draft (Super Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/announcements",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Get all announcements (history)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/announcements/{id}/send",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Send a draft or scheduled announcement immediately",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/announcements/templates",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Get all announcement templates",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/announcements/templates",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Create a new announcement template",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/announcements/templates/{id}",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Get a specific announcement template",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/announcements/templates/{id}",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Update an announcement template",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/announcements/templates/{id}",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Delete an announcement template",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/announcements/{id}",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Get a specific announcement",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/announcements/{id}",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Update a draft or scheduled announcement",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/announcements/{id}",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Delete an announcement",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/announcements/{id}/cancel",
+        "tags": [
+          "Announcements"
+        ],
+        "security": "bearer",
+        "summary": "Cancel a scheduled announcement",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/broadcasts/my-inbox",
+        "tags": [
+          "Broadcast — User Inbox"
+        ],
+        "security": "bearer",
+        "summary": "List broadcast announcements and messages received by the current user",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "unreadOnly"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/broadcasts/my-inbox/unread-count",
+        "tags": [
+          "Broadcast — User Inbox"
+        ],
+        "security": "bearer",
+        "summary": "Get total unread broadcast count for current user badge indicators",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/broadcasts/my-inbox/{id}",
+        "tags": [
+          "Broadcast — User Inbox"
+        ],
+        "security": "bearer",
+        "summary": "Get details of a specific broadcast message",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/broadcasts/my-inbox/{id}/read",
+        "tags": [
+          "Broadcast — User Inbox"
+        ],
+        "security": "bearer",
+        "summary": "Mark a received broadcast message as read",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/broadcasts/my-inbox/read-all",
+        "tags": [
+          "Broadcast — User Inbox"
+        ],
+        "security": "bearer",
+        "summary": "Mark all received broadcast messages as read",
+        "queryParams": [],
+        "pathParams": []
+      }
+    ],
+    "Authentication": [
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/send-otp",
+        "tags": [
+          "Auth"
+        ],
+        "security": "public",
+        "summary": "Request OTP for phone verification or login",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/verify-otp",
+        "tags": [
+          "Auth"
+        ],
+        "security": "public",
+        "summary": "Verify OTP code and authenticate",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/reset-password",
+        "tags": [
+          "Auth"
+        ],
+        "security": "public",
+        "summary": "Reset account password with OTP",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/register",
+        "tags": [
+          "Auth"
+        ],
+        "security": "public",
+        "summary": "Register new user account with credentials",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/login",
+        "tags": [
+          "Auth"
+        ],
+        "security": "public",
+        "summary": "Password-based user authentication",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/refresh",
+        "tags": [
+          "Auth"
+        ],
+        "security": "public",
+        "summary": "Refresh access token using HTTP-only cookie, body, or header",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/logout",
+        "tags": [
+          "Auth"
+        ],
+        "security": "JWT-auth",
+        "summary": "Terminate session and clear cookies",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/auth/me",
+        "tags": [
+          "Auth"
+        ],
+        "security": "JWT-auth",
+        "summary": "Retrieve authenticated user profile",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/auth/me",
+        "tags": [
+          "Auth"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update current user personal profile",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/auth/me",
+        "tags": [
+          "Auth"
+        ],
+        "security": "JWT-auth",
+        "summary": "Schedule account deletion",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/auth/me/password",
+        "tags": [
+          "Auth"
+        ],
+        "security": "JWT-auth",
+        "summary": "Change account password",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/me/avatar",
+        "tags": [
+          "Auth"
+        ],
+        "security": "JWT-auth",
+        "summary": "Upload user profile avatar image",
+        "queryParams": [],
+        "pathParams": []
+      }
+    ],
+    "Admin": [
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/importer/run",
+        "tags": [
+          "Catalog - Importer"
+        ],
+        "security": "JWT-auth",
+        "summary": "Trigger bulk product import or dry-run (Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/importer/logs",
+        "tags": [
+          "Catalog - Importer"
+        ],
+        "security": "JWT-auth",
+        "summary": "List history of product import runs (Admin only)",
+        "queryParams": [
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/importer/logs/{id}",
+        "tags": [
+          "Catalog - Importer"
+        ],
+        "security": "JWT-auth",
+        "summary": "Retrieve specific import log details (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/reviews/admin/{id}/moderate",
+        "tags": [
+          "Reviews"
+        ],
+        "security": "JWT-auth",
+        "summary": "Moderate review approval status (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/orders/admin/all",
+        "tags": [
+          "Orders"
+        ],
+        "security": "JWT-auth",
+        "summary": "List all platform orders with search (Admin only)",
+        "queryParams": [
+          "page",
+          "limit",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/orders/admin/{id}/status",
+        "tags": [
+          "Orders"
+        ],
+        "security": "JWT-auth",
+        "summary": "Manually override order status (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/admin/all",
+        "tags": [
+          "Payments"
+        ],
+        "security": "bearer",
+        "summary": "List all payment transactions with filters (Admin only)",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "status",
+          "provider"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/admin/{id}",
+        "tags": [
+          "Payments"
+        ],
+        "security": "bearer",
+        "summary": "Get payment transaction details by ID (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/product-requests",
+        "tags": [
+          "Product Requests"
+        ],
+        "security": "JWT-auth",
+        "summary": "List all product requests for fulfillment (Admin only)",
+        "queryParams": [
+          "status",
+          "search",
+          "page",
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/product-requests/{id}",
+        "tags": [
+          "Product Requests"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get product request details (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/product-requests/{id}/status",
+        "tags": [
+          "Product Requests"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update product request fulfillment status (Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/audit-logs",
+        "tags": [
+          "Audit Logs (Admin)"
+        ],
+        "security": "bearer",
+        "summary": "List audit logs (Admin)",
+        "queryParams": [
+          "search",
+          "limit",
+          "page"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/deliveries/admin/assign",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Assign an order to a rider",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/deliveries/admin/riders",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get list of riders",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/analytics/dashboard",
+        "tags": [
+          "Analytics"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get dashboard metrics",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/analytics/demand",
+        "tags": [
+          "Analytics"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get demand analytics reports",
+        "queryParams": [
+          "from",
+          "to"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/analytics/sales",
+        "tags": [
+          "Analytics"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get sales analytics",
+        "queryParams": [
+          "from",
+          "to"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/analytics/products",
+        "tags": [
+          "Analytics"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get products analytics",
+        "queryParams": [
+          "from",
+          "to"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/analytics/customers",
+        "tags": [
+          "Analytics"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get customers analytics",
+        "queryParams": [
+          "from",
+          "to"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/coupons",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Create a new coupon",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/coupons",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get all coupons",
+        "queryParams": [
+          "page",
+          "limit",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/coupons/{id}",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get a single coupon",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/coupons/{id}",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Update a coupon",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/admin/coupons/{id}",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Delete a coupon",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/disputes/admin/{id}",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get full dispute details",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/disputes/admin/{id}/messages",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Post official mediation message",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/disputes/admin/{id}/resolve",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Adjudicate and resolve dispute",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/disputes/admin/{id}/reject",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Reject dispute",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/disputes/admin/{id}/note",
+        "tags": [
+          "Disputes"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Add internal note",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/settings",
+        "tags": [
+          "Settings (Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Get marketplace settings (Admin)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/settings",
+        "tags": [
+          "Settings (Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Update marketplace settings (Admin)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/applications/admin/sellers",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get all seller applications",
+        "queryParams": [
+          "status",
+          "limit",
+          "page"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/applications/admin/sellers/{id}",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get seller application by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/applications/admin/sellers/{id}/approve",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Approve a seller application and activate role + shop",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/applications/admin/sellers/{id}/reject",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Reject a seller application with reason",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/applications/admin/riders",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get all rider applications",
+        "queryParams": [
+          "status",
+          "limit",
+          "page"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/applications/admin/riders/{id}",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Get rider application by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/applications/admin/riders/{id}/approve",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Approve a rider application and activate role",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/applications/admin/riders/{id}/reject",
+        "tags": [
+          "Applications"
+        ],
+        "security": "bearer",
+        "summary": "Admin: Reject a rider application with reason",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/admins/me",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get the authenticated admin profile with effective permissions",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/admins/permissions",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "List all permissions grouped by module",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/admins/roles",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "List roles and their permission sets",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/admins/roles/{role}/permissions",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Replace the permission set of a role (Super Admin only)",
+        "queryParams": [],
+        "pathParams": [
+          "role"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/admins",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "List administrative accounts",
+        "queryParams": [
+          "search",
+          "role",
+          "limit",
+          "page"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/admins",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a new administrative account",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/admins/{id}",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get an administrative account by ID",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/admins/{id}",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update an administrative account",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/admin/admins/{id}",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Deactivate an administrative account",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/admins/{id}/permissions",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Replace the explicit permission grants of an admin",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/admins/{id}/password",
+        "tags": [
+          "Admin Management (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Reset an administrative account password",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/impersonation/start",
+        "tags": [
+          "Impersonation (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Start impersonating a Customer, Seller, or Rider (Super Admin only)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/impersonation/exit",
+        "tags": [
+          "Impersonation (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Exit impersonation and restore the Super Admin session",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/impersonation/target/{userId}",
+        "tags": [
+          "Impersonation (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get paginated impersonation history for a target user (Super Admin only)",
+        "queryParams": [
+          "limit",
+          "page"
+        ],
+        "pathParams": [
+          "userId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/impersonation/sessions",
+        "tags": [
+          "Impersonation (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "List all impersonation sessions platform-wide (Super Admin only)",
+        "queryParams": [
+          "status",
+          "reason",
+          "targetRole",
+          "targetUserId",
+          "search",
+          "limit",
+          "page"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/impersonation/session",
+        "tags": [
+          "Impersonation (Super Admin)"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get the active impersonation session for the current Super Admin",
+        "queryParams": [],
+        "pathParams": []
+      }
+    ],
+    "Payment": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/initiate",
+        "tags": [
+          "Payments"
+        ],
+        "security": "bearer",
+        "summary": "Initiate payment session for an order",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/retry/{orderId}",
+        "tags": [
+          "Payments"
+        ],
+        "security": "bearer",
+        "summary": "Retry payment for an existing unpaid order",
+        "queryParams": [
+          "lang"
+        ],
+        "pathParams": [
+          "orderId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/verify/{transactionId}",
+        "tags": [
+          "Payments"
+        ],
+        "security": "bearer",
+        "summary": "Verify payment status by transaction ID",
+        "queryParams": [],
+        "pathParams": [
+          "transactionId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/order/{orderId}",
+        "tags": [
+          "Payments"
+        ],
+        "security": "bearer",
+        "summary": "Get payment records for an order",
+        "queryParams": [],
+        "pathParams": [
+          "orderId"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/payments/my-payments",
+        "tags": [
+          "Payments"
+        ],
+        "security": "bearer",
+        "summary": "Get payment history for current logged in user",
+        "queryParams": [
+          "page",
+          "limit"
+        ],
+        "pathParams": []
+      }
+    ],
+    "Payment (callback)": [
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/sslcommerz/success",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Hosted Checkout Success Callback",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/success",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Hosted Checkout Success Callback",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/sslcommerz/fail",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Hosted Checkout Fail Callback",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/fail",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Hosted Checkout Fail Callback",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/sslcommerz/cancel",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Hosted Checkout Cancel Callback",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/cancel",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Hosted Checkout Cancel Callback",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/sslcommerz/ipn",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Server-to-Server IPN Webhook",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/ipn",
+        "tags": [
+          "Payments"
+        ],
+        "security": "public",
+        "summary": "SSLCOMMERZ Server-to-Server IPN Webhook",
+        "queryParams": [],
+        "pathParams": []
+      }
+    ],
+    "Notification": [
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/unread-count",
+        "tags": [
+          "Notifications"
+        ],
+        "security": "bearer",
+        "summary": "Get unread notifications count",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/notifications/{id}/read",
+        "tags": [
+          "Notifications"
+        ],
+        "security": "bearer",
+        "summary": "Mark a notification as read",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/notifications/read-all",
+        "tags": [
+          "Notifications"
+        ],
+        "security": "bearer",
+        "summary": "Mark all notifications as read",
+        "queryParams": [],
+        "pathParams": []
+      }
+    ],
+    "Seller": [
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/dashboard",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get seller dashboard metrics",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/analytics",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get seller sales analytics",
+        "queryParams": [
+          "days"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/shop",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get current seller shop profile",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller-portal/shop",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update current seller shop profile",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seller-portal/shop/logo",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Upload shop logo",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seller-portal/shop/banner",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Upload shop cover banner",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/catalog/categories",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "List categories available for product creation",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/catalog/brands",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "List brands available for product creation",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/products",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "List products listed by the seller",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "status",
+          "stock",
+          "categoryId",
+          "sort"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seller-portal/products",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Create a product for the seller shop",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/products/{id}",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get a single product listing",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller-portal/products/{id}",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Update price, stock, status or owned catalog details",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/seller-portal/products/{id}",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Archive a product listing",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seller-portal/products/{id}/images",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Upload optimized product images",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller-portal/products/{id}/images/{imageId}/primary",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Set the primary product image",
+        "queryParams": [],
+        "pathParams": [
+          "id",
+          "imageId"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller-portal/products/{id}/images/reorder",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Reorder product images",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/seller-portal/products/{id}/images/{imageId}",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Delete a product image",
+        "queryParams": [],
+        "pathParams": [
+          "id",
+          "imageId"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller-portal/inventory/bulk",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Bulk update stock levels",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/orders",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "List orders containing this shop’s products",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "status",
+          "needsAction"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/orders/{id}",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get details for one of the shop’s orders",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller-portal/orders/{id}/status",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Transition seller order status",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seller-portal/profile/avatar",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Upload seller avatar",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/reviews",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "List reviews for the shop’s products",
+        "queryParams": [
+          "page",
+          "limit",
+          "search",
+          "rating",
+          "replyState"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller-portal/reviews/summary",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Get the shop review score summary",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller-portal/reviews/{id}/reply",
+        "tags": [
+          "Seller Portal"
+        ],
+        "security": "JWT-auth",
+        "summary": "Reply publicly to a product review",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seller/coupons",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Seller: Create a shop coupon",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/seller/coupons",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Seller: Get all shop coupons",
+        "queryParams": [
+          "page",
+          "limit",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/seller/coupons/{id}",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Seller: Update a shop coupon",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/seller/coupons/{id}",
+        "tags": [
+          "Coupons"
+        ],
+        "security": "bearer",
+        "summary": "Seller: Delete a shop coupon",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      }
+    ],
+    "Rider": [
+      {
+        "method": "GET",
+        "path": "/api/v1/deliveries/rider/dashboard",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get aggregated dashboard metrics and deliveries trend",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/deliveries/rider/assigned",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get assigned deliveries",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/deliveries/rider/history",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get paginated delivery history",
+        "queryParams": [
+          "status",
+          "search",
+          "from",
+          "to",
+          "page",
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/deliveries/rider/{id}",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get specific delivery details",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/deliveries/rider/{id}/status",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Rider/Admin: Update delivery status",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/deliveries/rider/{id}/location",
+        "tags": [
+          "Deliveries"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Update live GPS location",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/riders/me",
+        "tags": [
+          "Riders"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get my operational profile",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/riders/me",
+        "tags": [
+          "Riders"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Update my contact & vehicle details",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/riders/me/availability",
+        "tags": [
+          "Riders"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Set my availability",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/riders/me/dashboard",
+        "tags": [
+          "Riders"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get operational dashboard",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/riders/me/earnings",
+        "tags": [
+          "Riders"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get my earnings ledger",
+        "queryParams": [
+          "status",
+          "from",
+          "to",
+          "page",
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/riders/me/earnings/summary",
+        "tags": [
+          "Riders"
+        ],
+        "security": "bearer",
+        "summary": "Rider: Get my earnings summary",
+        "queryParams": [],
+        "pathParams": []
+      }
+    ],
+    "Super Admin": [
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/templates",
+        "tags": [
+          "Broadcast — Templates (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "List broadcast templates",
+        "queryParams": [
+          "page",
+          "limit",
+          "status",
+          "category",
+          "search"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/super-admin/broadcast/templates",
+        "tags": [
+          "Broadcast — Templates (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Create a broadcast template",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/templates/{id}",
+        "tags": [
+          "Broadcast — Templates (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Get a broadcast template",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/super-admin/broadcast/templates/{id}",
+        "tags": [
+          "Broadcast — Templates (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Update a broadcast template",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/super-admin/broadcast/templates/{id}",
+        "tags": [
+          "Broadcast — Templates (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Delete a broadcast template",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/super-admin/broadcast/templates/{id}/status",
+        "tags": [
+          "Broadcast — Templates (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Change a broadcast template status",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/audience/segments",
+        "tags": [
+          "Broadcast — Audience (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Audience segment counts and marketing consent overview",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/audience/customers",
+        "tags": [
+          "Broadcast — Audience (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Search customers for a SELECTED_CUSTOMERS audience",
+        "queryParams": [
+          "search",
+          "limit"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/super-admin/broadcast/audience/preview",
+        "tags": [
+          "Broadcast — Audience (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Preview the resolved audience and recipient count",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/campaigns",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "List broadcast campaigns (history, filterable)",
+        "queryParams": [
+          "page",
+          "limit",
+          "status",
+          "audienceType",
+          "search",
+          "from",
+          "to",
+          "sortBy",
+          "sortOrder"
+        ],
+        "pathParams": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/super-admin/broadcast/campaigns",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Create a broadcast campaign (draft or scheduled)",
+        "queryParams": [],
+        "pathParams": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/campaigns/{id}",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Get a broadcast campaign by id",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/super-admin/broadcast/campaigns/{id}",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Update a draft or scheduled campaign",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/super-admin/broadcast/campaigns/{id}/test",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Send a test message through the active provider",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/super-admin/broadcast/campaigns/{id}/send",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Send a campaign now (resolves audience and queues recipients)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/super-admin/broadcast/campaigns/{id}/cancel",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Cancel a draft or scheduled campaign",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/campaigns/{id}/stats",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Campaign delivery statistics (mock stats are simulated)",
+        "queryParams": [],
+        "pathParams": [
+          "id"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/super-admin/broadcast/campaigns/{id}/recipients",
+        "tags": [
+          "Broadcast — Campaigns (Super Admin)"
+        ],
+        "security": "bearer",
+        "summary": "Paginated campaign recipient delivery list",
+        "queryParams": [
+          "page",
+          "limit",
+          "status",
+          "search"
+        ],
+        "pathParams": [
+          "id"
+        ]
+      }
+    ]
+  }
+}

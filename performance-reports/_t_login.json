@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-10-04T05:39:24.171Z",
+  "baseUrl": "http://localhost:4005",
+  "concurrency": 10,
+  "durationSeconds": 8,
+  "warmupSeconds": 2,
+  "note": "Measured on a local production-mode NestJS instance (NODE_ENV=production, TypeORM query logging off, in-memory cache). Throttling raised on the benchmark instance only.",
+  "totalElapsedMs": 11860,
+  "results": [
+    {
+      "group": "Auth",
+      "name": "POST auth/login (customer)",
+      "method": "POST",
+      "route": "/api/v1/auth/login",
+      "auth": "public",
+      "concurrency": 10,
+      "durationSeconds": 8,
+      "coldMs": 169,
+      "payloadBytes": 1052,
+      "requests": {
+        "total": 41,
+        "success2xx": 41,
+        "failed": 0,
+        "timeouts": 0,
+        "rps": 5.13
+      },
+      "latencyMs": {
+        "avg": 1730.98,
+        "min": 1416,
+        "max": 2798,
+        "p50": 1571,
+        "p99": 2798
+      },
+      "throughputKbps": 14.47,
+      "errorRate": 0
+    }
+  ]
+}

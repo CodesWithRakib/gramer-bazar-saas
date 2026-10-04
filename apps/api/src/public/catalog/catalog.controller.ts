@@ -133,8 +133,11 @@ export class PublicCatalogController {
     description: 'List of category product sections',
   })
   @ApiCommonErrors([500])
-  getCategorySections() {
-    return this.catalogService.getCategorySections();
+  getCategorySections(@Query('limit') limit?: string) {
+    const parsed = limit !== undefined ? Number(limit) : undefined;
+    return this.catalogService.getCategorySections(
+      parsed !== undefined && Number.isFinite(parsed) ? parsed : undefined,
+    );
   }
 
   @Get('brands')

@@ -1,0 +1,121 @@
+{
+  "label": "before",
+  "db": "gramer_bazar_p2",
+  "generatedAt": "2026-10-04T06:47:55.962Z",
+  "queries": [
+    {
+      "key": "categories_productCounts",
+      "planningMs": 13.017,
+      "executionMs": 46218.159,
+      "nodeTypes": [
+        "Seq Scan",
+        "Aggregate",
+        "Sort",
+        "Nested Loop",
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "reviews_by_product_approved",
+      "planningMs": 1.163,
+      "executionMs": 96.206,
+      "nodeTypes": [
+        "Aggregate",
+        "Gather Merge",
+        "Sort",
+        "Seq Scan"
+      ]
+    },
+    {
+      "key": "reviews_admin_order",
+      "planningMs": 0.161,
+      "executionMs": 114.261,
+      "nodeTypes": [
+        "Limit",
+        "Gather Merge",
+        "Sort",
+        "Seq Scan"
+      ]
+    },
+    {
+      "key": "search_name_asc",
+      "planningMs": 14.827,
+      "executionMs": 664.552,
+      "nodeTypes": [
+        "Limit",
+        "Incremental Sort",
+        "Nested Loop",
+        "Gather Merge",
+        "Sort",
+        "Hash Join",
+        "Seq Scan",
+        "Hash",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "key": "search_price_asc",
+      "planningMs": 1.246,
+      "executionMs": 9.629,
+      "nodeTypes": [
+        "Limit",
+        "Incremental Sort",
+        "Nested Loop",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "key": "search_newest",
+      "planningMs": 1.159,
+      "executionMs": 72.896,
+      "nodeTypes": [
+        "Limit",
+        "Nested Loop",
+        "Gather Merge",
+        "Incremental Sort",
+        "Index Scan",
+        "Memoize"
+      ]
+    },
+    {
+      "key": "products_by_category",
+      "planningMs": 0.178,
+      "executionMs": 0.041,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "products_by_brand",
+      "planningMs": 0.197,
+      "executionMs": 0.137,
+      "nodeTypes": [
+        "Bitmap Heap Scan",
+        "Bitmap Index Scan"
+      ]
+    },
+    {
+      "key": "trgm_name_en_search",
+      "planningMs": 0.228,
+      "executionMs": 174.916,
+      "nodeTypes": [
+        "Seq Scan"
+      ]
+    },
+    {
+      "key": "products_rating_sort",
+      "planningMs": 0.255,
+      "executionMs": 84.055,
+      "nodeTypes": [
+        "Limit",
+        "Gather Merge",
+        "Sort",
+        "Seq Scan"
+      ]
+    }
+  ]
+}
