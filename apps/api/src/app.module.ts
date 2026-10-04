@@ -63,7 +63,11 @@ import { BroadcastSystem1791200000000 } from './migrations/1791200000000-Broadca
 import { DisputeSystemUpgrade1791300000000 } from './migrations/1791300000000-DisputeSystemUpgrade.js';
 import { ScalableCatalogTaxonomy1791400000000 } from './migrations/1791400000000-ScalableCatalogTaxonomy.js';
 import { MedicineCatalog1791500000000 } from './migrations/1791500000000-MedicineCatalog.js';
+import { AddAnnouncementsTable1790865560497 } from './migrations/1790865560497-AddAnnouncementsTable.js';
+import { SeedAnnouncementTemplates1791200000000 } from './migrations/1791200000000-SeedAnnouncementTemplates.js';
+import { FixDisputeStatusEnum1791600000000 } from './migrations/1791600000000-FixDisputeStatusEnum.js';
 import { FashionColorSwatches1791700000000 } from './migrations/1791700000000-FashionColorSwatches.js';
+import { SearchAndPaginationIndexes1792000000000 } from './migrations/1792000000000-SearchAndPaginationIndexes.js';
 import { BroadcastModule } from './broadcast/broadcast.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -90,7 +94,13 @@ import { ScheduleModule } from '@nestjs/schedule';
         const syncEnabled =
           configService.get<string>('DB_SYNCHRONIZE') === 'true' ||
           (nodeEnv !== 'production' && configService.get<string>('DB_SYNCHRONIZE') !== 'false');
-        const migrationsRun = configService.get<string>('MIGRATIONS_RUN') === 'true';
+        const migrationsRun =
+          configService.get<string>('MIGRATIONS_RUN') === 'true' ||
+          configService.get<string>('MIGRATION') === 'true' ||
+          configService.get<string>('RUN_MIGRATIONS') === 'true' ||
+          process.env.MIGRATION === 'true' ||
+          process.env.MIGRATIONS_RUN === 'true' ||
+          process.env.RUN_MIGRATIONS === 'true';
 
         return {
           type: 'postgres',
@@ -103,15 +113,19 @@ import { ScheduleModule } from '@nestjs/schedule';
             AddPerformanceIndexes1790600000000,
             RiderSystem1790700000000,
             SellerSystem1790800000000,
+            AddAnnouncementsTable1790865560497,
             CreateRefundEntity1790870236048,
             AdminRbac1790900000000,
             ImpersonationSessions1791000000000,
             NotificationsUpgrade1791100000000,
             BroadcastSystem1791200000000,
+            SeedAnnouncementTemplates1791200000000,
             DisputeSystemUpgrade1791300000000,
             ScalableCatalogTaxonomy1791400000000,
             MedicineCatalog1791500000000,
+            FixDisputeStatusEnum1791600000000,
             FashionColorSwatches1791700000000,
+            SearchAndPaginationIndexes1792000000000,
           ],
           migrationsRun,
           ssl: isSsl ? { rejectUnauthorized: false } : false,

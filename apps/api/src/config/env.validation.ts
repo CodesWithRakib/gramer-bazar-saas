@@ -53,6 +53,8 @@ export const envValidationSchema = z
     SUPABASE_BUCKET: z.string().default('gramer-bazar'),
     DB_SYNCHRONIZE: z.string().optional(),
     MIGRATIONS_RUN: z.string().optional(),
+    MIGRATION: z.string().optional(),
+    RUN_MIGRATIONS: z.string().optional(),
     // Broadcast & Marketing Communication
     BROADCAST_PROVIDER: z.enum(['mock', 'whatsapp']).default('mock'),
     BROADCAST_MOCK_FAILURE_RATE: z.coerce.number().min(0).max(1).optional(),
