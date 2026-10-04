@@ -13,7 +13,7 @@ config({ path: join(__dirname, '../../../.env') });
 
 const dbUrl =
   process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/gramer_bazar';
-const isSsl = dbUrl.includes('sslmode=require') || process.env.NODE_ENV === 'production';
+const isSsl = process.env.NODE_ENV === 'production' && !dbUrl.includes('localhost') && !dbUrl.includes('127.0.0.1');
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',

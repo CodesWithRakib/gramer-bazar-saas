@@ -1,0 +1,233 @@
+{
+  "timestamp": "2026-10-04T04:33:03.923Z",
+  "environment": "local",
+  "baseUrl": "http://localhost:4000",
+  "database": "PostgreSQL - Pool configuration retained",
+  "results": [
+    {
+      "scenario": "catalog_newest",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 18,
+        "successful": 18,
+        "failed": 0,
+        "requestsPerSecond": 9
+      },
+      "latencyMs": {
+        "avg": 970.06,
+        "p50": 1273,
+        "p99": 1590,
+        "max": 1590
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "catalog_price_asc",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 34,
+        "successful": 34,
+        "failed": 0,
+        "requestsPerSecond": 17
+      },
+      "latencyMs": {
+        "avg": 538.36,
+        "p50": 528,
+        "p99": 790,
+        "max": 790
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "catalog_price_desc",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 40,
+        "successful": 40,
+        "failed": 0,
+        "requestsPerSecond": 20
+      },
+      "latencyMs": {
+        "avg": 431.43,
+        "p50": 380,
+        "p99": 745,
+        "max": 745
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "catalog_name_asc",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 0,
+        "successful": 0,
+        "failed": 0,
+        "requestsPerSecond": 0
+      },
+      "latencyMs": {
+        "avg": 0,
+        "p50": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "errorRate": null
+    },
+    {
+      "scenario": "search_english",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 24,
+        "successful": 24,
+        "failed": 0,
+        "requestsPerSecond": 12
+      },
+      "latencyMs": {
+        "avg": 708.25,
+        "p50": 700,
+        "p99": 1143,
+        "max": 1143
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "search_bangla",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 0,
+        "successful": 0,
+        "failed": 0,
+        "requestsPerSecond": 0
+      },
+      "latencyMs": {
+        "avg": 0,
+        "p50": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "errorRate": null
+    },
+    {
+      "scenario": "search_partial",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 10,
+        "successful": 10,
+        "failed": 0,
+        "requestsPerSecond": 5
+      },
+      "latencyMs": {
+        "avg": 1494.5,
+        "p50": 1543,
+        "p99": 1711,
+        "max": 1711
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "search_typo",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 0,
+        "successful": 0,
+        "failed": 0,
+        "requestsPerSecond": 0
+      },
+      "latencyMs": {
+        "avg": 0,
+        "p50": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "errorRate": null
+    },
+    {
+      "scenario": "search_short",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 13,
+        "successful": 13,
+        "failed": 0,
+        "requestsPerSecond": 6.5
+      },
+      "latencyMs": {
+        "avg": 1157.85,
+        "p50": 1103,
+        "p99": 1670,
+        "max": 1670
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "filter_price",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 31,
+        "successful": 31,
+        "failed": 0,
+        "requestsPerSecond": 15.5
+      },
+      "latencyMs": {
+        "avg": 571.65,
+        "p50": 576,
+        "p99": 781,
+        "max": 781
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "filter_stock",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 33,
+        "successful": 33,
+        "failed": 0,
+        "requestsPerSecond": 16.5
+      },
+      "latencyMs": {
+        "avg": 518.04,
+        "p50": 427,
+        "p99": 922,
+        "max": 922
+      },
+      "errorRate": 0
+    },
+    {
+      "scenario": "mixed_realistic_traffic",
+      "concurrency": 10,
+      "durationSeconds": 2,
+      "requests": {
+        "total": 32,
+        "successful": 32,
+        "failed": 0,
+        "requestsPerSecond": 16
+      },
+      "latencyMs": {
+        "avg": 528.97,
+        "p50": 488,
+        "p99": 905,
+        "max": 905
+      },
+      "errorRate": 0
+    }
+  ],
+  "cursorResult": {
+    "scenario": "cursor_deep_traversal",
+    "pagesTraversed": 100,
+    "latencyMs": {
+      "avg": 168.5676519999992,
+      "p50": 152.95939999999246,
+      "p95": 223.97959999999148
+    }
+  }
+}

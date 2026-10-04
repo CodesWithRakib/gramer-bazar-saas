@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import { Review } from './entities/review.entity.js';
+import { Product } from '../catalog/entities/product.entity.js';
 import { OrderStatus } from '../orders/enums/order-status.enum.js';
 
 @Injectable()
@@ -11,6 +12,55 @@ export class ReviewsService {
     private readonly reviewRepo: Repository<Review>,
     private readonly dataSource: DataSource,
   ) {}
+
+  /**
+   * Reconciles the product's denormalized review counts/averages with the authoritative reviews table.
+   * MUST be executed inside a transaction manager.
+   * Acquires a row lock on the product to serialize concurrent updates.
+   */
+  async recalculateProductReviewAggregate(productId: string, manager: EntityManager) {
+    // 1. Lock the product row to serialize concurrent aggregations
+    const product = await manager
+      .createQueryBuilder(Product, 'product')
+      .where('product.id = :productId', { productId })
+      .setLock('pessimistic_write')
+      .getOne();
+
+    if (!product) {
+      // Product may have been deleted, no aggregate to update.
+      return null;
+    }
+
+    // 2. Authoritative aggregate query
+    // Includes ONLY reviews where is_approved = true
+    const [{ total, average }] = await manager.query(
+      `
+      SELECT 
+        COUNT(*)::int as total, 
+        COALESCE(ROUND(AVG(rating)::numeric, 2), 0) as average 
+      FROM reviews 
+      WHERE product_id = $1 AND is_approved = true
+      `,
+      [productId]
+    );
+
+    const totalReviews = parseInt(total, 10);
+    const averageRating = parseFloat(average);
+
+    // 3. Update the locked product
+    await manager.query(
+      `
+      UPDATE products 
+      SET 
+        total_reviews = $1, 
+        average_rating = $2 
+      WHERE id = $3
+      `,
+      [totalReviews, averageRating, productId]
+    );
+
+    return { totalReviews, averageRating };
+  }
 
   async getProductReviews(productId: string, page = 1, limit = 10) {
     const [items, total] = await this.reviewRepo.findAndCount({
@@ -80,19 +130,59 @@ export class ReviewsService {
       );
     }
 
-    // 3. Add review (auto-approved by default based on config)
-    const review = this.reviewRepo.create({
-      userId,
-      productId,
-      rating,
-      comment,
-      images,
-      isApproved: true,
-    });
+    // 3. Add review inside a transaction
+    return this.dataSource.transaction(async (manager) => {
+      const review = manager.create(Review, {
+        userId,
+        productId,
+        rating,
+        comment,
+        images,
+        isApproved: true,
+      });
 
-    await this.reviewRepo.save(review);
-    await this.recalculateProductRating(productId);
-    return review;
+      await manager.save(review);
+      await this.recalculateProductReviewAggregate(productId, manager);
+      return review;
+    });
+  }
+
+  async updateReview(
+    userId: string,
+    reviewId: string,
+    rating?: number,
+    comment?: string,
+    images?: string[],
+  ) {
+    return this.dataSource.transaction(async (manager) => {
+      const review = await manager.findOne(Review, {
+        where: { id: reviewId, userId },
+      });
+
+      if (!review) throw new NotFoundException('Review not found or unauthorized');
+
+      if (rating !== undefined) review.rating = rating;
+      if (comment !== undefined) review.comment = comment;
+      if (images !== undefined) review.images = images;
+
+      await manager.save(review);
+      await this.recalculateProductReviewAggregate(review.productId, manager);
+      return review;
+    });
+  }
+
+  async deleteReview(userId: string, reviewId: string) {
+    return this.dataSource.transaction(async (manager) => {
+      const review = await manager.findOne(Review, {
+        where: { id: reviewId, userId },
+      });
+
+      if (!review) throw new NotFoundException('Review not found or unauthorized');
+
+      const productId = review.productId;
+      await manager.remove(review);
+      await this.recalculateProductReviewAggregate(productId, manager);
+    });
   }
 
   async getUserReviews(userId: string) {
@@ -141,29 +231,18 @@ export class ReviewsService {
   }
 
   async moderateReview(id: string, isApproved: boolean) {
-    const review = await this.reviewRepo.findOne({ where: { id } });
-    if (!review) throw new NotFoundException('Review not found');
+    return this.dataSource.transaction(async (manager) => {
+      const review = await manager.findOne(Review, { where: { id } });
+      if (!review) throw new NotFoundException('Review not found');
 
-    review.isApproved = isApproved;
-    await this.reviewRepo.save(review);
-    await this.recalculateProductRating(review.productId);
-    return review;
-  }
+      if (review.isApproved === isApproved) {
+        return review; // Idempotent
+      }
 
-  private async recalculateProductRating(productId: string) {
-    await this.dataSource.query(
-      `
-      UPDATE products
-      SET 
-        total_reviews = (
-          SELECT COUNT(*) FROM reviews WHERE product_id = $1 AND is_approved = true
-        ),
-        average_rating = (
-          SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = $1 AND is_approved = true
-        )
-      WHERE id = $1;
-      `,
-      [productId]
-    );
+      review.isApproved = isApproved;
+      await manager.save(review);
+      await this.recalculateProductReviewAggregate(review.productId, manager);
+      return review;
+    });
   }
 }

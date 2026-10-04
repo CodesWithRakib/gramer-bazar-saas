@@ -90,7 +90,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       useFactory: (configService: ConfigService) => {
         const dbUrl = configService.get<string>('database.url');
         const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
-        const isSsl = dbUrl?.includes('sslmode=require') || nodeEnv === 'production';
+        const isSsl = nodeEnv === 'production' && !dbUrl?.includes('localhost') && !dbUrl?.includes('127.0.0.1');
         const syncEnabled =
           configService.get<string>('DB_SYNCHRONIZE') === 'true' ||
           (nodeEnv !== 'production' && configService.get<string>('DB_SYNCHRONIZE') !== 'false');

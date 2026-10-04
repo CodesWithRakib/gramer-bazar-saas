@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Patch,
+  Delete,
   Param,
   Query,
   UseGuards,
@@ -14,6 +15,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
+import { UpdateReviewDto } from './dto/update-review.dto.js';
 import { ReviewResponseDto, ModerateReviewDto } from './dto/review-response.dto.js';
 import {
   ApiStandardResponse,
@@ -144,5 +146,52 @@ export class ReviewsController {
   @ApiCommonErrors([400, 401, 403, 404, 500])
   moderateReview(@Param('id', ParseUUIDPipe) id: string, @Body() dto: ModerateReviewDto) {
     return this.reviewsService.moderateReview(id, dto.isApproved);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.CUSTOMER)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Update your review (Customer only)',
+    description: 'Requires CUSTOMER role. Updates an existing review submitted by you.',
+  })
+  @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Review UUID' })
+  @ApiStandardResponse({
+    type: ReviewResponseDto,
+    status: HttpStatus.OK,
+    description: 'Review updated successfully',
+  })
+  @ApiCommonErrors([400, 401, 403, 404, 500])
+  updateReview(
+    @Request() req: any,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateReviewDto,
+  ) {
+    return this.reviewsService.updateReview(
+      req.user.id,
+      id,
+      dto.rating,
+      dto.comment,
+      dto.images,
+    );
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.CUSTOMER)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Delete your review (Customer only)',
+    description: 'Requires CUSTOMER role. Deletes a review you submitted.',
+  })
+  @ApiParam({ name: 'id', type: String, format: 'uuid', description: 'Review UUID' })
+  @ApiStandardResponse({
+    status: HttpStatus.OK,
+    description: 'Review deleted successfully',
+  })
+  @ApiCommonErrors([401, 403, 404, 500])
+  deleteReview(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
+    return this.reviewsService.deleteReview(req.user.id, id);
   }
 }
