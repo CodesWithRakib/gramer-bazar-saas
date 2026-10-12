@@ -106,4 +106,32 @@ export class AnalyticsController {
   getCustomersAnalytics(@Query('from') from?: string, @Query('to') to?: string) {
     return this.analyticsService.getCustomersAnalytics(from, to);
   }
+
+  @Get('admin/analytics/forecasting/seasonal')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reports.read')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin: Get agricultural seasonal demand forecast',
+    description:
+      'Projects seasonal commodity demand surges and warehouse safety buffer requirements across Bangladesh crop cycles.',
+  })
+  getSeasonalDemandForecast(@Query('season') season?: string) {
+    return this.analyticsService.getSeasonalDemandForecast(season);
+  }
+
+  @Get('admin/analytics/forecasting/regional')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Permissions('reports.read')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin: Get regional rural demand density breakdown',
+    description:
+      'Aggregates orders and GMV across divisions and districts to identify high-density consumer clusters.',
+  })
+  getRegionalDemandBreakdown() {
+    return this.analyticsService.getRegionalDemandBreakdown();
+  }
 }

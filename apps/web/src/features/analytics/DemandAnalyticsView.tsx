@@ -1,7 +1,11 @@
 'use client';
 
-import React, { use } from 'react';
-import { useGetDemandAnalyticsQuery } from '@/features/analytics/analyticsApi';
+import React from 'react';
+import {
+  useGetDemandAnalyticsQuery,
+  useGetSeasonalDemandForecastQuery,
+  useGetRegionalDemandBreakdownQuery,
+} from '@/features/analytics/analyticsApi';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Table,
@@ -11,8 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Search, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Search, AlertTriangle, TrendingUp, Sprout, MapPin, Calendar, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { formatCurrency } from '@/lib/format';
 
 export interface DemandAnalyticsViewProps {
   lang?: string;
@@ -22,6 +27,8 @@ export interface DemandAnalyticsViewProps {
 export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
   const isBn = lang === 'bn';
   const { data, isLoading } = useGetDemandAnalyticsQuery();
+  const { data: seasonalData, isLoading: isSeasonalLoading } = useGetSeasonalDemandForecastQuery();
+  const { data: regionalData, isLoading: isRegionalLoading } = useGetRegionalDemandBreakdownQuery();
 
   if (isLoading) {
     return (
@@ -240,6 +247,144 @@ export function DemandAnalyticsView({ lang = 'en' }: DemandAnalyticsViewProps) {
           </div>
         </div>
       </div>
+
+      {/* Seasonal Commodity Demand Forecasting (BI) */}
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <Sprout className="w-5 h-5 text-emerald-600" />
+            <span>{isBn ? 'মৌসুমী কৃষি পণ্য চাহিদা পূর্বাভাস' : 'Seasonal Commodity Demand Forecast'}</span>
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {isBn
+              ? 'বাংলাদেশের ঋতুভিত্তিক ফসলের চক্র এবং সার্চ ভেলোসিটির উপর ভিত্তি করে ভবিষ্যৎ চাহিদা প্রক্ষেপণ।'
+              : 'Forward-looking demand projections based on Bangladesh crop cycles and search velocity.'}
+          </p>
+        </div>
+
+        {seasonalData && (
+          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:p-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-emerald-500/20 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-xs">
+                    {isBn ? seasonalData.seasonBn : seasonalData.seasonEn}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {seasonalData.periodMonths}
+                  </span>
+                </div>
+                <p className="text-xs text-foreground font-medium mt-2">
+                  {isBn ? seasonalData.insightsBn : seasonalData.insightsEn}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 shrink-0">
+                <div className="text-right">
+                  <div className="text-xs text-muted-foreground">{isBn ? 'প্রত্যাশিত বৃদ্ধি' : 'Projected Surge'}</div>
+                  <div className="text-lg font-bold text-emerald-600">+{seasonalData.projectedSurgePercent}%</div>
+                </div>
+                <div className="text-right border-s border-emerald-500/20 ps-4">
+                  <div className="text-xs text-muted-foreground">{isBn ? 'প্রস্তাবিত বাফার' : 'Safety Buffer'}</div>
+                  <div className="text-lg font-bold text-foreground">{seasonalData.recommendedSafetyBufferPercent}%</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Commodities Table */}
+            <div className="mt-4 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-emerald-500/10">
+                    <TableHead className="text-xs font-semibold">{isBn ? 'পণ্য' : 'Commodity'}</TableHead>
+                    <TableHead className="text-xs font-semibold text-center">{isBn ? 'পূর্বাভাস (কেজি)' : 'Forecasted Volume'}</TableHead>
+                    <TableHead className="text-xs font-semibold text-center">{isBn ? 'বৃদ্ধির হার' : 'Growth'}</TableHead>
+                    <TableHead className="text-xs font-semibold text-end">{isBn ? 'ঝুঁকি স্তর' : 'Risk Tier'}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {seasonalData.commodities?.map((item, i) => (
+                    <TableRow key={i} className="border-emerald-500/10 text-xs">
+                      <TableCell className="font-medium text-foreground">
+                        {isBn ? item.nameBn : item.nameEn}
+                      </TableCell>
+                      <TableCell className="text-center font-bold">
+                        {item.forecastDemandKg.toLocaleString()} KG
+                      </TableCell>
+                      <TableCell className="text-center text-emerald-600 font-bold">
+                        {item.growthRate}
+                      </TableCell>
+                      <TableCell className="text-end">
+                        <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-700 bg-emerald-500/10">
+                          {item.riskLevel}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Regional Rural Demand Breakdown */}
+      {regionalData && (
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-primary" />
+              <span>{isBn ? 'আঞ্চলিক গ্রামীণ চাহিদা ঘনত্ব' : 'Regional Demand Density Breakdown'}</span>
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {isBn
+                ? 'বিভাগ ও জেলাভিত্তিক অর্ডারের ঘনত্ব এবং গড় ভ্যালু বিশ্লেষণ।'
+                : 'Order volume, gross merchandise value, and delivery density grouped across regions.'}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden dark:border-border dark:bg-card">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-gray-50 dark:bg-muted/40 text-xs font-semibold">
+                  <TableRow>
+                    <TableHead>{isBn ? 'বিভাগ' : 'Division'}</TableHead>
+                    <TableHead>{isBn ? 'জেলা' : 'District'}</TableHead>
+                    <TableHead className="text-center">{isBn ? 'অর্ডার সংখ্যা' : 'Orders'}</TableHead>
+                    <TableHead className="text-center">{isBn ? 'মোট জিএমভি' : 'Total GMV'}</TableHead>
+                    <TableHead className="text-center">{isBn ? 'গড় অর্ডার মান' : 'Avg Order'}</TableHead>
+                    <TableHead className="text-end">{isBn ? 'ঘনত্ব স্তর' : 'Density Tier'}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="text-xs">
+                  {regionalData.regions?.map((reg, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell className="font-medium">{reg.division}</TableCell>
+                      <TableCell>{reg.district}</TableCell>
+                      <TableCell className="text-center font-bold">{reg.orderCount}</TableCell>
+                      <TableCell className="text-center font-mono">{formatCurrency(reg.totalGmv, lang)}</TableCell>
+                      <TableCell className="text-center font-mono">{formatCurrency(reg.avgOrderValue, lang)}</TableCell>
+                      <TableCell className="text-end">
+                        <Badge
+                          variant="secondary"
+                          className={
+                            reg.densityTier === 'HIGH_DENSITY'
+                              ? 'bg-primary/10 text-primary border-primary/20'
+                              : ''
+                          }
+                        >
+                          {reg.densityTier}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

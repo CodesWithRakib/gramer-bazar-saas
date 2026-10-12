@@ -1,0 +1,49 @@
+{
+  "packageId": "com.gramerbazar.app",
+  "host": "gramer-bazar-saas.vercel.app",
+  "name": "Gramer Bazar",
+  "launcherName": "Gramer Bazar",
+  "themeColor": "#EA580C",
+  "navigationColor": "#EA580C",
+  "backgroundColor": "#FCFBF9",
+  "enableNotifications": true,
+  "startUrl": "/bn",
+  "iconUrl": "https://gramer-bazar-saas.vercel.app/icon.png",
+  "maskableIconUrl": "https://gramer-bazar-saas.vercel.app/icon.png",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Orders",
+      "shortName": "Orders",
+      "url": "https://gramer-bazar-saas.vercel.app/bn/customer/orders",
+      "icon": "https://gramer-bazar-saas.vercel.app/icon.png"
+    },
+    {
+      "name": "Products",
+      "shortName": "Products",
+      "url": "https://gramer-bazar-saas.vercel.app/bn/products",
+      "icon": "https://gramer-bazar-saas.vercel.app/icon.png"
+    },
+    {
+      "name": "Wallet",
+      "shortName": "Wallet",
+      "url": "https://gramer-bazar-saas.vercel.app/bn/customer/wallet",
+      "icon": "https://gramer-bazar-saas.vercel.app/icon.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://gramer-bazar-saas.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  }
+}

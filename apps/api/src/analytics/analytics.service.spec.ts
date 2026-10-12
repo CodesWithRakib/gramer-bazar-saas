@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { vi } from 'vitest';
 import { AnalyticsService } from './analytics.service.js';
 import { DemandEvent } from './entities/demand-event.entity.js';
 import { Order } from '../orders/entities/order.entity.js';
@@ -39,5 +40,51 @@ describe('AnalyticsService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('generates seasonal demand forecast with agricultural projections', async () => {
+    (service as any).demandEventRepository = {
+      createQueryBuilder: vi.fn(() => ({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        getCount: vi.fn().mockResolvedValue(150),
+      })),
+    };
+
+    const forecast = await service.getSeasonalDemandForecast('SUMMER');
+    expect(forecast.activeSeason).toBe('SUMMER');
+    expect(forecast.projectedSurgePercent).toBe(42);
+    expect(forecast.commodities.length).toBeGreaterThan(0);
+    expect(forecast.recentSearchVelocity).toBe(150);
+  });
+
+  it('generates regional demand breakdown grouped by division and district', async () => {
+    (service as any).orderRepository = {
+      createQueryBuilder: vi.fn(() => ({
+        innerJoin: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        addSelect: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        addGroupBy: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        getRawMany: vi.fn().mockResolvedValue([
+          {
+            division: 'Rajshahi',
+            district: 'Bogra',
+            orderCount: '65',
+            totalGmv: '135000',
+            avgOrderValue: '2077',
+          },
+        ]),
+      })),
+    };
+
+    const breakdown = await service.getRegionalDemandBreakdown();
+    expect(breakdown.regions.length).toBe(1);
+    expect(breakdown.regions[0].district).toBe('Bogra');
+    expect(breakdown.regions[0].densityTier).toBe('HIGH_DENSITY');
+    expect(breakdown.totalRegionalOrders).toBe(65);
   });
 });

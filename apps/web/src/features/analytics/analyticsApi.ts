@@ -99,6 +99,39 @@ export interface DateQuery {
   to?: string;
 }
 
+export interface SeasonalDemandForecast {
+  activeSeason: string;
+  seasonEn: string;
+  seasonBn: string;
+  periodMonths: string;
+  projectedSurgePercent: number;
+  recommendedSafetyBufferPercent: number;
+  insightsEn: string;
+  insightsBn: string;
+  commodities: Array<{
+    nameEn: string;
+    nameBn: string;
+    forecastDemandKg: number;
+    growthRate: string;
+    riskLevel: string;
+  }>;
+  recentSearchVelocity: number;
+  generatedAt: string;
+}
+
+export interface RegionalDemandBreakdown {
+  regions: Array<{
+    division: string;
+    district: string;
+    orderCount: number;
+    totalGmv: number;
+    avgOrderValue: number;
+    densityTier: string;
+  }>;
+  totalRegionalOrders: number;
+  analyzedAt: string;
+}
+
 export const analyticsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getDashboardMetrics: builder.query<DashboardMetrics, void>({
@@ -129,6 +162,15 @@ export const analyticsApi = api.injectEndpoints({
         params: params || undefined,
       }),
     }),
+    getSeasonalDemandForecast: builder.query<SeasonalDemandForecast, string | void>({
+      query: (season) => ({
+        url: '/admin/analytics/forecasting/seasonal',
+        params: season ? { season } : undefined,
+      }),
+    }),
+    getRegionalDemandBreakdown: builder.query<RegionalDemandBreakdown, void>({
+      query: () => '/admin/analytics/forecasting/regional',
+    }),
   }),
 });
 
@@ -138,4 +180,6 @@ export const {
   useGetSalesAnalyticsQuery,
   useGetProductsAnalyticsQuery,
   useGetCustomersAnalyticsQuery,
+  useGetSeasonalDemandForecastQuery,
+  useGetRegionalDemandBreakdownQuery,
 } = analyticsApi;
