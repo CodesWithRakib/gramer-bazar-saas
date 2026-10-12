@@ -146,6 +146,26 @@ export const ordersApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Order'],
     }),
+    quickCheckout: builder.mutation<
+      { order: Order; paymentUrl: string | null },
+      {
+        name: string;
+        phone: string;
+        address: string;
+        sellerProductId: string;
+        quantity?: number;
+        paymentMethod?: string;
+        agentCode?: string;
+        lang?: string;
+      }
+    >({
+      query: (body) => ({
+        url: `/orders/quick-checkout`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Order'],
+    }),
     getAdminOrders: builder.query<
       { data: Order[]; meta: PaginationMeta },
       { page?: number; limit?: number; search?: string }
@@ -182,6 +202,7 @@ export const {
   useGetOrderByIdQuery,
   useCancelOrderMutation,
   useCheckoutOrderMutation,
+  useQuickCheckoutMutation,
   useGetAdminOrdersQuery,
   useUpdateAdminOrderStatusMutation,
   useTransitionOrderMutation,

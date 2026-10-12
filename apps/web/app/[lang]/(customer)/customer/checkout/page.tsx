@@ -134,7 +134,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
           ? isBn
             ? 'প্রক্রিয়াধীন...'
             : 'Processing...'
-          : paymentMethod === 'ONLINE'
+          : paymentMethod === 'ONLINE' || paymentMethod === 'BKASH'
             ? isBn
               ? 'অর্ডার করুন ও পেমেন্ট করুন'
               : 'Place order & pay'
@@ -264,7 +264,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-5">
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div className="relative">
                   <input
                     type="radio"
@@ -297,6 +297,44 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                   <input
                     type="radio"
                     name="paymentMethod"
+                    value="BKASH"
+                    id="bkash"
+                    className="peer sr-only"
+                    checked={paymentMethod === 'BKASH'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  />
+                  <label
+                    htmlFor="bkash"
+                    className="flex h-full flex-col gap-1.5 rounded-xl border-2 border-input p-4 transition-colors hover:bg-muted peer-checked:border-[#E2136E] peer-checked:bg-[#E2136E]/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring cursor-pointer"
+                  >
+                    <span className="flex flex-wrap items-center justify-between gap-2 font-semibold">
+                      <span className="flex items-center gap-1.5">
+                        <span className="inline-flex items-center justify-center rounded bg-[#E2136E] px-1.5 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                          bKash
+                        </span>
+                        <span>{isBn ? 'বিকাশ সরাসরি' : 'bKash 1-Click'}</span>
+                      </span>
+                      <StatusBadge
+                        tone="progress"
+                        label={isBn ? 'তাৎক্ষণিক' : 'Instant'}
+                        className="text-[10px]"
+                      />
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {isBn
+                        ? 'বিকাশ অ্যাপ বা পিন দিয়ে সাথে সাথে পরিশোধ করুন'
+                        : 'Instant checkout via official bKash tokenized gateway'}
+                    </span>
+                  </label>
+                  {paymentMethod === 'BKASH' && (
+                    <CheckCircle2 className="absolute end-4 top-4 h-5 w-5 text-[#E2136E]" />
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
                     value="ONLINE"
                     id="digital"
                     className="peer sr-only"
@@ -317,11 +355,11 @@ export default function CheckoutPage({ params }: { params: Promise<{ lang: strin
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {isBn
-                        ? 'বিকাশ, নগদ, রকেট, কার্ড ও ইন্টারনেট ব্যাংকিং'
-                        : 'bKash, Nagad, Rocket, cards and net banking'}
+                        ? 'নগদ, রকেট, কার্ড ও ইন্টারনেট ব্যাংকিং'
+                        : 'Nagad, Rocket, cards and net banking'}
                     </span>
                     <span className="flex flex-wrap gap-1.5 pt-1" aria-hidden>
-                      {['bKash', 'Nagad', 'Rocket', 'Visa/MC'].map((brand) => (
+                      {['Nagad', 'Rocket', 'Visa/MC'].map((brand) => (
                         <span
                           key={brand}
                           className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"

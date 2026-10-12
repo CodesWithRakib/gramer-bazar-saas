@@ -13,6 +13,7 @@ export enum OrderStatus {
 export enum PaymentMethod {
   COD = 'COD',
   ONLINE = 'ONLINE', // for future use
+  BKASH = 'BKASH',
 }
 
 export enum PaymentStatus {

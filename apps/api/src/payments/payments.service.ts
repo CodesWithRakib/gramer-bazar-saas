@@ -25,6 +25,7 @@ import {
 } from '../notifications/entities/notification.entity.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BkashService } from './bkash/bkash.service.js';
 
 export interface InitiatePaymentResult {
   paymentUrl: string;
@@ -50,6 +51,8 @@ export class PaymentsService {
     private settingsService?: SettingsService,
     @Optional()
     private eventEmitter?: EventEmitter2,
+    @Optional()
+    private bkashService?: BkashService,
   ) {}
 
   /**
@@ -817,5 +820,153 @@ export class PaymentsService {
     }
 
     return payment;
+  }
+
+  /**
+   * Initiates direct bKash Tokenized Checkout payment.
+   */
+  async createBkashPayment(orderId: string, user: User) {
+    if (!this.bkashService) {
+      throw new BadRequestException('bKash payment service is unavailable.');
+    }
+
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['customer'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.userId !== user.id && !user.roles?.some((r) => r.name === Role.ADMIN || r.name === Role.SUPER_ADMIN)) {
+      throw new ForbiddenException('You do not own this order.');
+    }
+
+    if (order.paymentStatus === PaymentStatus.PAID) {
+      throw new BadRequestException('Order is already paid.');
+    }
+
+    const totalAmount = Number(order.total);
+    const bkashResponse = await this.bkashService.createPayment({
+      orderId: order.id,
+      amount: totalAmount,
+      customerPhone: user.phone,
+    });
+
+    let payment = await this.paymentRepository.findOne({
+      where: { orderId: order.id, provider: PaymentProvider.BKASH },
+    });
+
+    if (!payment) {
+      payment = this.paymentRepository.create({
+        orderId: order.id,
+        userId: user.id,
+        amount: totalAmount,
+        provider: PaymentProvider.BKASH,
+        transactionId: bkashResponse.paymentID,
+        status: PaymentStatus.INITIATED,
+        gatewayResponse: bkashResponse as any,
+      });
+    } else {
+      payment.transactionId = bkashResponse.paymentID;
+      payment.status = PaymentStatus.INITIATED;
+      payment.gatewayResponse = bkashResponse as any;
+    }
+
+    await this.paymentRepository.save(payment);
+
+    return {
+      paymentUrl: bkashResponse.bkashURL,
+      paymentId: bkashResponse.paymentID,
+      transactionId: bkashResponse.merchantInvoiceNumber,
+    };
+  }
+
+  /**
+   * Executes and finalizes direct bKash payment.
+   */
+  async executeBkashPayment(paymentId: string, orderId: string) {
+    if (!this.bkashService) {
+      throw new BadRequestException('bKash payment service is unavailable.');
+    }
+
+    const result = await this.bkashService.executePayment(paymentId);
+
+    const payment = await this.paymentRepository.findOne({
+      where: [{ transactionId: paymentId }, { orderId }],
+      relations: ['order'],
+    });
+
+    if (!payment) {
+      throw new NotFoundException('Payment record not found.');
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      payment.status = PaymentStatus.PAID;
+      payment.bankTransactionId = result.trxID;
+      payment.gatewayResponse = result as any;
+      payment.paidAt = new Date();
+      await manager.save(Payment, payment);
+
+      const order = await manager.findOne(Order, { where: { id: orderId } });
+      if (order) {
+        order.paymentStatus = PaymentStatus.PAID as any;
+        if (order.status === OrderStatus.PENDING) {
+          order.status = OrderStatus.CONFIRMED;
+        }
+        await manager.save(Order, order);
+      }
+
+      this.eventEmitter?.emit('payment.completed', {
+        paymentId: payment.id,
+        orderId,
+        provider: PaymentProvider.BKASH,
+        trxId: result.trxID,
+      });
+
+      return {
+        success: true,
+        transactionId: result.trxID,
+        paymentId,
+        status: 'PAID',
+      };
+    });
+  }
+
+  /**
+   * Instant bKash refund.
+   */
+  async refundBkashPayment(params: {
+    paymentId: string;
+    trxId: string;
+    amount: number;
+    reason?: string;
+  }) {
+    if (!this.bkashService) {
+      throw new BadRequestException('bKash payment service is unavailable.');
+    }
+
+    const result = await this.bkashService.refundPayment({
+      paymentId: params.paymentId,
+      trxId: params.trxId,
+      amount: params.amount,
+      reason: params.reason,
+    });
+
+    const payment = await this.paymentRepository.findOne({
+      where: [{ transactionId: params.paymentId }, { bankTransactionId: params.trxId }],
+    });
+
+    if (payment) {
+      payment.status = PaymentStatus.REFUNDED;
+      payment.gatewayResponse = {
+        ...(payment.gatewayResponse || {}),
+        refund: result,
+      };
+      await this.paymentRepository.save(payment);
+    }
+
+    return result;
   }
 }

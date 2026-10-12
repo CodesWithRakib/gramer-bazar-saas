@@ -29,6 +29,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { FashionSizeChartModal } from '@/components/catalog/FashionSizeChartModal';
+import { QuickOrderModal } from '@/components/catalog/QuickOrderModal';
 import { Button } from '@/components/ui/button';
 import { ProductRequestModal } from '@/components/catalog/ProductRequestModal';
 import { ProductGrid } from '@/components/catalog/ProductGrid';
@@ -63,6 +64,7 @@ export function ProductDetailsClient({
 
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
   const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({});
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
@@ -1813,28 +1815,41 @@ export function ProductDetailsClient({
                 </div>
               </div>
 
-              {/* Two High-Converting Action Buttons */}
+              {/* High-Converting 1-Click Fast Order + Standard Buttons */}
               <div className="space-y-2.5">
                 <Button
                   size="lg"
-                  className="w-full h-12 text-sm font-bold rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+                  className="w-full h-12 text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
                   disabled={isOutOfStock}
-                  onClick={handleBuyNow}
+                  onClick={() => setIsQuickOrderOpen(true)}
                 >
                   <Zap className="h-4 w-4 fill-current" />
-                  <span>{isBn ? 'এখনই অর্ডার করুন' : 'Buy Now'}</span>
+                  <span>{isBn ? '১-ক্লিকে দ্রুত অর্ডার করুন' : '1-Click Fast Order'}</span>
                 </Button>
 
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full h-12 text-sm font-bold rounded-xl border-primary/30 text-primary hover:bg-primary/5 transition-all active:scale-[0.99] flex items-center justify-center gap-2"
-                  disabled={isOutOfStock}
-                  onClick={handleAddToCart}
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                  <span>{isBn ? 'কার্টে যোগ করুন' : 'Add to Cart'}</span>
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-11 text-xs font-bold rounded-xl border-primary/30 text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-1.5"
+                    disabled={isOutOfStock}
+                    onClick={handleAddToCart}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    <span>{isBn ? 'কার্টে যোগ করুন' : 'Add to Cart'}</span>
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="h-11 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5"
+                    disabled={isOutOfStock}
+                    onClick={handleBuyNow}
+                  >
+                    <Truck className="h-4 w-4" />
+                    <span>{isBn ? 'সাধারণ চেকআউট' : 'Standard Buy'}</span>
+                  </Button>
+                </div>
               </div>
 
               {/* Trust & Guarantee Highlights */}
@@ -2142,15 +2157,37 @@ export function ProductDetailsClient({
           </Button>
           <Button
             size="sm"
-            className="h-10 text-xs font-bold rounded-xl px-5 shadow-sm"
+            className="h-10 text-xs font-bold rounded-xl px-4 shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white"
             disabled={isOutOfStock}
-            onClick={handleBuyNow}
+            onClick={() => setIsQuickOrderOpen(true)}
           >
             <Zap className="h-3.5 w-3.5 fill-current me-1" />
-            <span>{isBn ? 'অর্ডার করুন' : 'Buy Now'}</span>
+            <span>{isBn ? 'দ্রুত অর্ডার' : '1-Click Buy'}</span>
           </Button>
         </div>
       </div>
+
+      {/* 1-Click Fast Buy Modal */}
+      {product && (
+        <QuickOrderModal
+          isOpen={isQuickOrderOpen}
+          onClose={() => setIsQuickOrderOpen(false)}
+          product={{
+            id: masterProduct.id,
+            sellerProductId: product.id,
+            nameEn: masterProduct.nameEn,
+            nameBn: masterProduct.nameBn,
+            price: currentPrice,
+            discountPrice: product.discountPrice ? Number(product.discountPrice) : null,
+            image: activeImage,
+            variantNameEn: product.productVariant?.nameEn,
+            variantNameBn: product.productVariant?.nameBn,
+            shopNameEn: product.shop?.nameEn,
+            shopNameBn: product.shop?.nameBn,
+          }}
+          lang={lang}
+        />
+      )}
     </div>
   );
 }

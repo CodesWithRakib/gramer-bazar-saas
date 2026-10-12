@@ -13,4 +13,5 @@ export enum PaymentStatus {
 export enum PaymentProvider {
   SSLCOMMERZ = 'SSLCOMMERZ',
   COD = 'COD',
+  BKASH = 'BKASH',
 }

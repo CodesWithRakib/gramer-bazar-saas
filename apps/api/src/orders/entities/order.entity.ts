@@ -80,6 +80,15 @@ export class Order {
   @Column({ name: 'transaction_id', type: 'varchar', nullable: true })
   transactionId: string | null;
 
+  @Column({ name: 'agent_id', type: 'uuid', nullable: true })
+  agentId?: string | null;
+
+  @Column({ name: 'agent_commission', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  agentCommission?: number | null;
+
+  @Column({ name: 'is_quick_order', type: 'boolean', default: false })
+  isQuickOrder: boolean;
+
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   items: Relation<OrderItem[]>;
 

@@ -28,6 +28,9 @@ describe('OrdersService', () => {
       find: vi.fn(),
       findOne: vi.fn(),
       createQueryBuilder: vi.fn(),
+      create: vi.fn((data: any) => ({ ...data, id: 'mock-id' })),
+      save: vi.fn(async (data: any) => ({ ...data, id: data.id || 'mock-id' })),
+      update: vi.fn().mockResolvedValue({ affected: 1 }),
     })),
   };
   const paymentsService = { initPayment: vi.fn() };
@@ -293,6 +296,47 @@ describe('OrdersService', () => {
 
       expect(result.status).toBe(OrderStatus.CANCELLED);
       expect(manager.save).toHaveBeenCalled();
+    });
+  });
+
+  describe('quickCheckout', () => {
+    it('throws BadRequestException if name or phone or address or product is missing', async () => {
+      await expect(
+        service.quickCheckout(
+          { name: '', phone: '01712345678', address: 'Vill', sellerProductId: 'sp-1' },
+          'http://localhost:5000',
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('creates customer user and completes fast checkout successfully', async () => {
+      const product = sellerProduct();
+      givenFindOne([
+        { match: isAddressLookup, value: address },
+        { match: isUserLookup, value: { id: 'user-1', email: 'c@g.com' } },
+      ]);
+      manager.find.mockResolvedValueOnce([product]);
+      manager.find.mockResolvedValueOnce([product.inventory]);
+      manager.save.mockImplementation(async (_entity, value) => {
+        if (Array.isArray(value)) return value;
+        return { ...value, id: value.id || 'order-quick-1' };
+      });
+
+      const res = await service.quickCheckout(
+        {
+          name: 'Rahim Khan',
+          phone: '01711223344',
+          address: 'Bilbari, Sirajganj',
+          sellerProductId: 'sp-1',
+          quantity: 1,
+          paymentMethod: PaymentMethod.COD,
+        },
+        'http://localhost:5000',
+      );
+
+      expect(res).toBeDefined();
+      expect(res.order).toBeDefined();
+      expect(res.order.isQuickOrder).toBe(true);
     });
   });
 });

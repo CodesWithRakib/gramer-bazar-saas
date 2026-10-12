@@ -292,4 +292,44 @@ export class PaymentsController {
   async getAdminPaymentById(@Param('id') id: string) {
     return this.paymentsService.findOneAdmin(id);
   }
+
+  // ========================================================
+  // DIRECT BKASH TOKENIZED CHECKOUT ENDPOINTS
+  // ========================================================
+
+  @Post('bkash/create')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Initiate direct bKash Tokenized Checkout session',
+    description: 'Creates a tokenized bKash payment URL and paymentID for 1-click in-app payment.',
+  })
+  async createBkashPayment(@Body() body: { orderId: string }, @Req() req: any) {
+    return this.paymentsService.createBkashPayment(body.orderId, req.user);
+  }
+
+  @Post('bkash/execute')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Execute bKash Tokenized payment after customer validation',
+    description: 'Finalizes the transaction with bKash and marks the order as paid.',
+  })
+  async executeBkashPayment(@Body() body: { paymentId: string; orderId: string }) {
+    return this.paymentsService.executeBkashPayment(body.paymentId, body.orderId);
+  }
+
+  @Post('bkash/refund')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({
+    summary: 'Admin: Instant bKash refund',
+    description: 'Dispatches instant refund to customer bKash wallet.',
+  })
+  async refundBkashPayment(
+    @Body() body: { paymentId: string; trxId: string; amount: number; reason?: string },
+  ) {
+    return this.paymentsService.refundBkashPayment(body);
+  }
 }

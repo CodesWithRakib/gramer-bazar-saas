@@ -19,6 +19,7 @@ import { Role } from '../roles/enums/role.enum.js';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { OrdersService } from './orders.service.js';
 import { CheckoutDto } from './dto/checkout.dto.js';
+import { QuickCheckoutDto } from './dto/quick-checkout.dto.js';
 import { TransitionOrderDto } from './dto/transition-order.dto.js';
 import {
   OrderResponseDto,
@@ -61,6 +62,26 @@ export class OrdersController {
     const lang = checkoutDto.lang || 'en';
     const redirectUrl = `${baseUrl}/${lang}/customer/checkout`;
     return this.ordersService.checkout(req.user.id, checkoutDto, redirectUrl);
+  }
+
+  @Post('quick-checkout')
+  @ApiOperation({
+    summary: '1-Click fast checkout for rural commerce & village agents',
+    description:
+      'Allows instant ordering with recipient name, phone, address, and product. Does not require prior password login. Creates customer account and dispatches SMS confirmation.',
+  })
+  @ApiStandardResponse({
+    type: CheckoutResponseDto,
+    status: HttpStatus.CREATED,
+    description: 'Quick order created successfully; payment URL returned if digital payment',
+  })
+  @ApiCommonErrors([400, 500])
+  async quickCheckout(@Request() req: any, @Body() dto: QuickCheckoutDto) {
+    const originUrl = req.headers.origin || req.headers.referer || 'http://localhost:5000';
+    const baseUrl = originUrl.replace(/\/$/, '');
+    const lang = dto.lang || 'bn';
+    const redirectUrl = `${baseUrl}/${lang}/customer/checkout`;
+    return this.ordersService.quickCheckout(dto, redirectUrl);
   }
 
   @Get('admin/all')

@@ -40,6 +40,7 @@ export const PAYMENT_STATUS_META: Record<string, StatusMeta> = {
 export const PAYMENT_METHOD_META: Record<string, { en: string; bn: string }> = {
   COD: { en: 'Cash on Delivery', bn: 'ক্যাশ অন ডেলিভারি' },
   ONLINE: { en: 'Online Payment', bn: 'অনলাইন পেমেন্ট' },
+  BKASH: { en: 'bKash Direct', bn: 'বিকাশ সরাসরি' },
 };
 
 function lookup(meta: Record<string, StatusMeta>, status?: string | null): StatusMeta {

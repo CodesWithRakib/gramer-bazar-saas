@@ -1,23 +1,24 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import { Otp } from './entities/otp.entity.js';
+import { SmsService } from './services/sms.service.js';
 
 @Injectable()
 export class OtpService {
   constructor(
     @InjectRepository(Otp)
     private readonly otpRepository: Repository<Otp>,
+    @Optional()
+    private readonly smsService?: SmsService,
   ) {}
 
-  async generateOtp(phone: string): Promise<string> {
+  async generateOtp(phone: string, lang = 'bn'): Promise<string> {
     // Determine expiration time (e.g., 5 minutes from now)
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
 
     // Generate a 6-digit OTP
-    // For development/MVP, we can use a hardcoded or simple random generator.
-    // In production, use a secure random generator and hash it in DB.
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     const otp = this.otpRepository.create({
@@ -28,7 +29,10 @@ export class OtpService {
 
     await this.otpRepository.save(otp);
 
-    // In a real app, you would dispatch a background job to send the SMS here.
+    // Dispatch SMS via configured provider (Mock, Greenweb, or BulkSMSBD)
+    if (this.smsService) {
+      await this.smsService.sendOtpSms(phone, code, lang);
+    }
     return code;
   }
 

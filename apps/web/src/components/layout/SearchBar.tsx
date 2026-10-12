@@ -6,11 +6,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, ArrowRight, Tag, Layers, X } from 'lucide-react';
+import { Search, Loader2, ArrowRight, Tag, Layers, X, Mic, MicOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGetSearchSuggestionsQuery } from '@/features/catalog/catalogApi';
 import { analyticsTracker } from '@/lib/analyticsTracker';
 import { formatCurrency } from '@/lib/format';
+import { useVoiceSearch } from '@/hooks/useVoiceSearch';
+import { customToast as toast } from '@/components/ui/custom-toast';
 
 interface SearchBarProps {
   lang: string;
@@ -35,6 +37,42 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isBn = lang === 'bn';
+
+  // Voice Search Hook with Bangla ('bn-BD') recognition
+  const { isListening, startListening, stopListening, isSupported } = useVoiceSearch({
+    lang: isBn ? 'bn-BD' : 'en-US',
+    onResult: (text, isFinal) => {
+      setSearchTerm(text);
+      if (!isOpen) setIsOpen(true);
+      if (isFinal && text.trim()) {
+        analyticsTracker.track('SEARCH', { searchQuery: text.trim() });
+        router.push(`/${lang}/search?q=${encodeURIComponent(text.trim())}`);
+      }
+    },
+    onError: () => {
+      toast.info(
+        isBn
+          ? 'মাইক্রোফোনে স্পষ্ট করে বলুন অথবা অনুমতি নিশ্চিত করুন।'
+          : 'Please speak clearly or check microphone permissions.'
+      );
+    },
+  });
+
+  const handleVoiceToggle = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      if (!isSupported) {
+        toast.warning(
+          isBn
+            ? 'আপনার ব্রাউজার ভয়েস সার্চ সমর্থন করে না। গুগল ক্রোম বা এজ ব্যবহার করুন।'
+            : 'Voice search is not supported by your current browser.'
+        );
+        return;
+      }
+      startListening(isBn ? 'bn-BD' : 'en-US');
+    }
+  };
 
   // Debounce search query for live suggestions
   useEffect(() => {
@@ -93,12 +131,19 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
           type="search"
           autoFocus={autoFocus}
           placeholder={
-            placeholder ||
-            (isBn
-              ? 'পণ্য, ক্যাটাগরি বা ব্র্যান্ড খুঁজুন...'
-              : 'Search for products, categories or brands...')
+            isListening
+              ? isBn
+                ? 'শুনছি... আপনার প্রয়োজনীয় পণ্য বলুন...'
+                : 'Listening... speak now...'
+              : placeholder ||
+                (isBn
+                  ? 'পণ্য, ক্যাটাগরি বা ব্র্যান্ড খুঁজুন...'
+                  : 'Search for products, categories or brands...')
           }
-          className="w-full pe-20 ps-4 py-2 text-sm rounded-full bg-muted/60 border-muted focus-visible:ring-2 focus-visible:ring-primary shadow-xs transition-all"
+          className={cn(
+            'w-full pe-28 ps-4 py-2 text-sm rounded-full bg-muted/60 border-muted focus-visible:ring-2 focus-visible:ring-primary shadow-xs transition-all',
+            isListening && 'ring-2 ring-destructive/80 border-destructive/50 bg-destructive/5'
+          )}
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -110,6 +155,7 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
             }
           }}
         />
+
         {searchTerm.length > 0 && (
           <button
             type="button"
@@ -118,17 +164,54 @@ export function SearchBar({ lang, className, id, placeholder, autoFocus }: Searc
               setDebouncedTerm('');
               setIsOpen(false);
             }}
-            className="absolute end-12 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors"
+            className="absolute end-20 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors"
             aria-label={isBn ? 'অনুসন্ধান মুছুন' : 'Clear search'}
           >
             <X className="h-3.5 w-3.5" />
           </button>
         )}
+
+        {/* Voice Search (Bangla & English Speech Recognition) */}
+        <button
+          type="button"
+          onClick={handleVoiceToggle}
+          aria-label={
+            isListening
+              ? isBn
+                ? 'ভয়েস সার্চ বন্ধ করুন'
+                : 'Stop voice search'
+              : isBn
+                ? 'বাংলায় মুখে বলে খুঁজুন'
+                : 'Search by voice'
+          }
+          title={
+            isListening
+              ? isBn
+                ? 'শুনছি... (ক্লিক করে বন্ধ করুন)'
+                : 'Listening... (click to stop)'
+              : isBn
+                ? 'বাংলায় মুখে বলে খুঁজুন'
+                : 'Search by voice'
+          }
+          className={cn(
+            'absolute end-10 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full flex items-center justify-center transition-all',
+            isListening
+              ? 'bg-destructive text-destructive-foreground animate-pulse shadow-md ring-2 ring-destructive/40'
+              : 'text-muted-foreground hover:text-primary hover:bg-muted'
+          )}
+        >
+          {isListening ? (
+            <MicOff className="h-4 w-4" />
+          ) : (
+            <Mic className="h-4 w-4 text-primary" />
+          )}
+        </button>
+
         <Button
           type="submit"
           variant="ghost"
           size="icon"
-          className="absolute end-0 top-0 h-full w-12 rounded-e-full text-muted-foreground hover:text-primary hover:bg-transparent"
+          className="absolute end-0 top-0 h-full w-10 rounded-e-full text-muted-foreground hover:text-primary hover:bg-transparent"
         >
           {isFetching ? (
             <Loader2 className="h-4 w-4 animate-spin text-primary" />

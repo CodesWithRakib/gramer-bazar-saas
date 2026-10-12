@@ -80,6 +80,27 @@ export class Delivery {
   })
   lastLocationUpdatedAt: Date | null;
 
+  @Column({ name: 'courier_provider', type: 'varchar', length: 50, nullable: true })
+  courierProvider: string | null;
+
+  @Column({ name: 'consignment_id', type: 'varchar', length: 100, nullable: true })
+  consignmentId: string | null;
+
+  @Column({ name: 'tracking_code', type: 'varchar', length: 100, nullable: true })
+  trackingCode: string | null;
+
+  @Column({ name: 'courier_status', type: 'varchar', length: 50, nullable: true })
+  courierStatus: string | null;
+
+  @Column({
+    name: 'rider_earning',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
+  riderEarning: number | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

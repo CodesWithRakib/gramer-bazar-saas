@@ -55,6 +55,34 @@ export const envValidationSchema = z
     MIGRATIONS_RUN: z.string().optional(),
     MIGRATION: z.string().optional(),
     RUN_MIGRATIONS: z.string().optional(),
+    // SMS Gateway Configuration (Bangladesh)
+    SMS_PROVIDER: z.enum(['mock', 'greenweb', 'bulksmsbd']).default('mock'),
+    GREENWEB_TOKEN: z.string().optional(),
+    GREENWEB_URL: z.string().optional(),
+    BULKSMSBD_API_KEY: z.string().optional(),
+    BULKSMSBD_SENDER_ID: z.string().optional(),
+    BULKSMSBD_URL: z.string().optional(),
+    // 3PL Courier Logistics Configuration (Bangladesh)
+    COURIER_DEFAULT_PROVIDER: z.enum(['MOCK', 'STEADFAST', 'PATHAO']).default('MOCK'),
+    STEADFAST_API_KEY: z.string().optional(),
+    STEADFAST_SECRET_KEY: z.string().optional(),
+    STEADFAST_BASE_URL: z.string().optional(),
+    PATHAO_CLIENT_ID: z.string().optional(),
+    PATHAO_CLIENT_SECRET: z.string().optional(),
+    PATHAO_USERNAME: z.string().optional(),
+    PATHAO_PASSWORD: z.string().optional(),
+    PATHAO_STORE_ID: z.string().optional(),
+    PATHAO_BASE_URL: z.string().optional(),
+    // Direct bKash Tokenized Checkout Configuration
+    BKASH_APP_KEY: z.string().optional(),
+    BKASH_APP_SECRET: z.string().optional(),
+    BKASH_USERNAME: z.string().optional(),
+    BKASH_PASSWORD: z.string().optional(),
+    BKASH_IS_SANDBOX: z
+      .union([z.string(), z.boolean()])
+      .optional()
+      .transform((val) => val === true || val === 'true'),
+    BKASH_BASE_URL: z.string().optional(),
     // Broadcast & Marketing Communication
     BROADCAST_PROVIDER: z.enum(['mock', 'whatsapp']).default('mock'),
     BROADCAST_MOCK_FAILURE_RATE: z.coerce.number().min(0).max(1).optional(),

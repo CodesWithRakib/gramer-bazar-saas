@@ -7,12 +7,16 @@ import { OrderItem } from './entities/order-item.entity.js';
 import { OrderStatusHistory } from './entities/order-status-history.entity.js';
 import { PaymentsModule } from '../payments/payments.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
+import { UsersModule } from '../users/users.module.js';
+import { OtpModule } from '../otp/otp.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, OrderStatusHistory]),
     PaymentsModule,
     NotificationsModule,
+    UsersModule,
+    OtpModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

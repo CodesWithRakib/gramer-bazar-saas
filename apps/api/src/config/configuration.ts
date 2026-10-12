@@ -51,4 +51,44 @@ export default () => ({
     // 'mock' (default) or 'whatsapp'. WhatsApp is not implemented yet.
     provider: process.env.BROADCAST_PROVIDER || 'mock',
   },
+  sms: {
+    provider: process.env.SMS_PROVIDER || 'mock',
+    greenweb: {
+      token: process.env.GREENWEB_TOKEN,
+      url: process.env.GREENWEB_URL || 'https://api.greenweb.com.bd/api.php',
+    },
+    bulksmsbd: {
+      apiKey: process.env.BULKSMSBD_API_KEY,
+      senderId: process.env.BULKSMSBD_SENDER_ID || '8809617612345',
+      url: process.env.BULKSMSBD_URL || 'http://bulksmsbd.net/api/smsapi',
+    },
+  },
+  courier: {
+    defaultProvider: process.env.COURIER_DEFAULT_PROVIDER || 'MOCK',
+    steadfast: {
+      apiKey: process.env.STEADFAST_API_KEY,
+      secretKey: process.env.STEADFAST_SECRET_KEY,
+      baseUrl: process.env.STEADFAST_BASE_URL || 'https://portal.steadfast.com.bd/api/v1',
+    },
+    pathao: {
+      clientId: process.env.PATHAO_CLIENT_ID,
+      clientSecret: process.env.PATHAO_CLIENT_SECRET,
+      username: process.env.PATHAO_USERNAME,
+      password: process.env.PATHAO_PASSWORD,
+      storeId: process.env.PATHAO_STORE_ID || '1',
+      baseUrl: process.env.PATHAO_BASE_URL || 'https://api-hermes.pathao.com',
+    },
+  },
+  bkash: {
+    appKey: process.env.BKASH_APP_KEY,
+    appSecret: process.env.BKASH_APP_SECRET,
+    username: process.env.BKASH_USERNAME,
+    password: process.env.BKASH_PASSWORD,
+    isSandbox: process.env.BKASH_IS_SANDBOX !== 'false',
+    baseUrl:
+      process.env.BKASH_BASE_URL ||
+      (process.env.BKASH_IS_SANDBOX === 'false'
+        ? 'https://tokenized.pay.bka.sh/v1.2.0-beta/tokenized/checkout'
+        : 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout'),
+  },
 });

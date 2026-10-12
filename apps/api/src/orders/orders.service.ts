@@ -1,7 +1,14 @@
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Logger,
+  Optional,
+} from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, In } from 'typeorm';
 import { CheckoutDto } from './dto/checkout.dto.js';
+import { QuickCheckoutDto } from './dto/quick-checkout.dto.js';
 import { Order } from './entities/order.entity.js';
 import { OrderItem } from './entities/order-item.entity.js';
 import { OrderStatusHistory } from './entities/order-status-history.entity.js';
@@ -14,6 +21,9 @@ import {
 } from '../notifications/entities/notification.entity.js';
 import { User } from '../users/entities/user.entity.js';
 import { Role } from '../roles/enums/role.enum.js';
+import { UserStatus } from '../users/enums/user-status.enum.js';
+import { UsersService } from '../users/users.service.js';
+import { SmsService } from '../otp/services/sms.service.js';
 
 import { OrderStatus, PaymentMethod, PaymentStatus } from './enums/order-status.enum.js';
 import { Address } from '../addresses/entities/address.entity.js';
@@ -37,6 +47,8 @@ export class OrdersService {
     private paymentsService: PaymentsService,
     private notificationsService: NotificationsService,
     private readonly eventEmitter: EventEmitter2,
+    @Optional() private readonly usersService?: UsersService,
+    @Optional() private readonly smsService?: SmsService,
   ) {}
 
   async checkout(userId: string, checkoutDto: CheckoutDto, originUrl: string) {
@@ -225,7 +237,14 @@ export class OrdersService {
 
     // 8. Payment Gateway Session Initiation (runs after order is committed to satisfy foreign keys)
     let paymentUrl = null;
-    if (savedOrder.paymentMethod !== PaymentMethod.COD) {
+    if (savedOrder.paymentMethod === PaymentMethod.BKASH) {
+      savedOrder.total = Number(savedOrder.total);
+      const bkashRes = await this.paymentsService.createBkashPayment(
+        savedOrder.id,
+        user as any,
+      );
+      paymentUrl = bkashRes.paymentUrl;
+    } else if (savedOrder.paymentMethod !== PaymentMethod.COD) {
       savedOrder.total = Number(savedOrder.total);
       paymentUrl = await this.paymentsService.initPayment(
         savedOrder,
@@ -322,6 +341,120 @@ export class OrdersService {
     });
 
     return { order: savedOrder, paymentUrl };
+  }
+
+  async quickCheckout(dto: QuickCheckoutDto, originUrl: string) {
+    if (!dto.phone || !dto.name || !dto.address || !dto.sellerProductId) {
+      throw new BadRequestException('Recipient name, phone, address, and product are required.');
+    }
+
+    const cleanPhone = dto.phone.trim();
+    const normalizedPhone = this.usersService
+      ? this.usersService.normalizeBdPhone(cleanPhone)
+      : cleanPhone.startsWith('+88')
+        ? cleanPhone
+        : cleanPhone.startsWith('01')
+          ? `+88${cleanPhone}`
+          : cleanPhone;
+
+    // 1. Resolve or register user
+    let user: User | null = null;
+    if (this.usersService) {
+      user = await this.usersService.findByPhone(normalizedPhone);
+    }
+    if (!user) {
+      const userRepo = this.dataSource.getRepository(User);
+      user = await userRepo.findOne({
+        where: [{ phone: normalizedPhone }, { phone: cleanPhone }],
+      });
+      if (!user) {
+        user = userRepo.create({
+          phone: normalizedPhone,
+          firstName: dto.name.split(' ')[0] || 'Customer',
+          lastName: dto.name.split(' ').slice(1).join(' ') || '',
+          isPhoneVerified: false,
+          status: UserStatus.ACTIVE,
+        });
+        user = await userRepo.save(user);
+      }
+    }
+
+    // 2. Resolve or create delivery address
+    const addressRepo = this.dataSource.getRepository(Address);
+    let address = await addressRepo.findOne({
+      where: { userId: user.id, streetAddress: dto.address.trim() },
+    });
+    if (!address) {
+      address = addressRepo.create({
+        userId: user.id,
+        title: 'Quick Order Address',
+        contactName: dto.name.trim(),
+        contactPhone: normalizedPhone,
+        streetAddress: dto.address.trim(),
+        isDefault: true,
+      });
+      address = await addressRepo.save(address);
+    }
+
+    // 3. Resolve optional Village Agent if agentCode is provided
+    let agentId: string | null = null;
+    if (dto.agentCode && dto.agentCode.trim()) {
+      const cleanAgentCode = dto.agentCode.trim();
+      const agentUser = await this.dataSource.getRepository(User).findOne({
+        where: [{ id: cleanAgentCode }, { phone: cleanAgentCode }],
+      });
+      if (agentUser) {
+        agentId = agentUser.id;
+      }
+    }
+
+    // 4. Standard checkout process
+    const checkoutDto: CheckoutDto = {
+      addressId: address.id,
+      paymentMethod: dto.paymentMethod || PaymentMethod.COD,
+      items: [
+        {
+          sellerProductId: dto.sellerProductId,
+          quantity: dto.quantity && dto.quantity > 0 ? dto.quantity : 1,
+        },
+      ],
+      lang: dto.lang || 'bn',
+    };
+
+    const checkoutRes = await this.checkout(user.id, checkoutDto, originUrl);
+
+    // 5. Annotate order with quick-order and agent details
+    if (checkoutRes?.order) {
+      const orderRepo = this.dataSource.getRepository(Order);
+      const subtotalNum = Number(checkoutRes.order.subtotal) || 0;
+      const commission = agentId ? Number((subtotalNum * 0.02).toFixed(2)) : null; // 2% agent commission
+
+      await orderRepo.update(checkoutRes.order.id, {
+        isQuickOrder: true,
+        agentId: agentId || null,
+        agentCommission: commission,
+      });
+      checkoutRes.order.isQuickOrder = true;
+      checkoutRes.order.agentId = agentId || null;
+      checkoutRes.order.agentCommission = commission;
+
+      // 6. Send instant SMS to customer via Bangladeshi SMS Gateway
+      const shortOrderId = (checkoutRes.order.id || '').slice(0, 8).toUpperCase();
+      const totalAmount = checkoutRes.order.total || 0;
+      const isBn = dto.lang === 'bn';
+
+      if (this.smsService) {
+        const smsMsg = isBn
+          ? `গ্রামের বাজার: আপনার অর্ডার #${shortOrderId} (৳${totalAmount}) সফলভাবে গ্রহণ করা হয়েছে। ২৪-৪৮ ঘণ্টার মধ্যে ডেলিভারি সম্পন্ন হবে।`
+          : `Gramer Bazar: Your order #${shortOrderId} (Tk ${totalAmount}) has been placed successfully. Delivery within 24-48 hrs.`;
+
+        void this.smsService.sendNotificationSms(normalizedPhone, smsMsg).catch((err: any) => {
+          this.logger.warn(`Failed to dispatch quick-order SMS: ${err?.message}`);
+        });
+      }
+    }
+
+    return checkoutRes;
   }
 
   async findCustomerOrders(userId: string) {

@@ -10,6 +10,11 @@ export interface Delivery {
   riderId: string;
   rider: User;
   status: DeliveryStatus;
+  courierProvider?: 'MOCK' | 'STEADFAST' | 'PATHAO' | null;
+  consignmentId?: string | null;
+  trackingCode?: string | null;
+  courierStatus?: string | null;
+  riderEarning?: number | null;
   assignedAt: string;
   pickupTime: string;
   deliveryTime: string;
@@ -112,6 +117,36 @@ export const deliveriesApi = api.injectEndpoints({
       // it mainly updates the specific delivery query anyway.
     }),
 
+    // COURIER 3PL ENDPOINTS
+    bookCourier: builder.mutation<
+      {
+        success: boolean;
+        consignmentId: string;
+        trackingCode: string;
+        courierStatus: string;
+        courierProvider: string;
+      },
+      { orderId: string; provider?: 'MOCK' | 'STEADFAST' | 'PATHAO'; note?: string }
+    >({
+      query: (body) => ({
+        url: '/courier/admin/book',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Order'],
+    }),
+    trackCourier: builder.query<
+      {
+        provider: string;
+        trackingCode: string;
+        status: string;
+        raw?: any;
+      },
+      string
+    >({
+      query: (trackingCode) => `/courier/track/${trackingCode}`,
+    }),
+
     // CUSTOMER ENDPOINTS
     getCustomerDelivery: builder.query<Delivery, string>({
       query: (orderId) => `/deliveries/customer/${orderId}`,
@@ -124,6 +159,8 @@ export const {
   useGetAdminDeliveriesQuery,
   useGetRidersQuery,
   useAssignDeliveryMutation,
+  useBookCourierMutation,
+  useTrackCourierQuery,
   useGetRiderDashboardQuery,
   useGetRiderDeliveriesQuery,
   useGetRiderDeliveryDetailsQuery,
