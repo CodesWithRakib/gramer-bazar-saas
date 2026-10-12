@@ -479,4 +479,74 @@ export class BroadcastCampaignsService {
       .getCount();
     return count > 0;
   }
+
+  /**
+   * Updates recipient delivery status monotonically based on provider webhooks (e.g. WhatsApp).
+   * Monotonic progression ensures that out-of-order webhooks (e.g. READ arriving before DELIVERED)
+   * never regress the status backwards.
+   */
+  async handleProviderReceipt(
+    providerMessageId: string,
+    rawStatus: string,
+    errorReason?: string,
+  ): Promise<{ updated: boolean; recipientId?: string }> {
+    const recipient = await this.recipientRepo.findOne({
+      where: { providerMessageId },
+    });
+    if (!recipient) {
+      this.logger.warn(`No recipient found for providerMessageId: ${providerMessageId}`);
+      return { updated: false };
+    }
+
+    const now = new Date();
+    const normalized = rawStatus.toLowerCase();
+
+    if (
+      normalized === 'sent' &&
+      recipient.status !== BroadcastRecipientStatus.DELIVERED &&
+      recipient.status !== BroadcastRecipientStatus.READ
+    ) {
+      if (recipient.status !== BroadcastRecipientStatus.SENT) {
+        recipient.status = BroadcastRecipientStatus.SENT;
+        recipient.sentAt = recipient.sentAt ?? now;
+        await this.recipientRepo.save(recipient);
+        await this.broadcastRepo.increment({ id: recipient.broadcastId }, 'sentCount', 1);
+      }
+      return { updated: true, recipientId: recipient.id };
+    }
+
+    if (normalized === 'delivered' && recipient.status !== BroadcastRecipientStatus.READ) {
+      if (recipient.status !== BroadcastRecipientStatus.DELIVERED) {
+        recipient.status = BroadcastRecipientStatus.DELIVERED;
+        recipient.sentAt = recipient.sentAt ?? now;
+        recipient.deliveredAt = now;
+        await this.recipientRepo.save(recipient);
+        await this.broadcastRepo.increment({ id: recipient.broadcastId }, 'deliveredCount', 1);
+      }
+      return { updated: true, recipientId: recipient.id };
+    }
+
+    if (normalized === 'read') {
+      if (recipient.status !== BroadcastRecipientStatus.READ) {
+        recipient.status = BroadcastRecipientStatus.READ;
+        recipient.sentAt = recipient.sentAt ?? now;
+        recipient.deliveredAt = recipient.deliveredAt ?? now;
+        recipient.readAt = now;
+        await this.recipientRepo.save(recipient);
+        await this.broadcastRepo.increment({ id: recipient.broadcastId }, 'readCount', 1);
+      }
+      return { updated: true, recipientId: recipient.id };
+    }
+
+    if (normalized === 'failed') {
+      recipient.status = BroadcastRecipientStatus.FAILED;
+      recipient.failedAt = now;
+      recipient.failedReason = errorReason ?? 'Delivery failed reported by provider webhook';
+      await this.recipientRepo.save(recipient);
+      await this.broadcastRepo.increment({ id: recipient.broadcastId }, 'failedCount', 1);
+      return { updated: true, recipientId: recipient.id };
+    }
+
+    return { updated: false, recipientId: recipient.id };
+  }
 }

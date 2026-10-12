@@ -11,7 +11,7 @@ import {
 } from '../common/decorators/api-standard-response.decorator.js';
 import { WalletResponseDto, WalletTransactionResponseDto } from './dto/wallet-response.dto.js';
 
-@ApiTags('Wallets (Seller)')
+@ApiTags('Wallets')
 @Controller('wallets')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
@@ -20,26 +20,26 @@ export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
 
   @Get('my-wallet')
-  @Roles(Role.SELLER)
+  @Roles(Role.CUSTOMER, Role.SELLER, Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
-    summary: 'Get current seller wallet balance',
+    summary: 'Get current user wallet balance',
     description:
-      'Returns available balance, pending clearance escrow, total earned, and total withdrawn for the seller.',
+      'Returns available balance, pending clearance escrow, total earned/credited, and total withdrawn/debited for the authenticated customer or seller.',
   })
   @ApiStandardResponse({
     type: WalletResponseDto,
-    description: 'Seller wallet balance retrieved successfully',
+    description: 'Wallet balance retrieved successfully',
   })
   getMyWallet(@Request() req: any) {
     return this.walletsService.getWallet(req.user.id);
   }
 
   @Get('my-transactions')
-  @Roles(Role.SELLER)
+  @Roles(Role.CUSTOMER, Role.SELLER, Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({
-    summary: 'Get current seller wallet transactions ledger',
+    summary: 'Get current user wallet transactions ledger',
     description:
-      'Lists chronological transaction records (credit from orders, debit from payouts).',
+      'Lists chronological transaction records (credits from orders/refunds/cashback, debits from payouts/purchases).',
   })
   @ApiStandardResponse({
     type: WalletTransactionResponseDto,

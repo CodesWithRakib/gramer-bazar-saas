@@ -28,6 +28,7 @@ import { StartChatButton } from '@/components/chat/StartChatButton';
 import { formatCurrency, formatDateTime } from '@/lib/format';
 import { getOrderStatusMeta, getPaymentMethodMeta, getPaymentStatusMeta } from '@/lib/order-status';
 import { useGetSellerOrderByIdQuery } from '@/features/seller';
+import { ThermalReceiptModal } from '@/components/orders/ThermalReceiptModal';
 import { SellerOrderActions } from './SellerOrderActions';
 
 export interface SellerOrderDetailsViewProps {
@@ -91,12 +92,15 @@ export function SellerOrderDetailsView({ lang = 'en', id }: SellerOrderDetailsVi
         }`}
         badge={<StatusBadge tone={statusMeta.tone} label={isBn ? statusMeta.bn : statusMeta.en} />}
         secondaryActions={
-          <Button asChild variant="outline" className="gap-2">
-            <Link href={`/${lang}/seller/orders`}>
-              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-              {isBn ? 'ফিরে যান' : 'Back'}
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThermalReceiptModal order={order as any} lang={lang} />
+            <Button asChild variant="outline" className="gap-2">
+              <Link href={`/${lang}/seller/orders`}>
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                {isBn ? 'ফিরে যান' : 'Back'}
+              </Link>
+            </Button>
+          </div>
         }
       />
 

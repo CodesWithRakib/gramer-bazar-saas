@@ -533,6 +533,15 @@ export const customerRoutes: DashboardRoute[] = [
     matchPrefixes: ['/customer/orders'],
   },
   {
+    title: 'My Wallet',
+    titleBn: 'আমার ওয়ালেট',
+    href: '/customer/wallet',
+    icon: Wallet,
+    section: 'Overview',
+    sectionBn: 'ওভারভিউ',
+    matchPrefixes: ['/customer/wallet'],
+  },
+  {
     title: 'Wishlist',
     titleBn: 'পছন্দের তালিকা',
     href: '/customer/wishlist',

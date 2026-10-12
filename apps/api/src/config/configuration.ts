@@ -48,8 +48,15 @@ export default () => ({
     bucket: process.env.SUPABASE_BUCKET || 'gramer-bazar',
   },
   broadcast: {
-    // 'mock' (default) or 'whatsapp'. WhatsApp is not implemented yet.
+    // 'mock' (default) or 'whatsapp'.
     provider: process.env.BROADCAST_PROVIDER || 'mock',
+    whatsapp: {
+      accessToken: process.env.WHATSAPP_ACCESS_TOKEN,
+      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
+      businessAccountId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID,
+      webhookVerifyToken: process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'gramer-bazar-whatsapp-verify',
+      baseUrl: process.env.WHATSAPP_API_BASE_URL || 'https://graph.facebook.com/v21.0',
+    },
   },
   sms: {
     provider: process.env.SMS_PROVIDER || 'mock',

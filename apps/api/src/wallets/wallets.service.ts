@@ -127,4 +127,22 @@ export class WalletsService {
 
     return await this.walletsRepository.save(wallet);
   }
+
+  /**
+   * Credits a refund directly into the customer's wallet ledger (ACID transaction).
+   */
+  async creditRefund(userId: string, amount: number, referenceId: string, reason?: string) {
+    const description = reason ? `Refund: ${reason}` : `Order Refund (${referenceId})`;
+    return this.creditEarnings(userId, amount, description, referenceId);
+  }
+
+  /**
+   * Credits promotional cashback or loyalty bonus into the customer's wallet.
+   */
+  async creditCashback(userId: string, amount: number, referenceId: string, campaignTitle?: string) {
+    const description = campaignTitle
+      ? `Loyalty Cashback: ${campaignTitle}`
+      : `Promotional Cashback (${referenceId})`;
+    return this.creditEarnings(userId, amount, description, referenceId);
+  }
 }

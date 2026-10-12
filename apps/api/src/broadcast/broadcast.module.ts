@@ -11,6 +11,7 @@ import { BroadcastTemplatesController } from './controllers/broadcast-templates.
 import { BroadcastAudienceController } from './controllers/broadcast-audience.controller.js';
 import { BroadcastCampaignsController } from './controllers/broadcast-campaigns.controller.js';
 import { UserBroadcastsController } from './controllers/user-broadcasts.controller.js';
+import { WhatsAppWebhookController } from './controllers/whatsapp-webhook.controller.js';
 
 import { BroadcastTemplatesService } from './services/broadcast-templates.service.js';
 import { BroadcastAudienceService } from './services/broadcast-audience.service.js';
@@ -37,6 +38,7 @@ import { WhatsAppBroadcastProvider } from './providers/whatsapp/whatsapp-broadca
     BroadcastAudienceController,
     BroadcastCampaignsController,
     UserBroadcastsController,
+    WhatsAppWebhookController,
   ],
   providers: [
     BroadcastTemplatesService,

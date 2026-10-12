@@ -20,6 +20,7 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { getApiErrorMessage } from '@/lib/apiError';
 import { getOrderStatusMeta, getPaymentStatusMeta, PAYMENT_METHOD_META } from '@/lib/order-status';
 import { formatCurrency, formatDateTime, formatReference } from '@/lib/format';
+import { ThermalReceiptModal } from '@/components/orders/ThermalReceiptModal';
 
 export interface CustomerOrderDetailsViewProps {
   lang?: string;
@@ -155,6 +156,7 @@ export function CustomerOrderDetailsView({ lang = 'en', orderId }: CustomerOrder
         badge={<StatusBadge tone={statusMeta.tone} label={isBn ? statusMeta.bn : statusMeta.en} />}
         secondaryActions={
           <>
+            <ThermalReceiptModal order={order as any} lang={lang} />
             {canCancel && (
               <Button
                 variant="outline"
