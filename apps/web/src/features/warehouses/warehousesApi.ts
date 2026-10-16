@@ -109,6 +109,32 @@ export interface UpdateStockTransferStatusDto {
   notes?: string;
 }
 
+export interface WarehouseTelemetry {
+  id: string;
+  hubId: string;
+  sensorType: 'TEMPERATURE' | 'HUMIDITY' | 'ETHYLENE_GAS' | 'POWER_STATUS';
+  value: number;
+  unit: string;
+  status: 'OPTIMAL' | 'WARNING' | 'CRITICAL';
+  notes?: string | null;
+  recordedAt: string;
+}
+
+export interface TelemetryOverview {
+  totalHubs: number;
+  optimalHubs: number;
+  warningHubs: number;
+  criticalHubs: number;
+  latestReadings: WarehouseTelemetry[];
+}
+
+export interface IngestTelemetryDto {
+  sensorType: 'TEMPERATURE' | 'HUMIDITY' | 'ETHYLENE_GAS' | 'POWER_STATUS';
+  value: number;
+  unit: string;
+  notes?: string;
+}
+
 export const warehousesApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getWarehouseHubs: builder.query<
@@ -202,6 +228,34 @@ export const warehousesApi = api.injectEndpoints({
         { type: 'HubStock' as const },
       ],
     }),
+
+    getTelemetryOverview: builder.query<TelemetryOverview, void>({
+      query: () => '/warehouses/telemetry/overview',
+      providesTags: [{ type: 'WarehouseTelemetry', id: 'OVERVIEW' }],
+    }),
+
+    getHubTelemetry: builder.query<WarehouseTelemetry[], { hubId: string; limit?: number }>({
+      query: ({ hubId, limit = 50 }) => ({
+        url: `/warehouses/hubs/${hubId}/telemetry`,
+        params: { limit },
+      }),
+      providesTags: (_res, _err, { hubId }) => [{ type: 'WarehouseTelemetry', id: hubId }],
+    }),
+
+    ingestTelemetry: builder.mutation<
+      WarehouseTelemetry,
+      { hubId: string; data: IngestTelemetryDto }
+    >({
+      query: ({ hubId, data }) => ({
+        url: `/warehouses/hubs/${hubId}/telemetry`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: (_res, _err, { hubId }) => [
+        { type: 'WarehouseTelemetry', id: hubId },
+        { type: 'WarehouseTelemetry', id: 'OVERVIEW' },
+      ],
+    }),
   }),
   overrideExisting: false,
 });
@@ -215,4 +269,8 @@ export const {
   useGetStockTransfersQuery,
   useCreateStockTransferMutation,
   useUpdateStockTransferStatusMutation,
+  useGetTelemetryOverviewQuery,
+  useGetHubTelemetryQuery,
+  useIngestTelemetryMutation,
 } = warehousesApi;
+

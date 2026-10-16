@@ -17,6 +17,7 @@ import {
   AllocateHubStockDto,
   CreateStockTransferDto,
   UpdateStockTransferStatusDto,
+  IngestTelemetryDto,
 } from '../dto/warehouse-hub.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../../common/guards/roles.guard.js';
@@ -30,6 +31,13 @@ import { StockTransferStatus } from '../entities/stock-transfer.entity.js';
 @ApiBearerAuth()
 export class WarehouseHubController {
   constructor(private readonly hubService: WarehouseHubService) {}
+
+  @Get('telemetry/overview')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Get nationwide IoT cold storage telemetry overview and alerts' })
+  getTelemetryOverview() {
+    return this.hubService.getTelemetryOverview();
+  }
 
   @Get('hubs')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.SELLER)
@@ -76,6 +84,27 @@ export class WarehouseHubController {
     return this.hubService.allocateStock(hubId, dto);
   }
 
+  @Post('hubs/:id/telemetry')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Ingest IoT environmental sensor readings for a warehouse hub' })
+  ingestTelemetry(
+    @Param('id', ParseUUIDPipe) hubId: string,
+    @Body() dto: IngestTelemetryDto,
+  ) {
+    return this.hubService.ingestTelemetry(hubId, dto);
+  }
+
+  @Get('hubs/:id/telemetry')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Get recent IoT telemetry records for a warehouse hub' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  getHubTelemetry(
+    @Param('id', ParseUUIDPipe) hubId: string,
+    @Query('limit') limit?: number,
+  ) {
+    return this.hubService.getHubTelemetry(hubId, limit ? Number(limit) : 50);
+  }
+
   @Get('transfers')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'List stock transfers between warehouse hubs' })
@@ -105,3 +134,4 @@ export class WarehouseHubController {
     return this.hubService.updateTransferStatus(id, dto.status, dto.notes);
   }
 }
+

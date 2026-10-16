@@ -23,8 +23,11 @@ import {
   Megaphone,
   UserCog,
   Building2,
+  Coins,
+  Navigation,
 } from 'lucide-react';
 import { ElementType } from 'react';
+
 
 export interface DashboardRoute {
   title: string;
@@ -383,6 +386,15 @@ export const sellerRoutes: DashboardRoute[] = [
     matchPrefixes: ['/seller/wallet'],
   },
   {
+    title: 'Agri Micro-Credit',
+    titleBn: 'কৃষি ঋণ ও চলতি মূলধন',
+    href: '/seller/finance/loans',
+    icon: Coins,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/finance/loans'],
+  },
+  {
     title: 'Sales Reports',
     titleBn: 'বিক্রয় রিপোর্ট',
     href: '/seller/reports',
@@ -391,6 +403,7 @@ export const sellerRoutes: DashboardRoute[] = [
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/reports'],
   },
+
 
   // Section: Support & Settings
   {
@@ -452,6 +465,15 @@ export const riderRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'ডেলিভারি কাজ',
     matchPrefixes: ['/rider/deliveries'],
+  },
+  {
+    title: 'Optimized Route',
+    titleBn: 'স্মার্ট রুট ও ক্লাস্টার',
+    href: '/rider/routes',
+    icon: Navigation,
+    section: 'Operations',
+    sectionBn: 'ডেলিভারি কাজ',
+    matchPrefixes: ['/rider/routes'],
   },
   {
     title: 'Delivery History',

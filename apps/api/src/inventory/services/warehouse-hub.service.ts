@@ -11,9 +11,15 @@ import { WarehouseHub } from '../entities/warehouse-hub.entity.js';
 import { HubStock } from '../entities/hub-stock.entity.js';
 import { StockTransfer, StockTransferStatus } from '../entities/stock-transfer.entity.js';
 import {
+  WarehouseTelemetry,
+  TelemetrySensorType,
+  TelemetryStatus,
+} from '../entities/warehouse-telemetry.entity.js';
+import {
   CreateWarehouseHubDto,
   AllocateHubStockDto,
   CreateStockTransferDto,
+  IngestTelemetryDto,
 } from '../dto/warehouse-hub.dto.js';
 
 @Injectable()
@@ -27,8 +33,11 @@ export class WarehouseHubService {
     private readonly hubStockRepo: Repository<HubStock>,
     @InjectRepository(StockTransfer)
     private readonly transferRepo: Repository<StockTransfer>,
+    @InjectRepository(WarehouseTelemetry)
+    private readonly telemetryRepo: Repository<WarehouseTelemetry>,
     private readonly dataSource: DataSource,
   ) {}
+
 
   async createHub(dto: CreateWarehouseHubDto): Promise<WarehouseHub> {
     const existing = await this.hubRepo.findOne({ where: { code: dto.code } });
@@ -274,4 +283,119 @@ export class WarehouseHubService {
 
     return qb.orderBy('transfer.createdAt', 'DESC').getMany();
   }
+
+  async ingestTelemetry(hubId: string, dto: IngestTelemetryDto): Promise<WarehouseTelemetry> {
+    const hub = await this.findOneHub(hubId);
+
+    // Dynamic Agricultural Spoilage & Safety Thresholds
+    let calculatedStatus = TelemetryStatus.OPTIMAL;
+
+    if (dto.sensorType === 'TEMPERATURE') {
+      // Perishable crops / Cold Storage threshold in Celsius:
+      // Optimal: 2°C to 12°C
+      // Warning: 12.1°C to 18°C or 0°C to 1.9°C
+      // Critical: > 18°C (spoilage risk) or < 0°C (frost damage)
+      if (dto.value > 18 || dto.value < 0) {
+        calculatedStatus = TelemetryStatus.CRITICAL;
+      } else if (dto.value > 12 || dto.value < 2) {
+        calculatedStatus = TelemetryStatus.WARNING;
+      }
+    } else if (dto.sensorType === 'HUMIDITY') {
+      // Optimal relative humidity for grain/crop storage: 55% to 80%
+      if (dto.value > 90 || dto.value < 40) {
+        calculatedStatus = TelemetryStatus.CRITICAL;
+      } else if (dto.value > 80 || dto.value < 55) {
+        calculatedStatus = TelemetryStatus.WARNING;
+      }
+    } else if (dto.sensorType === 'ETHYLENE_GAS') {
+      // Ethylene in ppm (high levels trigger rapid rot)
+      if (dto.value > 10) {
+        calculatedStatus = TelemetryStatus.CRITICAL;
+      } else if (dto.value > 5) {
+        calculatedStatus = TelemetryStatus.WARNING;
+      }
+    } else if (dto.sensorType === 'POWER_STATUS') {
+      if (dto.value === 0) {
+        calculatedStatus = TelemetryStatus.CRITICAL;
+      }
+    }
+
+    const telemetry = this.telemetryRepo.create({
+      hubId: hub.id,
+      sensorType: dto.sensorType as TelemetrySensorType,
+      value: dto.value,
+      unit: dto.unit,
+      status: calculatedStatus,
+      notes: dto.notes ?? null,
+    });
+
+    const saved = await this.telemetryRepo.save(telemetry);
+
+    if (calculatedStatus === TelemetryStatus.CRITICAL) {
+      this.logger.error(
+        `🚨 CRITICAL STORAGE ALERT: Hub ${hub.name} (${hub.code}) sensor ${dto.sensorType} recorded ${dto.value} ${dto.unit}!`,
+      );
+    } else if (calculatedStatus === TelemetryStatus.WARNING) {
+      this.logger.warn(
+        `⚠️ STORAGE WARNING: Hub ${hub.name} (${hub.code}) sensor ${dto.sensorType} recorded ${dto.value} ${dto.unit}.`,
+      );
+    }
+
+    return saved;
+  }
+
+  async getHubTelemetry(hubId: string, limit = 50): Promise<WarehouseTelemetry[]> {
+    await this.findOneHub(hubId);
+    return this.telemetryRepo.find({
+      where: { hubId },
+      order: { recordedAt: 'DESC' },
+      take: limit,
+    });
+  }
+
+  async getTelemetryOverview(): Promise<{
+    totalHubs: number;
+    optimalHubs: number;
+    warningHubs: number;
+    criticalHubs: number;
+    latestReadings: WarehouseTelemetry[];
+  }> {
+    const hubs = await this.hubRepo.find({ where: { isActive: true } });
+    const latestReadings: WarehouseTelemetry[] = [];
+
+    let optimalCount = 0;
+    let warningCount = 0;
+    let criticalCount = 0;
+
+    for (const hub of hubs) {
+      const readings = await this.telemetryRepo.find({
+        where: { hubId: hub.id },
+        order: { recordedAt: 'DESC' },
+        take: 1,
+      });
+
+      if (readings.length > 0) {
+        const latest = readings[0];
+        latestReadings.push(latest);
+        if (latest.status === TelemetryStatus.CRITICAL) {
+          criticalCount++;
+        } else if (latest.status === TelemetryStatus.WARNING) {
+          warningCount++;
+        } else {
+          optimalCount++;
+        }
+      } else {
+        optimalCount++;
+      }
+    }
+
+    return {
+      totalHubs: hubs.length,
+      optimalHubs: optimalCount,
+      warningHubs: warningCount,
+      criticalHubs: criticalCount,
+      latestReadings,
+    };
+  }
 }
+

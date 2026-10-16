@@ -71,9 +71,13 @@ import { SearchAndPaginationIndexes1792000000000 } from './migrations/1792000000
 import { RestorePerformanceIndexes1793000000000 } from './migrations/1793000000000-RestorePerformanceIndexes.js';
 import { BroadcastModule } from './broadcast/broadcast.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
+import { AgriIntelligenceModule } from './agri-intelligence/agri-intelligence.module.js';
+import { AgriFintechModule } from './agri-fintech/agri-fintech.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
+
+
   imports: [
     StorageModule,
     ServeStaticModule.forRoot({
@@ -224,8 +228,12 @@ import { ScheduleModule } from '@nestjs/schedule';
     ImpersonationModule,
     AnnouncementsModule,
     BroadcastModule,
+    AgriIntelligenceModule,
+    AgriFintechModule,
   ],
+
   controllers: [AppController],
+
   providers: [
     AppService,
     {

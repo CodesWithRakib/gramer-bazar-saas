@@ -18,6 +18,10 @@ import {
   Package,
   Layers,
   ArrowRight,
+  Thermometer,
+  Activity,
+  Zap,
+  Wifi,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,9 +57,14 @@ import {
   useGetStockTransfersQuery,
   useCreateStockTransferMutation,
   useUpdateStockTransferStatusMutation,
+  useGetTelemetryOverviewQuery,
+  useGetHubTelemetryQuery,
+  useIngestTelemetryMutation,
   WarehouseHub,
   StockTransfer,
+  WarehouseTelemetry,
 } from '../warehousesApi';
+
 
 export interface AdminWarehousesViewProps {
   lang?: string;
@@ -70,7 +79,7 @@ export function AdminWarehousesView({
   const basePath = namespace === 'super-admin' ? 'super-admin' : 'admin';
 
   // State
-  const [activeTab, setActiveTab] = useState<'hubs' | 'stocks' | 'transfers'>('hubs');
+  const [activeTab, setActiveTab] = useState<'hubs' | 'stocks' | 'transfers' | 'telemetry'>('hubs');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedHubId, setSelectedHubId] = useState<string>('');
 
@@ -78,6 +87,7 @@ export function AdminWarehousesView({
   const [isCreateHubOpen, setIsCreateHubOpen] = useState(false);
   const [isCreateTransferOpen, setIsCreateTransferOpen] = useState(false);
   const [isAllocateStockOpen, setIsAllocateStockOpen] = useState(false);
+  const [isIngestTelemetryOpen, setIsIngestTelemetryOpen] = useState(false);
 
   // Queries
   const { data: hubs = [], isLoading: isHubsLoading, refetch: refetchHubs } = useGetWarehouseHubsQuery();
@@ -94,12 +104,28 @@ export function AdminWarehousesView({
     refetch: refetchTransfers,
   } = useGetStockTransfersQuery();
 
+  const {
+    data: telemetryOverview,
+    isLoading: isTelemetryOverviewLoading,
+    refetch: refetchTelemetry,
+  } = useGetTelemetryOverviewQuery();
+
+  const {
+    data: hubTelemetry = [],
+    isLoading: isHubTelemetryLoading,
+    refetch: refetchHubTelemetry,
+  } = useGetHubTelemetryQuery(
+    { hubId: selectedHubId },
+    { skip: !selectedHubId }
+  );
+
   // Mutations
   const [createHub, { isLoading: isCreatingHub }] = useCreateWarehouseHubMutation();
   const [createTransfer, { isLoading: isCreatingTransfer }] = useCreateStockTransferMutation();
   const [updateTransferStatus, { isLoading: isUpdatingStatus }] =
     useUpdateStockTransferStatusMutation();
   const [allocateStock, { isLoading: isAllocatingStock }] = useAllocateHubStockMutation();
+  const [ingestTelemetry, { isLoading: isIngestingTelemetry }] = useIngestTelemetryMutation();
 
   // Form states
   const [hubForm, setHubForm] = useState({
@@ -131,6 +157,14 @@ export function AdminWarehousesView({
     reorderPoint: 15,
     reorderQuantity: 100,
   });
+
+  const [telemetryForm, setTelemetryForm] = useState({
+    sensorType: 'TEMPERATURE' as 'TEMPERATURE' | 'HUMIDITY' | 'ETHYLENE_GAS' | 'POWER_STATUS',
+    value: 5.5,
+    unit: '°C',
+    notes: '',
+  });
+
 
   // Automatically select first hub for stock inspection if none selected
   React.useEffect(() => {
@@ -268,6 +302,35 @@ export function AdminWarehousesView({
     }
   };
 
+  const handleIngestTelemetry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedHubId) {
+      toast.error(isBn ? 'হাব বেছে নিন' : 'Please select a hub');
+      return;
+    }
+    try {
+      await ingestTelemetry({
+        hubId: selectedHubId,
+        data: {
+          sensorType: telemetryForm.sensorType,
+          value: Number(telemetryForm.value),
+          unit: telemetryForm.unit,
+          notes: telemetryForm.notes || undefined,
+        },
+      }).unwrap();
+
+      toast.success(
+        isBn ? 'আইওটি টেলিমেট্রি রিডিং সফলভাবে যোগ করা হয়েছে' : 'IoT telemetry reading logged successfully'
+      );
+      setIsIngestTelemetryOpen(false);
+      refetchHubTelemetry();
+      refetchTelemetry();
+    } catch {
+      toast.error(isBn ? 'টেলিমেট্রি রিডিং সংরক্ষণ ব্যর্থ হয়েছে' : 'Failed to log telemetry reading');
+    }
+  };
+
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -395,7 +458,17 @@ export function AdminWarehousesView({
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="telemetry" className="gap-2">
+              <Thermometer className="w-4 h-4" />
+              <span>{isBn ? 'কোল্ড স্টোরেজ আইওটি' : 'Cold Storage IoT'}</span>
+              {telemetryOverview && telemetryOverview.criticalHubs > 0 && (
+                <Badge variant="destructive" className="ms-1 px-1.5 py-0 text-[10px]">
+                  {telemetryOverview.criticalHubs}
+                </Badge>
+              )}
+            </TabsTrigger>
           </TabsList>
+
 
           {activeTab === 'hubs' && (
             <div className="relative w-full sm:w-72">
@@ -436,7 +509,35 @@ export function AdminWarehousesView({
               </Button>
             </div>
           )}
+
+          {activeTab === 'telemetry' && (
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Select value={selectedHubId} onValueChange={(val) => setSelectedHubId(val)}>
+                <SelectTrigger className="w-[240px]">
+                  <SelectValue
+                    placeholder={isBn ? 'ওয়্যারহাউস বেছে নিন' : 'Select warehouse hub'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {hubs.map((h) => (
+                    <SelectItem key={h.id} value={h.id}>
+                      {isBn ? h.nameBn : h.nameEn} ({h.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                size="sm"
+                className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() => setIsIngestTelemetryOpen(true)}
+              >
+                <Activity className="w-4 h-4" />
+                <span>{isBn ? 'সেন্সর রিডিং যোগ' : 'Log IoT Reading'}</span>
+              </Button>
+            </div>
+          )}
         </div>
+
 
         {/* Tab 1: Hubs List */}
         <TabsContent value="hubs" className="m-0 space-y-4">
@@ -782,7 +883,238 @@ export function AdminWarehousesView({
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Tab 4: IoT Cold Storage Telemetry */}
+        <TabsContent value="telemetry" className="m-0 space-y-6">
+          {/* Telemetry Overview Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <Card className="border border-border/80 shadow-xs">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {isBn ? 'মনিটরকৃত স্টোরেজ হাব' : 'Monitored Storage Hubs'}
+                  </p>
+                  <h4 className="text-xl font-bold mt-1 text-foreground">
+                    {telemetryOverview?.totalHubs || hubs.length}
+                  </h4>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <Wifi className="w-5 h-5" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-border/80 shadow-xs">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {isBn ? 'অনুকূল পরিবেশ (Optimal)' : 'Optimal Hubs'}
+                  </p>
+                  <h4 className="text-xl font-bold mt-1 text-emerald-600">
+                    {telemetryOverview?.optimalHubs ?? hubs.length}
+                  </h4>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-border/80 shadow-xs">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {isBn ? 'সতর্কতা স্তর (Warning)' : 'Warning Alerts'}
+                  </p>
+                  <h4 className="text-xl font-bold mt-1 text-amber-600">
+                    {telemetryOverview?.warningHubs ?? 0}
+                  </h4>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-border/80 shadow-xs">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {isBn ? 'পচন ঝুঁকি (Critical)' : 'Critical Spoilage Risks'}
+                  </p>
+                  <h4 className="text-xl font-bold mt-1 text-rose-600">
+                    {telemetryOverview?.criticalHubs ?? 0}
+                  </h4>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center">
+                  <XCircle className="w-5 h-5" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Active Hub Telemetry Detail */}
+          <Card className="border border-border/80 shadow-xs">
+            <CardHeader className="pb-4 border-b border-border/40">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-base font-bold flex items-center gap-2">
+                    <Thermometer className="w-4 h-4 text-emerald-600" />
+                    <span>
+                      {isBn
+                        ? 'লাইভ পরিবেশগত সেন্সর রিডিং'
+                        : 'Live Environmental Sensor Telemetry'}
+                    </span>
+                  </CardTitle>
+                  <CardDescription className="text-xs mt-0.5">
+                    {isBn
+                      ? 'নির্বাচিত ওয়্যারহাউসের তাপমাত্রা, আর্দ্রতা ও বায়ুর গুণমান মনিটরিং'
+                      : 'Real-time temperature, humidity and air quality tracking for the selected facility'}
+                  </CardDescription>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => setIsIngestTelemetryOpen(true)}
+                  className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  <Activity className="w-4 h-4" />
+                  <span>{isBn ? 'নতুন রিডিং লগ করুন' : 'Log Sensor Reading'}</span>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              {isHubTelemetryLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 py-8">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-28 rounded-2xl" />
+                  ))}
+                </div>
+              ) : hubTelemetry.length === 0 ? (
+                <EmptyState
+                  icon={<Thermometer className="w-8 h-8 text-muted-foreground" />}
+                  title={
+                    isBn
+                      ? 'এই হাবের কোনো আইওটি সেন্সর রিডিং নেই'
+                      : 'No IoT sensor telemetry for this hub'
+                  }
+                  description={
+                    isBn
+                      ? 'টেলিমেট্রি সেন্সর কানেক্ট করুন অথবা সিমুলেটেড টেস্ট রিডিং রেকর্ড করুন।'
+                      : 'Connect IoT hardware probes or log a test environmental packet to start tracking.'
+                  }
+                  action={{
+                    label: isBn ? 'প্রথম রিডিং যোগ করুন' : 'Log First Reading',
+                    onClick: () => setIsIngestTelemetryOpen(true),
+                  }}
+                />
+
+              ) : (
+                <div className="space-y-6">
+                  {/* Dials Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {hubTelemetry.slice(0, 4).map((reading) => (
+                      <div
+                        key={reading.id}
+                        className={`p-4 rounded-2xl border transition-all ${
+                          reading.status === 'CRITICAL'
+                            ? 'bg-rose-50/60 border-rose-300 dark:bg-rose-950/20'
+                            : reading.status === 'WARNING'
+                              ? 'bg-amber-50/60 border-amber-300 dark:bg-amber-950/20'
+                              : 'bg-emerald-50/60 border-emerald-300 dark:bg-emerald-950/20'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">
+                            {reading.sensorType}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              reading.status === 'CRITICAL'
+                                ? 'bg-rose-100 text-rose-800'
+                                : reading.status === 'WARNING'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-emerald-100 text-emerald-800'
+                            }`}
+                          >
+                            {reading.status}
+                          </span>
+                        </div>
+                        <div className="text-2xl font-black text-slate-900 dark:text-white">
+                          {reading.value} {reading.unit}
+                        </div>
+                        {reading.notes && (
+                          <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                            {reading.notes}
+                          </div>
+                        )}
+                        <div className="text-[10px] text-slate-400 mt-2">
+                          {formatDate(reading.recordedAt, lang)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* History Log Table */}
+                  <div className="overflow-x-auto rounded-xl border border-border/60">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-muted/40 text-xs font-semibold text-muted-foreground uppercase border-b border-border/60">
+                        <tr>
+                          <th className="py-2.5 px-4">{isBn ? 'সময়' : 'Recorded At'}</th>
+                          <th className="py-2.5 px-4">{isBn ? 'সেন্সর' : 'Sensor Type'}</th>
+                          <th className="py-2.5 px-4">{isBn ? 'রিডিং' : 'Reading Value'}</th>
+                          <th className="py-2.5 px-4 text-center">
+                            {isBn ? 'স্ট্যাটাস' : 'Safety Status'}
+                          </th>
+                          <th className="py-2.5 px-4">{isBn ? 'মন্তব্য' : 'Notes'}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40">
+                        {hubTelemetry.map((row) => (
+                          <tr key={row.id} className="hover:bg-muted/30">
+                            <td className="py-2.5 px-4 text-xs text-muted-foreground">
+                              {formatDate(row.recordedAt, lang)}
+                            </td>
+                            <td className="py-2.5 px-4 font-medium text-xs">
+                              {row.sensorType}
+                            </td>
+                            <td className="py-2.5 px-4 font-bold text-sm text-foreground">
+                              {row.value} {row.unit}
+                            </td>
+                            <td className="py-2.5 px-4 text-center">
+                              <Badge
+                                variant={
+                                  row.status === 'CRITICAL'
+                                    ? 'destructive'
+                                    : row.status === 'WARNING'
+                                      ? 'outline'
+                                      : 'default'
+                                }
+                                className={`text-[10px] ${
+                                  row.status === 'OPTIMAL'
+                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                                    : row.status === 'WARNING'
+                                      ? 'border-amber-500 text-amber-700 bg-amber-50'
+                                      : ''
+                                }`}
+                              >
+                                {row.status}
+                              </Badge>
+                            </td>
+                            <td className="py-2.5 px-4 text-xs text-muted-foreground">
+                              {row.notes || '-'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
+
 
       {/* Dialog: Create Hub */}
       <Dialog open={isCreateHubOpen} onOpenChange={setIsCreateHubOpen}>
@@ -1128,6 +1460,119 @@ export function AdminWarehousesView({
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog: Ingest Telemetry */}
+      <Dialog open={isIngestTelemetryOpen} onOpenChange={setIsIngestTelemetryOpen}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleIngestTelemetry}>
+            <DialogHeader>
+              <DialogTitle>
+                {isBn ? 'আইওটি পরিবেশগত সেন্সর রিডিং রেকর্ড করুন' : 'Log IoT Environmental Telemetry'}
+              </DialogTitle>
+              <DialogDescription>
+                {isBn
+                  ? 'ওয়্যারহাউস প্রকোষ্ঠের তাপমাত্রা, আর্দ্রতা বা গ্যাসের পরিমাপ ইনপুট দিন।'
+                  : 'Transmit real-time probe measurements for perishable produce protection.'}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4 text-sm">
+              <div className="space-y-1.5">
+                <Label>{isBn ? 'সেন্সর ধরন' : 'Sensor Probe Type'} *</Label>
+                <Select
+                  value={telemetryForm.sensorType}
+                  onValueChange={(val: any) => {
+                    let defaultUnit = '°C';
+                    if (val === 'HUMIDITY') defaultUnit = '%';
+                    if (val === 'ETHYLENE_GAS') defaultUnit = 'ppm';
+                    if (val === 'POWER_STATUS') defaultUnit = 'status';
+                    setTelemetryForm({
+                      ...telemetryForm,
+                      sensorType: val,
+                      unit: defaultUnit,
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="TEMPERATURE">
+                      {isBn ? 'তাপমাত্রা (Temperature °C)' : 'Temperature (°C)'}
+                    </SelectItem>
+                    <SelectItem value="HUMIDITY">
+                      {isBn ? 'বাতাসের আর্দ্রতা (Humidity %)' : 'Relative Humidity (%)'}
+                    </SelectItem>
+                    <SelectItem value="ETHYLENE_GAS">
+                      {isBn ? 'ইথিলিন গ্যাস (Ethylene Gas ppm)' : 'Ethylene Gas (ppm)'}
+                    </SelectItem>
+                    <SelectItem value="POWER_STATUS">
+                      {isBn ? 'বিদ্যুৎ সংযোগ অবস্থা (Power Status)' : 'Grid / Backup Power (1=ON, 0=OFF)'}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>{isBn ? 'পরিমাপ মান' : 'Reading Value'} *</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    required
+                    value={telemetryForm.value}
+                    onChange={(e) =>
+                      setTelemetryForm({ ...telemetryForm, value: parseFloat(e.target.value) })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{isBn ? 'একক' : 'Unit'} *</Label>
+                  <Input
+                    required
+                    value={telemetryForm.unit}
+                    onChange={(e) => setTelemetryForm({ ...telemetryForm, unit: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>{isBn ? 'মন্তব্য বা টেস্ট নোট' : 'Probe Location / Operational Notes'}</Label>
+                <Input
+                  placeholder={isBn ? 'যেমন: চেম্বার-২ সেন্ট্রাল র্যাক' : 'e.g. Chamber-2 Cold Vault'}
+                  value={telemetryForm.notes}
+                  onChange={(e) => setTelemetryForm({ ...telemetryForm, notes: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsIngestTelemetryOpen(false)}
+              >
+                {isBn ? 'বাতিল' : 'Cancel'}
+              </Button>
+              <Button
+                type="submit"
+                disabled={isIngestingTelemetry}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              >
+                {isIngestingTelemetry
+                  ? isBn
+                    ? 'সংরক্ষণ হচ্ছে...'
+                    : 'Transmitting...'
+                  : isBn
+                    ? 'রিডিং জমা দিন'
+                    : 'Transmit Packet'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

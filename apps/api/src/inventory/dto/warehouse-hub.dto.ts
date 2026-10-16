@@ -104,3 +104,27 @@ export class UpdateStockTransferStatusDto {
   @IsString()
   notes?: string;
 }
+
+export class IngestTelemetryDto {
+  @ApiProperty({
+    description: 'Telemetry sensor type',
+    enum: ['TEMPERATURE', 'HUMIDITY', 'ETHYLENE_GAS', 'POWER_STATUS'],
+    example: 'TEMPERATURE',
+  })
+  @IsString()
+  sensorType: 'TEMPERATURE' | 'HUMIDITY' | 'ETHYLENE_GAS' | 'POWER_STATUS';
+
+  @ApiProperty({ description: 'Sensor reading value', example: 4.5 })
+  @IsNumber()
+  value: number;
+
+  @ApiProperty({ description: 'Measurement unit', example: '°C' })
+  @IsString()
+  unit: string;
+
+  @ApiPropertyOptional({ description: 'Optional operational notes' })
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
+

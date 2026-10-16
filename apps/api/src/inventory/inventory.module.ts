@@ -6,6 +6,7 @@ import { Shop } from '../shops/entities/shop.entity.js';
 import { WarehouseHub } from './entities/warehouse-hub.entity.js';
 import { HubStock } from './entities/hub-stock.entity.js';
 import { StockTransfer } from './entities/stock-transfer.entity.js';
+import { WarehouseTelemetry } from './entities/warehouse-telemetry.entity.js';
 
 import { SellerProductsController } from './seller-products/seller-products.controller.js';
 import { SellerProductsService } from './seller-products/seller-products.service.js';
@@ -23,8 +24,10 @@ import { WarehouseHubService } from './services/warehouse-hub.service.js';
       WarehouseHub,
       HubStock,
       StockTransfer,
+      WarehouseTelemetry,
     ]),
   ],
+
   controllers: [
     SellerProductsController,
     InventoryController,

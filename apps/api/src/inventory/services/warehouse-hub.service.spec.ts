@@ -44,6 +44,13 @@ describe('WarehouseHubService', () => {
       })),
     };
 
+    const telemetryRepo = {
+      findOne: vi.fn(),
+      find: vi.fn(),
+      create: vi.fn((dto) => ({ id: 'telem-1', ...dto })),
+      save: vi.fn(async (entity) => entity),
+    };
+
     queryRunner = {
       connect: vi.fn(),
       startTransaction: vi.fn(),
@@ -60,8 +67,9 @@ describe('WarehouseHubService', () => {
       createQueryRunner: vi.fn(() => queryRunner),
     };
 
-    service = new WarehouseHubService(hubRepo, hubStockRepo, transferRepo, dataSource);
+    service = new WarehouseHubService(hubRepo, hubStockRepo, transferRepo, telemetryRepo as any, dataSource);
   });
+
 
   describe('createHub', () => {
     it('creates a new warehouse hub when code is unique', async () => {
@@ -176,4 +184,45 @@ describe('WarehouseHubService', () => {
       expect(queryRunner.commitTransaction).toHaveBeenCalled();
     });
   });
+
+  describe('ingestTelemetry', () => {
+    it('ingests optimal temperature reading correctly', async () => {
+      hubRepo.findOne.mockResolvedValue({ id: 'hub-1', name: 'Bogra Hub', code: 'HUB-BGR-01' });
+
+      const result = await service.ingestTelemetry('hub-1', {
+        sensorType: 'TEMPERATURE',
+        value: 5.2,
+        unit: '°C',
+        notes: 'Chamber 1 cooling test',
+      });
+
+      expect(result.status).toBe('OPTIMAL');
+      expect(result.value).toBe(5.2);
+    });
+
+    it('flags temperature above 18°C as CRITICAL spoilage risk', async () => {
+      hubRepo.findOne.mockResolvedValue({ id: 'hub-1', name: 'Bogra Hub', code: 'HUB-BGR-01' });
+
+      const result = await service.ingestTelemetry('hub-1', {
+        sensorType: 'TEMPERATURE',
+        value: 22.5,
+        unit: '°C',
+      });
+
+      expect(result.status).toBe('CRITICAL');
+    });
+
+    it('flags humidity between 80% and 90% as WARNING', async () => {
+      hubRepo.findOne.mockResolvedValue({ id: 'hub-1', name: 'Bogra Hub', code: 'HUB-BGR-01' });
+
+      const result = await service.ingestTelemetry('hub-1', {
+        sensorType: 'HUMIDITY',
+        value: 84.0,
+        unit: '%',
+      });
+
+      expect(result.status).toBe('WARNING');
+    });
+  });
 });
+

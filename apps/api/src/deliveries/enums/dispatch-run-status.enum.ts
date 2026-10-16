@@ -1,0 +1,14 @@
+export enum DispatchRunStatus {
+  PLANNED = 'PLANNED',
+  ASSIGNED = 'ASSIGNED',
+  IN_TRANSIT = 'IN_TRANSIT',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum WaypointStatus {
+  PENDING = 'PENDING',
+  ARRIVED = 'ARRIVED',
+  DELIVERED = 'DELIVERED',
+  FAILED = 'FAILED',
+}

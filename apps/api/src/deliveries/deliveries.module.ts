@@ -16,22 +16,36 @@ import { MockCourierProvider } from './courier/mock-courier.provider.js';
 import { SteadfastCourierProvider } from './courier/steadfast-courier.provider.js';
 import { PathaoCourierProvider } from './courier/pathao-courier.provider.js';
 
+import { DispatchCluster } from './entities/dispatch-cluster.entity.js';
+import { WarehouseHub } from '../inventory/entities/warehouse-hub.entity.js';
+import { LogisticsDispatchService } from './services/logistics-dispatch.service.js';
+import { LogisticsDispatchController } from './controllers/logistics-dispatch.controller.js';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Delivery, DeliveryHistory, Order, OrderStatusHistory, User]),
+    TypeOrmModule.forFeature([
+      Delivery,
+      DeliveryHistory,
+      Order,
+      OrderStatusHistory,
+      User,
+      DispatchCluster,
+      WarehouseHub,
+    ]),
     ConfigModule,
     NotificationsModule,
     RidersModule,
   ],
-  controllers: [DeliveriesController, CourierController],
+  controllers: [DeliveriesController, CourierController, LogisticsDispatchController],
   providers: [
     DeliveriesService,
     CourierService,
     MockCourierProvider,
     SteadfastCourierProvider,
     PathaoCourierProvider,
+    LogisticsDispatchService,
   ],
-  exports: [DeliveriesService, CourierService],
+  exports: [DeliveriesService, CourierService, LogisticsDispatchService],
 })
 export class DeliveriesModule {}
 

@@ -231,6 +231,13 @@ export const api = createApi({
     'HubStock',
     'StockTransfer',
     'PartnerInquiry',
+    'MandiPrice',
+    'WarehouseTelemetry',
+    'FarmerCredit',
+    'MicroLoan',
+    'DispatchCluster',
   ],
   endpoints: () => ({}),
 });
+
+
