@@ -25,6 +25,7 @@ import {
   Building2,
   Coins,
   Navigation,
+  QrCode,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -346,6 +347,24 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Shop Operations',
     sectionBn: 'দোকান অপারেশন',
     matchPrefixes: ['/seller/inventory'],
+  },
+  {
+    title: 'Quality & Traceability',
+    titleBn: 'শস্য গ্রেডিং ও ট্র্যাকিং',
+    href: '/seller/inventory/traceability',
+    icon: QrCode,
+    section: 'Shop Operations',
+    sectionBn: 'দোকান অপারেশন',
+    matchPrefixes: ['/seller/inventory/traceability'],
+  },
+  {
+    title: 'Village POS & Hub',
+    titleBn: 'ইউডিসি পয়েন্ট ও পিওএস',
+    href: '/seller/pos',
+    icon: Store,
+    section: 'Shop Operations',
+    sectionBn: 'দোকান অপারেশন',
+    matchPrefixes: ['/seller/pos'],
   },
   {
     title: 'Orders',

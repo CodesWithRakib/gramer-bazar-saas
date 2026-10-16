@@ -236,6 +236,10 @@ export const api = createApi({
     'FarmerCredit',
     'MicroLoan',
     'DispatchCluster',
+    'ProduceBatch',
+    'AgentSession',
+    'AgentCollection',
+    'AgentSettlement',
   ],
   endpoints: () => ({}),
 });

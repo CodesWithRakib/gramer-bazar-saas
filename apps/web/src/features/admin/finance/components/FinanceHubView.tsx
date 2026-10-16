@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CreditCard, Wallet } from 'lucide-react';
+import { CreditCard, Wallet, Building2 } from 'lucide-react';
 import DashboardHubOverview, { HubCardItem } from '@/components/dashboard/DashboardHubOverview';
 
 export interface FinanceHubViewProps {
@@ -39,6 +39,19 @@ export function FinanceHubView({ lang = 'en', namespace = 'admin' }: FinanceHubV
       href: `/${basePath}/finance/payouts`,
       badge: 'Disbursements',
       badgeBn: 'তহবিল বিতরণ',
+    },
+    {
+      id: 'agent-settlements',
+      title: 'UDC Agent Settlements & Drawers',
+      titleBn: 'ইউডিসি এজেন্ট ক্যাশ সেটেলমেন্ট ও ড্রয়ার',
+      description:
+        'Audit rural field agent cash drawers, verify Upazila Post Office & MFI deposit slips, and monitor remote cash flow.',
+      descriptionBn:
+        'মাঠপর্যায়ের ফিল্ড এজেন্টদের ক্যাশ ড্রয়ার নিরীক্ষা, ডাকঘর ও এমএফআই ডিপোজিট স্লিপ অনুমোদন এবং নগদ অর্থের স্থিতি দেখুন।',
+      icon: Building2,
+      href: `/${basePath}/finance/agent-settlements`,
+      badge: 'Post Office / MFI',
+      badgeBn: 'ডাকঘর ও ব্যাংক',
     },
   ];
 

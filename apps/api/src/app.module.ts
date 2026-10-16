@@ -73,6 +73,8 @@ import { BroadcastModule } from './broadcast/broadcast.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { AgriIntelligenceModule } from './agri-intelligence/agri-intelligence.module.js';
 import { AgriFintechModule } from './agri-fintech/agri-fintech.module.js';
+import { AgriTraceabilityModule } from './agri-traceability/agri-traceability.module.js';
+import { AgentCommerceModule } from './agent-commerce/agent-commerce.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -230,6 +232,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     BroadcastModule,
     AgriIntelligenceModule,
     AgriFintechModule,
+    AgriTraceabilityModule,
+    AgentCommerceModule,
   ],
 
   controllers: [AppController],
