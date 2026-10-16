@@ -293,11 +293,13 @@ flowchart TD
   - Wired into `SellerOrderDetailsView.tsx` and `CustomerOrderDetailsView.tsx`.
 
 ### Phase 5: Multi-Hub Operations & Enterprise Scale (COMPLETED ✅)
-- **Task 5.1: Multi-Hub Warehouse Inventory Tracking (COMPLETED)**
+- **Task 5.1: Multi-Hub Warehouse Inventory Tracking & Management UI (COMPLETED)**
   - Implemented multi-hub entities: `WarehouseHub` (Division, District, Upazila/Union hubs, Geo coordinates), `HubStock` (per-hub SKU inventory, reserved quantities, reorder thresholds), and `StockTransfer` (`INITIATED`, `IN_TRANSIT`, `RECEIVED`, `CANCELLED`).
   - Implemented `WarehouseHubService` with atomic ACID inventory transfers, stock adjustments, and rollback guarantees.
   - Exposed REST API endpoints via `WarehouseHubController`: `GET /warehouses/hubs`, `POST /warehouses/hubs`, `GET /warehouses/hubs/:id/stocks`, `POST /warehouses/transfers`, `PATCH /warehouses/transfers/:id/status`.
   - Added unit test suite `apps/api/src/inventory/services/warehouse-hub.service.spec.ts` (7 tests passing).
+  - Built comprehensive Frontend Management UI: `AdminWarehousesView.tsx` with dynamic hub creation, SKU stock allocation modal, inter-hub transfer dispatcher, and state transition controls (`INITIATED` → `IN_TRANSIT` → `RECEIVED` / `CANCELLED`).
+  - Added live dashboard routes at `apps/web/app/[lang]/(admin)/admin/warehouses/page.tsx` and `apps/web/app/[lang]/(super-admin)/super-admin/warehouses/page.tsx` registered in `dashboard-routes.ts` and linked from `OrdersHubView.tsx`.
 - **Task 5.2: Android Mobile Application (PWA / TWA Wrapper) (COMPLETED)**
   - Upgraded Next.js Web App Manifest (`apps/web/app/manifest.ts`) with Trusted Web Activity (TWA) specifications (`id: com.gramerbazar.app`, `lang: bn-BD`, `shortcuts` for Orders, Products, Wallet, and Bangla Voice Search, `related_applications`).
   - Added Digital Asset Links configuration (`apps/web/public/.well-known/assetlinks.json`) enabling zero-address-bar verification in Android Chrome.
@@ -308,6 +310,12 @@ flowchart TD
   - Added comprehensive unit test coverage in `apps/api/src/analytics/analytics.service.spec.ts`.
   - Added RTK Query hooks in `analyticsApi.ts` (`useGetSeasonalDemandForecastQuery`, `useGetRegionalDemandBreakdownQuery`).
   - Integrated rich dashboard cards and tables in `DemandAnalyticsView.tsx` with seasonal trend badges, growth percentages, and regional order density distribution.
+- **Task 5.4: Dynamic Partner Inquiries & Institutional B2B Pipeline (COMPLETED)**
+  - Implemented `PartnerInquiry` entity and DTOs in `apps/api/src/applications/` supporting corporate buyers, cooperative societies, NGOs, and bulk input suppliers.
+  - Built `PartnerInquiriesController` with endpoints: public `POST /partner-inquiries`, protected `GET /partner-inquiries` and `PATCH /partner-inquiries/:id/status`.
+  - Implemented RTK Query mutations & tags in `applicationsApi.ts` and `store/api.ts`.
+  - Removed simulated delays in `apps/web/app/[lang]/(public)/partner-inquiries/page.tsx`, directly persisting real inquiries to the database.
+  - Added "B2B & Partner Leads" management tab inside `AdminSellerApplicationsView.tsx` with review dialogs, contact logs, and status transitions (`PENDING` → `CONTACTED` → `ACCEPTED` / `REJECTED`).
 
 ---
 
@@ -319,10 +327,12 @@ flowchart TD
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
 3. **Phase 3: Rural Accessibility & Ergonomics** (Bangla Web Speech Voice Search, 1-Click Rural Fast Checkout with passwordless ordering, Union Digital Center / Village Agent assisted commerce with 2% commission tracking).
 4. **Phase 4: Marketing, Retention & Automation** (Meta WhatsApp Cloud API broadcast provider and webhook status tracker, Customer Digital Wallet with instant BDT refunds and cashback, 58mm/80mm Thermal Receipt and Packing Slip generator).
-5. **Phase 5: Multi-Hub Operations & Enterprise Scale** (Multi-hub warehouse inventory tracking with ACID inter-hub stock transfers, Android Trusted Web Activity packaging configuration, and seasonal agricultural crop demand forecasting).
+5. **Phase 5: Multi-Hub Operations & Enterprise Scale** (Multi-hub warehouse inventory tracking with ACID inter-hub stock transfers, complete admin management views, dynamic B2B partner inquiry pipeline, Android Trusted Web Activity packaging configuration, and seasonal agricultural crop demand forecasting).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all 6 workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 73 test suites, 334 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 73 test suites, 337 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js Turbopack production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
+- **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
 - **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, and offline thermal receipt printing for remote village markets.
+

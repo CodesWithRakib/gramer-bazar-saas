@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { ApplicationsService } from './applications.service.js';
 import { SellerApplication } from './entities/seller-application.entity.js';
 import { RiderApplication } from './entities/rider-application.entity.js';
+import { PartnerInquiry, PartnerInquiryStatus } from './entities/partner-inquiry.entity.js';
 import { Shop } from '../shops/entities/shop.entity.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
 import { UsersService } from '../users/users.service.js';
@@ -26,6 +27,7 @@ describe('ApplicationsService', () => {
   let service: ApplicationsService;
   const sellerAppRepo = makeRepo();
   const riderAppRepo = makeRepo();
+  const partnerInquiryRepo = makeRepo();
   const shopRepo = makeRepo();
   const roleRepo = makeRepo();
   const usersService = {
@@ -57,6 +59,7 @@ describe('ApplicationsService', () => {
         ApplicationsService,
         { provide: getRepositoryToken(SellerApplication), useValue: sellerAppRepo },
         { provide: getRepositoryToken(RiderApplication), useValue: riderAppRepo },
+        { provide: getRepositoryToken(PartnerInquiry), useValue: partnerInquiryRepo },
         { provide: getRepositoryToken(Shop), useValue: shopRepo },
         { provide: getRepositoryToken(RoleEntity), useValue: roleRepo },
         { provide: UsersService, useValue: usersService },
@@ -176,6 +179,52 @@ describe('ApplicationsService', () => {
       const approved = await service.approveRiderApplication('r-app-1', 'admin-1');
       expect(approved.status).toBe(ApplicationStatus.APPROVED);
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+    });
+  });
+
+  describe('Partner Inquiries', () => {
+    it('submits a new partner inquiry with PENDING status', async () => {
+      const dto = {
+        organizationName: 'Pran Sourcing',
+        contactPerson: 'Rahim',
+        phone: '01711223344',
+        email: 'rahim@pran.com',
+        partnerType: 'INSTITUTIONAL_BUYER',
+        location: 'Dhaka',
+        requirements: 'Bulk rice purchase',
+      };
+
+      const result = await service.submitPartnerInquiry(dto);
+      expect(partnerInquiryRepo.create).toHaveBeenCalled();
+      expect(partnerInquiryRepo.save).toHaveBeenCalled();
+      expect(result.status).toBe(PartnerInquiryStatus.PENDING);
+    });
+
+    it('finds all partner inquiries ordered by date', async () => {
+      partnerInquiryRepo.find.mockResolvedValueOnce([
+        { id: 'inq-1', organizationName: 'Test Org', status: PartnerInquiryStatus.PENDING },
+      ]);
+
+      const list = await service.findAllPartnerInquiries();
+      expect(list).toHaveLength(1);
+      expect(list[0].organizationName).toBe('Test Org');
+    });
+
+    it('updates partner inquiry status and notes', async () => {
+      partnerInquiryRepo.findOne.mockResolvedValueOnce({
+        id: 'inq-1',
+        status: PartnerInquiryStatus.PENDING,
+        adminNotes: null,
+      });
+
+      const updated = await service.updatePartnerInquiryStatus('inq-1', {
+        status: PartnerInquiryStatus.CONTACTED,
+        adminNotes: 'Spoke with rep',
+      });
+
+      expect(partnerInquiryRepo.save).toHaveBeenCalled();
+      expect(updated.status).toBe(PartnerInquiryStatus.CONTACTED);
+      expect(updated.adminNotes).toBe('Spoke with rep');
     });
   });
 });

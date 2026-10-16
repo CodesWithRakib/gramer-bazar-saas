@@ -22,6 +22,7 @@ import {
   Banknote,
   Megaphone,
   UserCog,
+  Building2,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -78,6 +79,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/products', '/admin/categories', '/admin/brands'],
+  },
+  {
+    title: 'Warehouses',
+    titleBn: 'ওয়্যারহাউস হাব',
+    href: '/admin/warehouses',
+    icon: Building2,
+    permissions: ['products.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/warehouses'],
   },
 
   // Section: Management & Commerce
@@ -177,6 +188,16 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/products', '/super-admin/categories', '/super-admin/brands'],
+  },
+  {
+    title: 'Warehouses',
+    titleBn: 'ওয়্যারহাউস হাব',
+    href: '/super-admin/warehouses',
+    icon: Building2,
+    permissions: ['products.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/warehouses'],
   },
 
   // Section: Platform Governance

@@ -190,8 +190,63 @@ export const applicationsApi = api.injectEndpoints({
         invalidatesTags: ['RiderApplication'],
       }
     ),
+
+    // Partner Inquiries (B2B / Agro Cooperatives)
+    submitPartnerInquiry: builder.mutation<PartnerInquiry, CreatePartnerInquiryRequest>({
+      query: (body) => ({
+        url: '/partner-inquiries',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['PartnerInquiry'],
+    }),
+    getPartnerInquiries: builder.query<PartnerInquiry[], { status?: string } | void>({
+      query: (params) => ({
+        url: '/partner-inquiries',
+        params: params || {},
+      }),
+      providesTags: ['PartnerInquiry'],
+    }),
+    updatePartnerInquiryStatus: builder.mutation<
+      PartnerInquiry,
+      { id: string; status: 'PENDING' | 'CONTACTED' | 'ACCEPTED' | 'REJECTED'; adminNotes?: string }
+    >({
+      query: ({ id, status, adminNotes }) => ({
+        url: `/partner-inquiries/${id}/status`,
+        method: 'PATCH',
+        body: { status, adminNotes },
+      }),
+      invalidatesTags: ['PartnerInquiry'],
+    }),
   }),
 });
+
+export interface PartnerInquiry {
+  id: string;
+  organizationName: string;
+  contactPerson?: string | null;
+  designation?: string | null;
+  phone: string;
+  email?: string | null;
+  partnerType: string;
+  location?: string | null;
+  requirements?: string | null;
+  status: 'PENDING' | 'CONTACTED' | 'ACCEPTED' | 'REJECTED';
+  adminNotes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePartnerInquiryRequest {
+  organizationName: string;
+  contactPerson?: string;
+  designation?: string;
+  phone: string;
+  email?: string;
+  partnerType?: string;
+  location?: string;
+  requirements?: string;
+}
 
 export const {
   useSubmitSellerApplicationMutation,
@@ -206,4 +261,7 @@ export const {
   useGetAdminRiderApplicationByIdQuery,
   useApproveRiderApplicationMutation,
   useRejectRiderApplicationMutation,
+  useSubmitPartnerInquiryMutation,
+  useGetPartnerInquiriesQuery,
+  useUpdatePartnerInquiryStatusMutation,
 } = applicationsApi;

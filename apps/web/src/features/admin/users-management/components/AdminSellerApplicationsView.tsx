@@ -5,7 +5,10 @@ import {
   useGetAdminSellerApplicationsQuery,
   useApproveSellerApplicationMutation,
   useRejectSellerApplicationMutation,
+  useGetPartnerInquiriesQuery,
+  useUpdatePartnerInquiryStatusMutation,
   SellerApplication,
+  PartnerInquiry,
   ApplicationStatus,
 } from '@/features/applications/applicationsApi';
 import { DataTable } from '@/components/ui/data-table';
@@ -18,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -26,11 +30,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { CheckCircle2, XCircle, Eye, Store, Clock } from 'lucide-react';
+import {
+  CheckCircle2,
+  XCircle,
+  Eye,
+  Store,
+  Clock,
+  Handshake,
+  Building2,
+  Phone,
+  Mail,
+  MapPin,
+  FileText,
+} from 'lucide-react';
 import { customToast as toast } from '@/components/ui/custom-toast';
 import { BackButton } from '@/components/common/BackButton';
+import { formatDate } from '@/lib/format';
 
 export interface AdminSellerApplicationsViewProps {
   lang?: string;
@@ -60,6 +79,41 @@ export function AdminSellerApplicationsView({
 
   const [approveApp, { isLoading: isApproving }] = useApproveSellerApplicationMutation();
   const [rejectApp, { isLoading: isRejecting }] = useRejectSellerApplicationMutation();
+
+  const [mainTab, setMainTab] = useState<'sellers' | 'inquiries'>('sellers');
+
+  // Partner Inquiries Query & Mutation
+  const {
+    data: partnerInquiries = [],
+    isLoading: isInquiriesLoading,
+    refetch: refetchInquiries,
+  } = useGetPartnerInquiriesQuery();
+  const [updateInquiryStatus, { isLoading: isUpdatingInquiry }] =
+    useUpdatePartnerInquiryStatusMutation();
+
+  const [selectedInquiry, setSelectedInquiry] = useState<PartnerInquiry | null>(null);
+  const [inquiryStatus, setInquiryStatus] = useState<
+    'PENDING' | 'CONTACTED' | 'ACCEPTED' | 'REJECTED'
+  >('CONTACTED');
+  const [inquiryNotes, setInquiryNotes] = useState('');
+
+  const handleUpdateInquiry = async () => {
+    if (!selectedInquiry) return;
+    try {
+      await updateInquiryStatus({
+        id: selectedInquiry.id,
+        status: inquiryStatus,
+        adminNotes: inquiryNotes.trim() || undefined,
+      }).unwrap();
+      toast.success(
+        isBn ? 'ইনকোয়ারি স্ট্যাটাস আপডেট করা হয়েছে' : 'Inquiry status updated successfully'
+      );
+      setSelectedInquiry(null);
+      refetchInquiries();
+    } catch {
+      toast.error(isBn ? 'স্ট্যাটাস আপডেট ব্যর্থ হয়েছে' : 'Failed to update inquiry status');
+    }
+  };
 
   const handleReviewSubmit = async () => {
     if (!selectedApp || !reviewAction) return;
@@ -212,63 +266,210 @@ export function AdminSellerApplicationsView({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              {isBn ? 'সেলার আবেদনসমূহ' : 'Seller Partner Applications'}
+              {isBn ? 'পার্টনার ও সেলার আবেদনসমূহ' : 'Merchant & B2B Partner Applications'}
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
               {isBn
-                ? 'দোকানদার পার্টনারদের আবেদন যাচাই করে অনুমোদন বা বাতিল করুন।'
-                : 'Review and approve merchant applications to grant seller portal access.'}
+                ? 'দোকানদার এবং প্রাতিষ্ঠানিক বি২বি সমবায় পার্টনারদের আবেদন পর্যালোচনা ও অনুমোদন করুন।'
+                : 'Review, verify, and approve shop vendor applications and institutional enterprise inquiries.'}
             </p>
           </div>
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data?.data || []}
-        pageCount={data?.meta?.totalPages ?? -1}
-        totalCount={data?.meta?.total}
-        itemLabel={{
-          singular: isBn ? 'আবেদন' : 'application',
-          plural: isBn ? 'আবেদন' : 'applications',
-        }}
-        isBn={isBn}
-        pagination={{ pageIndex: page - 1, pageSize: limit }}
-        onPaginationChange={(updater) => {
-          if (typeof updater === 'function') {
-            const newState = updater({ pageIndex: page - 1, pageSize: limit });
-            setPage(newState.pageIndex + 1);
-            setLimit(newState.pageSize);
-          } else {
-            setPage(updater.pageIndex + 1);
-            setLimit(updater.pageSize);
-          }
-        }}
-        filterSlot={
-          <div className="w-full sm:w-48">
-            <Select
-              value={statusFilter}
-              onValueChange={(val: ApplicationStatus | 'ALL') => {
-                setStatusFilter(val);
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 focus:ring-offset-0 dark:border-border dark:bg-card dark:text-foreground">
-                <SelectValue placeholder={isBn ? 'সকল আবেদন' : 'All Applications'} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">{isBn ? 'সকল আবেদন' : 'All Applications'}</SelectItem>
-                <SelectItem value="PENDING">{isBn ? 'অপেক্ষমাণ' : 'Pending'}</SelectItem>
-                <SelectItem value="APPROVED">{isBn ? 'অনুমোদিত' : 'Approved'}</SelectItem>
-                <SelectItem value="REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        }
-        isLoading={isLoading}
-        isError={isError}
-        onRetry={() => refetch()}
-      />
+      <Tabs
+        value={mainTab}
+        onValueChange={(val) => setMainTab(val as 'sellers' | 'inquiries')}
+        className="space-y-6"
+      >
+        <TabsList className="bg-muted/60 p-1">
+          <TabsTrigger value="sellers" className="gap-2">
+            <Store className="w-4 h-4" />
+            <span>{isBn ? 'সেলার আবেদনসমূহ' : 'Seller Applications'}</span>
+            {data?.meta?.total !== undefined && (
+              <Badge variant="secondary" className="ms-1 px-1.5 py-0 text-[10px]">
+                {data.meta.total}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="inquiries" className="gap-2">
+            <Handshake className="w-4 h-4" />
+            <span>{isBn ? 'বি২বি ও সমবায় ইনকোয়ারি' : 'B2B & Partner Leads'}</span>
+            {partnerInquiries.length > 0 && (
+              <Badge variant="secondary" className="ms-1 px-1.5 py-0 text-[10px]">
+                {partnerInquiries.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="sellers" className="m-0 space-y-4">
+          <DataTable
+            columns={columns}
+            data={data?.data || []}
+            pageCount={data?.meta?.totalPages ?? -1}
+            totalCount={data?.meta?.total}
+            itemLabel={{
+              singular: isBn ? 'আবেদন' : 'application',
+              plural: isBn ? 'আবেদন' : 'applications',
+            }}
+            isBn={isBn}
+            pagination={{ pageIndex: page - 1, pageSize: limit }}
+            onPaginationChange={(updater) => {
+              if (typeof updater === 'function') {
+                const newState = updater({ pageIndex: page - 1, pageSize: limit });
+                setPage(newState.pageIndex + 1);
+                setLimit(newState.pageSize);
+              } else {
+                setPage(updater.pageIndex + 1);
+                setLimit(updater.pageSize);
+              }
+            }}
+            filterSlot={
+              <div className="w-full sm:w-48">
+                <Select
+                  value={statusFilter}
+                  onValueChange={(val: ApplicationStatus | 'ALL') => {
+                    setStatusFilter(val);
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger className="!h-11 w-full rounded-full border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-0 focus:ring-offset-0 dark:border-border dark:bg-card dark:text-foreground">
+                    <SelectValue placeholder={isBn ? 'সকল আবেদন' : 'All Applications'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">{isBn ? 'সকল আবেদন' : 'All Applications'}</SelectItem>
+                    <SelectItem value="PENDING">{isBn ? 'অপেক্ষমাণ' : 'Pending'}</SelectItem>
+                    <SelectItem value="APPROVED">{isBn ? 'অনুমোদিত' : 'Approved'}</SelectItem>
+                    <SelectItem value="REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            }
+            isLoading={isLoading}
+            isError={isError}
+            onRetry={() => refetch()}
+          />
+        </TabsContent>
+
+        <TabsContent value="inquiries" className="m-0 space-y-4">
+          <Card className="border border-border/80 rounded-2xl overflow-hidden shadow-xs">
+            <CardContent className="p-0">
+              {isInquiriesLoading ? (
+                <div className="p-8 text-center text-muted-foreground animate-pulse">
+                  {isBn ? 'ইনকোয়ারি লোড হচ্ছে...' : 'Loading partner inquiries...'}
+                </div>
+              ) : partnerInquiries.length === 0 ? (
+                <div className="p-12 text-center text-muted-foreground">
+                  <Handshake className="w-12 h-12 mx-auto opacity-30 mb-3" />
+                  <p className="font-semibold text-foreground">
+                    {isBn ? 'কোনো পার্টনারশিপ ইনকোয়ারি নেই' : 'No partner inquiries received yet'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {isBn
+                      ? 'পাবলিক পার্টনারশিপ ফর্ম থেকে জমা হওয়া অনুরোধ এখানে প্রদর্শিত হবে।'
+                      : 'Submissions from the public partner inquiries page will appear here.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs sm:text-sm text-start">
+                    <thead className="bg-muted/40 border-b border-border/60 text-muted-foreground text-start font-semibold">
+                      <tr>
+                        <th className="py-3 px-4 text-start">{isBn ? 'প্রতিষ্ঠান / সমবায়' : 'Organization'}</th>
+                        <th className="py-3 px-4 text-start">{isBn ? 'যোগাযোগকারী' : 'Contact Person'}</th>
+                        <th className="py-3 px-4 text-start">{isBn ? 'ধরন' : 'Partner Type'}</th>
+                        <th className="py-3 px-4 text-center">{isBn ? 'স্ট্যাটাস' : 'Status'}</th>
+                        <th className="py-3 px-4 text-start">{isBn ? 'তারিখ' : 'Date'}</th>
+                        <th className="py-3 px-4 text-end">{isBn ? 'অ্যাকশন' : 'Actions'}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/60">
+                      {partnerInquiries.map((inq) => (
+                        <tr key={inq.id} className="hover:bg-muted/30 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="font-bold text-foreground">{inq.organizationName}</div>
+                            {inq.location && (
+                              <div className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3 text-primary shrink-0" />
+                                <span>{inq.location}</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="font-medium text-foreground">
+                              {inq.contactPerson || 'N/A'}{' '}
+                              {inq.designation && (
+                                <span className="text-muted-foreground font-normal">
+                                  ({inq.designation})
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground font-mono flex items-center gap-2 mt-0.5">
+                              <span className="flex items-center gap-0.5">
+                                <Phone className="w-3 h-3 text-muted-foreground" />
+                                {inq.phone}
+                              </span>
+                              {inq.email && (
+                                <span className="flex items-center gap-0.5">
+                                  <Mail className="w-3 h-3 text-muted-foreground" />
+                                  {inq.email}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <Badge variant="outline" className="text-[11px] font-medium">
+                              {inq.partnerType.replace(/_/g, ' ')}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            {inq.status === 'ACCEPTED' ? (
+                              <Badge className="bg-emerald-600 hover:bg-emerald-500 text-[11px]">
+                                {isBn ? 'অনুমোদিত' : 'Accepted'}
+                              </Badge>
+                            ) : inq.status === 'CONTACTED' ? (
+                              <Badge className="bg-blue-600 hover:bg-blue-500 text-[11px]">
+                                {isBn ? 'যোগাযোগ সম্পন্ন' : 'Contacted'}
+                              </Badge>
+                            ) : inq.status === 'REJECTED' ? (
+                              <Badge variant="destructive" className="text-[11px]">
+                                {isBn ? 'বাতিল' : 'Rejected'}
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-[11px]">
+                                {isBn ? 'অপেক্ষমাণ' : 'Pending'}
+                              </Badge>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-muted-foreground text-[11px]">
+                            {formatDate(inq.createdAt, lang)}
+                          </td>
+                          <td className="py-3 px-4 text-end">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 gap-1.5 text-xs"
+                              onClick={() => {
+                                setSelectedInquiry(inq);
+                                setInquiryStatus(inq.status);
+                                setInquiryNotes(inq.adminNotes || '');
+                              }}
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>{isBn ? 'বিবরণ ও রিভিউ' : 'Review'}</span>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Details Dialog */}
       <Dialog
@@ -456,6 +657,133 @@ export function AdminSellerApplicationsView({
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Partner Inquiry Review Dialog */}
+      <Dialog
+        open={!!selectedInquiry}
+        onOpenChange={(open) => !open && setSelectedInquiry(null)}
+      >
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Handshake className="w-5 h-5 text-primary" />
+              {selectedInquiry?.organizationName}
+            </DialogTitle>
+            <DialogDescription>
+              {isBn
+                ? 'প্রাতিষ্ঠানিক বা সমবায় পার্টনারশিপ ইনকোয়ারি বিবরণ ও অবস্থা আপডেট'
+                : 'Enterprise partnership lead review, contact log, and status update'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedInquiry && (
+            <div className="space-y-4 py-2 text-sm">
+              <div className="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-muted/40 border">
+                <div>
+                  <span className="text-muted-foreground text-xs block font-medium">
+                    {isBn ? 'যোগাযোগকারী ব্যক্তি' : 'Contact Person'}
+                  </span>
+                  <span className="font-semibold">
+                    {selectedInquiry.contactPerson || 'N/A'}{' '}
+                    {selectedInquiry.designation && (
+                      <span className="text-xs text-muted-foreground font-normal">
+                        ({selectedInquiry.designation})
+                      </span>
+                    )}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground text-xs block font-medium">
+                    {isBn ? 'মোবাইল ও ইমেইল' : 'Phone & Email'}
+                  </span>
+                  <span className="font-semibold block font-mono">{selectedInquiry.phone}</span>
+                  {selectedInquiry.email && (
+                    <span className="text-xs text-muted-foreground block">{selectedInquiry.email}</span>
+                  )}
+                </div>
+                <div>
+                  <span className="text-muted-foreground text-xs block font-medium">
+                    {isBn ? 'পার্টনারশিপের ধরন' : 'Partner Type'}
+                  </span>
+                  <Badge variant="outline" className="mt-1">
+                    {selectedInquiry.partnerType.replace(/_/g, ' ')}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground text-xs block font-medium">
+                    {isBn ? 'এলাকা / অবস্থান' : 'Location'}
+                  </span>
+                  <span className="font-semibold">{selectedInquiry.location || 'N/A'}</span>
+                </div>
+              </div>
+
+              {selectedInquiry.requirements && (
+                <div className="p-4 rounded-2xl bg-muted/20 border space-y-1">
+                  <span className="text-muted-foreground text-xs block font-semibold">
+                    {isBn ? 'প্রয়োজনীয়তা ও চাহিদা বিবরণ' : 'Stated Procurement Requirements'}
+                  </span>
+                  <p className="text-xs sm:text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                    {selectedInquiry.requirements}
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-3 pt-2 border-t">
+                <div className="space-y-1.5">
+                  <Label>{isBn ? 'ইনকোয়ারি স্ট্যাটাস' : 'Review Status'}</Label>
+                  <Select
+                    value={inquiryStatus}
+                    onValueChange={(val: any) => setInquiryStatus(val)}
+                  >
+                    <SelectTrigger className="rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PENDING">{isBn ? 'অপেক্ষমাণ' : 'Pending Review'}</SelectItem>
+                      <SelectItem value="CONTACTED">{isBn ? 'যোগাযোগ সম্পন্ন' : 'Contacted Rep'}</SelectItem>
+                      <SelectItem value="ACCEPTED">{isBn ? 'পার্টনারশিপ গৃহীত' : 'Accepted / Onboarding'}</SelectItem>
+                      <SelectItem value="REJECTED">{isBn ? 'বাতিল' : 'Rejected'}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{isBn ? 'অ্যাডমিন মন্তব্য / যোগাযোগের বিবরণ' : 'Internal Admin Notes'}</Label>
+                  <Textarea
+                    placeholder={
+                      isBn
+                        ? 'যোগাযোগের সারসংক্ষেপ বা পরবর্তী পদক্ষেপ লিখুন...'
+                        : 'Record notes from phone call, proposals sent, or next steps...'
+                    }
+                    value={inquiryNotes}
+                    onChange={(e) => setInquiryNotes(e.target.value)}
+                    className="rounded-xl min-h-[90px]"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="pt-2">
+                <Button variant="outline" onClick={() => setSelectedInquiry(null)}>
+                  {isBn ? 'বন্ধ করুন' : 'Close'}
+                </Button>
+                <Button
+                  onClick={handleUpdateInquiry}
+                  disabled={isUpdatingInquiry}
+                  className="bg-primary"
+                >
+                  {isUpdatingInquiry
+                    ? isBn
+                      ? 'সংরক্ষণ হচ্ছে...'
+                      : 'Saving...'
+                    : isBn
+                      ? 'স্ট্যাটাস আপডেট করুন'
+                      : 'Update Status'}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

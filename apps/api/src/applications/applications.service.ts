@@ -3,9 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { SellerApplication } from './entities/seller-application.entity.js';
 import { RiderApplication } from './entities/rider-application.entity.js';
+import { PartnerInquiry, PartnerInquiryStatus } from './entities/partner-inquiry.entity.js';
 import { ApplicationStatus } from './enums/application-status.enum.js';
 import { CreateSellerApplicationDto } from './dto/create-seller-application.dto.js';
 import { CreateRiderApplicationDto } from './dto/create-rider-application.dto.js';
+import { CreatePartnerInquiryDto, UpdatePartnerInquiryStatusDto } from './dto/partner-inquiry.dto.js';
 import { UsersService } from '../users/users.service.js';
 import { Role } from '../roles/enums/role.enum.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
@@ -24,6 +26,8 @@ export class ApplicationsService {
     private readonly sellerAppRepo: Repository<SellerApplication>,
     @InjectRepository(RiderApplication)
     private readonly riderAppRepo: Repository<RiderApplication>,
+    @InjectRepository(PartnerInquiry)
+    private readonly partnerInquiryRepo: Repository<PartnerInquiry>,
     @InjectRepository(Shop)
     private readonly shopRepo: Repository<Shop>,
     @InjectRepository(RoleEntity)
@@ -471,4 +475,45 @@ export class ApplicationsService {
 
     return saved;
   }
+
+  // ==================== PARTNER INQUIRY ====================
+
+  async submitPartnerInquiry(dto: CreatePartnerInquiryDto): Promise<PartnerInquiry> {
+    const inquiry = this.partnerInquiryRepo.create({
+      organizationName: dto.organizationName.trim(),
+      contactPerson: dto.contactPerson?.trim() || null,
+      designation: dto.designation?.trim() || null,
+      phone: dto.phone.trim(),
+      email: dto.email?.trim().toLowerCase() || null,
+      partnerType: dto.partnerType || 'INSTITUTIONAL_BUYER',
+      location: dto.location?.trim() || null,
+      requirements: dto.requirements?.trim() || null,
+      status: PartnerInquiryStatus.PENDING,
+    });
+    return this.partnerInquiryRepo.save(inquiry);
+  }
+
+  async findAllPartnerInquiries(status?: PartnerInquiryStatus): Promise<PartnerInquiry[]> {
+    const where = status ? { status } : {};
+    return this.partnerInquiryRepo.find({
+      where,
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async updatePartnerInquiryStatus(
+    id: string,
+    dto: UpdatePartnerInquiryStatusDto,
+  ): Promise<PartnerInquiry> {
+    const inquiry = await this.partnerInquiryRepo.findOne({ where: { id } });
+    if (!inquiry) {
+      throw new NotFoundException('Partner inquiry not found');
+    }
+    inquiry.status = dto.status;
+    if (dto.adminNotes !== undefined) {
+      inquiry.adminNotes = dto.adminNotes;
+    }
+    return this.partnerInquiryRepo.save(inquiry);
+  }
 }
+

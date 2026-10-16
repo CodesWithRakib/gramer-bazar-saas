@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ShoppingCart, Truck } from 'lucide-react';
+import { ShoppingCart, Truck, Building2 } from 'lucide-react';
 import DashboardHubOverview, { HubCardItem } from '@/components/dashboard/DashboardHubOverview';
 
 export interface OrdersHubViewProps {
@@ -43,6 +43,22 @@ export function OrdersHubView({ lang = 'en', namespace = 'admin' }: OrdersHubVie
       badge: 'Live Logistics',
       badgeBn: 'লজিস্টিকস',
       badgeVariant: 'secondary',
+    },
+    {
+      id: 'warehouses',
+      title: isSuperAdmin ? 'Distribution Hubs & Multi-Warehouse' : 'Warehouse Distribution Hubs',
+      titleBn: isSuperAdmin ? 'বিতরণ হাব ও ওয়্যারহাউস লজিস্টিকস' : 'ওয়্যারহাউস বিতরণ হাব',
+      description: isSuperAdmin
+        ? 'Centrally monitor regional warehouse hubs, SKU stock allocation, and execute ACID inter-hub stock transfers.'
+        : 'Manage upazila and union distribution centers, check local hub inventory, and transfer stock.',
+      descriptionBn: isSuperAdmin
+        ? 'আঞ্চলিক ওয়্যারহাউস হাব, এসকেইউ স্টক বরাদ্দ এবং নিরাপদ ইন্টার-হাব ট্রান্সফার তদারকি করুন।'
+        : 'উপজেলা ও ইউনিয়ন বিতরণ কেন্দ্র ব্যবস্থাপনা, স্থানীয় হাব স্টক ও স্থানান্তর পরিচালনা করুন।',
+      icon: Building2,
+      href: `/${basePath}/warehouses`,
+      badge: 'Multi-Hub Logistics',
+      badgeBn: 'মাল্টি-হাব লজিস্টিকস',
+      badgeVariant: 'outline',
     },
   ];
 

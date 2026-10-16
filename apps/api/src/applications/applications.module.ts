@@ -2,22 +2,24 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SellerApplication } from './entities/seller-application.entity.js';
 import { RiderApplication } from './entities/rider-application.entity.js';
+import { PartnerInquiry } from './entities/partner-inquiry.entity.js';
 import { Shop } from '../shops/entities/shop.entity.js';
 import { RoleEntity } from '../roles/entities/role.entity.js';
 import { ApplicationsService } from './applications.service.js';
 import { ApplicationsController } from './applications.controller.js';
+import { PartnerInquiriesController } from './partner-inquiries.controller.js';
 import { UsersModule } from '../users/users.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
 import { RidersModule } from '../riders/riders.module.js';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SellerApplication, RiderApplication, Shop, RoleEntity]),
+    TypeOrmModule.forFeature([SellerApplication, RiderApplication, PartnerInquiry, Shop, RoleEntity]),
     UsersModule,
     NotificationsModule,
     RidersModule,
   ],
-  controllers: [ApplicationsController],
+  controllers: [ApplicationsController, PartnerInquiriesController],
   providers: [ApplicationsService],
   exports: [ApplicationsService],
 })

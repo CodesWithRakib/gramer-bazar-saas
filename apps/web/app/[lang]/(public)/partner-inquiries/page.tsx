@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/custom-toast';
 import { CustomImage } from '@/components/ui/CustomImage';
+import { useSubmitPartnerInquiryMutation } from '@/features/applications/applicationsApi';
 
 export default function PartnerInquiriesPage({
   params,
@@ -50,10 +51,10 @@ export default function PartnerInquiriesPage({
     requirements: '',
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitInquiry, { isLoading: isSubmitting }] = useSubmitPartnerInquiryMutation();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.organizationName || !formData.phone) {
       toast.error(
@@ -62,16 +63,31 @@ export default function PartnerInquiriesPage({
       return;
     }
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await submitInquiry({
+        organizationName: formData.organizationName.trim(),
+        contactPerson: formData.contactPerson.trim() || undefined,
+        designation: formData.designation.trim() || undefined,
+        phone: formData.phone.trim(),
+        email: formData.email.trim() || undefined,
+        partnerType: formData.partnerType,
+        location: formData.location.trim() || undefined,
+        requirements: formData.requirements.trim() || undefined,
+      }).unwrap();
+
       setIsSubmitted(true);
       toast.success(
         isBn
-          ? 'ধন্যবাদ! আমাদের পার্টনারশিপ টিম ২৪ ঘণ্টার মধ্যে আপনার সাথে যোগাযোগ করবে।'
-          : 'Thank you! Our enterprise partnership desk will contact you within 24 hours.'
+          ? 'ধন্যবাদ! আপনার পার্টনারশিপ অনুরোধটি সফলভাবে গৃহীত হয়েছে। আমাদের টিম ২৪ ঘণ্টার মধ্যে যোগাযোগ করবে।'
+          : 'Thank you! Your enterprise partnership inquiry has been received. Our team will contact you within 24 hours.'
       );
-    }, 800);
+    } catch {
+      toast.error(
+        isBn
+          ? 'অনুরোধ পাঠাতে ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
+          : 'Failed to submit inquiry. Please try again.'
+      );
+    }
   };
 
   const partnerTracks = [

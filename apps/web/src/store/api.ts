@@ -227,6 +227,10 @@ export const api = createApi({
     'Broadcast',
     'BroadcastTemplate',
     'UserBroadcast',
+    'WarehouseHub',
+    'HubStock',
+    'StockTransfer',
+    'PartnerInquiry',
   ],
   endpoints: () => ({}),
 });
