@@ -291,6 +291,16 @@ export const adminRoutes: DashboardRoute[] = [
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/edible-oil'],
   },
+  {
+    title: 'Artisanal Gur & GI Certification',
+    titleBn: 'নলেন খেজুর ও আখের খাঁটি গুড় হাব',
+    href: '/admin/artisanal-gur',
+    icon: Flame,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/artisanal-gur'],
+  },
 
   // Section: Management & Commerce
   {
@@ -561,6 +571,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/edible-oil'],
+  },
+  {
+    title: 'Artisanal Gur & GI Certification',
+    titleBn: 'নলেন খেজুর ও আখের খাঁটি গুড় হাব',
+    href: '/super-admin/artisanal-gur',
+    icon: Flame,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/artisanal-gur'],
   },
 
   // Section: Platform Governance
@@ -906,6 +925,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/edible-oil'],
+  },
+  {
+    title: 'Gachhi Gur Boiling Hub',
+    titleBn: 'গাছি রস সংগ্রহ ও গুড় কড়াই হাব',
+    href: '/seller/artisanal-gur',
+    icon: Flame,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/artisanal-gur'],
   },
   {
     title: 'Reviews',
@@ -1323,6 +1351,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/edible-oil'],
+  },
+  {
+    title: 'Artisanal Nolen Gur',
+    titleBn: 'যশোরের নলেন ও খাঁটি পাটালি গুড়',
+    href: '/customer/artisanal-gur',
+    icon: Flame,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/artisanal-gur'],
   },
   {
     title: 'Messages',

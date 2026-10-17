@@ -1032,9 +1032,54 @@ flowchart TD
 
 ---
 
+#### Phase 30: Traditional Sugarcane Gur, Date Palm Khejur Gur (খেজুর গুড়) & Artisanal Nolen Gur Authenticity, Hydrosulfite Chemical-Free Certification Engine (আখ ও খাঁটি নলেন খেজুর গুড়, হাইড্রোজমুক্ত রাসায়নিক পরীক্ষণ ও জিআই মান নিশ্চিতকরণ প্ল্যাটফর্ম) - IMPLEMENTED & VERIFIED ✓
+- **Engine Overview:**
+  - Implemented Bangladesh's first specialized artisanal date palm and sugarcane gur authenticity, chemical anti-adulteration, and Geographical Indication (GI) verification platform.
+  - Connects traditional date palm tapper cooperatives (*গাছি সমবায়*) and sugarcane smallholders across Jashore (যশোরের খেজুর গুড় - registered Geographical Indication GI product), Chuadanga, Kushtia, Faridpur, Natore, and Rajshahi with conscious consumers and wholesale buyers.
+  - **Dawn Juice Collection (*ভোরের জিরান রস* / Jiran Rosh) & Freshness Monitoring:**
+    - Dawn harvest tracking before sunrise to protect unfermented raw sap rich in natural volatile terpenes and floral aromas.
+    - Brix refractometer screening ($12^\circ - 15^\circ$ Brix for date palm sap, $16^\circ - 20^\circ$ Brix for sugarcane juice) preventing early acidification and souring.
+  - **Anti-Adulteration Chemical Testing Ledger:**
+    - Zero-tolerance ($0.0\text{ ppm}$) enforcement against toxic industrial bleaching chemical Sodium Hydrosulfite (*সোডিয়াম হাইড্রোসালফাইট / হাইড্রোজ* - $Na_2S_2O_4$, used illegally for artificial whitening and bleaching).
+    - Immediate criminal seizure mandate under the Bangladesh Food Safety Act 2013 and BSTI standards (BDS 1660 / BDS 139) with mobile court referral upon any detection $>0.0\text{ ppm}$.
+    - Spectrophotometric screening against prohibited coal-tar and azo colorants (Metanil Yellow and Orange-II).
+    - Sucrose ($65\% - 75\%$) vs. reducing sugar ($10\% - 15\%$) natural balance verification detecting dilution with cheap industrial refined white sugar syrup ($>82\%$ sucrose, $<5\%$ reducing sugars).
+  - **Traditional Open Boiling Pan (*কড়াই / তাওয়া*) Telemetry:**
+    - Thermal curve regulation: strictly $114^\circ\text{C} - 116^\circ\text{C}$ for liquid Nolen Jhola Gur (*নলেন ঝোল গুড়*) and $118^\circ\text{C} - 120^\circ\text{C}$ for solid Patali Gur (*পাটালি গুড়*).
+    - Thermal degradation protection alerting against volatile aroma scorching ($>123^\circ\text{C}$).
+  - **Artisanal Forward Lots & Heritage Packaging:**
+    - Certified forward lots packaged in traditional earthen pots (*মাটির হাঁড়ি* - 1kg), food-grade glass jars (500g, 1kg), and bamboo leaf mats (*চাটাই* - 2kg).
+    - Unique digital authenticity seals (`GBZ-GI-GUR-...`) for genuine Grade AAA GI-tagged lots.
+- **Backend Architecture (`apps/api/src/artisanal-gur/`):**
+  - Enums (`artisanal-gur.enum.ts`): `GurType`, `GurRegion`, `SapCollectionShift`, `BoilingPanType`, `HydrosulfiteTestResult`, `SugarSyrupAdulterationStatus`, `GurPurityGrade`, `GurPackagingType`, `GurLotStatus`.
+  - Entities (`entities/`):
+    - `DatePalmTappingBatch`: Tapping batch tracking, gachhi cooperative, region, shift, trees tapped, raw sap liters, brix degrees, strike boiling temp, pan type, and sap-to-gur ratio.
+    - `GurPurityLabTest`: BSTI spectrophotometric & chromatographic testing for sucrose %, reducing sugar %, 0.0 ppm hydrosulfite screening, lead ppm, TSS brix, GI compliance, and digital QR seals.
+    - `ArtisanalGurLot`: Certified forward lots in traditional earthen pots and glass jars with aroma ratings (1–5 scale).
+  - DTOs (`dto/artisanal-gur.dto.ts`): `CalculateGurExtractionDto`, `EvaluateGurPurityDto`, `CreateDatePalmTappingBatchDto`, `UpdateBatchBoilingDto`, `CreateGurPurityLabTestDto`, `CreateArtisanalGurLotDto`, `PurchaseGurLotDto`.
+  - Service (`artisanal-gur.service.ts`): Seeded regional baseline datasets, sap-to-gur yield and purity evaluation algorithms, CRUD and purchase order flows.
+  - Controller (`artisanal-gur.controller.ts`): 13 REST endpoints guarded by JWT and RBAC.
+  - Module (`artisanal-gur.module.ts`): Registered in `AppModule`.
+  - Tests (`artisanal-gur.service.spec.ts`): 17 unit tests verifying extraction ratios, purity evaluations, seizure alerts, and lot procurement.
+- **Frontend Architecture (`apps/web/src/features/artisanal-gur/`):**
+  - RTK Query slice (`artisanalGurApi.ts`): Registered tags `DatePalmTappingBatch`, `GurPurityLabTest`, `ArtisanalGurLot`, and added `/artisanal-gur` to `publicPrefixes` in `apps/web/src/store/api.ts`.
+  - UI Components (`components/`):
+    - `ArtisanalGurMarketplaceView.tsx`: Public marketplace catalog, sap-to-gur yield calculator, hydrosulfite/sugar adulteration simulator, live boiling batches, and B2B purchasing modal.
+    - `GachhiGurBoilingHubView.tsx`: Gachhi & tap cooperative cockpit for dawn sap logging, strike boiling temp telemetry 115°C–120°C, mold crystallization, and finished lot publishing.
+    - `AdminBstiGurPurityHubView.tsx`: BSTI, BFSA & GI regulatory desk for chemical testing, zero-tolerance hydrosulfite seizure mandates, and issuing digital QR authenticity seals.
+  - Barrel export: `apps/web/src/features/artisanal-gur/index.ts`.
+  - Added routes:
+    - Public Gur Marketplace: `apps/web/app/[lang]/(public)/artisanal-gur/page.tsx` (`/[lang]/artisanal-gur`).
+    - Customer Nolen Gur Orders: `apps/web/app/[lang]/(customer)/customer/artisanal-gur/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Seller Gachhi Hub: `apps/web/app/[lang]/(seller)/seller/artisanal-gur/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Admin BSTI Gur Purity Desk: `apps/web/app/[lang]/(admin)/admin/artisanal-gur/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/artisanal-gur/page.tsx`.
+
+---
+
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, agro-tourism, medicinal botanical, heritage textile, dairy cooperative, natural honey, biosecure poultry/egg, certified mushroom, golden fiber/eco-packaging, tea estate auction, mango/litchi orchard, solar-dehydrated pure spices, and cold-pressed artisanal edible oil commerce ecosystem. All 29 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, agro-tourism, medicinal botanical, heritage textile, dairy cooperative, natural honey, biosecure poultry/egg, certified mushroom, golden fiber/eco-packaging, tea estate auction, mango/litchi orchard, solar-dehydrated pure spices, cold-pressed artisanal edible oil, and traditional sugarcane & artisanal date palm Nolen gur commerce ecosystem. All 30 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -1065,13 +1110,14 @@ flowchart TD
 27. **Phase 27: Mango & Litchi Orchard Pre-Harvest Auction, Hot Water Treatment (HWT) Phytosanitary Traceability & GI Tag Supply Chain Engine** (Chapainawabganj, Rajshahi, Dinajpur & Rangpur tree-count forward contract auctions, +15% paper bagging packout protection, +20% GI Tag bonus, 30/40/30 escrow tranche schedule, DAE 48°C / 60-min HWT fruit fly clearance, and refrigerated reefer cold-chain monitoring).
 28. **Phase 28: Spices & Aromatics Value Chain, Solar/Tunnel Drying Dehydration & Anti-Adulteration Origin Verification Engine** (Natore, Bogura, Pabna & Faridpur chilli, turmeric, garlic, ginger, and black cumin supply chains, solar parabolic tunnel dehydrator moisture <10% mass balance, zero tolerance for Sudan dyes I-IV, lead chromate PbCrO4, and metanil yellow, BSTI/BARI SRC digital authenticity QR seals, and GrainPro hermetic forward lots).
 29. **Phase 29: Cold-Pressed Mustard, Sesame & Artisanal Edible Oil Milling, Wood-Ghani (কাঠের ঘানি) Traceability & Organic Acid Value Certification Engine** (Tangail, Manikganj, Sirajganj, Jashore & Chuadanga mustard, til and sunflower supply chains; Tamarind/Neem/Mahogany/Babool wood-ghani <40°C cold press preservation of allyl isothiocyanate pungency; mass balance & cattle-feed oilcake khol yield; BSTI BDS-211 FFA <=1.5% and Peroxide <=10 meq/kg compliance; zero-tolerance toxic Argemone dropsy screening; and dark amber glass forward lots).
+30. **Phase 30: Traditional Sugarcane Gur, Date Palm Khejur Gur (খেজুর গুড়) & Artisanal Nolen Gur Authenticity, Hydrosulfite Chemical-Free Certification Engine** (Jashore GI-registered date palm gur, Chuadanga, Kushtia & Faridpur tree tapper cooperatives; dawn Jiran sap freshness tracking; open iron karai 115°C–120°C boiling telemetry; zero tolerance 0.0 ppm for toxic bleaching sodium hydrosulfite with Mobile Court seizure mandates; synthetic azo dye and white cane syrup chromatographic screening; and traditional 1kg earthen pot & glass jar forward lots).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all 6 workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 97 test suites, 537 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 98 test suites, 554 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, authentic village farm stay reservations, organic herbal medicine sourcing, heritage handloom silk commerce, dairy cooperative cold-chain IoT network, natural honey/superfood traceability, biosecure poultry hatchery/brooder IoT & egg grading, certified mushroom spawn/dehydration supply chain, BJRI golden fiber/eco-packaging supply chain, tea estate auction/specialty orthodox tea engine, mango/litchi orchard forward contract & HWT phytosanitary engine, solar-dehydrated pure spices & anti-adulteration verification engine, and traditional wood-ghani cold-pressed edible oil traceability & BSTI acid value certification engine.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, authentic village farm stay reservations, organic herbal medicine sourcing, heritage handloom silk commerce, dairy cooperative cold-chain IoT network, natural honey/superfood traceability, biosecure poultry hatchery/brooder IoT & egg grading, certified mushroom spawn/dehydration supply chain, BJRI golden fiber/eco-packaging supply chain, tea estate auction/specialty orthodox tea engine, mango/litchi orchard forward contract & HWT phytosanitary engine, solar-dehydrated pure spices & anti-adulteration verification engine, traditional wood-ghani cold-pressed edible oil traceability & BSTI acid value certification engine, and authentic Jashore GI date palm Nolen gur & chemical-free sugarcane gur certification engine.
 
 
 

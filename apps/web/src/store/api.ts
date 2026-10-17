@@ -75,6 +75,7 @@ const isPublicPath = (pathname: string): boolean => {
     '/orchard-auction',
     '/spice-market',
     '/edible-oil',
+    '/artisanal-gur',
   ];
 
   return publicPrefixes.some((prefix) =>
@@ -317,6 +318,9 @@ export const api = createApi({
     'GhaniPressingBatch',
     'OilPurityLabTest',
     'ArtisanalOilLot',
+    'DatePalmTappingBatch',
+    'GurPurityLabTest',
+    'ArtisanalGurLot',
   ],
   endpoints: () => ({}),
 });
