@@ -79,6 +79,7 @@ import { GroupBuyingModule } from './group-buying/group-buying.module.js';
 import { MachineryRentalModule } from './machinery-rental/machinery-rental.module.js';
 import { CropInsuranceModule } from './crop-insurance/crop-insurance.module.js';
 import { ContractFarmingModule } from './contract-farming/contract-farming.module.js';
+import { AgriPrecisionModule } from './agri-precision/agri-precision.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -242,6 +243,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     MachineryRentalModule,
     CropInsuranceModule,
     ContractFarmingModule,
+    AgriPrecisionModule,
   ],
 
   controllers: [AppController],

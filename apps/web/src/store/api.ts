@@ -60,6 +60,7 @@ const isPublicPath = (pathname: string): boolean => {
     '/machinery',
     '/insurance',
     '/contract-farming',
+    '/agri-precision',
   ];
 
   return publicPrefixes.some((prefix) =>
@@ -253,6 +254,11 @@ export const api = createApi({
     'InsuranceClaim',
     'ContractCampaign',
     'ContractAgreement',
+    'AgriInputRegistry',
+    'AgriCounterfeitReport',
+    'DroneUnit',
+    'DroneBooking',
+    'SoilCard',
   ],
   endpoints: () => ({}),
 });

@@ -29,6 +29,7 @@ import {
   Tractor,
   ShieldAlert,
   Handshake,
+  Plane,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -126,6 +127,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/contract-farming'],
+  },
+  {
+    title: 'Agri Precision & Drones',
+    titleBn: 'কৃষি প্রযুক্তি ও ড্রোন স্প্রে',
+    href: '/admin/agri-precision',
+    icon: Plane,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/agri-precision'],
   },
 
   // Section: Management & Commerce
@@ -262,6 +273,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/contract-farming'],
+  },
+  {
+    title: 'Agri Precision & Drones',
+    titleBn: 'কৃষি প্রযুক্তি ও ড্রোন স্প্রে',
+    href: '/super-admin/agri-precision',
+    icon: Plane,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/agri-precision'],
   },
 
   // Section: Platform Governance
@@ -472,6 +492,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/contract-farming'],
+  },
+  {
+    title: 'Drone Spraying Fleet',
+    titleBn: 'কৃষি ড্রোন স্প্রে বহর',
+    href: '/seller/drones',
+    icon: Plane,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/drones'],
   },
   {
     title: 'Reviews',
@@ -754,6 +783,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/contract-farming'],
+  },
+  {
+    title: 'Precision Ag & Drones',
+    titleBn: 'স্মার্ট ড্রোন ও মৃত্তিকা স্বাস্থ্য',
+    href: '/customer/agri-precision',
+    icon: Plane,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/agri-precision'],
   },
   {
     title: 'Messages',
