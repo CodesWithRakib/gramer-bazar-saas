@@ -26,6 +26,7 @@ import {
   Coins,
   Navigation,
   QrCode,
+  Tractor,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -93,6 +94,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/warehouses'],
+  },
+  {
+    title: 'Machinery Rental Hub',
+    titleBn: 'কৃষি যন্ত্রপাতি ভাড়া হাব',
+    href: '/admin/machinery/bookings',
+    icon: Tractor,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/machinery'],
   },
 
   // Section: Management & Commerce
@@ -202,6 +213,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/warehouses'],
+  },
+  {
+    title: 'Machinery Rental Hub',
+    titleBn: 'কৃষি যন্ত্রপাতি ভাড়া হাব',
+    href: '/super-admin/machinery/bookings',
+    icon: Tractor,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/machinery'],
   },
 
   // Section: Platform Governance
@@ -394,6 +414,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/promotions/group-buy'],
+  },
+  {
+    title: 'Machinery Fleet',
+    titleBn: 'কৃষি যন্ত্রপাতি বহর',
+    href: '/seller/machinery',
+    icon: Tractor,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/machinery'],
   },
   {
     title: 'Reviews',
@@ -649,6 +678,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/disputes'],
+  },
+  {
+    title: 'Machinery Rentals',
+    titleBn: 'যন্ত্রপাতি ভাড়া',
+    href: '/customer/machinery-bookings',
+    icon: Tractor,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/machinery-bookings'],
   },
   {
     title: 'Messages',

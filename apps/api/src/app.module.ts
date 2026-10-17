@@ -76,6 +76,7 @@ import { AgriFintechModule } from './agri-fintech/agri-fintech.module.js';
 import { AgriTraceabilityModule } from './agri-traceability/agri-traceability.module.js';
 import { AgentCommerceModule } from './agent-commerce/agent-commerce.module.js';
 import { GroupBuyingModule } from './group-buying/group-buying.module.js';
+import { MachineryRentalModule } from './machinery-rental/machinery-rental.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -236,6 +237,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AgriTraceabilityModule,
     AgentCommerceModule,
     GroupBuyingModule,
+    MachineryRentalModule,
   ],
 
   controllers: [AppController],

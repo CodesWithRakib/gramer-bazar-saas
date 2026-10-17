@@ -419,11 +419,35 @@ flowchart TD
     - Viral Social Pool: `apps/web/app/[lang]/(public)/group-buy/[shareCode]/page.tsx` (`/[lang]/group-buy/[shareCode]`).
     - Seller Management: `apps/web/app/[lang]/(seller)/seller/promotions/group-buy/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
 
+### Phase 12: Rural Cooperative Machinery & Irrigation Equipment Rental Pooling Engine (কৃষি যন্ত্রপাতি, ট্রাক্টর ও সেচ পাম্প সমবায় ভাড়া ব্যবস্থা) (COMPLETED ✅)
+- **Task 12.1: Equipment Fleet Catalog & Pricing Engine (COMPLETED)**
+  - Implemented `MachineryItem`, `MachineryBooking`, and `MachineryInspection` entities in `apps/api/src/machinery-rental/`.
+  - Categorization across Power Tillers, Tractors, Combine Harvesters, Diesel & Solar Irrigation Pumps, Paddy Threshers, and Spraying Drones.
+  - Flexible pricing basis (`PER_BIGHA` ৳/বিঘা, `PER_HOUR`, `PER_DAY`), fuel options (`FUEL_INCLUDED` vs. `FUEL_EXCLUDED`), and operator allowance (`OPERATOR_INCLUDED` vs. `SELF_OPERATED`).
+  - Automated Neighbor Cluster Pooling Discount Engine: automatically detects neighboring plots in same upazila/union within ±3 days and applies cooperative rate discounts (saving fuel & machinery transport overhead).
+  - Escrow damage security deposit lifecycle: automated hold during booking with digital pre-dispatch and post-return inspection sign-off.
+  - Added unit test suite `machinery-rental.service.spec.ts` (9/9 tests passing).
+  - Exposed REST endpoints in `MachineryRentalController`: `GET /machinery-rental/items`, `GET /machinery-rental/items/:id`, `POST /machinery-rental/quote`, `POST /machinery-rental/bookings`, `GET /machinery-rental/my-bookings`, `GET /machinery-rental/bookings/:id`, `PATCH /machinery-rental/bookings/:id/status`, `POST /machinery-rental/items`, `PATCH /machinery-rental/items/:id`, `GET /machinery-rental/owner/items`, `GET /machinery-rental/owner/bookings`, `POST /machinery-rental/bookings/:id/inspect`, `GET /machinery-rental/admin/bookings`, `POST /machinery-rental/admin/bookings/:id/resolve-deposit`.
+- **Task 12.2: Farmer Booking Marketplace, Owner Fleet Portal & Escrow Dispute Hub (COMPLETED)**
+  - Implemented RTK Query slice `machineryApi.ts` and registered `'MachineryItem'` and `'MachineryBooking'` tags in `store/api.ts`.
+  - Built `MachineryMarketplaceView.tsx` with category filters, district & upazila location selectors, Per-Bigha pricing cards, and cluster savings badges.
+  - Built `MachineryBookingView.tsx` with dynamic plot size calculator, live breakdown quotation, schedule calendar, and escrow hold checkout.
+  - Built `FarmerMachineryBookingsView.tsx` displaying customer bookings, status pills, and inspection reports.
+  - Built `OwnerMachineryDashboardView.tsx` for equipment owners to register machinery, manage calendar dispatch, and submit digital pre-dispatch and post-return inspection forms.
+  - Built `AdminMachineryView.tsx` for administrative booking supervision and escrow damage dispute arbitration.
+  - Added routes:
+    - Public Marketplace: `apps/web/app/[lang]/(public)/machinery/page.tsx` (`/[lang]/machinery`).
+    - Booking & Quotation: `apps/web/app/[lang]/(public)/machinery/[id]/book/page.tsx` (`/[lang]/machinery/[id]/book`).
+    - Customer Bookings: `apps/web/app/[lang]/(customer)/customer/machinery-bookings/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Owner Machinery Fleet: `apps/web/app/[lang]/(seller)/seller/machinery/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Admin Machinery Hub: `apps/web/app/[lang]/(admin)/admin/machinery/bookings/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Machinery Hub: `apps/web/app/[lang]/(admin)/super-admin/machinery/bookings/page.tsx`.
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 11 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 12 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
