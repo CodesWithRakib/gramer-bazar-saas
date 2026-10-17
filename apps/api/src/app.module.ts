@@ -78,6 +78,7 @@ import { AgentCommerceModule } from './agent-commerce/agent-commerce.module.js';
 import { GroupBuyingModule } from './group-buying/group-buying.module.js';
 import { MachineryRentalModule } from './machinery-rental/machinery-rental.module.js';
 import { CropInsuranceModule } from './crop-insurance/crop-insurance.module.js';
+import { ContractFarmingModule } from './contract-farming/contract-farming.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -240,6 +241,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     GroupBuyingModule,
     MachineryRentalModule,
     CropInsuranceModule,
+    ContractFarmingModule,
   ],
 
   controllers: [AppController],

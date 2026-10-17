@@ -462,11 +462,35 @@ flowchart TD
     - Admin Disaster Hub: `apps/web/app/[lang]/(admin)/admin/insurance/claims/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
     - Super Admin Disaster Hub: `apps/web/app/[lang]/(admin)/super-admin/insurance/claims/page.tsx`.
 
+### Phase 14: Agricultural Contract Farming, Forward Purchase Agreements & Pre-Harvest Escrow Collateral Engine (কৃষি চুক্তিভিত্তিক চাষাবাদ ও অগ্রিম শস্য ক্রয় চুক্তি ব্যবস্থা) (COMPLETED ✅)
+- **Task 14.1: Corporate Buyback Campaigns & Forward Agreement Escrow Lifecycle (COMPLETED)**
+  - Implemented `ContractFarmingCampaign`, `ContractFarmingAgreement`, `ContractMilestoneInspection`, and `ContractHarvestDelivery` entities in `apps/api/src/contract-farming/`.
+  - Corporate buyer forward campaigns with legally binding guaranteed floor prices (৳/kg) for processing crops (Lady Rosetta potato, export Chinigura rice, Roma tomato, poultry feed maize, cold-press mustard, spices).
+  - Automated 25% Upfront Input Working Capital Disbursement directly into farmer MFS/bank wallets upon planting verification.
+  - Pre-harvest agronomist milestone audits (germination rate, crop health score 1-100, pest infestation levels).
+  - Digital weighbridge intake vouchers (gross weight, tare weight, net weight) with quality grading premiums (+10% Grade A bonus, -15% Grade C deduction) and automated final escrow settlement balance disbursement.
+  - Added unit test suite `contract-farming.service.spec.ts` (7/7 tests passing).
+  - Exposed REST endpoints in `ContractFarmingController`: `GET /contract-farming/campaigns`, `GET /contract-farming/campaigns/:id`, `GET /contract-farming/stats`, `POST /contract-farming/campaigns`, `PATCH /contract-farming/campaigns/:id`, `POST /contract-farming/agreements/apply`, `GET /contract-farming/agreements/farmer`, `GET /contract-farming/agreements/buyer`, `GET /contract-farming/agreements/all`, `GET /contract-farming/agreements/:id`, `PATCH /contract-farming/agreements/:id/status`, `POST /contract-farming/agreements/:id/inspections`, `POST /contract-farming/agreements/:id/deliveries`, `POST /contract-farming/agreements/:id/settle`.
+- **Task 14.2: Public Marketplace, Farmer Portfolio, Buyer Fleet Portal & Admin Arbitration Hub (COMPLETED)**
+  - Implemented RTK Query slice `contractFarmingApi.ts` and registered `'ContractCampaign'` and `'ContractAgreement'` tags in `store/api.ts`.
+  - Built `ContractFarmingMarketplaceView.tsx` with crop filter tabs, district search, floor price badges, and 4-step escrow workflow explainer.
+  - Built `ContractFarmingApplyView.tsx` with dynamic yield & 25% cash advance live calculator, cadastral plot dag numbers, and MFS wallet input.
+  - Built `FarmerContractsPortfolioView.tsx` with active agreement cards, milestone audit timeline, and weighbridge intake voucher vouchers list.
+  - Built `BuyerContractFleetView.tsx` for corporate procurement managers to launch campaigns, approve agreements, record agronomy inspections, and issue weighbridge slips.
+  - Built `AdminContractArbitrationView.tsx` for nationwide escrow oversight and status arbitration.
+  - Added routes:
+    - Public Marketplace: `apps/web/app/[lang]/(public)/contract-farming/page.tsx` (`/[lang]/contract-farming`).
+    - Application View: `apps/web/app/[lang]/(public)/contract-farming/[id]/apply/page.tsx` (`/[lang]/contract-farming/[id]/apply`).
+    - Farmer Portfolio: `apps/web/app/[lang]/(customer)/customer/contract-farming/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Buyer Fleet Portal: `apps/web/app/[lang]/(seller)/seller/contract-farming/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Admin Hub: `apps/web/app/[lang]/(admin)/admin/contract-farming/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/contract-farming/page.tsx`.
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 13 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 14 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -479,13 +503,17 @@ flowchart TD
 9. **Phase 9: AI Computer-Vision Produce Quality Grading & Farm-to-Fork Batch Traceability** (Automated crop grading Grade A/B/C, defect percentage evaluation, price premium guidance, printable QR passports, and public consumer farm-to-fork verification portal).
 10. **Phase 10: Village Digital Center (UDC) Offline-First Field Agent POS, Char/Haor Cash Reconciliation & Micro-Aggregator Hub Engine** (Shift cash drawer float and denomination reconciliation, remote char farmer produce aggregation with cash payouts, daily Upazila Post Office & MFI deposit settlements, and unified UDC agent terminal).
 11. **Phase 11: Community Group Buying, Social WhatsApp Micro-Commerce & Dynamic Volume Tier Discounting** (Village cooperative demand pooling, minimum buyer thresholds, 1-click WhatsApp referral sharing, and single-drop consolidated rural delivery).
+12. **Phase 12: Rural Cooperative Machinery & Irrigation Equipment Rental Pooling** (Multi-bigha equipment leasing, neighbor cluster pooling discount engine, pre/post inspection checklists, and security deposit escrow).
+13. **Phase 13: Parametric Weather Crop Insurance, Flood/Cyclone Relief & Satellite Damage Assessment Engine** (Actuarial weather trigger breach thresholds, 50% government subsidy calculation, and automated batch claim disbursements).
+14. **Phase 14: Agricultural Contract Farming, Forward Purchase Agreements & Pre-Harvest Escrow Collateral Engine** (Corporate buyer buyback floor pricing, 25% upfront input cash disbursement, milestone growth inspections, and weighbridge harvest intake settlement).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all 6 workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 79 test suites, 383 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 82 test suites, 405 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js Turbopack production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, and community group buying pooling.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, and forward contract farming.
+
 
 
 

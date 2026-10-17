@@ -28,6 +28,7 @@ import {
   QrCode,
   Tractor,
   ShieldAlert,
+  Handshake,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -115,6 +116,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/insurance'],
+  },
+  {
+    title: 'Contract Farming Hub',
+    titleBn: 'চুক্তিভিত্তিক চাষাবাদ হাব',
+    href: '/admin/contract-farming',
+    icon: Handshake,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/contract-farming'],
   },
 
   // Section: Management & Commerce
@@ -242,6 +253,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/insurance'],
+  },
+  {
+    title: 'Contract Farming Hub',
+    titleBn: 'চুক্তিভিত্তিক চাষাবাদ হাব',
+    href: '/super-admin/contract-farming',
+    icon: Handshake,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/contract-farming'],
   },
 
   // Section: Platform Governance
@@ -443,6 +463,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/machinery'],
+  },
+  {
+    title: 'Contract Farming Buyback',
+    titleBn: 'চুক্তিভিত্তিক ক্রয় ও বাইব্যাক',
+    href: '/seller/contract-farming',
+    icon: Handshake,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/contract-farming'],
   },
   {
     title: 'Reviews',
@@ -716,6 +745,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/insurance'],
+  },
+  {
+    title: 'Contract Farming',
+    titleBn: 'চুক্তিভিত্তিক চাষাবাদ',
+    href: '/customer/contract-farming',
+    icon: Handshake,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/contract-farming'],
   },
   {
     title: 'Messages',
