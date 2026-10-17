@@ -27,6 +27,7 @@ import {
   Navigation,
   QrCode,
   Tractor,
+  ShieldAlert,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -104,6 +105,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/machinery'],
+  },
+  {
+    title: 'Crop Insurance Hub',
+    titleBn: 'শস্য বীমা ও দুর্যোগ হাব',
+    href: '/admin/insurance/claims',
+    icon: ShieldAlert,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/insurance'],
   },
 
   // Section: Management & Commerce
@@ -222,6 +233,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/machinery'],
+  },
+  {
+    title: 'Crop Insurance Hub',
+    titleBn: 'শস্য বীমা ও দুর্যোগ হাব',
+    href: '/super-admin/insurance/claims',
+    icon: ShieldAlert,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/insurance'],
   },
 
   // Section: Platform Governance
@@ -687,6 +707,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/machinery-bookings'],
+  },
+  {
+    title: 'Crop Insurance',
+    titleBn: 'শস্য বীমা ও দুর্যোগ কভারেজ',
+    href: '/customer/insurance',
+    icon: ShieldAlert,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/insurance'],
   },
   {
     title: 'Messages',

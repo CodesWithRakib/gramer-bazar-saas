@@ -443,11 +443,30 @@ flowchart TD
     - Admin Machinery Hub: `apps/web/app/[lang]/(admin)/admin/machinery/bookings/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
     - Super Admin Machinery Hub: `apps/web/app/[lang]/(admin)/super-admin/machinery/bookings/page.tsx`.
 
+### Phase 13: Parametric Weather Crop Insurance, Flood/Cyclone Disaster Relief & Satellite Damage Assessment Engine (আবহাওয়া ও বন্যা/ঘূর্ণিঝড় প্যারামেট্রিক শস্য বীমা ও দুর্যোগ ক্ষতিপূরণ ব্যবস্থা) (COMPLETED ✅)
+- **Task 13.1: Parametric Policy Underwriting & Environmental Trigger Engine (COMPLETED)**
+  - Implemented `CropInsurancePolicy`, `FarmerInsuranceEnrollment`, `ParametricClaimDisbursement`, and `WeatherTriggerTelemetry` entities in `apps/api/src/crop-insurance/`.
+  - Defined parametric trigger types: `FLASH_FLOOD`, `EXCESS_RAINFALL`, `CYCLONE_WIND`, `PROLONGED_DROUGHT`, `UNSEASONAL_HAILSTORM`, and `HEATWAVE`.
+  - Actuarial premium calculation with 50% government subsidy (`farmerPayablePerBigha = premiumPerBigha * (1 - subsidyPct / 100)`).
+  - Automated Parametric Trigger Breach Engine: evaluates ag-meteorological station readings (river gauge danger level, rainfall mm); when breached, automatically executes batch compensation payouts across all active farmer enrollments without bureaucratic delay.
+  - Added unit test suite `crop-insurance.service.spec.ts` (6/6 tests passing).
+  - Exposed REST endpoints in `CropInsuranceController`: `GET /crop-insurance/policies`, `GET /crop-insurance/policies/:id`, `GET /crop-insurance/telemetry/recent`, `POST /crop-insurance/enroll`, `GET /crop-insurance/my-enrollments`, `GET /crop-insurance/enrollments/:id`, `POST /crop-insurance/enrollments/:id/claims`, `POST /crop-insurance/policies`, `PATCH /crop-insurance/policies/:id`, `GET /crop-insurance/admin/enrollments`, `GET /crop-insurance/admin/claims`, `POST /crop-insurance/admin/claims/:id/disburse`, `POST /crop-insurance/admin/simulate-trigger`.
+- **Task 13.2: Farmer Policy Enrollment, Live Barometer & Emergency Disaster Hub (COMPLETED)**
+  - Implemented RTK Query slice `cropInsuranceApi.ts` and registered `'CropInsurancePolicy'`, `'FarmerEnrollment'`, and `'InsuranceClaim'` tags in `store/api.ts`.
+  - Built `CropInsuranceMarketplaceView.tsx` with crop filters (Boro, Aman, Potato, Onion, Jute, Mustard, Watermelon), subsidy badges, and interactive plot enrollment modal.
+  - Built `FarmerInsurancePortfolioView.tsx` with active policy certificate cards, regional telemetry risk barometers, and 1-click emergency disaster compensation filing modal.
+  - Built `AdminInsuranceDisasterHubView.tsx` featuring real-time meteorological stream, interactive weather breach simulator with auto-batch payout execution, and claims ledger.
+  - Added routes:
+    - Public Insurance Marketplace: `apps/web/app/[lang]/(public)/insurance/page.tsx` (`/[lang]/insurance`).
+    - Customer Insurance Portfolio: `apps/web/app/[lang]/(customer)/customer/insurance/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Admin Disaster Hub: `apps/web/app/[lang]/(admin)/admin/insurance/claims/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Disaster Hub: `apps/web/app/[lang]/(admin)/super-admin/insurance/claims/page.tsx`.
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 12 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 13 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).

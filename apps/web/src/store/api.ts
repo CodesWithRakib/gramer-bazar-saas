@@ -58,6 +58,7 @@ const isPublicPath = (pathname: string): boolean => {
     '/shops',
     '/group-buy',
     '/machinery',
+    '/insurance',
   ];
 
   return publicPrefixes.some((prefix) =>
@@ -246,6 +247,9 @@ export const api = createApi({
     'GroupBuyPool',
     'MachineryItem',
     'MachineryBooking',
+    'CropInsurancePolicy',
+    'FarmerEnrollment',
+    'InsuranceClaim',
   ],
   endpoints: () => ({}),
 });
