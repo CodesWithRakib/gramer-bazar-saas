@@ -40,6 +40,7 @@ import {
   Egg,
   Sprout,
   ScrollText,
+  Coffee,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -247,6 +248,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/jute-biotech'],
+  },
+  {
+    title: 'Tea Estate & Auction Desk',
+    titleBn: 'চা বাগান নিলাম ও চাষি ডেস্ক',
+    href: '/admin/tea-estate',
+    icon: Coffee,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/tea-estate'],
   },
 
   // Section: Management & Commerce
@@ -482,6 +493,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/jute-biotech'],
+  },
+  {
+    title: 'Tea Estate & Auction Desk',
+    titleBn: 'চা বাগান নিলাম ও চাষি ডেস্ক',
+    href: '/super-admin/tea-estate',
+    icon: Coffee,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/tea-estate'],
   },
 
   // Section: Platform Governance
@@ -791,6 +811,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/jute-biotech'],
+  },
+  {
+    title: 'Tea Grower & Factory Hub',
+    titleBn: 'ক্ষুদ্র চা চাষি ও কারখানা হাব',
+    href: '/seller/tea-estate',
+    icon: Coffee,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/tea-estate'],
   },
   {
     title: 'Reviews',
@@ -1172,6 +1201,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/jute-biotech'],
+  },
+  {
+    title: 'Specialty Tea & Auction Hub',
+    titleBn: 'স্পেশালিটি চা ও নিলাম হাব',
+    href: '/customer/tea-estate',
+    icon: Coffee,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/tea-estate'],
   },
   {
     title: 'Messages',

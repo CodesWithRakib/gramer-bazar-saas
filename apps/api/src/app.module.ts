@@ -90,6 +90,7 @@ import { HoneyApiaryModule } from './honey-apiary/honey-apiary.module.js';
 import { PoultryHatcheryModule } from './poultry-hatchery/poultry-hatchery.module.js';
 import { MushroomFarmingModule } from './mushroom-farming/mushroom-farming.module.js';
 import { JuteBiotechModule } from './jute-biotech/jute-biotech.module.js';
+import { TeaEstateModule } from './tea-estate/tea-estate.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -264,6 +265,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     PoultryHatcheryModule,
     MushroomFarmingModule,
     JuteBiotechModule,
+    TeaEstateModule,
   ],
 
   controllers: [AppController],
