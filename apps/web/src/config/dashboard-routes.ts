@@ -387,6 +387,15 @@ export const sellerRoutes: DashboardRoute[] = [
     matchPrefixes: ['/seller/coupons'],
   },
   {
+    title: 'Community Group Buy',
+    titleBn: 'দলীয় সমবায় বিক্রয়',
+    href: '/seller/promotions/group-buy',
+    icon: Users,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/promotions/group-buy'],
+  },
+  {
     title: 'Reviews',
     titleBn: 'গ্রাহক রিভিউ',
     href: '/seller/reviews',

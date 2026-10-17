@@ -240,6 +240,8 @@ export const api = createApi({
     'AgentSession',
     'AgentCollection',
     'AgentSettlement',
+    'GroupBuyCampaign',
+    'GroupBuyPool',
   ],
   endpoints: () => ({}),
 });

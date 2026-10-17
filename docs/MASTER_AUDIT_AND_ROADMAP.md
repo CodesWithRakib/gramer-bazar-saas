@@ -402,11 +402,28 @@ flowchart TD
     - Admin Settlements: `apps/web/app/[lang]/(admin)/admin/finance/agent-settlements/page.tsx` (linked from `FinanceHubView.tsx`).
     - Super Admin Settlements: `apps/web/app/[lang]/(super-admin)/super-admin/finance/agent-settlements/page.tsx`.
 
+### Phase 11: Community Group Buying (দলীয় সমবায় ক্রয়), Social WhatsApp Micro-Commerce & Dynamic Volume Tier Discounting Engine (COMPLETED ✅)
+- **Task 11.1: Campaign Lifecycle, Volume Pooling & Dynamic Tier Pricing (COMPLETED)**
+  - Implemented `GroupBuyCampaign`, `GroupBuyPool`, and `GroupBuyMember` entities in `apps/api/src/group-buying/`.
+  - Supports minimum participant thresholds (e.g. 5 buyers required to unlock 25% savings), duration countdown windows, tiered volume discounts, and consolidated single-drop village locations.
+  - Generates verifiable social share codes (`GB-BOGR-XXXX`) for deep-linking.
+  - Added unit test suite `group-buying.service.spec.ts` (8/8 tests passing).
+  - Exposed REST endpoints in `GroupBuyingController`: `GET /group-buying/campaigns`, `GET /group-buying/campaigns/:id`, `GET /group-buying/pools/code/:shareCode`, `GET /group-buying/pools/:id`, `POST /group-buying/pools/start`, `POST /group-buying/pools/:id/join`, `GET /group-buying/my-pools`, `POST /group-buying/campaigns`, `PATCH /group-buying/campaigns/:id`, `GET /group-buying/seller/my-campaigns`, `GET /group-buying/admin/campaigns`, `GET /group-buying/admin/pools`.
+- **Task 11.2: Public Marketplace & 1-Click Viral WhatsApp Social Invites (COMPLETED)**
+  - Implemented RTK Query slice `groupBuyingApi.ts` and registered `'GroupBuyCampaign'` and `'GroupBuyPool'` tags in `store/api.ts`.
+  - Built `GroupBuyMarketplaceView.tsx` with district filtering, price comparison blocks (regular retail vs. group price), savings badges, and quick pool launcher.
+  - Built `GroupBuyPoolDetailsView.tsx` with live participant progress bars, countdown timers, committed members list, and 1-click WhatsApp/SMS sharing with localized Bengali messages.
+  - Built `SellerGroupBuyView.tsx` enabling merchants and admins to launch campaigns and track active pooling progress.
+  - Added routes:
+    - Public Marketplace: `apps/web/app/[lang]/(public)/group-buy/page.tsx` (`/[lang]/group-buy`).
+    - Viral Social Pool: `apps/web/app/[lang]/(public)/group-buy/[shareCode]/page.tsx` (`/[lang]/group-buy/[shareCode]`).
+    - Seller Management: `apps/web/app/[lang]/(seller)/seller/promotions/group-buy/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 10 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 11 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -418,13 +435,14 @@ flowchart TD
 8. **Phase 8: Intelligent Multi-Stop Rural Logistics Dispatch & Route Clustering Optimization** (Upazila/Union waypoint clustering, ferry crossing schedule synchronization, TSP nearest-neighbor route sequencing, dynamic fuel allowance, rider turn-by-turn navigation view, and admin dispatcher board).
 9. **Phase 9: AI Computer-Vision Produce Quality Grading & Farm-to-Fork Batch Traceability** (Automated crop grading Grade A/B/C, defect percentage evaluation, price premium guidance, printable QR passports, and public consumer farm-to-fork verification portal).
 10. **Phase 10: Village Digital Center (UDC) Offline-First Field Agent POS, Char/Haor Cash Reconciliation & Micro-Aggregator Hub Engine** (Shift cash drawer float and denomination reconciliation, remote char farmer produce aggregation with cash payouts, daily Upazila Post Office & MFI deposit settlements, and unified UDC agent terminal).
+11. **Phase 11: Community Group Buying, Social WhatsApp Micro-Commerce & Dynamic Volume Tier Discounting** (Village cooperative demand pooling, minimum buyer thresholds, 1-click WhatsApp referral sharing, and single-drop consolidated rural delivery).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all 6 workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 78 test suites, 375 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 79 test suites, 383 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js Turbopack production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, and village digital center assisted POS commerce.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, and community group buying pooling.
 
 
 
