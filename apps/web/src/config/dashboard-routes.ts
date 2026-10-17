@@ -33,6 +33,7 @@ import {
   Beef,
   Fish,
   Trees,
+  Flower2,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -170,6 +171,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/agro-tourism'],
+  },
+  {
+    title: 'Herbal & Ayurvedic Hub',
+    titleBn: 'ভেষজ ও আয়ুর্বেদিক হাব',
+    href: '/admin/herbal-supply',
+    icon: Flower2,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/herbal-supply'],
   },
 
   // Section: Management & Commerce
@@ -342,6 +353,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/agro-tourism'],
+  },
+  {
+    title: 'Herbal & Ayurvedic Hub',
+    titleBn: 'ভেষজ ও আয়ুর্বেদিক হাব',
+    href: '/super-admin/herbal-supply',
+    icon: Flower2,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/herbal-supply'],
   },
 
   // Section: Platform Governance
@@ -588,6 +608,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/agro-tourism'],
+  },
+  {
+    title: 'Herbal Sourcing & Batches',
+    titleBn: 'ভেষজ চাষী ও সমবায় ব্যাচ',
+    href: '/seller/herbal-supply',
+    icon: Flower2,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/herbal-supply'],
   },
   {
     title: 'Reviews',
@@ -906,6 +935,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/agro-tourism'],
+  },
+  {
+    title: 'Herbal & Pharma Sourcing',
+    titleBn: 'ভেষজ ও ফার্মা চুক্তি পোর্টফোলিও',
+    href: '/customer/herbal-supply',
+    icon: Flower2,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/herbal-supply'],
   },
   {
     title: 'Messages',

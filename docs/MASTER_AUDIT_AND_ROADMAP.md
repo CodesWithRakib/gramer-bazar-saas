@@ -591,11 +591,42 @@ flowchart TD
     - Admin Regulatory Hub: `apps/web/app/[lang]/(admin)/admin/agro-tourism/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
     - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/agro-tourism/page.tsx`.
 
+### Phase 19: Organic Herbal, Medicinal Plants & Traditional Ayurvedic Ayush Farm Supply Chain Engine (ভেষজ চাষাবাদ, আয়ুর্বেদিক ফার্মাকোপিয়া মান নিয়ন্ত্রণ ও ইউনানী ভেষজ কাঁচামাল হাব) (COMPLETED ✅)
+
+- **Task 19.1: Botanical Catalog, Moisture & Aflatoxin Quality Audit, Biomass Conversion & Institutional Forward Contracts (COMPLETED)**
+  - Created enums in `apps/api/src/herbal-supply/enums/herbal-supply.enum.ts`: `HerbalSpecies` (Kalomegh, Ashwagandha, Tulsi Krishna/Rama, Shatavari, Aloe Vera, Vasaka, Amla, Haritaki, Bahera, Neem, Gulancha), `PlantPartUsed` (Whole Herb, Leaf Dried, Root Rhizome, Bark Stem, Fruit Seed, Flower, Gel Extract), `ProcessingState` (Raw Fresh Harvest, Shade Dried Whole, Solar Dehydrated Chopped, Fine Pulverized Powder, Standardized Extract), `GACPStandardGrade` (Pharma Grade A, Commercial Grade B, Raw Unsorted C), `LabCertificateStatus`, and `SourcingContractStatus`.
+  - Created TypeORM entities:
+    - `HerbalBatch`: Standardized botanical harvest batches from rural grower cooperatives (Natore "Oushodhi Gram", Tangail, Rangpur, Hill Tracts), moisture level %, active marker %, GACP grade, DGDA certification status, and unit pricing.
+    - `HerbalMoistureAudit`: Halogen moisture meter audit records, aflatoxin screening (negative/positive), lead/heavy metal ppm tests, foreign matter %, and compliance verdict.
+    - `PharmaSourcingContract`: Institutional forward procurement contracts between rural cooperatives and licensed pharmaceutical manufacturers (Square Herbal, Hamdard, Ibn Sina) with 30% advance escrow deposit hold.
+  - Built DTOs in `dto/herbal-supply.dto.ts` with strict `class-validator` rules.
+  - Implemented `HerbalSupplyService`:
+    - Seeded baseline batches and institutional contracts across Natore, Tangail, Rangpur, and Hill Tracts.
+    - Fresh-to-Dry Biomass Dehydration Calculator: computes plant part moisture loss ratios (5.5:1 leaves, 3.8:1 roots, 18:1 aloe gel) and calculates net farmer profit advantages (+40% to +65% net advantage for solar-dried A-grade herbs).
+    - Halogen Moisture Meter & Aflatoxin Auditor: automatically marks batches as `REJECTED_EXCESS_MOISTURE_OR_MOLD` when moisture exceeds 12.0% or aflatoxin is detected.
+    - Contract Escrow Engine: calculates 30% upfront escrow advance and manages status lifecycles (`CONTRACT_ACTIVE`, `INSPECTION_PENDING`, `FULFILLED_ACCEPTED`).
+  - Built `HerbalSupplyController` with 12 endpoints registered in `app.module.ts`.
+  - Created comprehensive unit test suite `herbal-supply.service.spec.ts` (7/7 tests passing 100%).
+- **Task 19.2: Public Marketplace, Dehydration Ratio Calculator, Grower Cooperative Hub & DGDA Regulatory Audit Desk (COMPLETED)**
+  - Implemented RTK Query slice `herbalSupplyApi.ts` and registered `'HerbalBatch'`, `'HerbalAudit'`, and `'PharmaContract'` tags in `store/api.ts`.
+  - Built `HerbalMarketplaceHubView.tsx` with 3 interactive tabs:
+    - Standardized Herbal Catalog: Botanical search, species filter, GACP grade badges, lab test tags, and 1-click pharma procurement quote modal.
+    - Fresh-to-Dry Biomass Conversion Calculator: Interactive yield simulator computing dry weight return and net farmer profit margin compared to unwashed raw farmgate sales.
+    - DGDA Botanical Quality Guidelines: Comprehensive pharmacopoeia reference standards (moisture <10%, zero aflatoxin, <10 ppm lead).
+  - Built `GrowerCooperativeManagementView.tsx`: Rural cooperative hub to register harvested botanical batches, log halogen moisture audits, and track institutional deliveries.
+  - Built `AdminPharmaRegulatoryHubView.tsx`: DGDA inspection desk, institutional contract ledger, quality verification, and contract wizard.
+  - Added routes:
+    - Public Herbal Hub: `apps/web/app/[lang]/(public)/herbal-supply/page.tsx` (`/[lang]/herbal-supply`).
+    - Customer Herbal & Pharma Sourcing: `apps/web/app/[lang]/(customer)/customer/herbal-supply/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Seller Herbal Sourcing & Batches: `apps/web/app/[lang]/(seller)/seller/herbal-supply/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Admin Herbal & Ayurvedic Hub: `apps/web/app/[lang]/(admin)/admin/herbal-supply/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/herbal-supply/page.tsx`.
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, and agro-tourism commerce ecosystem. All 18 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, agro-tourism, and medicinal botanical commerce ecosystem. All 19 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -615,13 +646,15 @@ flowchart TD
 16. **Phase 16: Livestock & Cattle Marketplace, Digital Veterinary Health Passports & Artificial Insemination (AI) Pedigree Registry Engine** (Middleman & toll-free digital cattle hat, DLS QR ear-tag health passports, AM/PM artificial insemination timing calculator, bio-secure cattle transport, and escrow-backed animal trade).
 17. **Phase 17: Aquaculture, Shrimp Hatchery Traceability & Bio-Floc Fish Farming IoT Management Engine** (Specific Pathogen Free fry marketplace for Bagda/Galda/Carp, DoF PCR virus testing verification, real-time IoT pond dissolved oxygen & ammonia monitoring with automated aerator alerts, FCR feed optimization, and 3-ton live fish aerated tanker logistics).
 18. **Phase 18: Agro-Tourism, Farm Stays & Rural Eco-Experience Booking Engine** (Traditional mud houses, tea estate eco-cottages, orchard camping, seasonal fruit picking, wild honey extraction, traditional fishing catch-and-cook, PIN-verified escrow payouts, and transparent cost breakdown calculator).
+19. **Phase 19: Organic Herbal, Medicinal Plants & Traditional Ayurvedic Ayush Farm Supply Chain Engine** (Standardized indigenous medicinal botanical catalog, GACP Grade A/B/C certifications, DGDA moisture <10% and aflatoxin lab audits, fresh-to-dry biomass ratio calculators, institutional pharma forward contracts, and rural herbal cooperative supply hubs).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 86 test suites, 431 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 87 test suites, 438 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, and authentic village farm stay reservations.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, authentic village farm stay reservations, and organic herbal medicine sourcing.
+
 
 
 
