@@ -82,6 +82,7 @@ import { ContractFarmingModule } from './contract-farming/contract-farming.modul
 import { AgriPrecisionModule } from './agri-precision/agri-precision.module.js';
 import { LivestockModule } from './livestock/livestock.module.js';
 import { AquacultureModule } from './aquaculture/aquaculture.module.js';
+import { AgroTourismModule } from './agro-tourism/agro-tourism.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -248,6 +249,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AgriPrecisionModule,
     LivestockModule,
     AquacultureModule,
+    AgroTourismModule,
   ],
 
   controllers: [AppController],

@@ -32,6 +32,7 @@ import {
   Plane,
   Beef,
   Fish,
+  Trees,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -159,6 +160,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/aquaculture'],
+  },
+  {
+    title: 'Agro-Tourism & Stays',
+    titleBn: 'কৃষি পর্যটন ও ইকো-স্টে',
+    href: '/admin/agro-tourism',
+    icon: Trees,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/agro-tourism'],
   },
 
   // Section: Management & Commerce
@@ -322,6 +333,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/aquaculture'],
+  },
+  {
+    title: 'Agro-Tourism & Stays',
+    titleBn: 'কৃষি পর্যটন ও ইকো-স্টে',
+    href: '/super-admin/agro-tourism',
+    icon: Trees,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/agro-tourism'],
   },
 
   // Section: Platform Governance
@@ -559,6 +579,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/aquaculture'],
+  },
+  {
+    title: 'Farm Stays & Eco-Host',
+    titleBn: 'ফার্ম স্টে ও গ্রামীণ হোস্ট',
+    href: '/seller/agro-tourism',
+    icon: Trees,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/agro-tourism'],
   },
   {
     title: 'Reviews',
@@ -868,6 +897,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/aquaculture'],
+  },
+  {
+    title: 'Farm Stays & Trips',
+    titleBn: 'ফার্ম স্টে ও ভ্রমণ বুকিং',
+    href: '/customer/agro-tourism',
+    icon: Trees,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/agro-tourism'],
   },
   {
     title: 'Messages',

@@ -563,11 +563,39 @@ flowchart TD
     - Admin Regulatory Hub: `apps/web/app/[lang]/(admin)/admin/aquaculture/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
     - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/aquaculture/page.tsx`.
 
+### Phase 18: Agro-Tourism, Farm Stays & Rural Eco-Experience Booking Engine (COMPLETED)
+
+- **Task 18.1: Agro-Tourism Domain Architecture, Pricing Engine, PIN Escrow & Booking Lifecycle (COMPLETED)**
+  - Created enums in `apps/api/src/agro-tourism/enums/agro-tourism.enum.ts`: `StayType` (Traditional Mud House, Tea Estate Eco Cottage, Orchard Camp, River/Beel Villa, Bamboo Machang, Sundarbans Mangrove Gher), `ExperienceCategory` (Fruit Picking, Honey Extraction, Catch & Cook Fishing, Clay Stove Cooking, Pottery/Handicrafts, Organic Harvest), `MealPlanOption`, and `BookingEscrowStatus`.
+  - Created TypeORM entities:
+    - `FarmStayListing`: Traditional rural cottages, guest capacities, bed counts, solar electricity, tube-well water, clay stove kitchen, and organic farm harvest access.
+    - `AgroExperiencePackage`: Authentic hands-on activities, participant limits, safety gear, and farm snacks.
+    - `FarmStayBooking`: Dynamic reservation ledger with nights count, adult/child split, meal plan subtotals, add-on activities, secret 4-digit check-in PIN code, and escrow status.
+  - Built DTOs in `dto/agro-tourism.dto.ts` with strict `class-validator` rules.
+  - Implemented `AgroTourismService`: seeded baseline stays (Sreemangal, Jashore, Dinajpur, Sundarbans), pricing calculator (differentiating weekday vs weekend nights, organic 3-meal vs breakfast plans, and activity packages), check-in PIN verification unlocking host escrow, and payout release.
+  - Built `AgroTourismController` with 15 endpoints registered in `app.module.ts`.
+  - Created comprehensive unit test suite `agro-tourism.service.spec.ts` (6/6 tests passing 100%).
+- **Task 18.2: Public Marketplace, Trip Cost Estimator, Host Management Hub & Admin Escrow Governance (COMPLETED)**
+  - Implemented RTK Query slice `agroTourismApi.ts` and registered `'FarmStay'`, `'AgroExperience'`, and `'AgroBooking'` tags in `store/api.ts`.
+  - Built `AgroTourismHubView.tsx` with 3 interactive tabs:
+    - Farm Stays & Eco-Cottages Catalog: Search by district, filter by stay type, inspect amenities badges, and open instant booking modal.
+    - Agro-Activities & Workshops: Browse honey harvesting, fruit orchard picking, and catch-and-cook fish barbecues.
+    - Tour & Meal Cost Calculator: Interactive estimation of cottage rates, farm meals, and platform coordination fees.
+    - Interactive Booking Modal: Multi-day date picker, guest selection, meal plans, add-on activities, and bKash escrow commitment generating booking voucher and secret check-in PIN.
+  - Built `HostFarmManagementView.tsx`: Host cottage inventory manager to list new mud houses/cottages, add activity packages, and verify guest check-in PINs to unlock escrow payouts.
+  - Built `AdminAgroTourismHubView.tsx`: Admin dashboard to monitor all nationwide reservations, audit Union Parishad safety certifications, and release host escrow payouts.
+  - Added routes:
+    - Public Agro-Tourism Hub: `apps/web/app/[lang]/(public)/agro-tourism/page.tsx` (`/[lang]/agro-tourism`).
+    - Customer Farm Stays & Trips: `apps/web/app/[lang]/(customer)/customer/agro-tourism/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Seller Farm Stays & Eco-Host: `apps/web/app/[lang]/(seller)/seller/agro-tourism/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Admin Regulatory Hub: `apps/web/app/[lang]/(admin)/admin/agro-tourism/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/agro-tourism/page.tsx`.
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, and aquaculture commerce ecosystem. All 17 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, and agro-tourism commerce ecosystem. All 18 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -586,13 +614,15 @@ flowchart TD
 15. **Phase 15: Agri-Inputs Anti-Adulteration Verification, Precision Drone Crop Spraying Booking & Digital Soil Nutrient Advisory Engine** (Chemical registry with DAE authentication, anti-counterfeit complaints with mobile court referral, DJI Agras precision spraying fleet booking, and SRDI soil health nutrient prescription calculator).
 16. **Phase 16: Livestock & Cattle Marketplace, Digital Veterinary Health Passports & Artificial Insemination (AI) Pedigree Registry Engine** (Middleman & toll-free digital cattle hat, DLS QR ear-tag health passports, AM/PM artificial insemination timing calculator, bio-secure cattle transport, and escrow-backed animal trade).
 17. **Phase 17: Aquaculture, Shrimp Hatchery Traceability & Bio-Floc Fish Farming IoT Management Engine** (Specific Pathogen Free fry marketplace for Bagda/Galda/Carp, DoF PCR virus testing verification, real-time IoT pond dissolved oxygen & ammonia monitoring with automated aerator alerts, FCR feed optimization, and 3-ton live fish aerated tanker logistics).
+18. **Phase 18: Agro-Tourism, Farm Stays & Rural Eco-Experience Booking Engine** (Traditional mud houses, tea estate eco-cottages, orchard camping, seasonal fruit picking, wild honey extraction, traditional fishing catch-and-cook, PIN-verified escrow payouts, and transparent cost breakdown calculator).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 85 test suites, 425 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 86 test suites, 431 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, and shrimp hatchery SPF traceability.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, and authentic village farm stay reservations.
+
 
 
 
