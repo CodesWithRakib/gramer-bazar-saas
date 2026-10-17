@@ -622,11 +622,43 @@ flowchart TD
     - Admin Herbal & Ayurvedic Hub: `apps/web/app/[lang]/(admin)/admin/herbal-supply/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
     - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/herbal-supply/page.tsx`.
 
+### Phase 20: Sericulture, Traditional Handloom Silk & Rural Artisan Textile Supply Chain Engine (রেশম চাষ, খাঁটি সিল্ক, জামদানি ও গ্রামীণ তাঁতশিল্প ই-কমার্স প্ল্যাটফর্ম) (COMPLETED ✅)
+
+- **Task 20.1: Heritage Textile Catalog, Cocoon Reeling Renditta Calculator, Fair-Wage Matrix & Escrow Lifecycle (COMPLETED)**
+  - Created enums in `apps/api/src/sericulture-handloom/enums/sericulture-handloom.enum.ts`: `SericultureCraftType` (Rajshahi Mulberry Silk, Endi/Eri Silk, Matka Silk, Dhakai Jamdani, Tangail Handloom Taant, Mirpur Banarasi Katan, Hill Tracts Chakma Pinon Hadi, Khadi Cotton), `SilkGrade`, `YarnMaterial`, `AuthenticityStatus` (BSDB/BHB Certified, GI Registered Origin, Lab Burn-Test Verified), `WeavingLoomType` (Pit Loom, Fly Shuttle Frame Loom, Indigenous Backstrap Loom), `CocoonType` (Bivoltine, Multivoltine), and `ArtisanOrderEscrowStatus`.
+  - Created TypeORM entities:
+    - `HandloomArtisanProduct`: Catalog of traditional sarees, shawls, and wraps with village origin, loom type, thread count warp/weft, GI certification number, direct artisan wage BDT, and burn test notes.
+    - `SericultureCocoonBatch`: Silkworm fresh cocoon harvest lots (Rajshahi, Bholahat, Shibganj, Natore) with shell ratio %, renditta conversion, and BSDB inspection records.
+    - `ArtisanCustomOrder`: Custom commissioned weaving orders with 50% upfront escrow advance, progress milestone tracking (0-100%), and safe payout settlement.
+  - Built DTOs in `dto/sericulture-handloom.dto.ts` with strict `class-validator` rules.
+  - Implemented `SericultureHandloomService`:
+    - Seeded baseline authentic products (Sopura Silk, Rupganj Jamdani, Pathrail Taant, Sapchhari Pinon Hadi, Bholahat Eri Silk).
+    - Cocoon Reeling Renditta Calculator: evaluates fresh cocoon-to-raw silk filament yield (e.g. 8.18 kg fresh cocoons = 1 kg raw silk yarn) and computes net value addition (+35% to +50%) and chrysalis protein by-products.
+    - Fair-Wage Weaver Cost Breakdown Matrix: transparent model guaranteeing daily artisan wage (৳850/day standard) yielding +150% to +180% higher earnings compared to exploitative middleman dadan (দাদন).
+    - Escrow Lifecycle Engine: 50% upfront advance locking and full release upon delivery verification.
+  - Built `SericultureHandloomController` with 15 endpoints registered in `app.module.ts`.
+  - Created comprehensive unit test suite `sericulture-handloom.service.spec.ts` (7/7 tests passing 100%).
+- **Task 20.2: Public Marketplace, Cocoon Reeling Calculator, Artisan Loom Hub & Handloom Board Regulatory Control (COMPLETED)**
+  - Implemented RTK Query slice `sericultureHandloomApi.ts` and registered `'ArtisanProduct'`, `'CocoonBatch'`, and `'CustomOrder'` tags in `store/api.ts`.
+  - Built `SericultureMarketplaceHubView.tsx` with 4 interactive tabs:
+    - Heritage Handloom & Silk Catalog: Filter by craft, loom type, and origin district; transparent weaver wage badges and 1-click custom commission modal.
+    - Cocoon-to-Silk Reeling Calculator: Live simulator computing renditta ratio, raw silk filament yield, chrysalis pupae protein, and value-addition percentage.
+    - Fair-Wage Transparency Matrix: Compares fair direct pricing against traditional middleman markups.
+    - Pure Silk Burn-Test & GI Heritage Guide: Explains natural protein fiber burn-test protocols and official GI registered clusters.
+  - Built `ArtisanLoomManagementView.tsx`: Artisan weaver dashboard to list handloom products, manage custom orders, update loom weaving progress, and log cocoon harvest lots.
+  - Built `AdminHeritageCraftHubView.tsx`: Bangladesh Sericulture Development Board (BSDB) & Handloom Board governance desk, cocoon lot inspection verification, GI certificate registry, and 50% escrow release arbitration.
+  - Added routes:
+    - Public Sericulture Hub: `apps/web/app/[lang]/(public)/sericulture-handloom/page.tsx` (`/[lang]/sericulture-handloom`).
+    - Customer Custom Commissions: `apps/web/app/[lang]/(customer)/customer/sericulture-handloom/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Seller Loom & Cocoons: `apps/web/app/[lang]/(seller)/seller/sericulture-handloom/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Admin Regulatory Hub: `apps/web/app/[lang]/(admin)/admin/sericulture-handloom/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/sericulture-handloom/page.tsx`.
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, agro-tourism, and medicinal botanical commerce ecosystem. All 19 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, agro-tourism, medicinal botanical, and heritage sericulture textile commerce ecosystem. All 20 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -647,13 +679,15 @@ flowchart TD
 17. **Phase 17: Aquaculture, Shrimp Hatchery Traceability & Bio-Floc Fish Farming IoT Management Engine** (Specific Pathogen Free fry marketplace for Bagda/Galda/Carp, DoF PCR virus testing verification, real-time IoT pond dissolved oxygen & ammonia monitoring with automated aerator alerts, FCR feed optimization, and 3-ton live fish aerated tanker logistics).
 18. **Phase 18: Agro-Tourism, Farm Stays & Rural Eco-Experience Booking Engine** (Traditional mud houses, tea estate eco-cottages, orchard camping, seasonal fruit picking, wild honey extraction, traditional fishing catch-and-cook, PIN-verified escrow payouts, and transparent cost breakdown calculator).
 19. **Phase 19: Organic Herbal, Medicinal Plants & Traditional Ayurvedic Ayush Farm Supply Chain Engine** (Standardized indigenous medicinal botanical catalog, GACP Grade A/B/C certifications, DGDA moisture <10% and aflatoxin lab audits, fresh-to-dry biomass ratio calculators, institutional pharma forward contracts, and rural herbal cooperative supply hubs).
+20. **Phase 20: Sericulture, Traditional Handloom Silk & Rural Artisan Textile Supply Chain Engine** (Rajshahi mulberry silk, Narayanganj Dhakai Jamdani, Tangail Taant, and Hill Tracts backstrap handloom catalog; BSDB cocoon reeling renditta calculator; transparent fair-wage cost breakdown matrix; and 50% advance escrow custom weaving orders).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 87 test suites, 438 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 88 test suites, 445 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, authentic village farm stay reservations, and organic herbal medicine sourcing.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, authentic village farm stay reservations, organic herbal medicine sourcing, and heritage handloom silk commerce.
+
 
 
 

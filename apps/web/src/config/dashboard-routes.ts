@@ -34,6 +34,7 @@ import {
   Fish,
   Trees,
   Flower2,
+  Scissors,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -181,6 +182,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/herbal-supply'],
+  },
+  {
+    title: 'Sericulture & Handloom Hub',
+    titleBn: 'রেশম ও তাঁতশিল্প নিয়ন্ত্রণ কেন্দ্র',
+    href: '/admin/sericulture-handloom',
+    icon: Scissors,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/sericulture-handloom'],
   },
 
   // Section: Management & Commerce
@@ -362,6 +373,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/herbal-supply'],
+  },
+  {
+    title: 'Sericulture & Handloom Hub',
+    titleBn: 'রেশম ও তাঁতশিল্প নিয়ন্ত্রণ কেন্দ্র',
+    href: '/super-admin/sericulture-handloom',
+    icon: Scissors,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/sericulture-handloom'],
   },
 
   // Section: Platform Governance
@@ -617,6 +637,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/herbal-supply'],
+  },
+  {
+    title: 'Handloom Looms & Cocoons',
+    titleBn: 'তাঁতশিল্প ও রেশম চাষী ড্যাশবোর্ড',
+    href: '/seller/sericulture-handloom',
+    icon: Scissors,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/sericulture-handloom'],
   },
   {
     title: 'Reviews',
@@ -944,6 +973,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/herbal-supply'],
+  },
+  {
+    title: 'Custom Handloom Commissions',
+    titleBn: 'কাস্টম বুনন ফরমায়েশ পোর্টফোলিও',
+    href: '/customer/sericulture-handloom',
+    icon: Scissors,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/sericulture-handloom'],
   },
   {
     title: 'Messages',
