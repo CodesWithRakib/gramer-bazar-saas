@@ -39,6 +39,7 @@ import {
   Sparkles,
   Egg,
   Sprout,
+  ScrollText,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -236,6 +237,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/mushroom-farming'],
+  },
+  {
+    title: 'Jute Bio-Tech & Packaging Desk',
+    titleBn: 'পাট বায়োটেক ও মোড়কীকরণ ডেস্ক',
+    href: '/admin/jute-biotech',
+    icon: ScrollText,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/jute-biotech'],
   },
 
   // Section: Management & Commerce
@@ -462,6 +473,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/mushroom-farming'],
+  },
+  {
+    title: 'Jute Bio-Tech & Packaging Desk',
+    titleBn: 'পাট বায়োটেক ও মোড়কীকরণ ডেস্ক',
+    href: '/super-admin/jute-biotech',
+    icon: ScrollText,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/jute-biotech'],
   },
 
   // Section: Platform Governance
@@ -762,6 +782,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/mushroom-farming'],
+  },
+  {
+    title: 'Jute Retting & Baling Hub',
+    titleBn: 'পাট পচন ও বেলিং প্রেস হাব',
+    href: '/seller/jute-biotech',
+    icon: ScrollText,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/jute-biotech'],
   },
   {
     title: 'Reviews',
@@ -1134,6 +1163,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/mushroom-farming'],
+  },
+  {
+    title: 'Jute Fibers & Sacks Hub',
+    titleBn: 'সোনালী আঁশ ও পাটের বস্তা হাব',
+    href: '/customer/jute-biotech',
+    icon: ScrollText,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/jute-biotech'],
   },
   {
     title: 'Messages',
