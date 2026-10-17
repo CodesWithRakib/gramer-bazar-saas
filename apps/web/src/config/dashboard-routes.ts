@@ -36,6 +36,7 @@ import {
   Flower2,
   Scissors,
   Milk,
+  Sparkles,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -203,6 +204,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/dairy-supply'],
+  },
+  {
+    title: 'Honey & Apiary Hub',
+    titleBn: 'মৌচাষ ও মধু মান নিয়ন্ত্রণ হাব',
+    href: '/admin/honey-apiary',
+    icon: Sparkles,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/honey-apiary'],
   },
 
   // Section: Management & Commerce
@@ -402,6 +413,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/dairy-supply'],
+  },
+  {
+    title: 'Honey & Apiary Hub',
+    titleBn: 'মৌচাষ ও মধু মান নিয়ন্ত্রণ হাব',
+    href: '/super-admin/honey-apiary',
+    icon: Sparkles,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/honey-apiary'],
   },
 
   // Section: Platform Governance
@@ -675,6 +695,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/dairy-supply'],
+  },
+  {
+    title: 'Apiary Fleet & Honey Lots',
+    titleBn: 'মৌ-বাক্স বহর ও মধু লট',
+    href: '/seller/honey-apiary',
+    icon: Sparkles,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/honey-apiary'],
   },
   {
     title: 'Reviews',
@@ -1020,6 +1049,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/dairy-supply'],
+  },
+  {
+    title: 'Honey Purity & Lab Passes',
+    titleBn: 'মধু ল্যাব সনদ ও বিশুদ্ধতা',
+    href: '/customer/honey-apiary',
+    icon: Sparkles,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/honey-apiary'],
   },
   {
     title: 'Messages',

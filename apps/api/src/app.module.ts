@@ -86,6 +86,7 @@ import { AgroTourismModule } from './agro-tourism/agro-tourism.module.js';
 import { HerbalSupplyModule } from './herbal-supply/herbal-supply.module.js';
 import { SericultureHandloomModule } from './sericulture-handloom/sericulture-handloom.module.js';
 import { DairySupplyModule } from './dairy-supply/dairy-supply.module.js';
+import { HoneyApiaryModule } from './honey-apiary/honey-apiary.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -256,6 +257,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     HerbalSupplyModule,
     SericultureHandloomModule,
     DairySupplyModule,
+    HoneyApiaryModule,
   ],
 
   controllers: [AppController],
