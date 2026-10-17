@@ -38,6 +38,7 @@ import {
   Milk,
   Sparkles,
   Egg,
+  Sprout,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -225,6 +226,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/poultry-hatchery'],
+  },
+  {
+    title: 'Mushroom & Spawn Lab Hub',
+    titleBn: 'মাশরুম স্পন ও প্রসেসিং হাব',
+    href: '/admin/mushroom-farming',
+    icon: Sprout,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/mushroom-farming'],
   },
 
   // Section: Management & Commerce
@@ -442,6 +453,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/poultry-hatchery'],
+  },
+  {
+    title: 'Mushroom & Spawn Lab Hub',
+    titleBn: 'মাশরুম স্পন ও প্রসেসিং হাব',
+    href: '/super-admin/mushroom-farming',
+    icon: Sprout,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/mushroom-farming'],
   },
 
   // Section: Platform Governance
@@ -733,6 +753,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/poultry-hatchery'],
+  },
+  {
+    title: 'Mushroom Spawn & Chamber Hub',
+    titleBn: 'মাশরুম স্পন ও চেম্বার হাব',
+    href: '/seller/mushroom-farming',
+    icon: Sprout,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/mushroom-farming'],
   },
   {
     title: 'Reviews',
@@ -1096,6 +1125,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/poultry-hatchery'],
+  },
+  {
+    title: 'Mushroom Spawns & Dry Lots',
+    titleBn: 'মাশরুম স্পন ও ড্রাই লট',
+    href: '/customer/mushroom-farming',
+    icon: Sprout,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/mushroom-farming'],
   },
   {
     title: 'Messages',
