@@ -301,6 +301,16 @@ export const adminRoutes: DashboardRoute[] = [
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/artisanal-gur'],
   },
+  {
+    title: 'Artisanal Sweetmeats & GI',
+    titleBn: 'ঐতিহ্যবাহী মিষ্টি, ছানা ও বগুড়ার দই হাব',
+    href: '/admin/artisanal-sweetmeats',
+    icon: Sparkles,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/artisanal-sweetmeats'],
+  },
 
   // Section: Management & Commerce
   {
@@ -580,6 +590,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/artisanal-gur'],
+  },
+  {
+    title: 'Artisanal Sweetmeats & GI',
+    titleBn: 'ঐতিহ্যবাহী মিষ্টি, ছানা ও বগুড়ার দই হাব',
+    href: '/super-admin/artisanal-sweetmeats',
+    icon: Sparkles,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/artisanal-sweetmeats'],
   },
 
   // Section: Platform Governance
@@ -934,6 +953,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/artisanal-gur'],
+  },
+  {
+    title: 'Moira Sweetmeat Guild Hub',
+    titleBn: 'ময়রা মিষ্টান্ন ও ছানা উৎপাদন হাব',
+    href: '/seller/artisanal-sweetmeats',
+    icon: Sparkles,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/artisanal-sweetmeats'],
   },
   {
     title: 'Reviews',
@@ -1360,6 +1388,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/artisanal-gur'],
+  },
+  {
+    title: 'Artisanal Sweetmeats & Doi',
+    titleBn: 'বগুড়ার দই, কাঁচাগোল্লা ও খাঁটি মিষ্টি',
+    href: '/customer/artisanal-sweetmeats',
+    icon: Sparkles,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/artisanal-sweetmeats'],
   },
   {
     title: 'Messages',

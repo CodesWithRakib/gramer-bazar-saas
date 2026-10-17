@@ -95,6 +95,7 @@ import { OrchardAuctionModule } from './orchard-auction/orchard-auction.module.j
 import { SpiceMarketModule } from './spice-market/spice-market.module.js';
 import { EdibleOilModule } from './edible-oil/edible-oil.module.js';
 import { ArtisanalGurModule } from './artisanal-gur/artisanal-gur.module.js';
+import { ArtisanalSweetmeatsModule } from './artisanal-sweetmeats/artisanal-sweetmeats.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -274,6 +275,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     SpiceMarketModule,
     EdibleOilModule,
     ArtisanalGurModule,
+    ArtisanalSweetmeatsModule,
   ],
 
   controllers: [AppController],
