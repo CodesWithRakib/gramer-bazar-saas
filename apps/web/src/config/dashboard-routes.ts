@@ -37,6 +37,7 @@ import {
   Scissors,
   Milk,
   Sparkles,
+  Egg,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -214,6 +215,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/honey-apiary'],
+  },
+  {
+    title: 'Poultry & Hatchery Hub',
+    titleBn: 'পোল্ট্রি হ্যাচারি ও ডিম গ্রেডিং হাব',
+    href: '/admin/poultry-hatchery',
+    icon: Egg,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/poultry-hatchery'],
   },
 
   // Section: Management & Commerce
@@ -422,6 +433,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/honey-apiary'],
+  },
+  {
+    title: 'Poultry & Hatchery Hub',
+    titleBn: 'পোল্ট্রি হ্যাচারি ও ডিম গ্রেডিং হাব',
+    href: '/super-admin/poultry-hatchery',
+    icon: Egg,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/poultry-hatchery'],
   },
 
   // Section: Platform Governance
@@ -704,6 +724,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/honey-apiary'],
+  },
+  {
+    title: 'Poultry Farm & Brooder Hub',
+    titleBn: 'পোল্ট্রি খামার ও ব্রুডার হাব',
+    href: '/seller/poultry-hatchery',
+    icon: Egg,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/poultry-hatchery'],
   },
   {
     title: 'Reviews',
@@ -1058,6 +1087,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/honey-apiary'],
+  },
+  {
+    title: 'Poultry & Graded Eggs',
+    titleBn: 'পোল্ট্রি ও গ্রেডেড ডিম',
+    href: '/customer/poultry-hatchery',
+    icon: Egg,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/poultry-hatchery'],
   },
   {
     title: 'Messages',

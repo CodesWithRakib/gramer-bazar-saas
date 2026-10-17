@@ -68,6 +68,7 @@ const isPublicPath = (pathname: string): boolean => {
     '/sericulture-handloom',
     '/dairy-supply',
     '/honey-apiary',
+    '/poultry-hatchery',
   ];
 
   return publicPrefixes.some((prefix) =>
@@ -289,6 +290,9 @@ export const api = createApi({
     'HoneyLot',
     'BeeBox',
     'SuperfoodBatch',
+    'PoultryBatch',
+    'BrooderTelemetry',
+    'EggLot',
   ],
   endpoints: () => ({}),
 });
