@@ -41,6 +41,7 @@ import {
   Sprout,
   ScrollText,
   Coffee,
+  Flame,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -268,6 +269,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/orchard-auction'],
+  },
+  {
+    title: 'Spices & Pure Origin Desk',
+    titleBn: 'খাঁটি মসলা ও সৌর টানেল ড্রায়িং',
+    href: '/admin/spice-market',
+    icon: Flame,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/spice-market'],
   },
 
   // Section: Management & Commerce
@@ -521,6 +532,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/orchard-auction'],
+  },
+  {
+    title: 'Spices & Pure Origin Desk',
+    titleBn: 'খাঁটি মসলা ও সৌর টানেল ড্রায়িং',
+    href: '/super-admin/spice-market',
+    icon: Flame,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/spice-market'],
   },
 
   // Section: Platform Governance
@@ -848,6 +868,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/orchard-auction'],
+  },
+  {
+    title: 'Solar Spice Drying & Lots',
+    titleBn: 'সৌর ড্রায়িং ও খাঁটি মসলা লট',
+    href: '/seller/spice-market',
+    icon: Flame,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/spice-market'],
   },
   {
     title: 'Reviews',
@@ -1247,6 +1276,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/orchard-auction'],
+  },
+  {
+    title: 'Pure Spices & Aromatics',
+    titleBn: 'খাঁটি মসলা ও সৌর প্রক্রিয়াজাত পণ্য',
+    href: '/customer/spice-market',
+    icon: Flame,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/spice-market'],
   },
   {
     title: 'Messages',

@@ -73,6 +73,7 @@ const isPublicPath = (pathname: string): boolean => {
     '/jute-biotech',
     '/tea-estate',
     '/orchard-auction',
+    '/spice-market',
   ];
 
   return publicPrefixes.some((prefix) =>
@@ -309,6 +310,9 @@ export const api = createApi({
     'OrchardAuctionLot',
     'PhytosanitaryHwtBatch',
     'OrchardHarvestDispatch',
+    'SpiceDryingBatch',
+    'SpicePurityLabTest',
+    'SpiceForwardLot',
   ],
   endpoints: () => ({}),
 });

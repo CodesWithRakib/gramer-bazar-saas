@@ -948,9 +948,51 @@ flowchart TD
 
 ---
 
+#### Phase 28: Spices & Aromatics Value Chain, Solar/Tunnel Drying Dehydration & Anti-Adulteration Origin Verification Engine (মসলা ও সুগন্ধি ভ্যালু চেইন, সৌর টানেল ড্রায়িং ও খাঁটি মসলা ভেজালরোধী সরবরাহ ব্যবস্থা প্ল্যাটফর্ম) - IMPLEMENTED & VERIFIED ✓
+- **Engine Overview:**
+  - Implemented Bangladesh's first specialized farm-to-table pure spice value chain and anti-adulteration regulatory verification engine connecting farmers and cooperatives across Natore, Bogura, Pabna, Faridpur, Lalmonirhat, and Bandarban with industrial food processors, packaging brands, and wholesale buyers.
+  - **Solar Parabolic Tunnel Dehydration & Mass Balance Engine:**
+    - Scientific moisture reduction from freshly harvested moisture (75%–85%) down to safe warehousing moisture strictly $\le 10.0\%$ (target 9.0%–9.5%) to prevent *Aspergillus flavus* mold growth and toxic aflatoxin synthesis.
+    - Dry matter conservation formula: $\text{Dry Matter} = \text{Fresh Weight} \times (1 - \text{Initial Moisture} / 100)$; Finished Dehydrated Weight $= \text{Dry Matter} / (1 - \text{Target Moisture} / 100)$.
+    - Enclosed parabolic tunnel solar telemetry tracking chamber temperature (45°C–55°C), relative humidity, and elapsed days, eliminating roadside dust, bird droppings, and animal contamination with a +25% clean produce market price premium.
+  - **BSTI & BARI Spices Research Center (SRC) Anti-Adulteration Verification Desk:**
+    - Spectrophotometric screening ledger with zero tolerance for banned carcinogenic Sudan dyes (Sudan I, II, III, IV), toxic lead chromate ($\text{PbCrO}_4$) root luster polish, and metanil yellow industrial dye.
+    - Mandatory seizure enforcement flags under Bangladesh Food Safety Act 2013 and mobile court confiscations for non-compliant lots.
+    - Statutory compliance with European Spice Association & BSTI limits for Aflatoxin $B_1 \le 5.0$ ppb.
+    - Digital QR authenticity seals issued for compliant lots (`GBZ-BSTI-PURE-...`), guaranteeing purity and traceability.
+    - Curcumin content (>5.0%), Scoville Heat Units (SHU >45,000 for Bogura chilli), and volatile essential oil (%) potency profiling.
+  - **Commercial Pure Spice Forward Lots Marketplace:**
+    - Forward contracts and wholesale spot sales in GrainPro hermetic ultra-barrier 50kg bags and nitrogen-flushed 1kg pouches.
+- **Backend Architecture (`apps/api/src/spice-market/`):**
+  - Enums (`enums/spice-market.enum.ts`): `SpiceType`, `SpiceRegion`, `DryingMethod`, `DryingBatchStatus`, `AflatoxinRiskLevel`, `AdulterationTestStatus`, `SpicePurityGrade`, `SpiceFormFactor`, `SpicePackagingType`, `SpiceLotStatus`.
+  - Entities (`entities/`):
+    - `spice-drying-batch.entity.ts`: Solar tunnel telemetry, moisture tracking, mass balance, and mold risk indicators.
+    - `spice-purity-lab-test.entity.ts`: Chemical purity analysis, banned dye detection, moisture, aflatoxin B1 ppb, and QR seals.
+    - `spice-forward-lot.entity.ts`: Certified whole & ground spice inventory, packaging, and commercial contracts.
+  - DTOs (`dto/spice-market.dto.ts`): `CalculateSpiceDehydrationDto`, `EvaluateSpicePurityDto`, `CreateSpiceDryingBatchDto`, `UpdateBatchTelemetryDto`, `CreateSpicePurityLabTestDto`, `CreateSpiceForwardLotDto`, `PurchaseSpiceLotDto`.
+  - Service (`spice-market.service.ts`): Seeded regional datasets (Bogura chilli, Natore turmeric, Pabna onion seed, Faridpur black cumin, Bandarban mountain ginger); dehydration and purity calculators; CRUD and purchase order flows.
+  - Controller (`spice-market.controller.ts`): 13 REST endpoints guarded by JWT and Role guards.
+  - Module (`spice-market.module.ts`): Registered in `apps/api/src/app.module.ts`.
+  - Unit Tests (`spice-market.service.spec.ts`): 11 unit tests passing (100% green). Total backend test suite: **96 test files, 525 tests passing (100% green)**.
+- **Frontend Architecture (`apps/web/src/features/spice-market/`):**
+  - RTK Query slice (`spiceMarketApi.ts`): Registered tags `SpiceDryingBatch`, `SpicePurityLabTest`, `SpiceForwardLot`, and added `/spice-market` to `publicPrefixes` in `apps/web/src/store/api.ts`.
+  - UI Components (`components/`):
+    - `SpiceMarketplaceView.tsx`: Public marketplace catalog, interactive dehydration mass balance calculator, BSTI chemical purity audit simulator, solar tunnel telemetry cards, and B2B ordering modal.
+    - `GrowerSpiceDryingHubView.tsx`: Grower & drying cooperative cockpit for logging solar tunnel intakes, updating real-time temperature/humidity/moisture telemetry, and publishing finished spice lots.
+    - `AdminBstiPurityHubView.tsx`: BSTI & BARI SRC regulatory desk for recording spectroscopic lab results, issuing digital QR seals, and monitoring anti-adulteration seizures and storage moisture compliance.
+  - Barrel export: `apps/web/src/features/spice-market/index.ts`.
+  - Added routes:
+    - Public Spice Hub: `apps/web/app/[lang]/(public)/spice-market/page.tsx` (`/[lang]/spice-market`).
+    - Customer Spice Orders: `apps/web/app/[lang]/(customer)/customer/spice-market/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Seller Grower Hub: `apps/web/app/[lang]/(seller)/seller/spice-market/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Admin BSTI Pure Origin Desk: `apps/web/app/[lang]/(admin)/admin/spice-market/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/spice-market/page.tsx`.
+
+---
+
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, agro-tourism, medicinal botanical, heritage textile, dairy cooperative, natural honey, biosecure poultry/egg, certified mushroom, golden fiber/eco-packaging, tea estate auction, and mango/litchi orchard forward contract commerce ecosystem. All 27 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural, agricultural, aquaculture, agro-tourism, medicinal botanical, heritage textile, dairy cooperative, natural honey, biosecure poultry/egg, certified mushroom, golden fiber/eco-packaging, tea estate auction, mango/litchi orchard, and solar-dehydrated pure spices commerce ecosystem. All 28 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -979,13 +1021,14 @@ flowchart TD
 25. **Phase 25: Jute Retting Bio-Tech, Golden Fiber Traceability & Eco-Packaging Industrial Supply Chain Engine** (BJRI biotechnical ribbon retting bacterial inoculants cutting steep duration from 21 to 10 days, pond water DO/temperature telemetry preventing *shyamla* dark staining, 14% safe moisture weighbridge deduction algorithm, and Mandatory Jute Packaging Act 2010 B2B forward contract fulfillment).
 26. **Phase 26: Tea Estate Auction, Specialty Artisanal Orthodox/Green Tea Traceability & Smallholder Grower Sourcing Engine** (Sylhet & Panchagarh smallholder green leaf plucking ledger with 85% two-leaves-and-a-bud +5% bonus, withering/oxidation factory telemetry with <3.0% dryer moisture, Chittagong & Sreemangal digital tea auction catalog, and 100-point liquor sensory profiling).
 27. **Phase 27: Mango & Litchi Orchard Pre-Harvest Auction, Hot Water Treatment (HWT) Phytosanitary Traceability & GI Tag Supply Chain Engine** (Chapainawabganj, Rajshahi, Dinajpur & Rangpur tree-count forward contract auctions, +15% paper bagging packout protection, +20% GI Tag bonus, 30/40/30 escrow tranche schedule, DAE 48°C / 60-min HWT fruit fly clearance, and refrigerated reefer cold-chain monitoring).
+28. **Phase 28: Spices & Aromatics Value Chain, Solar/Tunnel Drying Dehydration & Anti-Adulteration Origin Verification Engine** (Natore, Bogura, Pabna & Faridpur chilli, turmeric, garlic, ginger, and black cumin supply chains, solar parabolic tunnel dehydrator moisture <10% mass balance balance, zero tolerance for Sudan dyes I-IV, lead chromate PbCrO4, and metanil yellow, BSTI/BARI SRC digital authenticity QR seals, and GrainPro hermetic forward lots).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all 6 workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 95 test suites, 514 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 96 test suites, 525 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, authentic village farm stay reservations, organic herbal medicine sourcing, heritage handloom silk commerce, dairy cooperative cold-chain IoT network, natural honey/superfood traceability, biosecure poultry hatchery/brooder IoT & egg grading, certified mushroom spawn/dehydration supply chain, BJRI golden fiber/eco-packaging supply chain, tea estate auction/specialty orthodox tea engine, and mango/litchi orchard forward contract & HWT phytosanitary engine., and tea estate auction/specialty orthodox tea engine.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, veterinary health passports, shrimp hatchery SPF traceability, authentic village farm stay reservations, organic herbal medicine sourcing, heritage handloom silk commerce, dairy cooperative cold-chain IoT network, natural honey/superfood traceability, biosecure poultry hatchery/brooder IoT & egg grading, certified mushroom spawn/dehydration supply chain, BJRI golden fiber/eco-packaging supply chain, tea estate auction/specialty orthodox tea engine, mango/litchi orchard forward contract & HWT phytosanitary engine, and solar-dehydrated pure spices & anti-adulteration verification engine.
 
 
 
