@@ -91,6 +91,7 @@ import { PoultryHatcheryModule } from './poultry-hatchery/poultry-hatchery.modul
 import { MushroomFarmingModule } from './mushroom-farming/mushroom-farming.module.js';
 import { JuteBiotechModule } from './jute-biotech/jute-biotech.module.js';
 import { TeaEstateModule } from './tea-estate/tea-estate.module.js';
+import { OrchardAuctionModule } from './orchard-auction/orchard-auction.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -266,6 +267,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     MushroomFarmingModule,
     JuteBiotechModule,
     TeaEstateModule,
+    OrchardAuctionModule,
   ],
 
   controllers: [AppController],

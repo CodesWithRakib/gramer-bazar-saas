@@ -259,6 +259,16 @@ export const adminRoutes: DashboardRoute[] = [
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/tea-estate'],
   },
+  {
+    title: 'Orchard Pre-Harvest & HWT',
+    titleBn: 'আম ও লিচু বাগান নিলাম ও HWT',
+    href: '/admin/orchard-auction',
+    icon: Trees,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/orchard-auction'],
+  },
 
   // Section: Management & Commerce
   {
@@ -502,6 +512,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/tea-estate'],
+  },
+  {
+    title: 'Orchard Pre-Harvest & HWT',
+    titleBn: 'আম ও লিচু বাগান নিলাম ও HWT',
+    href: '/super-admin/orchard-auction',
+    icon: Trees,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/orchard-auction'],
   },
 
   // Section: Platform Governance
@@ -820,6 +839,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/tea-estate'],
+  },
+  {
+    title: 'Orchard Blocks & Tree Bids',
+    titleBn: 'বাগান গাছ নিলাম ও হার্ভেস্ট হাব',
+    href: '/seller/orchard-auction',
+    icon: Trees,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/orchard-auction'],
   },
   {
     title: 'Reviews',
@@ -1210,6 +1238,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/tea-estate'],
+  },
+  {
+    title: 'Mango & Litchi Tree Auctions',
+    titleBn: 'আম ও লিচু বাগান অগ্রিম নিলাম',
+    href: '/customer/orchard-auction',
+    icon: Trees,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/orchard-auction'],
   },
   {
     title: 'Messages',
