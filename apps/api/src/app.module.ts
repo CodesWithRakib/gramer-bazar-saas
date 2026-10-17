@@ -81,6 +81,7 @@ import { CropInsuranceModule } from './crop-insurance/crop-insurance.module.js';
 import { ContractFarmingModule } from './contract-farming/contract-farming.module.js';
 import { AgriPrecisionModule } from './agri-precision/agri-precision.module.js';
 import { LivestockModule } from './livestock/livestock.module.js';
+import { AquacultureModule } from './aquaculture/aquaculture.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -246,6 +247,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ContractFarmingModule,
     AgriPrecisionModule,
     LivestockModule,
+    AquacultureModule,
   ],
 
   controllers: [AppController],

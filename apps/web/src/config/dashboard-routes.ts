@@ -31,6 +31,7 @@ import {
   Handshake,
   Plane,
   Beef,
+  Fish,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -148,6 +149,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/livestock'],
+  },
+  {
+    title: 'Aquaculture & Fisheries',
+    titleBn: 'মৎস্য ও চিংড়ি হ্যাচারি হাব',
+    href: '/admin/aquaculture',
+    icon: Fish,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/aquaculture'],
   },
 
   // Section: Management & Commerce
@@ -302,6 +313,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/livestock'],
+  },
+  {
+    title: 'Aquaculture & Fisheries',
+    titleBn: 'মৎস্য ও চিংড়ি হ্যাচারি হাব',
+    href: '/super-admin/aquaculture',
+    icon: Fish,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/aquaculture'],
   },
 
   // Section: Platform Governance
@@ -530,6 +550,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/livestock'],
+  },
+  {
+    title: 'Aquaculture & Hatchery',
+    titleBn: 'মৎস্য খামার ও হ্যাচারি',
+    href: '/seller/aquaculture',
+    icon: Fish,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/aquaculture'],
   },
   {
     title: 'Reviews',
@@ -830,6 +859,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/livestock'],
+  },
+  {
+    title: 'Aquaculture & Live Fish',
+    titleBn: 'মৎস্য ও লাইভ ট্যাঙ্কার চালান',
+    href: '/customer/aquaculture',
+    icon: Fish,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/aquaculture'],
   },
   {
     title: 'Messages',

@@ -62,6 +62,7 @@ const isPublicPath = (pathname: string): boolean => {
     '/contract-farming',
     '/agri-precision',
     '/livestock',
+    '/aquaculture',
   ];
 
   return publicPrefixes.some((prefix) =>
@@ -264,6 +265,10 @@ export const api = createApi({
     'LivestockPassport',
     'AIBooking',
     'LivestockTransport',
+    'HatcheryBatch',
+    'PondTelemetry',
+    'FeedFcr',
+    'LiveFishTransport',
   ],
   endpoints: () => ({}),
 });
