@@ -93,6 +93,7 @@ import { JuteBiotechModule } from './jute-biotech/jute-biotech.module.js';
 import { TeaEstateModule } from './tea-estate/tea-estate.module.js';
 import { OrchardAuctionModule } from './orchard-auction/orchard-auction.module.js';
 import { SpiceMarketModule } from './spice-market/spice-market.module.js';
+import { EdibleOilModule } from './edible-oil/edible-oil.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -270,6 +271,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     TeaEstateModule,
     OrchardAuctionModule,
     SpiceMarketModule,
+    EdibleOilModule,
   ],
 
   controllers: [AppController],

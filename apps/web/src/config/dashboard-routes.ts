@@ -42,6 +42,7 @@ import {
   ScrollText,
   Coffee,
   Flame,
+  Droplets,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -279,6 +280,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/spice-market'],
+  },
+  {
+    title: 'Edible Oil & Ghani Traceability',
+    titleBn: 'কাঠের ঘানি ভোজ্যতেল ও অ্যাসিড মান',
+    href: '/admin/edible-oil',
+    icon: Droplets,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/edible-oil'],
   },
 
   // Section: Management & Commerce
@@ -541,6 +552,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/spice-market'],
+  },
+  {
+    title: 'Edible Oil & Ghani Traceability',
+    titleBn: 'কাঠের ঘানি ভোজ্যতেল ও অ্যাসিড মান',
+    href: '/super-admin/edible-oil',
+    icon: Droplets,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/edible-oil'],
   },
 
   // Section: Platform Governance
@@ -877,6 +897,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/spice-market'],
+  },
+  {
+    title: 'Wood-Ghani Oil Milling',
+    titleBn: 'কাঠের ঘানি তেল উৎপাদন হাব',
+    href: '/seller/edible-oil',
+    icon: Droplets,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/edible-oil'],
   },
   {
     title: 'Reviews',
@@ -1285,6 +1314,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/spice-market'],
+  },
+  {
+    title: 'Cold-Pressed Ghani Oil',
+    titleBn: 'খাঁটি ঘানি ভাঙা সরিষা ও তিল তেল',
+    href: '/customer/edible-oil',
+    icon: Droplets,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/edible-oil'],
   },
   {
     title: 'Messages',
