@@ -30,6 +30,7 @@ import {
   ShieldAlert,
   Handshake,
   Plane,
+  Beef,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -137,6 +138,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/agri-precision'],
+  },
+  {
+    title: 'Livestock & Cattle Hat',
+    titleBn: 'পশুর হাট ও ডিএলএস স্বাস্থ্য',
+    href: '/admin/livestock',
+    icon: Beef,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/livestock'],
   },
 
   // Section: Management & Commerce
@@ -282,6 +293,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/agri-precision'],
+  },
+  {
+    title: 'Livestock & Cattle Hat',
+    titleBn: 'পশুর হাট ও ডিএলএস স্বাস্থ্য',
+    href: '/super-admin/livestock',
+    icon: Beef,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/livestock'],
   },
 
   // Section: Platform Governance
@@ -501,6 +521,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/drones'],
+  },
+  {
+    title: 'Livestock & Cattle Hat',
+    titleBn: 'গবাদি পশু ও ডিজিটাল হাট',
+    href: '/seller/livestock',
+    icon: Beef,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/livestock'],
   },
   {
     title: 'Reviews',
@@ -792,6 +821,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/agri-precision'],
+  },
+  {
+    title: 'Livestock & AI Services',
+    titleBn: 'পশু ক্রয়, পরিবহন ও প্রজনন',
+    href: '/customer/livestock',
+    icon: Beef,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/livestock'],
   },
   {
     title: 'Messages',

@@ -509,11 +509,36 @@ flowchart TD
     - Admin Security Hub: `apps/web/app/[lang]/(admin)/admin/agri-precision/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
     - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/agri-precision/page.tsx`.
 
+### Phase 16: Livestock & Cattle Marketplace, Digital Veterinary Health Passports & Artificial Insemination (AI) Pedigree Registry Engine (ডিজিটাল পশুর হাট, গবাদি পশু স্বাস্থ্য পাসপোর্ট ও কৃত্রিম প্রজনন জাত উন্নয়ন ব্যবস্থা) (COMPLETED ✅)
+- **Task 16.1: Livestock Catalog, DLS Health Passport Registry & AI Insemination Engine (COMPLETED)**
+  - Implemented `LivestockListing`, `LivestockHealthPassport`, `ArtificialInseminationBooking`, and `LivestockTransportBooking` entities in `apps/api/src/livestock/`.
+  - Built Dressing Percentage and Meat Yield Estimation algorithm: computes net carcass weight (50-56%) and boneless meat estimation (~72% of carcass) based on live weight across cattle, goats, sheep, and buffaloes.
+  - Built Islamic Shariah Qurbani compliance validator: verifies teeth count (>= 2 permanent incisors), minimum age (24 months for cattle/buffalo, 12 months for goats/sheep), and DLS certified health status without defect.
+  - Implemented the AM/PM rule for artificial insemination: computes optimal 12-18 hour post-heat window to maximize conception rates (>75%).
+  - Built secure escrow holding and release engine for live cattle trades, eliminating extortionate physical hat toll fraud (হাসিল).
+  - Added unit test suite `livestock.service.spec.ts` (7/7 tests passing). Total backend test suite now at **84 test files, 418 tests passing**.
+  - Exposed 21 REST endpoints in `LivestockController`: overview stats, listings query with filters, live weight meat yield calculator, AM/PM AI window calculator, public DLS health passports, escrow buy/release/refund, and specialized transport bookings.
+- **Task 16.2: Public Digital Cattle Hat, DLS Passport Dialog, Farmer Herd Management & Regulatory Hub (COMPLETED)**
+  - Implemented RTK Query slice `livestockApi.ts` and registered `'LivestockListing'`, `'LivestockPassport'`, `'AIBooking'`, and `'LivestockTransport'` tags in `store/api.ts`.
+  - Built `LivestockMarketplaceView.tsx` with dynamic category filters (Dairy, Beef, Qurbani, Goats, Calves), live weight slider, teeth count badge, meat yield calculator modal, escrow commitment modal, and transport dispatcher.
+  - Built `LivestockPassportModal.tsx` displaying official Department of Livestock Services (DLS) QR ear-tag verification, veterinary surgeon credentials, body temperature, deworming dates, and official vaccination ledger (FMD, Anthrax, LSD, BQ, PPR).
+  - Built `FarmerLivestockManagementView.tsx` for seller cattle herd tracking, listing creation, and doorstep AI technician dispatch.
+  - Built `AIBreedingServiceView.tsx` for farmers and breeders with high-pedigree semen straws (HF 100%, Sahiwal 75%, RCC) and heat observation scheduling.
+  - Built `AdminLivestockRegulatoryHubView.tsx` for DLS veterinary officers and platform admins to certify livestock, record vaccinations, monitor bio-secure transport trucks, and arbitrate escrow releases.
+  - Added routes:
+    - Public Digital Hat: `apps/web/app/[lang]/(public)/livestock/page.tsx` (`/[lang]/livestock`).
+    - Animal Details & Passport: `apps/web/app/[lang]/(public)/livestock/[earTag]/page.tsx` (`/[lang]/livestock/[earTag]`).
+    - AI Breeding Portal: `apps/web/app/[lang]/(public)/livestock/ai-breeding/page.tsx` (`/[lang]/livestock/ai-breeding`).
+    - Farmer Herd Management: `apps/web/app/[lang]/(seller)/seller/livestock/page.tsx` (linked in `dashboard-routes.ts` under Seller "Business").
+    - Customer Livestock & AI: `apps/web/app/[lang]/(customer)/customer/livestock/page.tsx` (linked in `dashboard-routes.ts` under Customer "Activity").
+    - Admin Regulatory Hub: `apps/web/app/[lang]/(admin)/admin/livestock/page.tsx` (linked in `dashboard-routes.ts` under "Operations").
+    - Super Admin Hub: `apps/web/app/[lang]/(admin)/super-admin/livestock/page.tsx`.
+
 ---
 
 ## 8. Conclusion & Production Readiness Verification
 
-**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 15 phases of the master roadmap have been fully designed, implemented, tested, and verified:
+**Gramer Bazar** is now a fully realized, nationwide-ready rural and agricultural commerce ecosystem. All 16 phases of the master roadmap have been fully designed, implemented, tested, and verified:
 
 1. **Phase 1: Production Hardening & Essential Gateways** (Bangladeshi SMS Gateway with Greenweb/BulkSMSBD/Mock providers, Supabase Cloud Storage with binary magic-byte validation, secure `httpOnly` session cookies).
 2. **Phase 2: Logistics & Direct Payment Upgrade** (Steadfast & Pathao 3PL automated courier booking and live tracking dialogs, official bKash Direct Tokenized payment checkout, rider delivery earnings ledger).
@@ -530,13 +555,14 @@ flowchart TD
 13. **Phase 13: Parametric Weather Crop Insurance, Flood/Cyclone Relief & Satellite Damage Assessment Engine** (Actuarial weather trigger breach thresholds, 50% government subsidy calculation, and automated batch claim disbursements).
 14. **Phase 14: Agricultural Contract Farming, Forward Purchase Agreements & Pre-Harvest Escrow Collateral Engine** (Corporate buyer buyback floor pricing, 25% upfront input cash disbursement, milestone growth inspections, and weighbridge harvest intake settlement).
 15. **Phase 15: Agri-Inputs Anti-Adulteration Verification, Precision Drone Crop Spraying Booking & Digital Soil Nutrient Advisory Engine** (Chemical registry with DAE authentication, anti-counterfeit complaints with mobile court referral, DJI Agras precision spraying fleet booking, and SRDI soil health nutrient prescription calculator).
+16. **Phase 16: Livestock & Cattle Marketplace, Digital Veterinary Health Passports & Artificial Insemination (AI) Pedigree Registry Engine** (Middleman & toll-free digital cattle hat, DLS QR ear-tag health passports, AM/PM artificial insemination timing calculator, bio-secure cattle transport, and escrow-backed animal trade).
 
 ### Monorepo Health Metrics:
 - **TypeScript Typecheck:** 0 errors across all 6 workspace packages (`pnpm -r run typecheck`).
-- **Backend Test Suite:** 83 test suites, 411 unit & integration tests passing (100% green).
+- **Backend Test Suite:** 84 test suites, 418 unit & integration tests passing (100% green).
 - **Frontend Production Build:** Next.js Turbopack production build succeeds with all dynamic and static routes optimized (`pnpm -C apps/web run build`).
 - **Zero Mock / Placeholder Policy:** 100% of user routes and operations run against live dynamic API endpoints and database tables.
-- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, and digital soil health cards.
+- **Rural Readiness:** Native Bengali language support, 1-click passwordless orders, voice input, offline thermal receipt printing, wholesale price guidance, algorithmic credit access, waterway-aware logistics, crop quality traceability, village agent POS terminals, community group buying pooling, machinery rental, parametric weather crop insurance, forward contract farming, anti-counterfeit fertilizer validation, drone crop spraying, digital soil health cards, digital cattle hats, and veterinary health passports.
 
 
 
