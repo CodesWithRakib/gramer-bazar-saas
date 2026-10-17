@@ -66,6 +66,7 @@ const isPublicPath = (pathname: string): boolean => {
     '/agro-tourism',
     '/herbal-supply',
     '/sericulture-handloom',
+    '/dairy-supply',
   ];
 
   return publicPrefixes.some((prefix) =>
@@ -281,6 +282,9 @@ export const api = createApi({
     'ArtisanProduct',
     'CocoonBatch',
     'CustomOrder',
+    'MilkCollection',
+    'ChillingVat',
+    'FeedPool',
   ],
   endpoints: () => ({}),
 });

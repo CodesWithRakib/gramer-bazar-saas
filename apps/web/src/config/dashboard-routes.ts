@@ -35,6 +35,7 @@ import {
   Trees,
   Flower2,
   Scissors,
+  Milk,
 } from 'lucide-react';
 import { ElementType } from 'react';
 
@@ -192,6 +193,16 @@ export const adminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/admin/sericulture-handloom'],
+  },
+  {
+    title: 'Dairy Co-op & Chilling IoT',
+    titleBn: 'দুগ্ধ সমবায় ও চিলিং আইওটি',
+    href: '/admin/dairy-supply',
+    icon: Milk,
+    permissions: ['orders.read'],
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/admin/dairy-supply'],
   },
 
   // Section: Management & Commerce
@@ -382,6 +393,15 @@ export const superAdminRoutes: DashboardRoute[] = [
     section: 'Operations',
     sectionBn: 'অপারেশনস',
     matchPrefixes: ['/super-admin/sericulture-handloom'],
+  },
+  {
+    title: 'Dairy Co-op & Chilling IoT',
+    titleBn: 'দুগ্ধ সমবায় ও চিলিং আইওটি',
+    href: '/super-admin/dairy-supply',
+    icon: Milk,
+    section: 'Operations',
+    sectionBn: 'অপারেশনস',
+    matchPrefixes: ['/super-admin/dairy-supply'],
   },
 
   // Section: Platform Governance
@@ -646,6 +666,15 @@ export const sellerRoutes: DashboardRoute[] = [
     section: 'Business',
     sectionBn: 'ব্যবসা ও আয়',
     matchPrefixes: ['/seller/sericulture-handloom'],
+  },
+  {
+    title: 'Dairy Intake & Feed Pools',
+    titleBn: 'দুধ সংগ্রহ ডেস্ক ও ফিড পুল',
+    href: '/seller/dairy-supply',
+    icon: Milk,
+    section: 'Business',
+    sectionBn: 'ব্যবসা ও আয়',
+    matchPrefixes: ['/seller/dairy-supply'],
   },
   {
     title: 'Reviews',
@@ -982,6 +1011,15 @@ export const customerRoutes: DashboardRoute[] = [
     section: 'Activity',
     sectionBn: 'কার্যক্রম',
     matchPrefixes: ['/customer/sericulture-handloom'],
+  },
+  {
+    title: 'Dairy Passbook & MFS Payout',
+    titleBn: 'দুগ্ধ সরবরাহ খতিয়ান ও পে-আউট',
+    href: '/customer/dairy-supply',
+    icon: Milk,
+    section: 'Activity',
+    sectionBn: 'কার্যক্রম',
+    matchPrefixes: ['/customer/dairy-supply'],
   },
   {
     title: 'Messages',
